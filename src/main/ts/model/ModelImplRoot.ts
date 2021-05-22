@@ -34,7 +34,7 @@ export class ModelImplRoot implements IModelSeir {
 
     static async setupInstance(demographics: Demographics, modifications: Modifications): Promise<ModelStateIntegrator> {
 
-        const minInstant = ModelConstants.MODEL_MIN_______________DATE;
+        const minInstant = ModelConstants.MODEL_MIN____________INSTANT;
         const maxInstant = minInstant + TimeUtil.MILLISECONDS_PER_DAY * ModelConstants.PRELOAD_________________DAYS;
 
         const ageGroupMultipliers: number[] = [];
@@ -43,7 +43,7 @@ export class ModelImplRoot implements IModelSeir {
         });
         let overallMultiplier = 1;
 
-        const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN_______________DATE, 'STRAIN');
+        const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
         let initialIncidence = 0;
         modificationsStrain.forEach(modificationStrain => {
             initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;
@@ -119,7 +119,7 @@ export class ModelImplRoot implements IModelSeir {
 
         this.absTotal = demographics.getAbsTotal();
 
-        const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN_______________DATE, 'STRAIN');
+        const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
         let initialIncidence = 0;
         modificationsStrain.forEach(modificationStrain => {
             initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;

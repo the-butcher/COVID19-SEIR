@@ -16,7 +16,7 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             id: ObjectUtil.createId(),
             key: 'SETTINGS',
             name: 'settings',
-            instant: ModelConstants.MODEL_MIN_______________DATE,
+            instant: ModelConstants.MODEL_MIN____________INSTANT,
             recoveredD: 0.12,
             recoveredU: 0.12,
             vaccinated: 0.22,
@@ -26,12 +26,12 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             id: ObjectUtil.createId(),
             key: 'TIME',
             name: 'effective settings',
-            instant: ModelConstants.MODEL_MIN_______________DATE
+            instant: ModelConstants.MODEL_MIN____________INSTANT
         },
         {
             id: ObjectUtil.createId(),
             key: 'STRAIN',
-            instant: ModelConstants.MODEL_MIN_______________DATE,
+            instant: ModelConstants.MODEL_MIN____________INSTANT,
             name: 'b.1.1.7',
             r0: 4.4,
             serialInterval: 4.8,
@@ -42,7 +42,7 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             id: ObjectUtil.createId(),
             key: 'CONTACT',
             name: 'initial NPIs',
-            instant: ModelConstants.MODEL_MIN_______________DATE,
+            instant: ModelConstants.MODEL_MIN____________INSTANT,
             multipliers: {
                 'family': 0.65,
                 'school': 0.25,
@@ -55,7 +55,7 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_______________DATE,
+            instant: ModelConstants.MODEL_MIN____________INSTANT,
             multipliers: {
                 'family': 0.40,
                 'school': 0.60,
@@ -68,7 +68,7 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             id: ObjectUtil.createId(),
             key: 'VACCINATION',
             name: 'initial vaccinations',
-            instant: ModelConstants.MODEL_MIN_______________DATE,
+            instant: ModelConstants.MODEL_MIN____________INSTANT,
             doses: 100000
         },
         {
@@ -85,15 +85,6 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
 
     // initialize model mode
     ModelMode.getInstance();
-
-    // initialize required controls
-    // ControlsTime.getInstance();
-    // ControlsStrain.getInstance();
-    // ControlsContact.getInstance();
-    // ControlsTesting.getInstance();
-    // ControlsVaccination.getInstance();
-    // ControlsSeasonality.getInstance();
-    // ControlsSettings.getInstance();
 
     setTimeout(() => {
         ModelMode.getInstance().toggleMode('STRAIN');
@@ -118,9 +109,10 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
  * -- let the heatmap show i.e. vaccination percentages (and maybe other values)
  * -- when there is no initial strain, the model does not initialize
  * -- build model after create or delete of modification needs to be re - implemented
- * -- implement configurable seasonality
+ * OK implement configurable seasonality
  *    OK types and slider
- *    -- visualize
+ *    OK visualize
+ *    -- integrate into model
  *
  * -- complete the vaccination model
  *    -- plausibility
@@ -140,68 +132,3 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
  * OK graphic indication of selected age group in heatmap
  *
  */
-
-
-// import { TimeUtil } from './model2/util/TimeUtil';
-// import { ModelConstants } from './model2/ModelConstants';
-// import { IconModification } from './model2/gui/IconModification';
-// import { Slider } from './model2/gui/Slider';
-
-
-// new Slider({
-//     container: 'dateSliderContainer',
-//     min: new Date('2021-05-01').getTime(),
-//     max: new Date('2021-08-31').getTime(),
-//     step: TimeUtil.MILLISECONDS_PER_DAY,
-//     values: [
-//         new Date('2021-05-13').getTime(),
-//         new Date('2021-07-19').getTime()
-//     ],
-//     ticks: [
-//         new Date('2021-05-01').getTime(),
-//         new Date('2021-06-01').getTime(),
-//         new Date('2021-08-31').getTime()
-//     ],
-//     thumbCreateFunction: (index) => {
-//         return new IconModification('x', 'CONTACT', 'delete');
-//     },
-//     labelFormatFunction: (value, type, index) => {
-//         return `${new Date(value).toLocaleDateString()}`;
-//     }
-// });
-
-// new Slider({
-//     container: 'percentageSliderContainer',
-//     min: 0,
-//     max: 1,
-//     step: 0.001,
-//     values: [
-//         0.2,
-//         0.7
-//     ],
-//     ticks: [
-//         0.00,
-//         0.25,
-//         0.50,
-//         0.75,
-//         1.00,
-//     ],
-//     thumbCreateFunction: (index) => {
-//         return new IconModification('x', 'CONTACT', 'delete');
-//     },
-//     labelFormatFunction: (value, type, index) => {
-//         if (type === 'tick') {
-//             return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}%`;
-//         } else {
-//             return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1)}%`;
-//         }
-//     },
-//     input: {
-//         inputFormatFunction: (value, index) => {
-//             return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1)}`;
-//         },
-//         inputHandleFunction: (value, index) => {
-//             return parseFloat(value) / 100;
-//         }
-//     }
-// });

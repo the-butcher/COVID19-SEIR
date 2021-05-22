@@ -1,6 +1,6 @@
 import { Demographics } from '../../common/demographics/Demographics';
 import { Modifications } from '../../common/modification/Modifications';
-import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { ModelConstants, MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { ModelLoader } from './../ModelLoader';
@@ -32,8 +32,8 @@ export class SliderModification extends Slider {
 
         super({
             container: 'sliderDivTime',
-            min: new Date('2021-05-01').getTime(),
-            max: new Date('2021-09-01').getTime(),
+            min: ModelConstants.MODEL_MIN____________INSTANT,
+            max: ModelConstants.MODEL_MAX____________INSTANT,
             step: TimeUtil.MILLISECONDS_PER_DAY,
             values: [],
             ticks: [
@@ -77,9 +77,7 @@ export class SliderModification extends Slider {
         const modificationIcon = this.modificationIcons.find(m => m.getId() === id);
         modificationIcon.getBulletGroupElement().style.transform = 'rotate(45deg) scale(0.95)';
 
-        if (ControlsConstants.MODIFICATION_PARAMS[modificationIcon.getKey()].updateChartOnChange) { // if that Modification allows updates, the model needs to be rebuilt
-            ModelLoader.commit(Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
-        }
+        this.updateChart(modificationIcon.getKey());
 
         setTimeout(() => {
             modificationIcon.getBulletGroupElement().style.transform = 'rotate(0deg) scale(0.75)';
@@ -90,6 +88,12 @@ export class SliderModification extends Slider {
             // }
         }, 300);
 
+    }
+
+    updateChart(key: MODIFICATION____KEY): void {
+        if (ControlsConstants.MODIFICATION_PARAMS[key].updateChartOnChange) { // if that Modification allows updates, the model needs to be rebuilt
+            ModelLoader.commit(Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
+        }
     }
 
     updateModificationInstant(index: number, value: number): void {
@@ -108,8 +112,14 @@ export class SliderModification extends Slider {
         }
     }
 
+    /**
+     * gets all active modification of the given type and shows them on the time slider
+     *
+     * @param key
+     */
     showModifications(key: MODIFICATION____KEY): void {
 
+        // set this instance's updateModificationChart (small top area of the chart) function to that of the modification type specified by key
         this.updateModificationChart = ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart;
 
         const typedModifications = Modifications.getInstance().findModificationsByType(key);
@@ -138,6 +148,7 @@ export class SliderModification extends Slider {
                 this.selectableModificationId = modification.getId(); // store is so the modification gets selected right away
                 Modifications.getInstance().addModification(modification);
                 this.showModifications(modification.getKey());
+                this.updateChart(key);
             });
 
         }
@@ -196,6 +207,7 @@ export class SliderModification extends Slider {
                 modificationIcon.getHandleGroupElement().addEventListener('click', () => {
                     Modifications.getInstance().deleteModification(modificationIcon.getId());
                     this.showModifications(typedModifications[index].getKey());
+                    this.updateChart(key);
                 });
             }
 

@@ -28,8 +28,8 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
     const modelStateIntegrator = await ModelImplRoot.setupInstance(demographics, modifications);
     Logger.getInstance().log('modelStateIntegrator', modelStateIntegrator);
 
-    const minInstant = ModelConstants.MODEL_MIN_______________DATE;
-    const maxInstant = ModelConstants.MODEL_MAX_______________DATE;
+    const minInstant = ModelConstants.MODEL_MIN____________INSTANT;
+    const maxInstant = ModelConstants.MODEL_MAX____________INSTANT;
     modelStateIntegrator.buildModelData(demographics, minInstant, maxInstant, modelProgress => {
         ctx.postMessage(modelProgress);
     });

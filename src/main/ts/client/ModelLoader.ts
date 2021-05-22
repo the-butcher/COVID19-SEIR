@@ -1,15 +1,23 @@
-import { IModelProgress } from './../model/state/ModelStateIntegrator';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
 import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IWorkerInput } from '../model/IWorkerInput';
-import { Logger } from './../util/Logger';
+import { IModelProgress } from './../model/state/ModelStateIntegrator';
 import { ChartAgeGroup } from './chart/ChartAgeGroup';
 import { SliderModification } from './gui/SliderModification';
 
+/**
+ * utility type that will pass rebuilding of the model to a web-worker
+ *
+ * @author h.fleischer
+ * @since 22.05.2021
+ */
 export class ModelLoader {
 
+    /**
+     * static worker instance, terminated each time the model is rebuilt
+     */
     private static worker: ModelWorker;
 
     static async commit(demographicsConfig: IDemographicsConfig, modificationValues: IModificationValues[]): Promise<void> {
@@ -21,6 +29,9 @@ export class ModelLoader {
         // Logger.getInstance().log('modelData A', modelData);
         // ChartAgeGroup.getInstance().acceptModelData(modelData);
 
+        /**
+         * build worker input
+         */
         const workerInput: IWorkerInput = {
             demographicsConfig,
             modificationValues
@@ -43,10 +54,13 @@ export class ModelLoader {
             if (modelProgress.ratio === 1 && modelProgress.data) {
                 ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
                 SliderModification.getInstance().setProgress(0);
+                ModelLoader.worker.terminate();
+                ModelLoader.worker = null;
             } else {
                 SliderModification.getInstance().setProgress(modelProgress.ratio);
             }
         };
+
 
     }
 

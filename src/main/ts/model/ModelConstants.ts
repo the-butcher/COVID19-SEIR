@@ -89,8 +89,8 @@ export class ModelConstants {
         }
     };
 
-    static readonly MODEL_MIN_______________DATE = new Date('2021-05-01').getTime();
-    static readonly MODEL_MAX_______________DATE = new Date('2021-09-01').getTime();
+    static readonly MODEL_MIN____________INSTANT = new Date('2021-05-01').getTime();
+    static readonly MODEL_MAX____________INSTANT = new Date('2021-09-01').getTime();
 
     static readonly PRELOAD_________________DAYS = 15;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;

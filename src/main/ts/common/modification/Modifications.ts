@@ -113,11 +113,11 @@ export class Modifications {
         if (ObjectUtil.isNotEmpty(applicableModification)) {
             return applicableModification;
         } else if (ObjectUtil.isNotEmpty(ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification)) {
-            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification(ModelConstants.MODEL_MIN_______________DATE);
+            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification(ModelConstants.MODEL_MIN____________INSTANT);
             if (typedModifications.length > 0) {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_______________DATE, typedModifications[0].getInstantA());
+                defaultModification.setInstants(ModelConstants.MODEL_MIN____________INSTANT, typedModifications[0].getInstantA());
             } else {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_______________DATE, ModelConstants.MODEL_MAX_______________DATE);
+                defaultModification.setInstants(ModelConstants.MODEL_MIN____________INSTANT, ModelConstants.MODEL_MAX____________INSTANT);
             }
             return defaultModification;
         } else {
@@ -146,7 +146,7 @@ export class Modifications {
                     typedModifications[i].setInstants(typedModifications[i].getInstantA(), typedModifications[i+1].getInstantA());
                 }
                 const lastModification = typedModifications[typedModifications.length - 1];
-                lastModification.setInstants(lastModification.getInstantA(), ModelConstants.MODEL_MAX_______________DATE);
+                lastModification.setInstants(lastModification.getInstantA(), ModelConstants.MODEL_MAX____________INSTANT);
             }
         });
     }
