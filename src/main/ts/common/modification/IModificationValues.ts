@@ -24,8 +24,15 @@ export interface IModificationValues {
     instant: number;
 
     /**
-     * get a name for this strain
+     * get a name for this instance
      */
     name: string;
+
+    /**
+     * is this instance deletable
+     */
+    deletable: boolean;
+
+    draggable: boolean;
 
 }

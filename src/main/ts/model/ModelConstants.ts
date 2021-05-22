@@ -1,3 +1,4 @@
+import { Demographics } from './../common/demographics/Demographics';
 import { IModification } from '../common/modification/IModification';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IModificationValuesContact } from '../common/modification/IModificationValuesContact';
@@ -20,7 +21,7 @@ export type MODIFICATION_NATURE = 'INSTANT' | 'RANGE';
 export type MODIFICATION____KEY = 'TIME' | 'STRAIN' | 'CONTACT' | 'TESTING' | 'VACCINATION' | 'SEASONALITY' | 'SETTINGS';
 
 export interface IModificationDefinitions {
-    deletable: boolean;
+    // deletable: boolean;
     createDefaultModification?: (instant: number) => IModification<IModificationValues>;
     createValuesModification: (modificationValues: IModificationValues) => IModification<IModificationValues>;
 }
@@ -29,11 +30,10 @@ export class ModelConstants {
 
     static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IModificationDefinitions} = {
         'TIME': {
-            deletable: false,
+            // deletable: false,
             createValuesModification: (modificationValues) => new ModificationTime(modificationValues as IModificationValuesTime),
         },
         'STRAIN': {
-            deletable: true,
             createValuesModification: (modificationValues) => new ModificationStrain(modificationValues as IModificationValuesStrain),
             createDefaultModification: (instant: number) => new ModificationStrain({
                 id: ObjectUtil.createId(),
@@ -43,48 +43,51 @@ export class ModelConstants {
                 r0: 3.3,
                 serialInterval: 4.8,
                 intervalScale: 1.0,
-                incidence: 1
+                incidence: 1,
+                deletable: true,
+                draggable: true
             }),
         },
         'CONTACT': {
-            deletable: true,
             createValuesModification: (modificationValues) => new ModificationContact(modificationValues as IModificationValuesContact),
             createDefaultModification: (instant: number) => new ModificationContact({
                 id: ObjectUtil.createId(),
                 key: 'CONTACT',
                 instant,
                 name: 'contact',
-                multipliers: {}
+                multipliers: {},
+                deletable: true,
+                draggable: true
             }),
         },
         'TESTING': {
-            deletable: true,
             createValuesModification: (modificationValues) => new ModificationTesting(modificationValues as IModificationValuesTesting),
             createDefaultModification: (instant: number) => new ModificationTesting({
                 id: ObjectUtil.createId(),
                 key: 'TESTING',
                 name: 'testing',
                 instant,
-                multipliers: {}
+                multipliers: {},
+                deletable: true,
+                draggable: true
             }),
         },
         'VACCINATION': {
-            deletable: true,
             createValuesModification: (modificationValues) => new ModificationVaccination(modificationValues as IModificationValuesVaccination),
             createDefaultModification: (instant: number) => new ModificationVaccination({
                 id: ObjectUtil.createId(),
                 key: 'VACCINATION',
                 name: 'vaccinations',
                 instant,
-                doses: 0
+                doses: 0,
+                deletable: true,
+                draggable: true
             }),
         },
         'SEASONALITY': {
-            deletable: false,
             createValuesModification: (modificationValues) => new ModificationSeasonality(modificationValues as IModificationValuesSeasonality),
         },
         'SETTINGS': {
-            deletable: false,
             createValuesModification: (modificationValues) => new ModificationSettings(modificationValues as IModificationValuesSettings),
         }
     };

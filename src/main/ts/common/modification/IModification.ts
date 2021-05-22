@@ -25,6 +25,8 @@ export interface IModification<P extends IModificationValues> {
 
     isDeletable(): boolean;
 
+    isDraggable(): boolean;
+
     acceptUpdate(update: Partial<P>): void;
 
     /**

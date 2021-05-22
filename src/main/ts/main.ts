@@ -1,3 +1,12 @@
+import { IModificationValuesVaccination } from './common/modification/IModificationValuesVaccination';
+import { IModificationValuesSeasonality } from './common/modification/IModificationValuesSeasonality';
+import { TimeUtil } from './util/TimeUtil';
+import { IModificationValuesTime } from './common/modification/IModificationValuesTime';
+import { IModificationValuesSettings } from './common/modification/IModificationValuesSettings';
+import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
+import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
+import { IModificationValuesContact } from './common/modification/IModificationValuesContact';
+import { IModificationValues } from './common/modification/IModificationValues';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { ModelMode } from './client/gui/ModelMode';
 import { Demographics } from './common/demographics/Demographics';
@@ -7,11 +16,13 @@ import { JsonLoader } from './util/JsonLoader';
 import { Logger } from './util/Logger';
 import { ObjectUtil } from './util/ObjectUtil';
 
+export type IAnyModificationValue = IModificationValuesTime | IModificationValuesContact | IModificationValuesStrain | IModificationValuesTesting | IModificationValuesSettings | IModificationValuesTesting | IModificationValuesSeasonality | IModificationValuesVaccination;
+
 new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).then(demographicsConfig => {
 
     Logger.setInstance(console.log);
 
-    const modificationValues: any[] = [
+    const modificationValues: IAnyModificationValue[] = [
         {
             id: ObjectUtil.createId(),
             key: 'SETTINGS',
@@ -20,13 +31,17 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             recoveredD: 0.12,
             recoveredU: 0.12,
             vaccinated: 0.22,
-            dead: 0.001
+            dead: 0.001,
+            deletable: false,
+            draggable: false
         },
         {
             id: ObjectUtil.createId(),
             key: 'TIME',
             name: 'effective settings',
-            instant: ModelConstants.MODEL_MIN____________INSTANT
+            instant: ModelConstants.MODEL_MIN____________INSTANT,
+            deletable: false,
+            draggable: true
         },
         {
             id: ObjectUtil.createId(),
@@ -36,7 +51,9 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             r0: 4.4,
             serialInterval: 4.8,
             intervalScale: 1.0,
-            incidence: 150
+            incidence: 150,
+            deletable: false,
+            draggable: false
         },
         {
             id: ObjectUtil.createId(),
@@ -48,8 +65,10 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
                 'school': 0.25,
                 'nursing': 0.30,
                 'work': 0.50,
-                'other': 0.20,
-            }
+                'other': 0.20
+            },
+            deletable: false,
+            draggable: false
         },
         {
             id: ObjectUtil.createId(),
@@ -62,21 +81,27 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
                 'nursing': 0.75,
                 'work': 0.10,
                 'other': 0.10
-            }
+            },
+            deletable: false,
+            draggable: false
         },
         {
             id: ObjectUtil.createId(),
             key: 'VACCINATION',
             name: 'initial vaccinations',
             instant: ModelConstants.MODEL_MIN____________INSTANT,
-            doses: 100000
+            doses: 100000,
+            deletable: false,
+            draggable: false
         },
         {
             id: ObjectUtil.createId(),
             key: 'SEASONALITY',
             name: 'seasonality',
             instant: new Date('2021-07-10').getTime(),
-            amount: 0.90
+            amount: 0.90,
+            deletable: false,
+            draggable: true
         }
     ]
 

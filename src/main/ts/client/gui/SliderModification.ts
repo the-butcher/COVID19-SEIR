@@ -57,7 +57,7 @@ export class SliderModification extends Slider {
                 }
             },
             thumbPickedFunction: (index) => {
-                this.selectModificationByIndex(index);
+                this.showInEditor(index);
             }
         });
 
@@ -77,21 +77,21 @@ export class SliderModification extends Slider {
         const modificationIcon = this.modificationIcons.find(m => m.getId() === id);
         modificationIcon.getBulletGroupElement().style.transform = 'rotate(45deg) scale(0.95)';
 
-        this.updateChart(modificationIcon.getKey());
+        this.updateChartIfApplicable(modificationIcon.getKey());
 
         setTimeout(() => {
             modificationIcon.getBulletGroupElement().style.transform = 'rotate(0deg) scale(0.75)';
-            // if (ModelConstants.MODIFICATION_PARAMS[modificationIcon.getKey()].updateChartOnChange) { // if that Modification allows updates, the model needs to be rebuilt
-            //     setTimeout(() => {
-            //         Demographics.showInChart();
-            //     }, 300);
-            // }
         }, 300);
 
     }
 
-    updateChart(key: MODIFICATION____KEY): void {
-        if (ControlsConstants.MODIFICATION_PARAMS[key].updateChartOnChange) { // if that Modification allows updates, the model needs to be rebuilt
+    showInEditor(index: number): void {
+        const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
+        ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
+    }
+
+    updateChartIfApplicable(key: MODIFICATION____KEY): void {
+        if (ControlsConstants.MODIFICATION_PARAMS[key].updateChartOnChange) { // if that modification type allows updates, the model needs to be rebuilt
             ModelLoader.commit(Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
         }
     }
@@ -134,7 +134,7 @@ export class SliderModification extends Slider {
 
             creatorIcon = new IconModification('*****', key, 'create');
             creatorIcon.setHandleOpacity(creatorIcon.getLastHandleOpacity());
-            const creatorThumb = this.createThumb(-1, -1, creatorIcon.getId(), {
+            const creatorThumb = this.createThumb(-1, -1, creatorIcon.getId(), true, {
                 thumbCreateFunction: (index: number) => creatorIcon,
                 labelFormatFunction: (index, value) => `${new Date(value).toLocaleDateString()}`
             });
@@ -148,7 +148,7 @@ export class SliderModification extends Slider {
                 this.selectableModificationId = modification.getId(); // store is so the modification gets selected right away
                 Modifications.getInstance().addModification(modification);
                 this.showModifications(modification.getKey());
-                this.updateChart(key);
+                this.updateChartIfApplicable(key);
             });
 
         }
@@ -157,7 +157,7 @@ export class SliderModification extends Slider {
 
             //  the modification icon will be picked by the thumbCreateFunction and does not have to be actively added to the slider
             const modificationIcon = new IconModification(typedModifications[index].getId(), typedModifications[index].getKey(), typedModifications[index].isDeletable() ? 'delete' : undefined);
-            const modificationThumb = this.createThumb(typedModifications[index].getInstantA(), index, modificationIcon.getId(), {
+            const modificationThumb = this.createThumb(typedModifications[index].getInstantA(), index, modificationIcon.getId(), typedModifications[index].isDraggable(), {
                 thumbCreateFunction: (index: number) => modificationIcon,
                 labelFormatFunction: (index, value, type) => {
                     return `${new Date(value).toLocaleDateString()}`;
@@ -207,7 +207,7 @@ export class SliderModification extends Slider {
                 modificationIcon.getHandleGroupElement().addEventListener('click', () => {
                     Modifications.getInstance().deleteModification(modificationIcon.getId());
                     this.showModifications(typedModifications[index].getKey());
-                    this.updateChart(key);
+                    this.updateChartIfApplicable(key);
                 });
             }
 
@@ -248,9 +248,6 @@ export class SliderModification extends Slider {
 
     }
 
-    selectModificationByIndex(index: number): void {
-        const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
-        ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
-    }
+
 
 }

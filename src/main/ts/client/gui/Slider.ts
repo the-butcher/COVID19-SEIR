@@ -52,7 +52,7 @@ export interface ISliderElementParams {
 }
 
 export interface ISliderThumbParams extends ISliderElementParams, ISliderFunctions {
-    // declaration merging
+    draggable: boolean;
 }
 
 
@@ -182,7 +182,7 @@ export class Slider {
 
         // construct initial set of thumbs
         for (let index = 0; index < params.values.length; index++) {
-            const sliderThumb = this.createThumb(params.values[index], index, ObjectUtil.createId(), thumbParams);
+            const sliderThumb = this.createThumb(params.values[index], index, ObjectUtil.createId(), true, thumbParams);
             this.addThumb(sliderThumb);
         }
 
@@ -218,7 +218,8 @@ export class Slider {
         let keyupTimeout = -1;
         let keyupRequire = false;
         window.addEventListener('keydown', e => {
-            if (this.focusableThumbIndex >= 0) {
+            if (this.focusableThumbIndex >= 0 && this.sliderThumbs[this.focusableThumbIndex].isDraggable()) {
+
                 window.clearTimeout(keyupTimeout);
                 let value = this.getValue(this.focusableThumbIndex);
                 if (e.key === 'ArrowLeft') {
@@ -235,7 +236,7 @@ export class Slider {
             }
         });
         window.addEventListener('keyup', e => {
-            if (this.focusableThumbIndex >= 0 && keyupRequire) {
+            if (this.focusableThumbIndex >= 0 && keyupRequire && this.sliderThumbs[this.focusableThumbIndex].isDraggable()) {
                 keyupRequire = false;
                 keyupTimeout = setTimeout(() => {
                     this.valueChangeFunction(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'stop');
@@ -295,7 +296,7 @@ export class Slider {
      * @param index
      * @param params
      */
-    createThumb(value: number, index: number, id: string, params: ISliderFunctions): SliderThumb {
+    createThumb(value: number, index: number, id: string, draggable: boolean, params: ISliderFunctions): SliderThumb {
 
         const sliderThumb = new SliderThumb(id, {
             type: 'value',
@@ -305,12 +306,16 @@ export class Slider {
             labelFormatFunction: params.labelFormatFunction,
             inputFunctions: params.inputFunctions,
             containerClass: Slider.CLASS_THUMB__CONTAINER,
-            labelContainerClass: Slider.CLASS_THUMB______LABEL
+            labelContainerClass: Slider.CLASS_THUMB______LABEL,
+            draggable
         });
-        sliderThumb.getContainer().addEventListener('pointerdown', e => {
-            sliderThumb.getContainer().style.transition = '';
-            this.handlePointerDown(index, e);
-        });
+
+        if (draggable) {
+            sliderThumb.getContainer().addEventListener('pointerdown', e => {
+                sliderThumb.getContainer().style.transition = '';
+                this.handlePointerDown(index, e);
+            });
+        }
 
         sliderThumb.getThumbContentContainer().tabIndex = Slider.TAB_INDEX++;
         sliderThumb.getThumbContentContainer().addEventListener('focus', () => {

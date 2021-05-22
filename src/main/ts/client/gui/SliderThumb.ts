@@ -23,7 +23,7 @@ export class SliderThumb extends ASliderElement {
         super(params);
 
         this.id = id;
-        this.draggable = true;
+        this.draggable = params.draggable;
 
         if (params.inputFunctions) {
 
@@ -65,13 +65,15 @@ export class SliderThumb extends ASliderElement {
         /**
          * cursor styles for dragging
          */
-        this.thumbContentContainer.style.cursor = 'grab';
-        this.thumbContentContainer.addEventListener('pointerdown', e => {
-            this.thumbContentContainer.style.cursor = 'grabbing';
-        });
-        document.body.addEventListener('pointerup', e => {
+        if (this.draggable) {
             this.thumbContentContainer.style.cursor = 'grab';
-        });
+            this.thumbContentContainer.addEventListener('pointerdown', e => {
+                this.thumbContentContainer.style.cursor = 'grabbing';
+            });
+            document.body.addEventListener('pointerup', e => {
+                this.thumbContentContainer.style.cursor = 'grab';
+            });
+        }
 
     }
 

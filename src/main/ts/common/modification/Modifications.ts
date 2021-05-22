@@ -2,13 +2,6 @@ import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants'
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
-import { ModificationContact } from './ModificationContact';
-import { ModificationSeasonality } from './ModificationSeasonality';
-import { ModificationSettings } from './ModificationSettings';
-import { ModificationStrain } from './ModificationStrain';
-import { ModificationTesting } from './ModificationTesting';
-import { ModificationTime } from './ModificationTime';
-import { ModificationVaccination } from './ModificationVaccination';
 
 /**
  * central storage of modification instances of various types

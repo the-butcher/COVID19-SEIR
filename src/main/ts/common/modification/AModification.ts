@@ -8,14 +8,12 @@ export abstract class AModification<P extends IModificationValues> implements IM
 
     private readonly key: MODIFICATION____KEY;
     private readonly nature: MODIFICATION_NATURE;
-    private readonly deletable: boolean;
     private instantB: number;
 
     constructor(key: MODIFICATION____KEY, nature: MODIFICATION_NATURE, modificationValues: P) {
         this.key = key;
         this.nature = nature;
         this.modificationValues = modificationValues;
-        this.deletable = ModelConstants.MODIFICATION_PARAMS[key].deletable;
     }
 
     appliesToInstant(instant: number): boolean {
@@ -56,7 +54,11 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     isDeletable(): boolean {
-        return this.deletable;
+        return this.modificationValues.deletable;
+    }
+
+    isDraggable(): boolean {
+        return this.modificationValues.draggable;
     }
 
     abstract acceptUpdate(update: Partial<P>): void
