@@ -10,6 +10,8 @@ import { SliderModification } from './gui/SliderModification';
 
 export class ModelLoader {
 
+    private static worker: ModelWorker;
+
     static async commit(demographicsConfig: IDemographicsConfig, modificationValues: IModificationValues[]): Promise<void> {
 
         // const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance());
@@ -24,10 +26,19 @@ export class ModelLoader {
             modificationValues
         }
 
-        const worker = new ModelWorker(); // TODO reuse worker (and may allow cancellation of previous calculations)
-        Logger.getInstance().log('posting message to', worker);
-        worker.postMessage(workerInput);
-        worker.onmessage = (e: MessageEvent) => {
+        /**
+         * terminate any running worker
+         */
+        if (ModelLoader.worker) {
+            ModelLoader.worker.terminate();
+        }
+
+        /**
+         * pass input for a full model rebuild to a web-worker where a few seconds of calculation will not interfere with responsiveness of gui
+         */
+        ModelLoader.worker = new ModelWorker();
+        ModelLoader.worker.postMessage(workerInput);
+        ModelLoader.worker.onmessage = (e: MessageEvent) => {
             const modelProgress: IModelProgress = e.data;
             if (modelProgress.ratio === 1 && modelProgress.data) {
                 ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
