@@ -6,6 +6,7 @@ import { IModificationValues } from '../common/modification/IModificationValues'
 import { IWorkerInput } from '../model/IWorkerInput';
 import { Logger } from './../util/Logger';
 import { ChartAgeGroup } from './chart/ChartAgeGroup';
+import { SliderModification } from './gui/SliderModification';
 
 export class ModelLoader {
 
@@ -30,9 +31,10 @@ export class ModelLoader {
             const modelProgress: IModelProgress = e.data;
             if (modelProgress.ratio === 1 && modelProgress.data) {
                 ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
+                SliderModification.getInstance().setProgress(0);
+            } else {
+                SliderModification.getInstance().setProgress(modelProgress.ratio);
             }
-            Logger.getInstance().log('got model data from worker', e.data);
-            //
         };
 
     }

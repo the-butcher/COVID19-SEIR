@@ -11,9 +11,10 @@ import { Slider } from './../gui/Slider';
 import { Controls } from './Controls';
 import { SliderModification } from '../gui/SliderModification';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
+import { ControlsConstants } from '../gui/ControlsConstants';
 
 /**
- * controller for strain modifications
+ * controls for Strain modifications
  *
  * @author h.fleischer
  * @since 16.05.2021
@@ -56,9 +57,9 @@ export class ControlsStrain {
             },
             labelFormatFunction: (index, value, type) => {
                 if (type === 'tick') {
-                    return value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED);
+                    return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
                 } else {
-                    return value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_2);
+                    return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
                 }
             },
             valueChangeFunction: (index, value, type) => {
@@ -73,7 +74,7 @@ export class ControlsStrain {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value.replace(',', '.'));
@@ -98,9 +99,9 @@ export class ControlsStrain {
             },
             labelFormatFunction: (index, value, type) => {
                 if (type === 'tick') {
-                    return value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED);
+                    return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
                 } else {
-                    return value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1);
+                    return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1);
                 }
             },
             valueChangeFunction: (index, value, type) => {
@@ -121,7 +122,7 @@ export class ControlsStrain {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_2)}`;
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value.replace(',', '.'));
@@ -142,7 +143,7 @@ export class ControlsStrain {
                 return new IconSlider();
             },
             labelFormatFunction: (index, value, type) => {
-                return value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED);
+                return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
             },
             valueChangeFunction: (index, value, type) => {
                 this.incidence = value;
@@ -155,7 +156,7 @@ export class ControlsStrain {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}`;
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value.replace(',', '.'));

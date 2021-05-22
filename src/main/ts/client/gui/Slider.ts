@@ -81,6 +81,8 @@ export class Slider {
 
     private readonly sliderContainer: HTMLDivElement;
     private readonly trackElement: HTMLDivElement;
+    private readonly trackElement1: HTMLDivElement;
+    private readonly trackElement2: HTMLDivElement;
     private readonly trackLabelElement: HTMLDivElement;
 
     private readonly sliderTicks: SliderTick[];
@@ -125,6 +127,21 @@ export class Slider {
         this.trackElement = document.createElement('div');
         this.trackElement.classList.add(Slider.CLASS_SLIDER_____TRACK);
         this.sliderContainer.appendChild(this.trackElement);
+
+        // left part of the track (when used for indicating progress)
+        this.trackElement1 = document.createElement('div');
+        this.trackElement1.classList.add(Slider.CLASS_SLIDER_____TRACK);
+        this.trackElement1.style.width = '100%';
+        this.trackElement1.style.position = 'absolute';
+        this.trackElement.appendChild(this.trackElement1);
+
+        // right part of the track (when used for indicating progress)
+        this.trackElement2 = document.createElement('div');
+        this.trackElement2.classList.add(Slider.CLASS_SLIDER_____TRACK);
+        this.trackElement2.style.width = '0%';
+        this.trackElement2.style.position = 'absolute';
+        this.trackElement2.style.backgroundColor = 'var(--color-text)';
+        this.trackElement.appendChild(this.trackElement2);
 
         this.trackLabelElement = document.createElement('div');
         this.trackLabelElement.classList.add(Slider.CLASS_TRACK______LABEL);
@@ -226,6 +243,11 @@ export class Slider {
             }
         });
 
+    }
+
+    setProgress(progress: number): void {
+        this.trackElement1.style.width = `${(1 - progress) * 100}%`;
+        this.trackElement2.style.width = `${progress * 100}%`;
     }
 
     /**
