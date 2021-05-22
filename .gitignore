@@ -1,0 +1,5 @@
+dist
+node_modules
+src/main/webapp/js/**
+.vscode
+types.d.ts

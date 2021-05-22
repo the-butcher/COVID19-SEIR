@@ -1,0 +1,194 @@
+:root {
+  --color-panel-bg: #1a1a1a;
+  --color-dropshadow: #000000;
+  --color-text: #d1d1d1;
+  --color-text-slider: #999999;
+  --text-font: "Courier Prime Sans", Consolas, Courier-New, monospace;
+}
+
+@font-face {
+  font-family: "Courier Prime Sans";
+  src: url("Courier Prime Sans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Courier Prime Sans";
+  src: url("Courier Prime Sans Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+  background: #121212;
+  font-family: var(--text-font);
+  color: var(--color-text);
+}
+
+.size-full-xy {
+  width: 100%;
+  height: 100%;
+}
+.sliderspace {
+  min-height: 10px;
+  max-height: 10px;
+}
+
+.panel-container {
+  filter: drop-shadow(2px 2px 3px var(--color-dropshadow));
+  background-color: var(--color-panel-bg);
+}
+
+.modifiable-text {
+  cursor: pointer;
+}
+.modifiable-text:hover {
+  text-decoration: underline;
+}
+input {
+  background-color: rgba(120, 120, 120, 0.6);
+  font-family: var(--text-font);
+  border: 1px solid grey;
+  padding: 1px 0px;
+  color: var(--color-text);
+}
+
+.slider-modification {
+  padding: 0px 30px 0px 20px;
+}
+
+.slider-container {
+  position: relative;
+  height: 60px;
+}
+
+.slider-track {
+  position: relative;
+  background-color: #444444;
+  height: 2px;
+  width: 100%;
+  top: calc(50% - 1px);
+}
+
+.track-label {
+  padding: 0px 2px 0px 2px;
+  font-size: 10px;
+  position: absolute;
+  top: -5px;
+  right: 5px;
+  color: var(--color-text-slider);
+  background-color: var(--color-panel-bg);
+  user-select: none;
+}
+
+.tick-container {
+  position: absolute;
+  top: 0px;
+}
+
+.tick-line {
+  position: relative;
+  background-color: #999999;
+  height: 6px;
+  width: 1px;
+  left: calc(50% - 0.5px);
+}
+
+.tick-label {
+  position: relative;
+  top: 1px;
+  background-color: unset;
+  text-align: center;
+  height: 14px;
+  font-size: 10px;
+  user-select: none;
+}
+
+.thumb-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0px;
+  text-align: center;
+  background-color: unset;
+  transition: opacity 250ms ease-in-out;
+}
+
+.thumb-content {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  background-color: green;
+  top: -9px;
+}
+
+.thumb-label {
+  user-select: none;
+  display: inline-block;
+  margin: 0 auto;
+  position: relative;
+  background-color: unset;
+  min-width: 40px;
+  height: 17px;
+  font-size: 12px;
+  top: -1px;
+  border-radius: 2px;
+  border: 0px;
+}
+
+.thumb-input {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  width: inherit;
+  padding: 3px 0px 0px 0px;
+  text-align: center;
+  background-color: var(--color-panel-bg);
+  height: 14px;
+  font-size: 12px;
+  top: -3px;
+  border-radius: 2px;
+  border: 0px;
+  font-family: var(--text-font);
+  color: var(--color-text);
+}
+
+.thumb-edit-label:hover {
+  cursor:pointer;
+  text-decoration: underline;
+}
+
+/**
+ * browser
+ */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+  background: #404040
+}
+
+::-webkit-scrollbar:active {
+  background: #474747
+}
+
+::-webkit-scrollbar-corner {
+  background: #404040
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5c5c5c
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #787878;
+  cursor: pointer
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #8a8a8a
+}

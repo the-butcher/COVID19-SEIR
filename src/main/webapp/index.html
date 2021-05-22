@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@FleischerHannes">
+    <meta name="twitter:creator" content="@FleischerHannes">
+    <meta name="twitter:title" content="COVID-19 Timeline Model">
+    <meta name="twitter:image" content="https://the-butchers.at/covid-19-timeline/assets/model_128.png">
+    <meta name="twitter:description"
+        content="A simple SEIR model simulating multi strain spread meant to create a broader understanding of disease dynamics.">
+
+    <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="Description"
+        content="A simple SEIR model simulating multi strain spread meant to create a broader understanding of disease dynamics. Made privately by Hannes Fleischer of VertiGIS GmbH located in Austria.">
+    <meta name="theme-color" content="#2d3232" />
+
+    <title>COVID-19 Timeline Model</title>
+
+    <link rel="apple-touch-icon" href="assets/model_192.png?cb=COVID_19_TIMELINE_VERSION">
+    <!-- <link rel="manifest" href="manifest.webmanifest?cb=COVID_19_TIMELINE_VERSION"> -->
+    <link rel="shortcut icon" href="assets/favicon.png?cb=COVID_19_TIMELINE_VERSION">
+
+</head>
+
+<body>
+
+    <div id="layoutDivRoot" class="size-full-xy" style="position: absolute; top:0px; bottom: 0px; display: flex; flex-direction: row; overflow: hidden; align-items: stretch">
+        <div id="layoutDivLeft" style="display: flex; flex-direction: column; padding: 15px 0px 12px 12px; max-width: 40px; min-width: 40px">
+            <div id="modelModeDiv" style="flex-grow: 100">
+
+            </div>
+            <div id="modelActionDiv" style="display: flex; flex-direction: column">
+                <div id="actionImportDiv" style="width: 28px; height: 28px; padding: 0px 0px; cursor: pointer" title="import">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: #555555" viewbox="-15 -15 40 30">
+                        <path style="transition: transform 250ms ease-in-out" d="M -15.2 1.6 c -0.44 0 -0.8 0.36 -0.8 0.8 v 1.6 c 0 0.44 0.36 0.8 0.8 0.8 h 5.6 v -3.2 z m 24.45 -9.15 L 4.355 -12.45 c -0.225 -0.225 -0.53 -0.35 -0.85 -0.35 H 3.2 v 6.4 h 6.4 v -0.305 c 0 -0.315 -0.125 -0.62 -0.35 -0.845 z m -7.65 1.55 V -12.8 H -8.4 c -0.665 0 -1.2 0.535 -1.2 1.2 v 13.2 h 6.4 v -3.26 c 0 -0.715 0.865 -1.07 1.37 -0.565 L 2.95 2.6 c 0.33 0.335 0.33 0.87 0 1.2 l -4.785 4.82 c -0.505 0.505 -1.37 0.15 -1.37 -0.565 V 4.8 H -9.6 v 6.8 c 0 0.665 0.535 1.2 1.2 1.2 h 16.8 c 0.665 0 1.2 -0.535 1.2 -1.2 V -4.8 H 2.8 c -0.66 0 -1.2 -0.54 -1.2 -1.2 z" />
+                    </svg>
+                </div>
+                <div id="actionSaveDiv" style="width: 28px; height: 28px; padding: 0px 0px; cursor: pointer" title="save">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 25x; height: 25px; fill: #555555" viewbox="-15 -15 30 30">
+                        <path style="transition: transform 250ms ease-in-out" d="M 10.8833 -6.5785 l -4.3483 -4.3774 A 2.5049 2.4883 90 0 0 4.7755 -11.6897 H -9.1238 C -10.4982 -11.6897 -11.6122 -10.5682 -11.6122 -9.1846 v 18.3694 c 0 1.3834 1.114 2.5049 2.4883 2.5049 h 18.2477 c 1.3744 0 2.4883 -1.1215 2.4883 -2.5049 V -4.8073 a 2.5049 2.4883 90 0 0 -0.7289 -1.7712 z M 0 8.3497 c -1.8323 0 -3.3178 -1.4954 -3.3178 -3.34 c 0 -1.8445 1.4855 -3.34 3.3178 -3.34 s 3.3178 1.4954 3.3178 3.34 c 0 1.8445 -1.4855 3.34 -3.3178 3.34 z m 4.9766 -15.8916 V -2.2962 c 0 0.3457 -0.2788 0.6263 -0.6221 0.6263 H -7.6723 c -0.3436 0 -0.6221 -0.2806 -0.6221 -0.6263 V -7.7234 c 0 -0.3457 0.2788 -0.6263 0.6221 -0.6263 h 11.8464 c 0.1651 0 0.3232 0.066 0.4398 0.1835 l 0.1805 0.1816 A 0.6258 0.622 90 0 1 4.9766 -7.5419 z" />
+                    </svg>
+                </div>
+                <div id="actionExportDiv" style="width: 28px; height: 28px; padding: 0px 0px; cursor: pointer" title="export">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 23px; fill: #555555" viewbox="-15 -15 40 30">
+                        <path style="transition: transform 250ms ease-in-out" d="M 9.6 -6.705 c 0 -0.315 -0.125 -0.62 -0.35 -0.845 L 4.355 -12.45 c -0.225 -0.225 -0.53 -0.35 -0.85 -0.35 H 3.2 v 6.4 h 6.4 z M 18.95 2.6 l -4.785 -4.82 c -0.505 -0.505 -1.37 -0.15 -1.37 0.565 V 1.6 h -3.2 v 3.2 h 3.2 v 3.26 c 0 0.715 0.865 1.07 1.37 0.565 L 18.95 3.8 c 0.33 -0.33 0.33 -0.87 0 -1.2 z m -18.95 1.4 v -1.6 c 0 -0.44 0.36 -0.8 0.8 -0.8 h 8.8 V -4.8 H 2.8 c -0.66 0 -1.2 -0.54 -1.2 -1.2 V -12.8 H -8.4 C -9.065 -12.8 -9.6 -12.265 -9.6 -11.6 v 23.2 c 0 0.665 0.535 1.2 1.2 1.2 h 16.8 c 0.665 0 1.2 -0.535 1.2 -1.2 V 4.8 H 0.8 c -0.44 0 -0.8 -0.36 -0.8 -0.8 z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div id="layoutDivCenter" style="flex-grow: 100; display: flex; flex-direction: column; padding: 10px 5px 10px 0px; z-index: 100;">
+            <div id="sliderDivTime" class="slider-container panel-container" style="padding: 0px 26px 0px 77px;">
+
+            </div>
+            <div class="sliderspace"></div>
+            <div id="chartDivAgeGroupPlot" style="flex-grow: 100; background-color: var(--color-panel-bg); filter: drop-shadow(2px 2px 3px var(--color-dropshadow))">
+                <!-- seir chart -->
+            </div>
+        </div>
+        <div id="layoutDivRight" style="display: flex; flex-direction: column; padding: 10px 10px 10px 5px; overflow-y: scroll; overflow-x: hidden">
+
+            <div id="modificationDiv" style="width: 290px; display: flex; flex-direction: column; padding: 5px 0px" class="panel-container">
+
+                <div class="slidertitle1" style="padding: 0px 10px 0px 10px;">
+                    <div style="display: flex; flex-direction: row; width: 100%; height: 50px">
+
+                        <div style="width: 28px; height: 28px">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 28x; height: 28px; fill: #555555" viewbox="-15 -15 30 30">
+                                <path id="modificationBgPath" style="transition: transform 250ms ease-in-out" d="M 0 -12.4 C -6.85 -12.4 -12.4 -6.85 -12.4 0 S -6.85 12.4 0 12.4 S 12.4 6.85 12.4 0 S 6.85 -12.4 0 -12.4 Z" />
+                                <path id="modificationFgPath" style="transition: transform 250ms ease-in-out; fill: black" d="" />
+                            </svg>
+                        </div>
+                        <div style="flex-grow: 100; display: flex; flex-direction: column; width: 100%">
+                            <div id="modificationTitleDiv" style="padding-top: 5px;">
+                                <input id="modificationTitleInput" type="text" style="padding-top: 3px; padding-left: 3px; font-size: 16px; width: 100%; display: none; height: 18px">
+                                <span id="modificationTitleSpan" class="modifiable-text" contenteditable="true" style="padding-left: 4px">modifier</span>
+                            </div>
+                            <div id="modificationInstantDiv" style="padding: 0px 10px 0px 4px; font-size: 12px">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modificationTimeDiv" style="display: flex; flex-direction: column; display: block">
+                    <div id="chartTimeDiv" style="width: inherit; height: 350px; ">
+
+                    </div>
+                    <div id="infoStrainDiv">
+
+                    </div>
+                    <div style="width: calc(100% - 20px); height: 1px; padding: 10px;">
+                        <div style="width: 100%; height: 1px; background-color: var(--color-text)">
+
+                        </div>
+                    </div>
+                    <div id="infoVaccinationDiv" style="padding: 0px 10px; font-size: 12px">
+                        Doses per day: <span id="infoVaccinationSpan"></span>
+                    </div>
+                    <!--
+                    effective contact
+                    date: slider-date - ok
+                    effective contact matrix
+                    -->
+                </div>
+
+                <div id="modificationStrainDiv" style="display: block; flex-direction: column; height: 190px; padding: 10px 0px 0px 0px">
+
+                    <div style="display: flex; flex-direction: column; z-index: 100;">
+                        <div id="sliderReproductionDiv" class="sliderdiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
+
+                        </div>
+                    </div>
+                    <div style="min-height: 60px; z-index: 10;">
+                        <!-- TODO clarify dimensions, lots of magic numbers currently -->
+                        <div id="weibullDiv" class="sliderdiv" style="position: absolute; left: 10px; width: calc(100% - 30px); bottom: 86px; min-height: 120px">
+                            <canvas id="weibullCanvas" style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
+                        </div>
+                        <div id="serialIntervalDiv" style="background-color: unset; position: absolute; left: 10px; width: calc(100% - 30px); bottom: 74px; height: 60px; min-height: 60px">
+
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <div id="sliderIncidenceDiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modificationContactDiv" style="width: inherit; display: block; flex-direction: column">
+                    <div id="chartContactDiv" style="width: inherit; height: 350px; ">
+
+                    </div>
+                    <div id="slidersCategoryDiv">
+
+                    </div>
+                </div>
+
+                <div id="modificationTestingDiv" style="display: block; flex-direction: column">
+                    <div id="chartTestingDiv" style="width: 100%px; height: 200px; ">
+
+                    </div>
+                    <div id="slidersTestingDiv">
+
+                    </div>
+                </div>
+
+                <div id="modificationVaccinationDiv" style="display: block; flex-direction: column">
+                    <div id="slidersVaccinationDiv">
+
+                    </div>
+                </div>
+
+                <div id="modificationSeasonalityDiv" style="display: block; flex-direction: column">
+                    <div id="slidersSeasonalityDiv">
+
+                    </div>
+                </div>
+
+                <div id="modificationSettingsDiv" style="display: block; flex-direction: column">
+                    <div id="slidersSettingsDiv">
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="sliderspace"></div>
+            <div id="legendDiv" style="height: 100px" class="panel-container">
+                <div id="chartModeIncidenceDiv">incidence</div>
+                <div id="chartModeSeirDiv">seir</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            /* remove_s
+            navigator.serviceWorker.register('sw.js?cb=COVID_19_TIMELINE_VERSION').then((registration) => {
+                //do nothing
+            }, (err) => {
+                console.log('failed to register service worker due to', err);
+            });
+            remove_e */
+        });
+    }
+</script>
+
+</html>
