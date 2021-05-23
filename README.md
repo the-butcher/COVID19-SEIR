@@ -7,11 +7,11 @@ The code has been moved from local storage to github for backup- and documentati
 
 current Tasks:
 * better pre init when there is more than one strain
-** accept list of modification
-** add some preload days
-** iterate a minimum of preload days to a maximum of the last strain date
-** keep a set of virtual strain modifications, each at virtual model start (begin of preload period)
-** adapt virtual modifications until satisfactory precision is reached
+..* accept list of modification
+..* add some preload days
+..* iterate a minimum of preload days to a maximum of the last strain date
+..* keep a set of virtual strain modifications, each at virtual model start (begin of preload period)
+..* adapt virtual modifications until satisfactory precision is reached
 * (re)build the modification chart area for i.e. testing and other modification types
 * validity check for when i.e. too many vaccinations have been configured in settings
 * implement import, save, export
