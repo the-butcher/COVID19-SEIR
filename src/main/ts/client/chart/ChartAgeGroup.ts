@@ -493,7 +493,7 @@ export class ChartAgeGroup {
      * pushes all modifications to SliderModification, where they will be drawn on the time, depending on actual type
      * @param key
      */
-     async showModifications(modificationDefinition: IControlsChartDefinition, modificationData: IModificationData[]): Promise<void> {
+    async showModifications(modificationDefinition: IControlsChartDefinition, modificationData: IModificationData[]): Promise<void> {
 
         // TODO probably needs to move to separate method
         if (modificationDefinition) {
@@ -509,6 +509,8 @@ export class ChartAgeGroup {
 
             this.seriesModification.getSeries().stroke = color(modificationDefinition.color);
             this.seriesModification.getSeries().data = modificationData;
+
+            console.log('modificationData', modificationData);
 
         } else {
             // TODO reset display
@@ -591,7 +593,7 @@ export class ChartAgeGroup {
                 ageGroupCases
             }
 
-            // TODO instead of rebuild the data every time, it maybe could be much easier to change the value fields on the age specific series
+            // TODO instead of rebuilding the data every time, it maybe could be much easier to change the value fields on the age specific series
             modificationValuesStrain.forEach(modificationValueStrain => {
                 item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem[`${ageGroupPlot.getName()}_INCIDENCE_${modificationValueStrain.id}`];
             });

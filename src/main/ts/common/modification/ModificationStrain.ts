@@ -11,6 +11,10 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         this.modificationValues = {...this.modificationValues, ...update};
     }
 
+    getIncidence(): number {
+        return this.modificationValues.incidence;
+    }
+
     getModificationValue(): number {
         return -1; // TODO maybe find a way to show r(t)
     }

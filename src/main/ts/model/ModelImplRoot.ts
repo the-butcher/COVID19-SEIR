@@ -1,7 +1,12 @@
+import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
+import { IModificationValuesContact } from './../common/modification/IModificationValuesContact';
+import { min } from '@amcharts/amcharts4/core';
 import { Demographics } from '../common/demographics/Demographics';
+import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
+import { Logger } from '../util/Logger';
 import { TimeUtil } from '../util/TimeUtil';
 import { Modifications } from './../common/modification/Modifications';
 import { ObjectUtil } from './../util/ObjectUtil';
@@ -10,12 +15,11 @@ import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';
 import { ModelConstants } from './ModelConstants';
-import { ModelImplIncidence } from './ModelImplIncidence';
 import { ModelImplStrain } from './ModelImplStrain';
 import { ModelImplVaccination } from './ModelImplVaccination';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
-import { ModelStateIntegrator } from './state/ModelStateIntegrator';
+import { IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
 
 interface IVaccinationGroupData {
     nrmVaccS: number; // susceptible - vaccination of susceptible population
@@ -32,71 +36,102 @@ interface IVaccinationGroupData {
  */
 export class ModelImplRoot implements IModelSeir {
 
-    static async setupInstance(demographics: Demographics, modifications: Modifications): Promise<ModelStateIntegrator> {
+    static async setupInstance(demographics: Demographics, modifications: Modifications, progressCallback: (progress: IModelProgress) => void): Promise<ModelStateIntegrator> {
 
-        const minInstant = ModelConstants.MODEL_MIN____________INSTANT;
-        const maxInstant = minInstant + TimeUtil.MILLISECONDS_PER_DAY * ModelConstants.PRELOAD_________________DAYS;
+        /**
+         * start at minus preload days
+         */
+        const curInstant = ModelConstants.MODEL_MIN____________INSTANT - TimeUtil.MILLISECONDS_PER_DAY * ModelConstants.PRELOAD_________________DAYS;
 
-        // prepare a set of age multipliers
-        // const ageGroupMultipliers: number[] = [];
-        // demographics.getAgeGroups().forEach(() => {
-        //     ageGroupMultipliers.push(1);
-        // });
-        // let overallMultiplier = 1;
+        /**
+         * get all strain values as currently in modifications instance
+         */
+        const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
+        const incidences = modificationsStrain.map(m => m.getIncidence());
 
-        // get an initial incidence sum (TODO this part very likely has to change)
-        // goal should be to have a set of strain modifications, each positioned at MIN___INSTANT, with the respective initial incidences adapted to pass through target incidence at target date
-        // const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
-        // let initialIncidence = 0;
-        // modificationsStrain.forEach(modificationStrain => {
-        //     initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;
-        // });
+        /**
+         * adapt first contact modification to have initial conditions even in preload range
+         */
+        const modificationValueContact = Modifications.getInstance().findModificationsByType('CONTACT')[0].getModificationValues() as IModificationValuesContact;
+        const modificationValueTesting = Modifications.getInstance().findModificationsByType('TESTING')[0].getModificationValues() as IModificationValuesTesting;
+
+        modificationValueContact.instant = curInstant;
+        modificationValueTesting.instant = curInstant;
 
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
         let vaccinationMultiplier = 1;
 
-        let model = new ModelImplRoot(demographics, modifications);
+        let model;
         let modelStateIntegrator: ModelStateIntegrator;
 
         /**
          * 5 interpolation runs
          */
-        for (let i = 0; i < 5; i++) {
+        for (let interpolationIndex = 0; interpolationIndex < 5; interpolationIndex++) {
 
-            modelStateIntegrator = new ModelStateIntegrator(model);
+            model = new ModelImplRoot(demographics, modifications);
+            modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
             modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
 
-            const modelData = await modelStateIntegrator.buildModelData(demographics, minInstant, maxInstant, n => {});
-            const lastDataItem = modelData[modelData.length - 1];
-            const overallIncidence = lastDataItem.TOTAL_INCIDENCE;
+            let modelData: any[];
+            let lastDataItem: any;
+            for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+
+                const dstInstant = modificationsStrain[strainIndex].getInstantA();
+                modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
+                    progressCallback({
+                        ratio: modelProgress.ratio
+                    });
+                });
+                lastDataItem = modelData[modelData.length - 1];
+
+                /**
+                 * adjust incidence by multiplication
+                 */
+                const totalIncidenceStrain = lastDataItem[`TOTAL_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
+                const totalIncidenceTarget = incidences[strainIndex];
+                modificationsStrain[strainIndex].acceptUpdate({
+                    incidence:  modificationsStrain[strainIndex].getIncidence() * totalIncidenceTarget / totalIncidenceStrain
+                });
+
+                // Logger.getInstance().log(interpolationIndex, modificationsStrain[strainIndex].getName(), totalIncidenceTarget, totalIncidenceStrain);
+
+            };
             const overallVaccinated = lastDataItem.TOTAL_REMOVED_V;
 
-            // overallMultiplier *= initialIncidence / overallIncidence;
-            demographics.getAgeGroups().forEach(ageGroup => {
-                const ageGroupIncidence = lastDataItem[`${ageGroup.getName()}_INCIDENCE`];
-                const ageGroupOverallRatio = ageGroupIncidence / overallIncidence;
-                // ageGroupMultipliers[ageGroup.getIndex()] = ageGroupOverallRatio;
-            });
+
+            // const modelData = await modelStateIntegrator.buildModelData(maxInstant, modelProgress => {
+            //     progressCallback({
+            //         ratio: modelProgress.ratio * maxRatio
+            //     });
+            // });
+            // const lastDataItem = modelData[modelData.length - 1];
+            // const overallIncidence = lastDataItem.TOTAL_INCIDENCE;
+            // const overallVaccinated = lastDataItem.TOTAL_REMOVED_V;
+
+            // // overallMultiplier *= initialIncidence / overallIncidence;
+            // demographics.getAgeGroups().forEach(ageGroup => {
+            //     const ageGroupIncidence = lastDataItem[`${ageGroup.getName()}_INCIDENCE`];
+            //     const ageGroupOverallRatio = ageGroupIncidence / overallIncidence;
+            //     // ageGroupMultipliers[ageGroup.getIndex()] = ageGroupOverallRatio;
+            // });
 
             // adjust the vaccination multiplier to interpolate to a value that gives a closer match to desired settings
             vaccinationMultiplier *= modificationSettings.getVaccinated() / overallVaccinated;
 
-            model = new ModelImplRoot(demographics, modifications);
-
         }
 
         // final model setup with interpolated values, then integration over preload time
-        modelStateIntegrator = new ModelStateIntegrator(model);
+        model = new ModelImplRoot(demographics, modifications);
+        modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
-        // for (let tT = minInstant; tT <= maxInstant; tT += ModelStateIntegrator.DT) {
-        //     modelStateIntegrator.integrate(ModelStateIntegrator.DT, tT);
-        // }
+        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN____________INSTANT - TimeUtil.MILLISECONDS_PER_DAY, () => false, () => {});
 
         return modelStateIntegrator;
 
     }
 
-    private readonly absTotal: number;
+    private readonly demographics: Demographics;
     private readonly valid: boolean;
 
     private readonly strainModels: ModelImplStrain[];
@@ -117,7 +152,8 @@ export class ModelImplRoot implements IModelSeir {
         this.compartmentsRemovedU = [];
         this.vaccinationModels = [];
 
-        this.absTotal = demographics.getAbsTotal();
+        this.demographics = demographics;
+        // this.absTotal = demographics.getAbsTotal();
 
         // const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
         // let initialIncidence = 0;
@@ -138,11 +174,11 @@ export class ModelImplRoot implements IModelSeir {
 
             // TODO initial share of discovery (may split recovered slider)
             const absValueRemovedD = ageGroup.getAbsValue() * settingsValues.recoveredD;
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedD.push(compartmentRemovedD);
 
             const absValueRemovedU = ageGroup.getAbsValue() * settingsValues.recoveredU;
-            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedU.push(compartmentRemovedU);
 
             const shareOfRefusal = 0.40 - 0.25 * ageGroup.getIndex() / demographics.getAgeGroups().length;
@@ -158,7 +194,7 @@ export class ModelImplRoot implements IModelSeir {
         demographics.getAgeGroups().forEach(ageGroup => {
 
             const absValueSusceptible = ageGroup.getAbsValue() - this.getNrmValueGroup(ageGroup.getIndex(), true) * this.getAbsValue();
-            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsSusceptible.push(compartmentSusceptible);
 
             // this.pS = this.pN - this.pECov2 - this.pICov2 - this.pEB117 - this.pIB117 - this.pR;
@@ -201,8 +237,12 @@ export class ModelImplRoot implements IModelSeir {
         return nrmValueGroup;
     }
 
+    getDemographics(): Demographics {
+        return this.demographics;
+    }
+
     getAbsTotal(): number {
-        return this.absTotal;
+        return this.demographics.getAbsTotal();
     }
 
     getNrmValue(): number {
@@ -210,7 +250,7 @@ export class ModelImplRoot implements IModelSeir {
     }
 
     getAbsValue(): number {
-        return this.absTotal;
+        return this.demographics.getAbsTotal();
     }
 
     isValid(): boolean {

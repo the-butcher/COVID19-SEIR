@@ -55,18 +55,18 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
             deletable: false,
             draggable: false
         },
-        {
-            id: ObjectUtil.createId(),
-            key: 'STRAIN',
-            instant: new Date('2021-06-01').getTime(),
-            name: 'b.1.167.2',
-            r0: 6.5,
-            serialInterval: 4.8,
-            intervalScale: 1.0,
-            incidence: 10,
-            deletable: true,
-            draggable: true
-        },
+        // {
+        //     id: ObjectUtil.createId(),
+        //     key: 'STRAIN',
+        //     instant: new Date('2021-06-01').getTime(),
+        //     name: 'b.1.167.2',
+        //     r0: 6.5,
+        //     serialInterval: 4.8,
+        //     intervalScale: 1.0,
+        //     incidence: 10,
+        //     deletable: true,
+        //     draggable: true
+        // },
         {
             id: ObjectUtil.createId(),
             key: 'CONTACT',

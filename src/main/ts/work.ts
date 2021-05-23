@@ -4,33 +4,32 @@ import { IWorkerInput } from './model/IWorkerInput';
 import { ModelConstants } from './model/ModelConstants';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { Logger } from './util/Logger';
+import { TimeUtil } from './util/TimeUtil';
 
 const ctx: Worker = self as any;
 
 // We send a message back to the main thread
 ctx.addEventListener("message", async (event: MessageEvent) => {
 
-    self.console.log('worker received a message');
     Logger.setInstance(self.console.log);
 
     const workerInput: IWorkerInput = event.data;
     const demographicsConfig = workerInput.demographicsConfig;
     const modificationValues = workerInput.modificationValues;
 
-    // create a demographics singleton (in worker scope)
+    // create a demographics singleton (in worker scope, this does not interfere with main scope)
     Demographics.setInstanceFromConfig(demographicsConfig);
-    const demographics = Demographics.getInstance();
 
-    // create a modifications single (in worker scope)
+    // create a modifications single (in worker scope, this does not interfere with main scope)
     Modifications.setInstanceFromValues(modificationValues);
-    const modifications = Modifications.getInstance();
 
-    const modelStateIntegrator = await ModelImplRoot.setupInstance(demographics, modifications);
-    Logger.getInstance().log('modelStateIntegrator', modelStateIntegrator);
+    const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), modelProgress => {
+        ctx.postMessage(modelProgress);
+    });
 
     const minInstant = ModelConstants.MODEL_MIN____________INSTANT;
     const maxInstant = ModelConstants.MODEL_MAX____________INSTANT;
-    modelStateIntegrator.buildModelData(demographics, minInstant, maxInstant, modelProgress => {
+    modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER_DAY === 0, modelProgress => {
         ctx.postMessage(modelProgress);
     });
 

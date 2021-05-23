@@ -51,11 +51,11 @@ export class ModelLoader {
         ModelLoader.worker.postMessage(workerInput);
         ModelLoader.worker.onmessage = (e: MessageEvent) => {
             const modelProgress: IModelProgress = e.data;
-            if (modelProgress.ratio === 1 && modelProgress.data) {
+            if (modelProgress.ratio >= 1 && modelProgress.data) {
                 ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
                 SliderModification.getInstance().setProgress(0);
-                ModelLoader.worker.terminate();
-                ModelLoader.worker = null;
+                // ModelLoader.worker.terminate();
+                // ModelLoader.worker = null;
             } else {
                 SliderModification.getInstance().setProgress(modelProgress.ratio);
             }

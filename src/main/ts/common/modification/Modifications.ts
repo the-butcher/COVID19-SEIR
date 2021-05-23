@@ -1,3 +1,4 @@
+import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { IModification } from './IModification';
