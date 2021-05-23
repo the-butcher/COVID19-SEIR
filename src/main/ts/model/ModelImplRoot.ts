@@ -37,24 +37,30 @@ export class ModelImplRoot implements IModelSeir {
         const minInstant = ModelConstants.MODEL_MIN____________INSTANT;
         const maxInstant = minInstant + TimeUtil.MILLISECONDS_PER_DAY * ModelConstants.PRELOAD_________________DAYS;
 
-        const ageGroupMultipliers: number[] = [];
-        demographics.getAgeGroups().forEach(() => {
-            ageGroupMultipliers.push(1);
-        });
-        let overallMultiplier = 1;
+        // prepare a set of age multipliers
+        // const ageGroupMultipliers: number[] = [];
+        // demographics.getAgeGroups().forEach(() => {
+        //     ageGroupMultipliers.push(1);
+        // });
+        // let overallMultiplier = 1;
 
-        const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
-        let initialIncidence = 0;
-        modificationsStrain.forEach(modificationStrain => {
-            initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;
-        });
+        // get an initial incidence sum (TODO this part very likely has to change)
+        // goal should be to have a set of strain modifications, each positioned at MIN___INSTANT, with the respective initial incidences adapted to pass through target incidence at target date
+        // const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
+        // let initialIncidence = 0;
+        // modificationsStrain.forEach(modificationStrain => {
+        //     initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;
+        // });
 
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
         let vaccinationMultiplier = 1;
 
-        let model = new ModelImplRoot(demographics, modifications, overallMultiplier, ageGroupMultipliers);
+        let model = new ModelImplRoot(demographics, modifications);
         let modelStateIntegrator: ModelStateIntegrator;
 
+        /**
+         * 5 interpolation runs
+         */
         for (let i = 0; i < 5; i++) {
 
             modelStateIntegrator = new ModelStateIntegrator(model);
@@ -65,25 +71,26 @@ export class ModelImplRoot implements IModelSeir {
             const overallIncidence = lastDataItem.TOTAL_INCIDENCE;
             const overallVaccinated = lastDataItem.TOTAL_REMOVED_V;
 
-            overallMultiplier *= initialIncidence / overallIncidence;
+            // overallMultiplier *= initialIncidence / overallIncidence;
             demographics.getAgeGroups().forEach(ageGroup => {
-                const ageGroupIncidence = lastDataItem[ageGroup.getName() + '_INCIDENCE'];
+                const ageGroupIncidence = lastDataItem[`${ageGroup.getName()}_INCIDENCE`];
                 const ageGroupOverallRatio = ageGroupIncidence / overallIncidence;
-                ageGroupMultipliers[ageGroup.getIndex()] = ageGroupOverallRatio;
+                // ageGroupMultipliers[ageGroup.getIndex()] = ageGroupOverallRatio;
             });
 
             // adjust the vaccination multiplier to interpolate to a value that gives a closer match to desired settings
             vaccinationMultiplier *= modificationSettings.getVaccinated() / overallVaccinated;
 
-            model = new ModelImplRoot(demographics, modifications, overallMultiplier, ageGroupMultipliers);
+            model = new ModelImplRoot(demographics, modifications);
 
         }
 
+        // final model setup with interpolated values, then integration over preload time
         modelStateIntegrator = new ModelStateIntegrator(model);
         modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
-        for (let tT = minInstant; tT <= maxInstant; tT += ModelStateIntegrator.DT) {
-            modelStateIntegrator.integrate(ModelStateIntegrator.DT, tT);
-        }
+        // for (let tT = minInstant; tT <= maxInstant; tT += ModelStateIntegrator.DT) {
+        //     modelStateIntegrator.integrate(ModelStateIntegrator.DT, tT);
+        // }
 
         return modelStateIntegrator;
 
@@ -102,33 +109,26 @@ export class ModelImplRoot implements IModelSeir {
      */
     private readonly vaccinationModels: ModelImplVaccination[];
 
-    /**
-     * 1) a one-day compartment of cases that incubated that day
-     * 2) 6 more single day compartments to get a total of 7 -> 7-day incidence
-     */
-    private incidenceModels: ModelImplIncidence[];
-
-    private constructor(demographics: Demographics, modifications: Modifications, overallMultiplier: number, ageGroupMultipliers: number[]) {
+    private constructor(demographics: Demographics, modifications: Modifications) {
 
         this.strainModels = [];
         this.compartmentsSusceptible = [];
         this.compartmentsRemovedD = [];
         this.compartmentsRemovedU = [];
         this.vaccinationModels = [];
-        this.incidenceModels = [];
 
         this.absTotal = demographics.getAbsTotal();
 
-        const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
-        let initialIncidence = 0;
-        modificationsStrain.forEach(modificationStrain => {
-            initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;
-        });
-        initialIncidence *= overallMultiplier;
+        // const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
+        // let initialIncidence = 0;
+        // modificationsStrain.forEach(modificationStrain => {
+        //     initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;
+        // });
+        // initialIncidence *= overallMultiplier;
 
         // TODO setup of initial exposed and infectious compartments may have to be adapted by multipliers
         modifications.findModificationsByType('STRAIN').forEach((modification: ModificationStrain) => {
-            this.strainModels.push(new ModelImplStrain(this, demographics, modification.getModificationValues(), overallMultiplier, ageGroupMultipliers));
+            this.strainModels.push(new ModelImplStrain(this, demographics, modification.getModificationValues()));
         });
 
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
@@ -138,14 +138,12 @@ export class ModelImplRoot implements IModelSeir {
 
             // TODO initial share of discovery (may split recovered slider)
             const absValueRemovedD = ageGroup.getAbsValue() * settingsValues.recoveredD;
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, absValueRemovedD, ageGroup.getIndex(), CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedD.push(compartmentRemovedD);
 
             const absValueRemovedU = ageGroup.getAbsValue() * settingsValues.recoveredU;
-            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, absValueRemovedU, ageGroup.getIndex(), CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedU.push(compartmentRemovedU);
-
-            this.incidenceModels.push(new ModelImplIncidence(this, demographics, initialIncidence * ageGroupMultipliers[ageGroup.getIndex()], ageGroup));
 
             const shareOfRefusal = 0.40 - 0.25 * ageGroup.getIndex() / demographics.getAgeGroups().length;
             const vaccinationModel = new ModelImplVaccination(this, demographics, ageGroup, shareOfRefusal);
@@ -160,7 +158,7 @@ export class ModelImplRoot implements IModelSeir {
         demographics.getAgeGroups().forEach(ageGroup => {
 
             const absValueSusceptible = ageGroup.getAbsValue() - this.getNrmValueGroup(ageGroup.getIndex(), true) * this.getAbsValue();
-            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, absValueSusceptible, ageGroup.getIndex(), CompartmentChain.NO_CONTINUATION);
+            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsSusceptible.push(compartmentSusceptible);
 
             // this.pS = this.pN - this.pECov2 - this.pICov2 - this.pEB117 - this.pIB117 - this.pR;
@@ -183,10 +181,6 @@ export class ModelImplRoot implements IModelSeir {
 
     getCompartmentRemovedU(ageGroupIndex: number): CompartmentBase {
         return this.compartmentsRemovedU[ageGroupIndex];
-    }
-
-    getIncidenceModel(ageGroupIndex: number): ModelImplIncidence {
-        return this.incidenceModels[ageGroupIndex];
     }
 
     /**
@@ -236,9 +230,6 @@ export class ModelImplRoot implements IModelSeir {
         });
         this.compartmentsRemovedU.forEach(compartmentRemovedU => {
             initialState.addNrmValue(compartmentRemovedU.getNrmValue(), compartmentRemovedU);
-        });
-        this.incidenceModels.forEach(incidenceModel => {
-            initialState.add(incidenceModel.getInitialState());
         });
         this.strainModels.forEach(strainModel => {
             initialState.add(strainModel.getInitialState());
@@ -337,6 +328,8 @@ export class ModelImplRoot implements IModelSeir {
             key: 'TIME',
             instant: tT,
             name: 'step',
+            deletable: false,
+            draggable: false
         });
         // triggers fetching of contact, testing and vaccination modifications
         modificationTime.setInstants(tT, tT); // tT, tT is by purpose, standing for instant, instant
@@ -346,10 +339,6 @@ export class ModelImplRoot implements IModelSeir {
         this.strainModels.forEach(strainModel => {
             result.add(strainModel.apply(state, dT, tT, modificationTime));
         });
-        this.incidenceModels.forEach(incidenceModel => {
-            result.add(incidenceModel.apply(state, dT, tT));
-        });
-
 
         return result;
 

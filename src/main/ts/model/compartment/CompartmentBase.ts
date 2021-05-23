@@ -19,15 +19,17 @@ export class CompartmentBase implements ICompartment {
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly ageGroupIndex: number;
+    private readonly strainId: string;
 
     private readonly continuationRatio: IRational;
 
-    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, continuationDuration: number) {
+    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, continuationDuration: number) {
         this.id = ObjectUtil.createId();
         this.compartmentType = compartmentType;
         this.absTotal = absTotal;
         this.nrmValue = absValue * 1.0 / this.absTotal;
         this.ageGroupIndex = ageGroupIndex;
+        this.strainId = strainId;
         this.continuationRatio = new RationalDuration(continuationDuration);
     }
 
@@ -65,6 +67,10 @@ export class CompartmentBase implements ICompartment {
 
     getAgeGroupIndex(): number {
         return this.ageGroupIndex;
+    }
+
+    getStrainId(): string {
+        return this.strainId;
     }
 
     getContinuationRatio(): IRational {

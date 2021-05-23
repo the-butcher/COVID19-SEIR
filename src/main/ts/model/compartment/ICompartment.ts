@@ -32,4 +32,9 @@ export interface ICompartment extends IConnectable, IValueHolder {
      */
     getContinuationRatio(): IRational;
 
+    /**
+     * get a strain id associated with this compartment, if any
+     */
+    getStrainId(): string;
+
 }

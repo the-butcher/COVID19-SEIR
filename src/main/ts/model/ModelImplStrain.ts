@@ -6,29 +6,43 @@ import { ModelImplInfectious } from './ModelImplInfectious';
 import { ModelImplRoot } from './ModelImplRoot';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
+import { ModelImplIncidence } from './ModelImplIncidence';
 
 export class ModelImplStrain implements IModelSeir {
 
     private readonly parentModel: ModelImplRoot;
+
     private readonly infectiousModels: ModelImplInfectious[];
+
+    /**
+     * 1) a one-day compartment of cases that incubated that day
+     * 2) 6 more single day compartments to get a total of 7 -> 7-day incidence
+     */
+    private incidenceModels: ModelImplIncidence[];
+
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly exposuresPerContact: number;
     private readonly strain: IModificationValuesStrain;
 
-    constructor(parentModel: ModelImplRoot, demographics: Demographics, strain: IModificationValuesStrain, overallMultiplier: number, incidenceMultipliers: number[]) {
+    constructor(parentModel: ModelImplRoot, demographics: Demographics, strain: IModificationValuesStrain) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
+        this.incidenceModels = [];
         this.exposuresPerContact = demographics.getExposuresPerContact();
 
         this.absTotal = demographics.getAbsTotal();
 
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
-            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strain, overallMultiplier, incidenceMultipliers[ageGroup.getIndex()]);
+
+            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strain);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
+
+            this.incidenceModels.push(new ModelImplIncidence(this, demographics, strain.incidence, ageGroup, strain.id));
+
         });
         this.nrmValue = nrmValue1;
 
@@ -38,6 +52,10 @@ export class ModelImplStrain implements IModelSeir {
 
     getRootModel(): ModelImplRoot {
         return this.parentModel;
+    }
+
+    getIncidenceModel(ageGroupIndex: number): ModelImplIncidence {
+        return this.incidenceModels[ageGroupIndex];
     }
 
     getNrmValueGroup(ageGroupIndex: number): number {
@@ -59,6 +77,9 @@ export class ModelImplStrain implements IModelSeir {
         this.infectiousModels.forEach(groupModel => {
             initialState.add(groupModel.getInitialState());
         });
+        this.incidenceModels.forEach(incidenceModel => {
+            initialState.add(incidenceModel.getInitialState());
+        });
         return initialState;
     }
 
@@ -69,7 +90,7 @@ export class ModelImplStrain implements IModelSeir {
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();
-        if (tT >= this.strain.instant) {
+        // if (tT >= this.strain.instant) {
 
             const absExposedParticipants: number[] = [];
             this.infectiousModels.forEach(participantInfectiousModel => {
@@ -131,7 +152,12 @@ export class ModelImplStrain implements IModelSeir {
 
             }
 
-        }
+        // }
+
+        this.incidenceModels.forEach(incidenceModel => {
+            result.add(incidenceModel.apply(state, dT, tT));
+        });
+
         return result;
 
     }

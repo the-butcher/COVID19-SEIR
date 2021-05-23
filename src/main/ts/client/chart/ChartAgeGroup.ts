@@ -4,6 +4,9 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { AgeGroup } from '../../common/demographics/AgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
+import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { Modifications } from '../../common/modification/Modifications';
+import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
@@ -47,7 +50,16 @@ export class ChartAgeGroup {
     protected readonly yAxisHeat: CategoryAxis;
     protected readonly yAxisModification: ValueAxis;
 
+    /**
+     * primary incidence series (all strains)
+     */
     protected readonly seriesAgeGroupIncidence: ChartAgeGroupSeries;
+
+    /**
+     * incidence series by strain
+     */
+    protected readonly seriesAgeGroupIncidenceByStrain: Map<string, ChartAgeGroupSeries>;
+
     protected readonly seriesAgeGroupCases: ChartAgeGroupSeries;
 
     protected readonly seriesAgeGroupSusceptible: ChartAgeGroupSeries;
@@ -167,6 +179,8 @@ export class ChartAgeGroup {
             labelled: true,
             percent: false
         });
+        this.seriesAgeGroupIncidenceByStrain = new Map();
+
         this.seriesAgeGroupCases = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
@@ -504,7 +518,25 @@ export class ChartAgeGroup {
 
     async acceptModelData(modelData: any[]): Promise<void> {
 
-        // console.log('modelData', modelData);
+        console.log('modelData', modelData);
+
+        // add any missing strain series
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        modificationValuesStrain.forEach(modificationValueStrain => {
+            if (!this.seriesAgeGroupIncidenceByStrain.has(modificationValueStrain.id)) {
+                this.seriesAgeGroupIncidenceByStrain.set(modificationValueStrain.id, new ChartAgeGroupSeries({
+                    chart: this.chart,
+                    yAxis: this.yAxisPlotIncidence,
+                    valueField: `ageGroupIncidence${modificationValueStrain.id}`,
+                    colorKey: 'INCIDENCE',
+                    strokeWidth: 1,
+                    dashed: true,
+                    locationOnPath: 0.10,
+                    labelled: true,
+                    percent: false
+                }));
+            }
+        });
 
         this.modelData = modelData;
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
@@ -533,17 +565,21 @@ export class ChartAgeGroup {
         const plotData: any[] = [];
         const heatData: any[] = [];
 
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+
         const ageGroupPlot = this.ageGroupsWithTotal[this.ageGroupIndex];
         for (const dataItem of this.modelData) {
 
-            const ageGroupSusceptible = dataItem[ageGroupPlot.getName() + '_SUSCEPTIBLE'];
-            const ageGroupExposed = dataItem[ageGroupPlot.getName() + '_EXPOSED'];
-            const ageGroupInfectious = dataItem[ageGroupPlot.getName() + '_INFECTIOUS'];
-            const ageGroupRemovedI = dataItem[ageGroupPlot.getName() + '_REMOVED_I'];
-            const ageGroupRemovedV = dataItem[ageGroupPlot.getName() + '_REMOVED_V'];
-            const ageGroupIncidence = dataItem[ageGroupPlot.getName() + '_INCIDENCE'];
-            const ageGroupCases = dataItem[ageGroupPlot.getName() + '_CASES'];
-            plotData.push({
+            // data independent from sub-strains
+            const ageGroupSusceptible = dataItem[`${ageGroupPlot.getName()}_SUSCEPTIBLE`];
+            const ageGroupExposed = dataItem[`${ageGroupPlot.getName()}_EXPOSED`];
+            const ageGroupInfectious = dataItem[`${ageGroupPlot.getName()}_INFECTIOUS`];
+            const ageGroupRemovedI = dataItem[`${ageGroupPlot.getName()}_REMOVED_I`];
+            const ageGroupRemovedV = dataItem[`${ageGroupPlot.getName()}_REMOVED_V`];
+            const ageGroupIncidence = dataItem[`${ageGroupPlot.getName()}_INCIDENCE`];
+            const ageGroupCases = dataItem[`${ageGroupPlot.getName()}_CASES`];
+
+            const item = {
                 categoryX: dataItem[ChartAgeGroup.FIELD_CATEGORY_X],
                 ageGroupSusceptible,
                 ageGroupExposed,
@@ -553,7 +589,14 @@ export class ChartAgeGroup {
                 ageGroupRemovedV,
                 ageGroupIncidence,
                 ageGroupCases
+            }
+
+            // TODO instead of rebuild the data every time, it maybe could be much easier to change the value fields on the age specific series
+            modificationValuesStrain.forEach(modificationValueStrain => {
+                item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem[`${ageGroupPlot.getName()}_INCIDENCE_${modificationValueStrain.id}`];
             });
+
+            plotData.push(item);
 
         }
 

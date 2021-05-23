@@ -98,6 +98,7 @@ export class ModelConstants {
     static readonly PRELOAD_________________DAYS = 15;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
+    static readonly STRAIN_ID_ALL = '*****';
 
     static readonly RANGE__PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE__PERCENTAGE__10 = [0.0, 0.1];

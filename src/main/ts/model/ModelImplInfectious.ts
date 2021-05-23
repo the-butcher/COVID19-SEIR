@@ -25,7 +25,7 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
     private readonly compartments: CompartmentInfectious[];
     private integrationSteps: IModelIntegrationStep[];
 
-    constructor(parentModel: ModelImplStrain, modelSettings: Demographics, ageGroup: AgeGroup, strain: IModificationValuesStrain, overallMultiplier: number, incidenceMultiplier: number) {
+    constructor(parentModel: ModelImplStrain, modelSettings: Demographics, ageGroup: AgeGroup, strain: IModificationValuesStrain) {
 
         this.parentModel = parentModel;
         this.compartments = [];
@@ -37,7 +37,7 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
 
         // make some assumptions about initial cases
         // TODO strains entering later than min-time must not have instance-multipliers
-        const dailyCases = strain.incidence * incidenceMultiplier * overallMultiplier * ageGroup.getAbsValue() / 700000;
+        const dailyCases = strain.incidence * ageGroup.getAbsValue() / 700000;
         const durationLatent = StrainUtil.calculateLatency(strain.serialInterval, strain.intervalScale);
         const durationInfect = StrainUtil.calculateInfecty(strain.serialInterval, strain.intervalScale);
 
@@ -67,10 +67,10 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
             i0NormalSum += compartmentParam.i0Normal;
 
             if (compartmentParam.type === ECompartmentType.E_____EXPOSED) {
-                this.compartments.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absExposed, this.ageGroupIndex, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
+                this.compartments.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absExposed, this.ageGroupIndex, strain.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
             } else {
                 i0AbsoluteSum += absInfected * compartmentParam.i0Normal;
-                this.compartments.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absInfected * compartmentParam.i0Normal, this.ageGroupIndex, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
+                this.compartments.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absInfected * compartmentParam.i0Normal, this.ageGroupIndex, strain.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
             }
 
         });
@@ -92,7 +92,7 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
                         increments.addNrmValue(continuationValue, targetCompartment);
                     }
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
-                        const compartmentCases = this.getRootModel().getIncidenceModel(this.ageGroupIndex).getIncomingCompartment();
+                        const compartmentCases = this.parentModel.getIncidenceModel(this.ageGroupIndex).getIncomingCompartment();
                         increments.addNrmValue(continuationValue, compartmentCases);
                     }
                     return increments;
