@@ -7,7 +7,7 @@ import { Demographics } from '../../common/demographics/Demographics';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IContactMatrix } from '../../common/modification/IContactMatrix';
 import { ChartUtil } from './ChartUtil';
-import { MatrixAxisIcon } from './MatrixAxisIcon';
+import { IconMatrixAxis } from './IconMatrixAxis';
 
 export interface IChartData {
     categoryX?: string;
@@ -45,7 +45,7 @@ export class ChartContactMatrix {
     private contactMatrix: IContactMatrix;
     private readonly valueTotalLabel: Label;
 
-    private axisIcon: MatrixAxisIcon;
+    private axisIcon: IconMatrixAxis;
 
     constructor(container: string) {
 
@@ -203,17 +203,16 @@ export class ChartContactMatrix {
         this.valueTotalLabel.fontSize = ControlsConstants.FONT_SIZE - 1;
         this.valueTotalLabel.fill = color(ControlsConstants.COLOR____FONT);
         this.valueTotalLabel.text = '';
-        // this.valueTotalLabel.align = 'left';
         this.valueTotalLabel.isMeasured = false;
         this.valueTotalLabel.x = 50;
-        this.valueTotalLabel.y = 270;
+        this.valueTotalLabel.y = 287;
         this.valueTotalLabel.horizontalCenter = 'right';
 
         this.chart.leftAxesContainer.events.on('sizechanged', e => {
 
             this.yAxisHeat.y = 0;
-            this.yAxisHeat.height = 197;
-            this.yAxisPlot.y = 197;
+            this.yAxisHeat.height = 192;
+            this.yAxisPlot.y = 192;
             this.yAxisPlot.height = 70;
 
         });
@@ -223,7 +222,7 @@ export class ChartContactMatrix {
             (this.seriesPlot.element.node.firstChild as SVGGElement).setAttributeNS(null, 'clip-path', '');
             setTimeout(() => {
 
-                this.axisIcon = new MatrixAxisIcon();
+                this.axisIcon = new IconMatrixAxis();
                 document.getElementById(container).appendChild(this.axisIcon.getSvgContainer());
                 this.axisIcon.getSvgContainer().addEventListener('pointerup', () => {
                     this.toggleAxes();
@@ -274,7 +273,6 @@ export class ChartContactMatrix {
         heatRule.minValue = 0;
         heatRule.maxValue = 1;
 
-        // const cellCount =  Math.pow(groups.length, 2);
         const matrixContactTotal = demographics.getMatrixContactTotal();
         const maxCellTotal = demographics.getMaxCellTotal();
 
@@ -320,7 +318,7 @@ export class ChartContactMatrix {
             this.chart.invalidateRawData();
         } else {
             for (let i = 0; i < chartData.length; i++) {
-                for (const key of Object.keys(chartData[i])) { // const key in chartData[i]
+                for (const key of Object.keys(chartData[i])) {
                     this.chart.data[i][key] = chartData[i][key];
                 }
             }

@@ -21,28 +21,6 @@ export class ControlsContact {
     }
     private static instance: ControlsContact;
 
-    static rebuildModificationData(): void {
-        const modificationData: IModificationData[] = [];
-        Modifications.getInstance().findModificationsByType('CONTACT').forEach(modification => {
-            modificationData.push({
-                modValueY: modification.getModificationValue(),
-                categoryX: TimeUtil.formatCategoryDate(modification.getInstantA())
-            });
-            modificationData.push({
-                modValueY: modification.getModificationValue(),
-                categoryX: TimeUtil.formatCategoryDate(modification.getInstantB())
-            });
-        });
-        ChartAgeGroup.getInstance().showModifications({
-            min: 0,
-            max: 1,
-            percent: true,
-            text: 'CONTACT',
-            color: ControlsConstants.COLORS['CONTACT'],
-            useObjectColors: true,
-        }, modificationData);
-    }
-
     private readonly chartContact: ChartContactMatrix;
     private slidersCategory: SliderContactCategory[];
 
@@ -70,7 +48,7 @@ export class ControlsContact {
             multipliers
         });
 
-        ControlsContact.rebuildModificationData();
+        ControlsConstants.rebuildModificationData('CONTACT', 1);
         this.chartContact.redraw(this.modification);
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
 

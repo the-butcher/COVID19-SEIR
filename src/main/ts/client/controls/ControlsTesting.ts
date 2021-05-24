@@ -5,6 +5,10 @@ import { Demographics } from '../../common/demographics/Demographics';
 import { SliderTestingCategory } from '../gui/SliderTestingCategory';
 import { SliderModification } from '../gui/SliderModification';
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
+import { ChartAgeGroup, IModificationData } from '../chart/ChartAgeGroup';
+import { Modifications } from '../../common/modification/Modifications';
+import { TimeUtil } from '../../util/TimeUtil';
+import { ControlsConstants } from '../gui/ControlsConstants';
 
 export class ControlsTesting {
 

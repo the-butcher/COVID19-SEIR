@@ -510,7 +510,7 @@ export class ChartAgeGroup {
             this.seriesModification.getSeries().stroke = color(modificationDefinition.color);
             this.seriesModification.getSeries().data = modificationData;
 
-            console.log('modificationData', modificationData);
+            // console.log('modificationData', modificationData);
 
         } else {
             // TODO reset display
@@ -520,7 +520,7 @@ export class ChartAgeGroup {
 
     async acceptModelData(modelData: any[]): Promise<void> {
 
-        console.log('modelData', modelData);
+        // console.log('modelData', modelData);
 
         // add any missing strain series
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);

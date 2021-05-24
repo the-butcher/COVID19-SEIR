@@ -1,11 +1,10 @@
 import { CategoryAxis, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
-import { color, create, useTheme } from '@amcharts/amcharts4/core';
+import { color, create, Label, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
-import { ControlsConstants } from '../gui/ControlsConstants';
-import { ModelConstants } from '../../model/ModelConstants';
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
 
 export interface IChartDataHeat {
@@ -26,6 +25,7 @@ export class ChartTesting {
     private readonly xAxis: CategoryAxis;
     private readonly yAxis: ValueAxis;
     private readonly seriesHeat: LineSeries;
+    private readonly valueTotalLabel: Label;
 
     private fullDataUpdate: boolean;
 
@@ -92,6 +92,16 @@ export class ChartTesting {
         this.chart.cursor.lineX.disabled = true;
         this.chart.cursor.lineY.disabled = true;
 
+        this.valueTotalLabel = this.chart.createChild(Label);
+        this.valueTotalLabel.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.valueTotalLabel.fontSize = ControlsConstants.FONT_SIZE - 1;
+        this.valueTotalLabel.fill = color(ControlsConstants.COLOR____FONT);
+        this.valueTotalLabel.text = '';
+        this.valueTotalLabel.isMeasured = false;
+        this.valueTotalLabel.x = 50;
+        this.valueTotalLabel.y = 142;
+        this.valueTotalLabel.horizontalCenter = 'right';
+
         this.chart.events.on('ready', e => {
             (this.seriesHeat.bulletsContainer.element.node.parentNode as SVGGElement).setAttributeNS(null, 'clip-path', '');
             setTimeout(() => {
@@ -107,20 +117,24 @@ export class ChartTesting {
      */
     async redraw(modification: ModificationTesting): Promise<void> {
 
-        const modelConfig = Demographics.getInstance();
+        const demographics = Demographics.getInstance();
         const chartData = [];
-        const groups = modelConfig.getAgeGroups();
+        const ageGroups = demographics.getAgeGroups();
 
+        let totalTestingValue = 0;
         // full update required after setting all values to 0 (maybe an amcharts bug)
-        for (let indexContact = 0; indexContact < groups.length; indexContact++) {
+        for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
             const testingVal = modification.getTestingRatio(indexContact);
+            totalTestingValue += testingVal * ageGroups[indexContact].getAbsValue();
             chartData.push({
-                contactX: groups[indexContact].getName(),
-                participantY: Math.max(0.0001, testingVal),
+                contactX: ageGroups[indexContact].getName(),
+                participantY: Math.max(0.00000000001, testingVal),
                 label: (testingVal * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%',
                 color: ChartUtil.getInstance().toColor(testingVal)
             });
         }
+
+        this.valueTotalLabel.text = (totalTestingValue * 100 / demographics.getAbsTotal()).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;

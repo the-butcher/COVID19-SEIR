@@ -1,15 +1,10 @@
-import { Modifications } from '../../common/modification/Modifications';
+import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { ChartAgeGroup, IModificationData } from '../chart/ChartAgeGroup';
-import { ChartUtil } from '../chart/ChartUtil';
-import { Demographics } from '../../common/demographics/Demographics';
 import { SliderModification } from '../gui/SliderModification';
 import { SliderVaccination } from '../gui/SliderVaccination';
-import { ModelConstants } from '../../model/ModelConstants';
+import { ControlsConstants } from './../gui/ControlsConstants';
 import { Controls } from './Controls';
-import { ControlsConstants } from '../gui/ControlsConstants';
-import { TimeUtil } from '../../util/TimeUtil';
 
 export class ControlsVaccination {
 
@@ -20,28 +15,6 @@ export class ControlsVaccination {
         return this.instance;
     }
     private static instance: ControlsVaccination;
-
-    static rebuildModificationData(): void {
-        const modificationData: IModificationData[] = [];
-        Modifications.getInstance().findModificationsByType('VACCINATION').forEach(modification => {
-            modificationData.push({
-                modValueY: modification.getModificationValue(),
-                categoryX: TimeUtil.formatCategoryDate(modification.getInstantA())
-            });
-            modificationData.push({
-                modValueY: modification.getModificationValue(),
-                categoryX: TimeUtil.formatCategoryDate(modification.getInstantB())
-            });
-        });
-        ChartAgeGroup.getInstance().showModifications({
-            min: 0,
-            max: 100000,
-            percent: true,
-            text: 'VACCINATION',
-            color: ControlsConstants.COLORS['VACCINATION'],
-            useObjectColors: true,
-        }, modificationData);
-    }
 
     private sliderDosesPerDay: SliderVaccination;
 
@@ -58,7 +31,7 @@ export class ControlsVaccination {
         this.modification.acceptUpdate({
             doses: this.sliderDosesPerDay.getValue()
         });
-        ControlsVaccination.rebuildModificationData();
+        ControlsConstants.rebuildModificationData('VACCINATION', 100000);
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
     }
 

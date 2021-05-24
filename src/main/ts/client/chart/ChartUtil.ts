@@ -115,8 +115,8 @@ export class ChartUtil {
         axis.tooltip.label.paddingBottom = 1;
         axis.tooltip.label.paddingRight = 2;
 
-        axis.renderer.minWidth = 52;
-        axis.renderer.minHeight = 52;
+        axis.renderer.minWidth = 58;
+        axis.renderer.minHeight = 58;
         axis.renderer.grid.template.disabled = false;
         axis.renderer.grid.template.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
         axis.renderer.events.on('sizechanged', e => {

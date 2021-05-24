@@ -25,7 +25,7 @@ export class ControlsSeasonality {
         const modificationData: IModificationData[] = [];
         const modificationSeasonality = Modifications.getInstance().findModificationsByType('SEASONALITY')[0] as ModificationSeasonality;
         const maxSeasonalityInstant = modificationSeasonality.getInstantA(); // the instant where amount of seasonality is at it's max
-        console.log('-------------------');
+        // console.log('-------------------');
 
         // let 365 be "radius" of the cosine function and maxInstant "zero"
         const minInstant = SliderModification.getInstance().getMinValue();
@@ -39,7 +39,7 @@ export class ControlsSeasonality {
             value = 1 - (cosine + 1) * 0.5 * (1 - modificationSeasonality.getAmount()); // 1 at max seasonality, 0 at min
             // value = 1 - (cosine + 1) * 0.5 * modificationSeasonality.getAmount();
             // cosine = (Math.cos((instant - maxSeasonalityInstant) % millisYear / millisYear * Math.PI * 2) + 1) * 0.5 * modificationSeasonality.getAmount();
-            console.log('radians', new Date(instant), cosine);
+            // console.log('radians', new Date(instant), cosine);
             modificationData.push({
                 modValueY: value,
                 categoryX: TimeUtil.formatCategoryDate(instant)

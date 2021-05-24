@@ -6,7 +6,7 @@ import { ControlsConstants } from '../gui/ControlsConstants';
  * @author h.fleischer
  * @since 16.05.2021
  */
-export class MatrixAxisIcon {
+export class IconMatrixAxis {
 
     private readonly id: string;
     private readonly svgContainer: HTMLDivElement;
@@ -21,7 +21,7 @@ export class MatrixAxisIcon {
         this.svgContainer.style.cursor = 'pointer';
         this.svgContainer.style.position = 'absolute';
         this.svgContainer.style.left = '23px';
-        this.svgContainer.style.top = '290px';
+        this.svgContainer.style.top = '280px';
 
         const svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svgElement.setAttributeNS(null, 'viewBox', '-15 -15 30 30');

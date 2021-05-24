@@ -6,11 +6,13 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 current Tasks:
-* rebuild contact-matrix percentage to reflect symetric values, where population has been multiplied with contact-rate
+* ~~rebuild contact-matrix percentage to reflect symetric values, where population has been multiplied with contact-rate~~
 * modification chart area
   * find some primary value for strain (if possible use r<sub>t</sub>)
-  * use rebuilt contact matrix percentage
-  * introduce percentage for testing ratio
+  * ~~use rebuilt contact matrix percentage~~
+  * ~~introduce percentage for testing ratio~~
+  * format percentage when applicable
+  * ~~consider extra axis width for vaccination labels, messes up widths otherwise~~
 * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
 * implement import, save, export
 * do performance tests on model integration and try to improve performance
@@ -22,6 +24,9 @@ current Tasks:
   * EI (?), exposed(infected)
   * INCIDENCE
 * introduce vaccination heatmap
+* ~~vaccinations format to % in modification chart, but should not~~
+* split modification chart to one value per day, will provide tooltips on the curve
+  * implement some type mod-value provider, one for each modification type (bonus of that type will be i.e. seasonality value provider)
 
 
 done:

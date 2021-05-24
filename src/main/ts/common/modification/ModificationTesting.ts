@@ -14,7 +14,7 @@ import { AModification } from './AModification';
  */
 export class ModificationTesting extends AModification<IModificationValuesTesting> {
 
-    private readonly groups: AgeGroup[];
+    private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
     private readonly ageGroupTotalsByIndexContact: number[];
     private readonly testingValsByIndexContact: number[];
@@ -23,16 +23,16 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
 
         super('RANGE', testingParams);
 
-        this.groups = [];
+        this.ageGroups = [];
         this.contactCategories = [];
         this.ageGroupTotalsByIndexContact = [];
         this.testingValsByIndexContact = [];
 
-        this.groups.push(...Demographics.getInstance().getAgeGroups());
+        this.ageGroups.push(...Demographics.getInstance().getAgeGroups());
         this.contactCategories.push(...Demographics.getInstance().getContactCategories());
 
         // build an initial set of contact-sums for later normalization
-        for (let ageGroupIndex = 0; ageGroupIndex < this.groups.length; ageGroupIndex++) {
+        for (let ageGroupIndex = 0; ageGroupIndex < this.ageGroups.length; ageGroupIndex++) {
             let ageGroupTotal = 0;
             this.contactCategories.forEach(contactCategory => {
                 ageGroupTotal += contactCategory.getAgeGroupTotal(ageGroupIndex);
@@ -57,7 +57,7 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
     }
 
     private rebuildContactVals(): void {
-        for (let ageGroupIndex = 0; ageGroupIndex < this.groups.length; ageGroupIndex++) {
+        for (let ageGroupIndex = 0; ageGroupIndex < this.ageGroups.length; ageGroupIndex++) {
             let contactVal = 0;
             this.contactCategories.forEach(contactCategory => {
                 contactVal += this.getMultiplier(contactCategory.getName()) * contactCategory.getAgeGroupTotal(ageGroupIndex) /  this.ageGroupTotalsByIndexContact[ageGroupIndex];
@@ -67,7 +67,13 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
     }
 
     getModificationValue(): number {
-        return -1; // TODO build a percentage like in contact matrix
+        let totalTestingValue = 0;
+        // full update required after setting all values to 0 (maybe an amcharts bug)
+        for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
+            const testingVal = this.getTestingRatio(indexContact);
+            totalTestingValue += testingVal * this.ageGroups[indexContact].getAbsValue();
+        }
+        return totalTestingValue / Demographics.getInstance().getAbsTotal();
     }
 
     private getContactCategoryMultiplier(contactCategoryName: string): number {

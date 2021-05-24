@@ -1,3 +1,4 @@
+import { Modifications } from './../../common/modification/Modifications';
 import { IModification } from '../../common/modification/IModification';
 import { ControlsContact } from '../controls/ControlsContact';
 import { ControlsSeasonality } from '../controls/ControlsSeasonality';
@@ -15,6 +16,8 @@ import { ModificationSettings } from '../../common/modification/ModificationSett
 import { ControlsSettings } from '../controls/ControlsSettings';
 import { ModificationSeasonality } from '../../common/modification/ModificationSeasonality';
 import { ModificationContact } from '../../common/modification/ModificationContact';
+import { ChartAgeGroup, IModificationData } from '../chart/ChartAgeGroup';
+import { TimeUtil } from '../../util/TimeUtil';
 
 export interface IControlsDefinitions {
     icon: string;
@@ -74,20 +77,21 @@ export class ControlsConstants {
             icon: 'M -5.38 -4.08 A 1.79 1.79 90 1 0 -7.17 -5.88 A 1.79 1.79 90 0 0 -5.38 -4.08 Z M -5.38 0.85 A 1.24 1.24 90 0 1 -4.99 -0.05 L -2.97 -1.96 C -2.93 -2 -2.87 -2.02 -2.82 -2.06 A 1.79 1.79 90 0 0 -4.48 -3.19 H -6.27 A 1.79 1.79 90 0 0 -8.06 -1.4 V 1.29 A 0.9 0.9 90 0 0 -7.17 2.19 V 5.77 A 0.9 0.9 90 0 0 -6.27 6.67 H -4.48 A 0.9 0.9 90 0 0 -3.58 5.77 V 3.07 L -4.99 1.74 A 1.23 1.23 90 0 1 -5.38 0.85 Z M 5.38 -4.08 A 1.79 1.79 90 1 0 3.58 -5.88 A 1.79 1.79 90 0 0 5.38 -4.08 Z M 6.27 -3.19 H 4.48 A 1.79 1.79 90 0 0 2.82 -2.06 C 2.87 -2.02 2.93 -2 2.97 -1.96 L 4.99 -0.05 A 1.24 1.24 90 0 1 4.99 1.74 L 3.58 3.07 V 5.77 A 0.9 0.9 90 0 0 4.48 6.67 H 6.27 A 0.9 0.9 90 0 0 7.17 5.77 V 2.19 A 0.9 0.9 90 0 0 8.06 1.29 V -1.4 A 1.79 1.79 90 0 0 6.27 -3.19 Z M 4.38 0.6 L 2.36 -1.3 A 0.34 0.34 90 0 0 1.79 -1.06 V -0.05 H -1.79 V -1.06 A 0.34 0.34 90 0 0 -2.36 -1.3 L -4.38 0.6 A 0.35 0.35 90 0 0 -4.38 1.09 L -2.36 3 A 0.34 0.34 90 0 0 -1.79 2.75 V 1.74 H 1.79 V 2.75 A 0.34 0.34 90 0 0 2.36 3 L 4.38 1.09 A 0.35 0.35 90 0 0 4.38 0.6 Z',
             container: 'modificationContactDiv',
             updateChartOnChange: true,
-            updateModificationChart: async () => ControlsContact.rebuildModificationData(),
+            updateModificationChart: async () => ControlsConstants.rebuildModificationData('CONTACT', 1),
             showInEditor: modification => ControlsContact.getInstance().acceptModification(modification as ModificationContact)
         },
         'TESTING': {
             icon: 'M 7.98 -2.66 L 2.65 -7.98 C 2.55 -8.08 2.39 -8.08 2.29 -7.98 L 1.22 -6.91 C 1.12 -6.81 1.12 -6.65 1.22 -6.55 L 1.57 -6.2 L -6.11 1.47 C -7.34 2.69 -7.54 4.7 -6.41 6.01 C -5.75 6.77 -4.84 7.15 -3.92 7.15 C -3.09 7.15 -2.25 6.83 -1.61 6.2 L 6.19 -1.59 L 6.55 -1.24 C 6.64 -1.14 6.8 -1.14 6.9 -1.24 L 7.98 -2.31 C 8.08 -2.4 8.08 -2.57 7.98 -2.66 Z M 2.92 -0.45 H -2.05 L 2.64 -5.13 L 5.12 -2.65 L 2.92 -0.45 Z',
             container: 'modificationTestingDiv',
             updateChartOnChange: true,
+            updateModificationChart: async () => ControlsConstants.rebuildModificationData('TESTING', 1),
             showInEditor: modification => ControlsTesting.getInstance().acceptModification(modification as ModificationTesting)
         },
         'VACCINATION': {
             icon: 'm -1.68 -2.5 l 1.72 1.72 c 0.09 0.09 0.09 0.25 0 0.35 l -0.35 0.34 c -0.1 0.1 -0.25 0.1 -0.35 0 l -1.71 -1.71 l -1.4 1.39 l 1.72 1.72 c 0.09 0.09 0.09 0.25 0 0.35 l -0.35 0.34 c -0.09 0.1 -0.25 0.1 -0.35 0 l -1.72 -1.72 l -0.81 0.82 c -0.53 0.53 -0.79 1.26 -0.71 2.01 l 0.22 1.96 l -2.04 2.04 c -0.1 0.1 -0.1 0.26 0 0.35 l 0.34 0.35 c 0.1 0.1 0.26 0.1 0.35 0 l 2.04 -2.04 l 1.96 0.22 c 0.74 0.08 1.48 -0.17 2.02 -0.71 l 5.6 -5.6 l -4.18 -4.18 l -2 2 z m 9.49 -2.87 l -2.44 -2.44 c -0.09 -0.1 -0.25 -0.1 -0.34 0 l -0.35 0.34 c -0.1 0.1 -0.1 0.26 0 0.35 l 0.87 0.87 l -1.39 1.4 l -1.75 -1.74 l -0.52 -0.53 c -0.1 -0.09 -0.25 -0.09 -0.35 0 l -1.04 1.05 c -0.1 0.09 -0.1 0.25 0 0.34 l 0.52 0.53 l 4.18 4.18 l 0.52 0.53 c 0.1 0.09 0.26 0.09 0.35 0 l 1.04 -1.05 c 0.1 -0.1 0.1 -0.25 0 -0.35 l -2.26 -2.26 l 1.4 -1.4 l 0.87 0.87 c 0.09 0.1 0.25 0.1 0.35 0 l 0.34 -0.34 c 0.1 -0.1 0.1 -0.26 0 -0.35 z',
             container: 'modificationVaccinationDiv',
             updateChartOnChange: true,
-            updateModificationChart: async () => ControlsVaccination.rebuildModificationData(),
+            updateModificationChart: async () => ControlsConstants.rebuildModificationData('VACCINATION', 100000),
             showInEditor: modification => ControlsVaccination.getInstance().acceptModification(modification as ModificationVaccination)
         },
         'SEASONALITY': {
@@ -127,5 +131,27 @@ export class ControlsConstants {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
     };
+
+    static rebuildModificationData(key: MODIFICATION____KEY, max: number): void {
+        const modificationData: IModificationData[] = [];
+        Modifications.getInstance().findModificationsByType(key).forEach(modification => {
+            modificationData.push({
+                modValueY: modification.getModificationValue(),
+                categoryX: TimeUtil.formatCategoryDate(modification.getInstantA())
+            });
+            modificationData.push({
+                modValueY: modification.getModificationValue(),
+                categoryX: TimeUtil.formatCategoryDate(modification.getInstantB())
+            });
+        });
+        ChartAgeGroup.getInstance().showModifications({
+            min: 0,
+            max,
+            percent: max === 1,
+            text: key,
+            color: ControlsConstants.COLORS[key],
+            useObjectColors: true,
+        }, modificationData);
+    }
 
 }
