@@ -21,4 +21,14 @@ export class ObjectUtil {
         return Math.round(Math.random() * 1000000).toString(16);
     }
 
+    /**
+     * normalized an array of numbers so that the resulting value array sums up to 1
+     * @param values
+     * @returns
+     */
+    static normalize(values: number[]): number[] {
+        const valueSum = values.reduce((a, b) => a + b, 0);
+        return values.map(v => v / valueSum);
+    }
+
 }

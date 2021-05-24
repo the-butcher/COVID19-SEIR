@@ -10,7 +10,7 @@ import { AModification } from './AModification';
 export class ModificationSeasonality extends AModification<IModificationValuesSeasonality> {
 
     constructor(modificationParams: IModificationValuesSeasonality) {
-        super('SEASONALITY', 'INSTANT', modificationParams);
+        super('INSTANT', modificationParams);
     }
 
     acceptUpdate(update: Partial<IModificationValuesSeasonality>): void {

@@ -25,7 +25,7 @@ export class ModelImplStrain implements IModelSeir {
     private readonly exposuresPerContact: number;
     private readonly strain: IModificationValuesStrain;
 
-    constructor(parentModel: ModelImplRoot, demographics: Demographics, strain: IModificationValuesStrain) {
+    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
@@ -37,16 +37,16 @@ export class ModelImplStrain implements IModelSeir {
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strain);
+            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
 
-            this.incidenceModels.push(new ModelImplIncidence(this, demographics, strain.incidence, ageGroup, strain.id));
+            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues));
 
         });
         this.nrmValue = nrmValue1;
 
-        this.strain = strain;
+        this.strain = strainValues;
 
     }
 

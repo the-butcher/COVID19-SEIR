@@ -1,13 +1,11 @@
-import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
-import { IModificationValuesContact } from './../common/modification/IModificationValuesContact';
-import { min } from '@amcharts/amcharts4/core';
 import { Demographics } from '../common/demographics/Demographics';
-import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { Logger } from '../util/Logger';
 import { TimeUtil } from '../util/TimeUtil';
+import { IModificationValuesContact } from './../common/modification/IModificationValuesContact';
+import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
 import { Modifications } from './../common/modification/Modifications';
 import { ObjectUtil } from './../util/ObjectUtil';
 import { CompartmentBase } from './compartment/CompartmentBase';
@@ -36,6 +34,15 @@ interface IVaccinationGroupData {
  */
 export class ModelImplRoot implements IModelSeir {
 
+    /**
+     * this method performs multiple integrations of the model from a date earlier than the actual model date
+     * from the model values at specific times in the model integration corrective multipliers are approximated
+     * that way the desired starting values can be achieved with satisfactory precision
+     * @param demographics
+     * @param modifications
+     * @param progressCallback
+     * @returns
+     */
     static async setupInstance(demographics: Demographics, modifications: Modifications, progressCallback: (progress: IModelProgress) => void): Promise<ModelStateIntegrator> {
 
         /**
@@ -90,38 +97,33 @@ export class ModelImplRoot implements IModelSeir {
                  */
                 const totalIncidenceStrain = lastDataItem[`TOTAL_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
                 const totalIncidenceTarget = incidences[strainIndex];
-                modificationsStrain[strainIndex].acceptUpdate({
-                    incidence:  modificationsStrain[strainIndex].getIncidence() * totalIncidenceTarget / totalIncidenceStrain
+                const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceStrain;
+
+                const ageGroupIncidences: number[] = [];
+                demographics.getAgeGroups().forEach(ageGroup => {
+                    const ageGroupIncidence = lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
+                    ageGroupIncidences[ageGroup.getIndex()] = ageGroupIncidence * totalIncidenceFactor;
                 });
 
-                // Logger.getInstance().log(interpolationIndex, modificationsStrain[strainIndex].getName(), totalIncidenceTarget, totalIncidenceStrain);
+                modificationsStrain[strainIndex].acceptUpdate({
+                    incidence:  modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor,
+                    ageGroupIncidences
+                });
+
+                // Logger.getInstance().log(interpolationIndex, ageGroupIncidences, ObjectUtil.normalize(ageGroupIncidences));
 
             };
             const overallVaccinated = lastDataItem.TOTAL_REMOVED_V;
-
-
-            // const modelData = await modelStateIntegrator.buildModelData(maxInstant, modelProgress => {
-            //     progressCallback({
-            //         ratio: modelProgress.ratio * maxRatio
-            //     });
-            // });
-            // const lastDataItem = modelData[modelData.length - 1];
-            // const overallIncidence = lastDataItem.TOTAL_INCIDENCE;
-            // const overallVaccinated = lastDataItem.TOTAL_REMOVED_V;
-
-            // // overallMultiplier *= initialIncidence / overallIncidence;
-            // demographics.getAgeGroups().forEach(ageGroup => {
-            //     const ageGroupIncidence = lastDataItem[`${ageGroup.getName()}_INCIDENCE`];
-            //     const ageGroupOverallRatio = ageGroupIncidence / overallIncidence;
-            //     // ageGroupMultipliers[ageGroup.getIndex()] = ageGroupOverallRatio;
-            // });
 
             // adjust the vaccination multiplier to interpolate to a value that gives a closer match to desired settings
             vaccinationMultiplier *= modificationSettings.getVaccinated() / overallVaccinated;
 
         }
 
-        // final model setup with interpolated values, then integration over preload time
+        /**
+         * final model setup with adapted modifications values,
+         * integrate to match model start date
+         */
         model = new ModelImplRoot(demographics, modifications);
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
@@ -153,16 +155,6 @@ export class ModelImplRoot implements IModelSeir {
         this.vaccinationModels = [];
 
         this.demographics = demographics;
-        // this.absTotal = demographics.getAbsTotal();
-
-        // const modificationsStrain = modifications.findAllApplicable(ModelConstants.MODEL_MIN____________INSTANT, 'STRAIN');
-        // let initialIncidence = 0;
-        // modificationsStrain.forEach(modificationStrain => {
-        //     initialIncidence += (modificationStrain as ModificationStrain).getModificationValues().incidence;
-        // });
-        // initialIncidence *= overallMultiplier;
-
-        // TODO setup of initial exposed and infectious compartments may have to be adapted by multipliers
         modifications.findModificationsByType('STRAIN').forEach((modification: ModificationStrain) => {
             this.strainModels.push(new ModelImplStrain(this, demographics, modification.getModificationValues()));
         });
@@ -190,15 +182,10 @@ export class ModelImplRoot implements IModelSeir {
         });
 
         // now find out how many people are already contained in compartments / by age group
-
         demographics.getAgeGroups().forEach(ageGroup => {
-
             const absValueSusceptible = ageGroup.getAbsValue() - this.getNrmValueGroup(ageGroup.getIndex(), true) * this.getAbsValue();
             const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsSusceptible.push(compartmentSusceptible);
-
-            // this.pS = this.pN - this.pECov2 - this.pICov2 - this.pEB117 - this.pIB117 - this.pR;
-
         });
 
     }

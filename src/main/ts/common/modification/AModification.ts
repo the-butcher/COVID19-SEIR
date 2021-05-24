@@ -1,17 +1,21 @@
-import { IModificationValues } from './IModificationValues';
-import { ModelConstants, MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { IModification } from './IModification';
+import { IModificationValues } from './IModificationValues';
 
+/**
+ * base class for modifications. this type adds some logic, getters and setters to instances of IModificationValues
+ *
+ * @author h.fleischer
+ * @since 24.05.2021
+ */
 export abstract class AModification<P extends IModificationValues> implements IModification<P> {
 
     protected modificationValues: P;
 
-    private readonly key: MODIFICATION____KEY;
     private readonly nature: MODIFICATION_NATURE;
     private instantB: number;
 
-    constructor(key: MODIFICATION____KEY, nature: MODIFICATION_NATURE, modificationValues: P) {
-        this.key = key;
+    constructor(nature: MODIFICATION_NATURE, modificationValues: P) {
         this.nature = nature;
         this.modificationValues = modificationValues;
     }
@@ -29,7 +33,7 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     getKey(): MODIFICATION____KEY {
-        return this.key;
+        return this.modificationValues.key;
     }
 
     getNature(): MODIFICATION_NATURE {

@@ -15,14 +15,12 @@ import { IContactMatrix } from './IContactMatrix';
  */
 export class ModificationContact extends AModification<IModificationValuesContact> implements IContactMatrix {
 
-
-
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
 
     constructor(modificationParams: IModificationValuesContact) {
 
-        super('CONTACT', 'RANGE', modificationParams);
+        super('RANGE', modificationParams);
 
         this.ageGroups = [];
         this.contactCategories = [];

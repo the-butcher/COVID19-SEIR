@@ -21,7 +21,7 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
 
     constructor(testingParams: IModificationValuesTesting) {
 
-        super('TESTING', 'RANGE', testingParams);
+        super('RANGE', testingParams);
 
         this.groups = [];
         this.contactCategories = [];

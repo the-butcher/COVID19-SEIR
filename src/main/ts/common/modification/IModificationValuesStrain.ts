@@ -28,4 +28,9 @@ export interface IModificationValuesStrain extends IModificationValues {
      */
     incidence: number;
 
+    /**
+     * optional information about how incidence should be distributed between age-groups
+     */
+    ageGroupIncidences?: number[];
+
 }

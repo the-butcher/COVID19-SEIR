@@ -21,7 +21,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private modificationVaccination: ModificationVaccination;
 
     constructor(modificationParams: IModificationValuesTime) {
-        super('TIME', 'INSTANT', modificationParams);
+        super('INSTANT', modificationParams);
     }
 
     acceptUpdate(update: Partial<IModificationValuesTime>): void {

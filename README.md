@@ -6,13 +6,6 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 current Tasks:
-* better pre init when there is more than one strain
-  * ~~accept list of modifications~~
-  * ~~add some preload days~~
-  * ~~iterate a minimum of preload days to a maximum of the last strain date~~
-  * ~~keep a set of virtual strain modifications, each at virtual model start (begin of preload period)~~
-  * ~~adapt virtual modifications until satisfactory precision is reached~~
-  * re-implement proper age-group incidence setup
 * rebuild contact-matrix percentage to reflect symetric values, where population has been multiplied with contact-rate
 * modification chart area
   * find some primary value for strain (if possible use r<sub>t</sub>)
@@ -23,3 +16,19 @@ current Tasks:
 * do performance tests on model integration and try to improve performance
   * will caching compartments on compartmentFilter improve performance
   * rather flip value fields than transforming model data
+* strain incidence series labelling
+* create some decent chart model toggle
+  * SEIR, all seir curves
+  * EI (?), exposed(infected)
+  * INCIDENCE
+* introduce vaccination heatmap
+
+
+done:
+* ~~better pre init when there is more than one strain~~
+  * ~~accept list of modifications~~
+  * ~~add some preload days~~
+  * ~~iterate a minimum of preload days to a maximum of the last strain date~~
+  * ~~keep a set of virtual strain modifications, each at virtual model start (begin of preload period)~~
+  * ~~adapt virtual modifications until satisfactory precision is reached~~
+  * ~~re-implement proper age-group incidence setup~~

@@ -10,7 +10,7 @@ import { AModification } from './AModification';
 export class ModificationVaccination extends AModification<IModificationValuesVaccination> {
 
     constructor(modificationParams: IModificationValuesVaccination) {
-        super('VACCINATION', 'INSTANT', modificationParams);
+        super('INSTANT', modificationParams);
     }
 
     acceptUpdate(update: Partial<IModificationValuesVaccination>): void {

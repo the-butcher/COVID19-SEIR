@@ -12,6 +12,7 @@ import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModelImplStrain } from './ModelImplStrain';
+import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 
 export class ModelImplIncidence implements IModelSeir, IConnectable {
 
@@ -23,24 +24,28 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
     private readonly compartments: CompartmentBase[];
     private integrationSteps: IModelIntegrationStep[];
 
-    constructor(parentModel: ModelImplStrain, modelSettings: Demographics, initialIncidence: number, ageGroup: AgeGroup, strainId: string) {
+    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain) {
 
         this.rootModel = parentModel.getRootModel();
         this.compartments = [];
         this.integrationSteps = [];
 
-        this.absTotal = modelSettings.getAbsTotal();
+        this.absTotal = demographics.getAbsTotal();
         this.ageGroupIndex = ageGroup.getIndex();
 
-        const dailyCases = initialIncidence * ageGroup.getAbsValue() / 700000;
+        // make some assumptions about initial cases (duplicated code in ModelImplInfectious)
+        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000;
+        if (strainValues.ageGroupIncidences) {
+            dailyCases = strainValues.ageGroupIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
+        }
         this.nrmValue = dailyCases * 7 / this.absTotal;
 
         // primary compartment (cases at the point of incubation)
-        this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_0, this.absTotal, dailyCases, this.ageGroupIndex, strainId, TimeUtil.MILLISECONDS_PER_DAY));
+        this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_0, this.absTotal, dailyCases, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER_DAY));
 
         // secondary compartments (cases propagate backwards 7 days, so an incidence can be calculated from the total sum of this model)
         for (let i = 1; i < 7; i++) {
-            this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_N, this.absTotal, dailyCases, this.ageGroupIndex, strainId, TimeUtil.MILLISECONDS_PER_DAY));
+            this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_N, this.absTotal, dailyCases, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER_DAY));
         }
 
         // console.log('cl', this.compartments.length);

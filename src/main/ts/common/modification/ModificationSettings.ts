@@ -11,7 +11,7 @@ import { AModification } from './AModification';
 export class ModificationSettings extends AModification<IModificationValuesSettings> {
 
     constructor(modificationParams: IModificationValuesSettings) {
-        super('SETTINGS', 'RANGE', modificationParams);
+        super('RANGE', modificationParams);
     }
 
     acceptUpdate(update: Partial<IModificationValuesSettings>): void {
