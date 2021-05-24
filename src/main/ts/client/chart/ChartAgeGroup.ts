@@ -6,7 +6,6 @@ import { AgeGroup } from '../../common/demographics/AgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
-import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
@@ -119,6 +118,11 @@ export class ChartAgeGroup {
             return x;
         });
 
+        const numberFormat = (10000).toLocaleString();
+        this.chart.language.locale._thousandSeparator = numberFormat.indexOf('1.') >= -1 ? '.' : ',';
+        this.chart.language.locale._decimalSeparator = numberFormat.indexOf('1.') >= -1 ? ',' : '.';
+
+
         this.chart.leftAxesContainer.layout = 'absolute';
         this.chart.bottomAxesContainer.layout = 'absolute';
 
@@ -161,16 +165,36 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence = this.chart.yAxes.push(new ValueAxis());
         this.yAxisPlotIncidence.rangeChangeDuration = 0;
         this.yAxisPlotIncidence.strictMinMax = true;
+        this.yAxisPlotIncidence.rangeChangeDuration = 0;
         ChartUtil.getInstance().configureAxis(this.yAxisPlotIncidence, '7-day incidence / ' + (100000).toLocaleString());
+
+        const formatModificationAxisLabel = (value: string) => {
+            if (value) {
+                value = value.replace(this.chart.language.locale._thousandSeparator, '');
+                value = value.replace(this.chart.language.locale._decimalSeparator, '.');
+                const parsed = parseFloat(value);
+                if (parsed !== 0 && this.seriesModification.isPercent()) {
+                    return Math.round(parseFloat(value) * 100) + '%';
+                } else {
+                    return parsed.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
+                }
+            } else {
+                return value;
+            }
+        };
 
         // modification indicator axis
         this.yAxisModification = this.chart.yAxes.push(new ValueAxis());
         this.yAxisModification.strictMinMax = true;
+        this.yAxisModification.rangeChangeDuration = 0;
         ChartUtil.getInstance().configureAxis(this.yAxisModification, 'mods');
+        this.yAxisModification.renderer.labels.template.adapter.add('text', formatModificationAxisLabel);
+        this.yAxisModification.tooltip.label.adapter.add('text', formatModificationAxisLabel);
 
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
+            baseLabel: 'incidence',
             valueField: 'ageGroupIncidence',
             colorKey: 'INCIDENCE',
             strokeWidth: 2,
@@ -184,90 +208,98 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCases = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
+            baseLabel: 'cases',
             valueField: 'ageGroupCases',
             colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.40,
+            locationOnPath: 0.50,
             labelled: true,
             percent: false
         });
         this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            baseLabel: 'susceptible',
             valueField: 'ageGroupSusceptible',
             colorKey: 'SUSCEPTIBLE',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.10,
+            locationOnPath: 0.05,
             labelled: true,
             percent: true
         });
         this.seriesAgeGroupExposed = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            baseLabel: 'exposed',
             valueField: 'ageGroupExposed',
             colorKey: 'EXPOSED',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.20,
+            locationOnPath: 0.25,
             labelled: true,
             percent: true
         });
         this.seriesAgeGroupInfectious = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            baseLabel: 'infectious',
             valueField: 'ageGroupInfectious',
             colorKey: 'INFECTIOUS',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.30,
+            locationOnPath: 0.45,
             labelled: true,
             percent: true
         });
         this.seriesAgeGroupRemoved = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            baseLabel: 'removed',
             valueField: 'ageGroupRemoved',
             colorKey: 'REMOVED',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.40,
+            locationOnPath: 0.45,
             labelled: true,
             percent: true
         });
         this.seriesAgeGroupRemovedI = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            baseLabel: 'recovered',
             valueField: 'ageGroupRemovedI',
             colorKey: 'REMOVED',
             strokeWidth: 1,
             dashed: true,
-            locationOnPath: 0.50,
+            locationOnPath: 0.65,
             labelled: true,
             percent: true
         });
         this.seriesAgeGroupRemovedV = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            baseLabel: 'vaccinated',
             valueField: 'ageGroupRemovedV',
             colorKey: 'REMOVED',
             strokeWidth: 1,
             dashed: true,
-            locationOnPath: 0.20,
+            locationOnPath: 0.85,
             labelled: true,
             percent: true
         });
         this.seriesModification = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisModification,
+            baseLabel: '',
             valueField: 'modValueY',
             colorKey: 'TIME',
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.70,
             labelled: true,
-            percent: false
+            percent: true
         });
 
         this.chart.cursor = new XYCursor();
@@ -333,8 +365,6 @@ export class ChartAgeGroup {
             minValue: 0,
             maxValue: 1,
         });
-
-
 
         // zoom in y-direction
         // this.valueAxisAbsolute.adapter.add('start', (value, target) => {
@@ -440,16 +470,43 @@ export class ChartAgeGroup {
             }
         }, 100);
 
-        this.seriesAgeGroupIncidence.setSeriesLabel(`incidence (${ageGroup.getName()})`);
-        this.seriesAgeGroupCases.setSeriesLabel(`cases (${ageGroup.getName()})`);
+        this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupCases.setSeriesNote(ageGroup.getName());
 
-        this.seriesAgeGroupSusceptible.setSeriesLabel(`susceptible (${ageGroup.getName()})`);
-        this.seriesAgeGroupExposed.setSeriesLabel(`exposed (${ageGroup.getName()})`);
-        this.seriesAgeGroupInfectious.setSeriesLabel(`infectious (${ageGroup.getName()})`);
-        this.seriesAgeGroupRemoved.setSeriesLabel(`removed (${ageGroup.getName()})`);
-        this.seriesAgeGroupRemovedI.setSeriesLabel(`removed by infection (${ageGroup.getName()})`);
-        this.seriesAgeGroupRemovedV.setSeriesLabel(`removed by vaccination (${ageGroup.getName()})`);
+        this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupInfectious.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemoved.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedI.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedV.setSeriesNote(ageGroup.getName());
 
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        modificationValuesStrain.forEach(strainValues => {
+            // this call implicitly updates the base label, explicity updates series label
+            this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setSeriesNote(ageGroup.getName());
+        });
+
+    }
+
+    getOrCreateSeriesAgeGroupIncidenceStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
+        if (!this.seriesAgeGroupIncidenceByStrain.has(strainValues.id)) {
+            this.seriesAgeGroupIncidenceByStrain.set(strainValues.id, new ChartAgeGroupSeries({
+                chart: this.chart,
+                yAxis: this.yAxisPlotIncidence,
+                baseLabel: strainValues.name,
+                valueField: `ageGroupIncidence${strainValues.id}`,
+                colorKey: 'INCIDENCE',
+                strokeWidth: 1,
+                dashed: true,
+                locationOnPath: 0.3,
+                labelled: true,
+                percent: false
+            }));
+        }
+        const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
+        seriesAgeGroup.setBaseLabel(strainValues.name);
+        seriesAgeGroup.getSeries().visible = true;
+        return seriesAgeGroup;
     }
 
     setSeriesSeirVisible(visible: boolean): void {
@@ -464,12 +521,25 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedV.getSeries().visible = visible;
     }
     setSeriesIncidenceVisible(visible: boolean): void {
+
         this.yAxisPlotIncidence.visible = visible;
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
         this.seriesAgeGroupIncidence.getSeries().visible = visible;
         this.seriesAgeGroupCases.getSeries().visible = visible;
-        // this.seriesAge
+
+        // set everything to invisible
+        this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
+            seriesAgeGroupIncidence.getSeries().visible = false;
+        });
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        // specific incidence makes sense only if there is more than one strain
+        if (visible && modificationValuesStrain.length > 1) {
+            modificationValuesStrain.forEach(strainValues => {
+                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).getSeries().visible = true;
+            });
+        }
+
     }
 
     toggleChartMode(chartMode: CHART_MODE______KEY): void {
@@ -499,7 +569,8 @@ export class ChartAgeGroup {
         if (modificationDefinition) {
 
             this.seriesModification.setPercent(modificationDefinition.percent);
-            this.seriesModification.setSeriesLabel(modificationDefinition.text);
+            this.seriesModification.setBaseLabel(modificationDefinition.text);
+            this.seriesModification.setSeriesNote('');
             this.seriesModification.getSeries().fill = color(modificationDefinition.color);
             this.seriesModification.getSeries().fillOpacity = 0.20;
             ChartUtil.getInstance().configureAgeGroupSeries(this.seriesModification, modificationDefinition.color, modificationDefinition.useObjectColors);
@@ -522,22 +593,10 @@ export class ChartAgeGroup {
 
         // console.log('modelData', modelData);
 
-        // add any missing strain series
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
-        modificationValuesStrain.forEach(modificationValueStrain => {
-            if (!this.seriesAgeGroupIncidenceByStrain.has(modificationValueStrain.id)) {
-                this.seriesAgeGroupIncidenceByStrain.set(modificationValueStrain.id, new ChartAgeGroupSeries({
-                    chart: this.chart,
-                    yAxis: this.yAxisPlotIncidence,
-                    valueField: `ageGroupIncidence${modificationValueStrain.id}`,
-                    colorKey: 'INCIDENCE',
-                    strokeWidth: 1,
-                    dashed: true,
-                    locationOnPath: 0.10,
-                    labelled: true,
-                    percent: false
-                }));
-            }
+        modificationValuesStrain.forEach(strainValues => {
+            // be sure there is a series for each strain
+            this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues);
         });
 
         this.modelData = modelData;
