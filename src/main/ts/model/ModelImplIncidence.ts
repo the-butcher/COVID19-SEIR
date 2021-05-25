@@ -41,11 +41,11 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
         this.nrmValue = dailyCases * 7 / this.absTotal;
 
         // primary compartment (cases at the point of incubation)
-        this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_0, this.absTotal, dailyCases, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER_DAY));
+        this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_0, this.absTotal, dailyCases, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
 
         // secondary compartments (cases propagate backwards 7 days, so an incidence can be calculated from the total sum of this model)
         for (let i = 1; i < 7; i++) {
-            this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_N, this.absTotal, dailyCases, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER_DAY));
+            this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_N, this.absTotal, dailyCases, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
         }
 
         // console.log('cl', this.compartments.length);

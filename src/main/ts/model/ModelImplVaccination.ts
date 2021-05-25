@@ -37,7 +37,7 @@ export class ModelImplVaccination implements IModelSeir {
         this.groupPriority = Math.pow(ageGroup.getVacc(), 5);
         this.nrmRefusal = percentageRefusal * this.ageGroupTotal / this.absTotal;
 
-        this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, TimeUtil.MILLISECONDS_PER_DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
+        this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
         this.compartmentImmunizedS = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
         this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
         this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);

@@ -21,8 +21,4 @@ export class ModificationSeasonality extends AModification<IModificationValuesSe
         return this.modificationValues.amount;
     }
 
-    getModificationValue(): number {
-        return this.getAmount();
-    }
-
 }

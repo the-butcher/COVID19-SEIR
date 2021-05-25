@@ -106,8 +106,8 @@ export class ModelConstants {
         new Date('2021-05-01').getTime(),
         new Date('2021-06-01').getTime(),
         new Date('2021-07-01').getTime(),
-        // new Date('2021-08-01').getTime(),
-        // new Date('2021-09-01').getTime(),
+        new Date('2021-08-01').getTime(),
+        new Date('2021-09-01').getTime(),
         // new Date('2021-10-01').getTime(),
         // new Date('2021-11-01').getTime()
     ];

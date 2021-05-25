@@ -34,8 +34,4 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         return this.modificationValues.dead;
     }
 
-    getModificationValue(): number {
-        return -1;
-    }
-
 }

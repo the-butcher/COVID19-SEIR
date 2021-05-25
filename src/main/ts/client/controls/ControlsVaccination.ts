@@ -3,9 +3,14 @@ import { ModificationVaccination } from '../../common/modification/ModificationV
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { SliderModification } from '../gui/SliderModification';
 import { SliderVaccination } from '../gui/SliderVaccination';
-import { ControlsConstants } from './../gui/ControlsConstants';
 import { Controls } from './Controls';
 
+/**
+ * controller for editing vaccination modifications
+ *
+ * @author h.fleischer
+ * @since 25.05.2021
+ */
 export class ControlsVaccination {
 
     static getInstance(): ControlsVaccination {
@@ -31,7 +36,6 @@ export class ControlsVaccination {
         this.modification.acceptUpdate({
             doses: this.sliderDosesPerDay.getValue()
         });
-        ControlsConstants.rebuildModificationData('VACCINATION', 100000);
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
     }
 

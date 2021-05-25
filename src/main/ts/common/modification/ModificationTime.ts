@@ -1,3 +1,6 @@
+import { ModificationResolverVaccination } from './ModificationResolverVaccination';
+import { ModificationResolverTesting } from './ModificationResolverTesting';
+import { ModificationResolverContact } from './ModificationResolverContact';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { Modifications } from './Modifications';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
@@ -35,9 +38,12 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      */
     setInstants(instantA: number, instantB: number): void {
         super.setInstants(instantA, instantB);
-        this.modificationContact = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'CONTACT') as ModificationContact;
-        this.modificationTesting = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'TESTING') as ModificationTesting;
-        this.modificationVaccination = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'VACCINATION') as ModificationVaccination;
+        // this.modificationContact = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'CONTACT') as ModificationContact;
+        // this.modificationTesting = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'TESTING') as ModificationTesting;
+        // this.modificationVaccination = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'VACCINATION') as ModificationVaccination;
+        this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA());
+        this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
+        this.modificationVaccination = new ModificationResolverVaccination().getModification(this.getInstantA());
     }
 
     getDosesPerDay(): number {
@@ -72,10 +78,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      */
     getTestingMultiplier(ageGroupIndex: number): number {
         return 1 - (this.modificationTesting.getTestingRatio(ageGroupIndex) * (1 - CompartmentChain.getInstance().getShareOfPresymptomaticInfection()));
-    }
-
-    getModificationValue(): number {
-        return -1;
     }
 
 }

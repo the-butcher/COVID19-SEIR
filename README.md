@@ -9,7 +9,12 @@ current Tasks:
 * modification chart area
   * find some primary value for strain (if possible use r<sub>t</sub>)
 * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
-* implement import, save, export
+* implement
+  * import
+  * save
+  * export
+  * png
+  * csv
 * do performance tests on model integration and try to improve performance
   * will caching compartments on compartmentFilter improve performance
   * rather flip value fields than transforming model data
@@ -18,11 +23,11 @@ current Tasks:
   * EI (?), exposed(infected)
   * INCIDENCE
 * introduce vaccination heatmap
-* split modification chart to one value per day, will provide tooltips on the curve
-  * implement some type mod-value provider, one for each modification type (bonus of that type will be i.e. seasonality value provider)
 
 
 done:
+* ~~split modification chart to one value per day, will provide tooltips on the curve~~
+  * ~~implement some type mod-value provider, one for each modification type (bonus of that type will be i.e. seasonality value provider)~~
 * ~~modification chart area~~
   * ~~use rebuilt contact matrix percentage~~
   * ~~introduce percentage for testing ratio~~

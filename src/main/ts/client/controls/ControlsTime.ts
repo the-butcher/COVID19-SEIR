@@ -1,9 +1,15 @@
-import { ChartContactMatrix } from '../chart/ChartContactMatrix';
+import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { ChartContactMatrix } from '../chart/ChartContactMatrix';
 import { Controls } from './Controls';
-import { ModificationTime } from '../../common/modification/ModificationTime';
 
+/**
+ * controller for editing time modifications (which does not actually change anything, but rather displays state)
+ *
+ * @author h.fleischer
+ * @since 25.05.2021
+ */
 export class ControlsTime {
 
     static getInstance(): ControlsTime {
@@ -22,10 +28,7 @@ export class ControlsTime {
     }
 
     handleChange(): void {
-
         // console.warn('handleChange');
-        // no-op, no changeable state in ControlsTime
-        // TODO this should NOT update the model
     }
 
     /**

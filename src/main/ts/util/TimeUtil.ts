@@ -1,11 +1,15 @@
 /**
  * utility class for managing time related units
+ *
+ * @author h.fleischer
+ * @since 25.05.2021
  */
 export class TimeUtil {
 
     static readonly MILLISECONDS_PER_MINUTE = 60 * 1000;
-    static readonly MILLISECONDS_PER_HOUR = 60 * TimeUtil.MILLISECONDS_PER_MINUTE;
-    static readonly MILLISECONDS_PER_DAY: number = 24 * TimeUtil.MILLISECONDS_PER_HOUR;
+    static readonly MILLISECONDS_PER___HOUR = 60 * TimeUtil.MILLISECONDS_PER_MINUTE;
+    static readonly MILLISECONDS_PER____DAY: number = 24 * TimeUtil.MILLISECONDS_PER___HOUR;
+    static readonly MILLISECONDS_PER___YEAR: number = TimeUtil.MILLISECONDS_PER____DAY * 365;
 
     static formatCategoryDate(instant: number): string {
         const date = new Date(instant);

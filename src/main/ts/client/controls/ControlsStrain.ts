@@ -1,20 +1,20 @@
-import { SliderSerialInterval } from './../gui/SliderSerialInterval';
+import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { ModificationStrain } from '../../common/modification/ModificationStrain';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
+import { ModelConstants } from '../../model/ModelConstants';
 import { Color } from '../../util/Color';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { StrainUtil } from '../../util/StrainUtil';
 import { TimeUtil } from '../../util/TimeUtil';
-import { IconSlider } from '../gui/IconSlider';
-import { ModelConstants } from '../../model/ModelConstants';
-import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { Slider } from './../gui/Slider';
-import { Controls } from './Controls';
-import { SliderModification } from '../gui/SliderModification';
-import { ModificationStrain } from '../../common/modification/ModificationStrain';
 import { ControlsConstants } from '../gui/ControlsConstants';
+import { IconSlider } from '../gui/IconSlider';
+import { SliderModification } from '../gui/SliderModification';
+import { Slider } from './../gui/Slider';
+import { SliderSerialInterval } from './../gui/SliderSerialInterval';
+import { Controls } from './Controls';
 
 /**
- * controls for Strain modifications
+ * controller for editing contact modifications
  *
  * @author h.fleischer
  * @since 16.05.2021
@@ -232,7 +232,7 @@ export class ControlsStrain {
         weibullContext.fillStyle = 'rgba(187, 137, 12, 0.75)'; // ValueSet.COLORS.EXPOSED;
 
         const toCanvasY = (n: number) =>  weibullCanvas.height - 20 - n;
-        const pxPerDay = weibullCanvas.width / (this.sliderSerialInterval.getMaxValue() * TimeUtil.MILLISECONDS_PER_DAY); // one day in pixel
+        const pxPerDay = weibullCanvas.width / (this.sliderSerialInterval.getMaxValue() * TimeUtil.MILLISECONDS_PER____DAY); // one day in pixel
 
         const strain: IModificationValuesStrain = {
             id: 'temp',
@@ -242,7 +242,9 @@ export class ControlsStrain {
             r0: this.r0,
             serialInterval: this.serialInterval,
             intervalScale: this.intervalScale,
-            incidence: -1
+            incidence: -1,
+            deletable: false,
+            draggable: false
         };
         const compartmentParams = CompartmentChain.getInstance().getStrainedCompartmentParams(strain);
         compartmentParams.forEach(compartmentParam => {

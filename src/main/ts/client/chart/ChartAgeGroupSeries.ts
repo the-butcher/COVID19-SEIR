@@ -81,7 +81,7 @@ export class ChartAgeGroupSeries {
 
         this.series.adapter.add('tooltipText', (value, target) => {
             const indexCurr = target.tooltipDataItem.index;
-            if (params.percent && indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
+            if (this.isPercent() && indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
                 const itemCurr = target.dataItems.values[indexCurr];
                 const valueCurr = itemCurr.dataContext[this.valueField];
                 return this.seriesLabel.text + ': ' + (valueCurr * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%';
@@ -92,7 +92,7 @@ export class ChartAgeGroupSeries {
 
         this.series.events.on('ready', () => {
             // remove clip-path so thicker line series appear in full width around y==0
-            (this.series.element.node.firstChild as SVGGElement).setAttributeNS(null, 'clip-path', '');
+            // (this.series.element.node.firstChild as SVGGElement).setAttributeNS(null, 'clip-path', '');
             if (params.labelled) {
                 this.series.segments.getIndex(0).strokeSprite.events.on('propertychanged', e => {
                     if (e.property === 'path') {

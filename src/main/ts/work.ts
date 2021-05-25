@@ -29,7 +29,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
 
     const minInstant = ModelConstants.MODEL_MIN_____INSTANT;
     const maxInstant = ModelConstants.MODEL_MAX_____INSTANT;
-    modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER_DAY === 0, modelProgress => {
+    modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
         ctx.postMessage(modelProgress);
     });
 

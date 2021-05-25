@@ -34,7 +34,7 @@ export class SliderModification extends Slider {
             container: 'sliderDivTime',
             min: ModelConstants.MODEL_MIN_____INSTANT,
             max: ModelConstants.MODEL_MAX_____INSTANT,
-            step: TimeUtil.MILLISECONDS_PER_DAY,
+            step: TimeUtil.MILLISECONDS_PER____DAY,
             values: [],
             ticks: [
                 new Date('2021-05-01').getTime(),
@@ -91,6 +91,7 @@ export class SliderModification extends Slider {
     }
 
     updateChartIfApplicable(key: MODIFICATION____KEY): void {
+        ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart();
         if (ControlsConstants.MODIFICATION_PARAMS[key].updateChartOnChange) { // if that modification type allows updates, the model needs to be rebuilt
             ModelLoader.commit(Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
         }
@@ -119,8 +120,8 @@ export class SliderModification extends Slider {
      */
     showModifications(key: MODIFICATION____KEY): void {
 
-        // set this instance's updateModificationChart (small top area of the chart) function to that of the modification type specified by key
-        this.updateModificationChart = ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart;
+        // // assign the update function
+        // this.updateModificationChart = ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart;
 
         const typedModifications = Modifications.getInstance().findModificationsByType(key);
 
@@ -242,9 +243,10 @@ export class SliderModification extends Slider {
             }
         }
 
-        if (this.updateModificationChart) {
-            this.updateModificationChart();
-        }
+        /**
+         * update the modification chart
+         */
+        ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart();
 
     }
 

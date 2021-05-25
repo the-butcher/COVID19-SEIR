@@ -1,4 +1,4 @@
-import { MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { ModelConstants, MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
 
@@ -21,7 +21,7 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     appliesToInstant(instant: number): boolean {
-        return instant >= this.modificationValues.instant && instant < this.instantB;
+        return instant >= this.modificationValues.instant && (this.instantB === ModelConstants.MODEL_MAX_____INSTANT || instant < this.instantB);
     }
 
     getId(): string {
@@ -66,8 +66,6 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     abstract acceptUpdate(update: Partial<P>): void
-
-    abstract getModificationValue(): number;
 
     getModificationValues(): P {
         return this.modificationValues;

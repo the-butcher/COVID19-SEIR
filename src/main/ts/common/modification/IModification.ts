@@ -73,9 +73,4 @@ export interface IModification<P extends IModificationValues> {
      */
     getModificationValues(): P;
 
-    /**
-     * get a value displayable in the modification chart
-     */
-    getModificationValue(): number;
-
 }

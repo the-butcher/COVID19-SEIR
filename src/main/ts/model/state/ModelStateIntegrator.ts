@@ -25,7 +25,7 @@ export interface IModelProgress {
  */
 export class ModelStateIntegrator {
 
-    static readonly DT = TimeUtil.MILLISECONDS_PER_DAY / 24;
+    static readonly DT = TimeUtil.MILLISECONDS_PER____DAY / 24;
 
     private readonly model: ModelImplRoot;
     private curInstant: number;
@@ -152,7 +152,7 @@ export class ModelStateIntegrator {
 
             }
 
-            if (this.curInstant % TimeUtil.MILLISECONDS_PER_DAY * 7 === 0) {
+            if (this.curInstant % TimeUtil.MILLISECONDS_PER____DAY * 7 === 0) {
                 progressCallback({
                     ratio: (this.curInstant - ModelConstants.MODEL_MIN_____INSTANT) / (ModelConstants.MODEL_MAX_____INSTANT - ModelConstants.MODEL_MIN_____INSTANT)
                 });

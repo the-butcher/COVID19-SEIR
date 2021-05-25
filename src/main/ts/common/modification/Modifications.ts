@@ -1,5 +1,4 @@
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
-import { ObjectUtil } from '../../util/ObjectUtil';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
 
@@ -62,28 +61,6 @@ export class Modifications {
      */
     findModificationsByType(key: MODIFICATION____KEY): Array<IModification<IModificationValues>> {
         return this.modifications.filter(m => m.getKey() === key);
-    }
-
-    findAllApplicable(instant: number, key: MODIFICATION____KEY): Array<IModification<IModificationValues>> {
-        return this.findModificationsByType(key).filter(m => m.appliesToInstant(instant));
-    }
-
-    findFirstApplicableOrElseDefault(instant: number, key: MODIFICATION____KEY): IModification<IModificationValues> {
-        const typedModifications = this.findModificationsByType(key);
-        const applicableModification = typedModifications.find(m => m.appliesToInstant(instant));
-        if (ObjectUtil.isNotEmpty(applicableModification)) {
-            return applicableModification;
-        } else if (ObjectUtil.isNotEmpty(ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification)) {
-            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification(ModelConstants.MODEL_MIN_____INSTANT);
-            if (typedModifications.length > 0) {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_____INSTANT, typedModifications[0].getInstantA());
-            } else {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_____INSTANT, ModelConstants.MODEL_MAX_____INSTANT);
-            }
-            return defaultModification;
-        } else {
-            return null;
-        }
     }
 
     deleteModification(id: string): void {

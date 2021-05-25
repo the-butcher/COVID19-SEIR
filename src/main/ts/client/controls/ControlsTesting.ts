@@ -1,15 +1,17 @@
-import { ChartTesting } from '../chart/ChartTesting';
-import { ObjectUtil } from '../../util/ObjectUtil';
-import { Controls } from './Controls';
 import { Demographics } from '../../common/demographics/Demographics';
-import { SliderTestingCategory } from '../gui/SliderTestingCategory';
-import { SliderModification } from '../gui/SliderModification';
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
-import { ChartAgeGroup, IModificationData } from '../chart/ChartAgeGroup';
-import { Modifications } from '../../common/modification/Modifications';
-import { TimeUtil } from '../../util/TimeUtil';
-import { ControlsConstants } from '../gui/ControlsConstants';
+import { ObjectUtil } from '../../util/ObjectUtil';
+import { ChartTesting } from '../chart/ChartTesting';
+import { SliderModification } from '../gui/SliderModification';
+import { SliderTestingCategory } from '../gui/SliderTestingCategory';
+import { Controls } from './Controls';
 
+/**
+ * controller for editing testing modifications
+ *
+ * @author h.fleischer
+ * @since 25.05.2021
+ */
 export class ControlsTesting {
 
     static getInstance(): ControlsTesting {

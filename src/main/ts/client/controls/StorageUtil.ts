@@ -9,12 +9,11 @@ import { IModificationValuesVaccination } from '../../common/modification/IModif
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { ModelActions } from '../gui/ModelActions';
 
 export type IAnyModificationValue = IModificationValuesTime | IModificationValuesContact | IModificationValuesStrain | IModificationValuesTesting | IModificationValuesSettings | IModificationValuesTesting | IModificationValuesSeasonality | IModificationValuesVaccination;
 
 /**
- * helper type for writing / loading modifications to local storage
+ * helper type for writing / loading modifications to / from local storage
  *
  * @author h.fleischer
  * @since 25.05.2021

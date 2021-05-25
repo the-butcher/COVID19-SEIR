@@ -168,8 +168,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.rangeChangeDuration = 0;
         ChartUtil.getInstance().configureAxis(this.yAxisPlotIncidence, '7-day incidence / ' + (100000).toLocaleString());
 
-        const formatModificationAxisLabel = (value: string) => {
+        // modification indicator axis
+        this.yAxisModification = this.chart.yAxes.push(new ValueAxis());
+        this.yAxisModification.strictMinMax = true;
+        this.yAxisModification.rangeChangeDuration = 0;
+        ChartUtil.getInstance().configureAxis(this.yAxisModification, 'mods');
+        this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
             if (value) {
+                console.log('value', value);
                 value = value.replace(this.chart.language.locale._thousandSeparator, '');
                 value = value.replace(this.chart.language.locale._decimalSeparator, '.');
                 const parsed = parseFloat(value);
@@ -181,15 +187,7 @@ export class ChartAgeGroup {
             } else {
                 return value;
             }
-        };
-
-        // modification indicator axis
-        this.yAxisModification = this.chart.yAxes.push(new ValueAxis());
-        this.yAxisModification.strictMinMax = true;
-        this.yAxisModification.rangeChangeDuration = 0;
-        ChartUtil.getInstance().configureAxis(this.yAxisModification, 'mods');
-        this.yAxisModification.renderer.labels.template.adapter.add('text', formatModificationAxisLabel);
-        this.yAxisModification.tooltip.label.adapter.add('text', formatModificationAxisLabel);
+        });
 
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
             chart: this.chart,

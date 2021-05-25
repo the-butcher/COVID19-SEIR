@@ -46,19 +46,6 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return value;
     }
 
-    getModificationValue(): number {
-
-        const matrixContactTotal = Demographics.getInstance().getMatrixContactTotal();
-        let matrixContactCurr = 0;
-        for (let indexX = 0; indexX < this.ageGroups.length; indexX++) {
-            for (let indexY = 0; indexY < this.ageGroups.length; indexY++) {
-                matrixContactCurr += this.getContacts(indexX, indexY); // TODO premultiply with population to give a more meaningful value;
-            }
-        }
-        return matrixContactCurr / matrixContactTotal;
-
-    }
-
     private getContactCategoryMultiplier(contactCategoryName: string): number {
         if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
             this.modificationValues.multipliers[contactCategoryName] = 1.0;

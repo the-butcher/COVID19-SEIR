@@ -1,11 +1,17 @@
+import { Demographics } from '../../common/demographics/Demographics';
+import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { Controls } from './Controls';
-import { SliderSetting } from '../gui/SliderSetting';
-import { Demographics } from '../../common/demographics/Demographics';
 import { SliderModification } from '../gui/SliderModification';
-import { ModificationSettings } from '../../common/modification/ModificationSettings';
+import { SliderSetting } from '../gui/SliderSetting';
+import { Controls } from './Controls';
 
+/**
+ * controller for editing settings modifications
+ *
+ * @author h.fleischer
+ * @since 25.05.2021
+ */
 export class ControlsSettings {
 
     static getInstance(): ControlsSettings {

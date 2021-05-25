@@ -66,16 +66,6 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
         }
     }
 
-    getModificationValue(): number {
-        let totalTestingValue = 0;
-        // full update required after setting all values to 0 (maybe an amcharts bug)
-        for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            const testingVal = this.getTestingRatio(indexContact);
-            totalTestingValue += testingVal * this.ageGroups[indexContact].getAbsValue();
-        }
-        return totalTestingValue / Demographics.getInstance().getAbsTotal();
-    }
-
     private getContactCategoryMultiplier(contactCategoryName: string): number {
         if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
             this.modificationValues.multipliers[contactCategoryName] = 0.0;

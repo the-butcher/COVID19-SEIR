@@ -114,7 +114,7 @@ export class CompartmentChain {
             type: ECompartmentType.E_____EXPOSED,
             reproduction: CompartmentChain.NO_REPRODUCTION,
             instantA: 0,
-            instantB: Math.round(toStrainedValue(this.compartmentParams[0].instantA) * TimeUtil.MILLISECONDS_PER_DAY),
+            instantB: Math.round(toStrainedValue(this.compartmentParams[0].instantA) * TimeUtil.MILLISECONDS_PER____DAY),
             i0Normal: 0,
             presymptomatic: true
         });
@@ -123,8 +123,8 @@ export class CompartmentChain {
             strainedCompartmentParams.push({
                 type: compartmentParam.type,
                 reproduction: compartmentParam.reproduction * strain.r0,
-                instantA: Math.round(toStrainedValue(compartmentParam.instantA) * TimeUtil.MILLISECONDS_PER_DAY),
-                instantB: Math.round(toStrainedValue(compartmentParam.instantB) * TimeUtil.MILLISECONDS_PER_DAY),
+                instantA: Math.round(toStrainedValue(compartmentParam.instantA) * TimeUtil.MILLISECONDS_PER____DAY),
+                instantB: Math.round(toStrainedValue(compartmentParam.instantB) * TimeUtil.MILLISECONDS_PER____DAY),
                 i0Normal: compartmentParam.i0Normal,
                 presymptomatic: compartmentParam.presymptomatic
             });

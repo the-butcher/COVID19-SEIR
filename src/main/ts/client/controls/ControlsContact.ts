@@ -1,16 +1,17 @@
 import { Demographics } from '../../common/demographics/Demographics';
-import { Modifications } from '../../common/modification/Modifications';
+import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { ChartAgeGroup, IModificationData } from '../chart/ChartAgeGroup';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
-import { ChartUtil } from '../chart/ChartUtil';
 import { SliderContactCategory } from '../gui/SliderContactCategory';
 import { SliderModification } from '../gui/SliderModification';
-import { ModificationContact } from '../../common/modification/ModificationContact';
-import { ControlsConstants } from './../gui/ControlsConstants';
 import { Controls } from './Controls';
-import { TimeUtil } from '../../util/TimeUtil';
 
+/**
+ * controller for editing contact modifications
+ *
+ * @author h.fleischer
+ * @since 25.05.2021
+ */
 export class ControlsContact {
 
     static getInstance(): ControlsContact {
@@ -47,8 +48,6 @@ export class ControlsContact {
         this.modification.acceptUpdate({
             multipliers
         });
-
-        ControlsConstants.rebuildModificationData('CONTACT', 1);
         this.chartContact.redraw(this.modification);
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
