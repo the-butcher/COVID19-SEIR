@@ -437,6 +437,16 @@ export class ChartAgeGroup {
             // (this.seriesHeat.bulletsContainer.element.node.parentNode as SVGGElement).setAttributeNS(null, 'clip-path', '');
         });
 
+        this.chart.exporting.adapter.add('filePrefix', (value, target) => {
+            return {
+                filePrefix: 'timeline_' + Date.now()
+            };
+        });
+
+    }
+
+    exportToPng(): void {
+        this.chart.exporting.export("png");
     }
 
     async setSeriesAgeGroup(ageGroupIndex: number): Promise<void> {

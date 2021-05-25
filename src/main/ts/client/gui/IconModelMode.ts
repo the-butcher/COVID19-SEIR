@@ -1,6 +1,6 @@
-import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ControlsConstants } from './ControlsConstants';
-import { ModelMode } from './ModelMode';
+import { ModelActions } from './ModelActions';
 
 
 export class IconModelMode {
@@ -20,7 +20,7 @@ export class IconModelMode {
         this.svgContainer.style.height = '30px';
         this.svgContainer.style.cursor = 'pointer';
         this.svgContainer.addEventListener('pointerup', e => {
-            ModelMode.getInstance().toggleMode(this.key);
+            ModelActions.getInstance().toggleMode(this.key);
         });
 
         const svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");

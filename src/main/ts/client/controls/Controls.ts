@@ -1,9 +1,9 @@
+import { IModification } from '../../common/modification/IModification';
 import { IModificationValues } from '../../common/modification/IModificationValues';
+import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ControlsConstants } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
-import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
-import { IModification } from '../../common/modification/IModification';
 
 export class Controls {
 

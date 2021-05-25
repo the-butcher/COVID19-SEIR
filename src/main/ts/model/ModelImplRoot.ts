@@ -48,7 +48,7 @@ export class ModelImplRoot implements IModelSeir {
         /**
          * start at minus preload days
          */
-        const curInstant = ModelConstants.MODEL_MIN____________INSTANT - TimeUtil.MILLISECONDS_PER_DAY * ModelConstants.PRELOAD_________________DAYS;
+        const curInstant = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER_DAY * ModelConstants.PRELOAD_________________DAYS;
 
         /**
          * get all strain values as currently in modifications instance
@@ -127,7 +127,7 @@ export class ModelImplRoot implements IModelSeir {
         model = new ModelImplRoot(demographics, modifications);
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
-        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN____________INSTANT - TimeUtil.MILLISECONDS_PER_DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER_DAY, () => false, () => {});
 
         return modelStateIntegrator;
 

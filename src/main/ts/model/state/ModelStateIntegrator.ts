@@ -154,14 +154,14 @@ export class ModelStateIntegrator {
 
             if (this.curInstant % TimeUtil.MILLISECONDS_PER_DAY * 7 === 0) {
                 progressCallback({
-                    ratio: (this.curInstant - ModelConstants.MODEL_MIN____________INSTANT) / (ModelConstants.MODEL_MAX____________INSTANT - ModelConstants.MODEL_MIN____________INSTANT)
+                    ratio: (this.curInstant - ModelConstants.MODEL_MIN_____INSTANT) / (ModelConstants.MODEL_MAX_____INSTANT - ModelConstants.MODEL_MIN_____INSTANT)
                 });
             }
 
         }
 
         progressCallback({
-            ratio: (this.curInstant - ModelConstants.MODEL_MIN____________INSTANT) / (ModelConstants.MODEL_MAX____________INSTANT - ModelConstants.MODEL_MIN____________INSTANT),
+            ratio: (this.curInstant - ModelConstants.MODEL_MIN_____INSTANT) / (ModelConstants.MODEL_MAX_____INSTANT - ModelConstants.MODEL_MIN_____INSTANT),
             data
         });
 

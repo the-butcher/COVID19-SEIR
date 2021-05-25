@@ -1,4 +1,3 @@
-import { Demographics } from './../common/demographics/Demographics';
 import { IModification } from '../common/modification/IModification';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IModificationValuesContact } from '../common/modification/IModificationValuesContact';
@@ -30,7 +29,6 @@ export class ModelConstants {
 
     static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IModificationDefinitions} = {
         'TIME': {
-            // deletable: false,
             createValuesModification: (modificationValues) => new ModificationTime(modificationValues as IModificationValuesTime),
         },
         'STRAIN': {
@@ -92,9 +90,6 @@ export class ModelConstants {
         }
     };
 
-    static readonly MODEL_MIN____________INSTANT = new Date('2021-05-01').getTime();
-    static readonly MODEL_MAX____________INSTANT = new Date('2021-09-01').getTime();
-
     static readonly PRELOAD_________________DAYS = 15;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
@@ -107,6 +102,18 @@ export class ModelConstants {
     static readonly RANGE_______INCIDENCE = [1, 250, 500, 750, 1000];
     static readonly RANGE_SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
     static readonly RANGE______________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    static readonly RANGE___MODEL_INSTANT = [
+        new Date('2021-05-01').getTime(),
+        new Date('2021-06-01').getTime(),
+        new Date('2021-07-01').getTime(),
+        // new Date('2021-08-01').getTime(),
+        // new Date('2021-09-01').getTime(),
+        // new Date('2021-10-01').getTime(),
+        // new Date('2021-11-01').getTime()
+    ];
+    static readonly MODEL_MIN_____INSTANT = Math.min(...ModelConstants.RANGE___MODEL_INSTANT);
+    static readonly MODEL_MAX_____INSTANT = Math.max(...ModelConstants.RANGE___MODEL_INSTANT);
+
 
 }
 

@@ -1,6 +1,6 @@
 import { Demographics } from '../../common/demographics/Demographics';
 import { Modifications } from '../../common/modification/Modifications';
-import { ModelConstants, MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { ModelLoader } from './../ModelLoader';
@@ -32,8 +32,8 @@ export class SliderModification extends Slider {
 
         super({
             container: 'sliderDivTime',
-            min: ModelConstants.MODEL_MIN____________INSTANT,
-            max: ModelConstants.MODEL_MAX____________INSTANT,
+            min: ModelConstants.MODEL_MIN_____INSTANT,
+            max: ModelConstants.MODEL_MAX_____INSTANT,
             step: TimeUtil.MILLISECONDS_PER_DAY,
             values: [],
             ticks: [

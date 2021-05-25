@@ -1,8 +1,8 @@
-import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
+
 
 /**
  * central storage of modification instances of various types
@@ -28,40 +28,7 @@ export class Modifications {
     private modifications: Array<IModification<IModificationValues>>;
 
     constructor() {
-
         this.modifications = [];
-
-        // this.modifications.push(new ModificationStrain({
-        //     id: ObjectUtil.createId(),
-        //     key: 'STRAIN',
-        //     instant: new Date('2021-06-01').getTime(),
-        //     name: 'b.1.167.2',
-        //     r0: 6.2,
-        //     serialInterval: 4.8,
-        //     intervalScale: 1.0,
-        //     incidence: 2
-        // }));
-        // this.modifications.push(new ModificationContact({
-        //     id: ObjectUtil.createId(),
-        //     key: 'CONTACT',
-        //     name: 'medium NPIs',
-        //     instant: new Date('2021-05-19').getTime(),
-        //     multipliers: {
-        //         'family': 0.65,
-        //         'school': 0.50,
-        //         'nursing': 0.30,
-        //         'work': 0.50,
-        //         'other': 0.20,
-        //     }
-        // }));
-
-        // requestAnimationFrame(() => {
-        // setTimeout(() => {
-            this.updateModificationInstants();
-        // }, 100);
-
-        // });
-
     }
 
     buildModificationValues(): IModificationValues[] {
@@ -107,11 +74,11 @@ export class Modifications {
         if (ObjectUtil.isNotEmpty(applicableModification)) {
             return applicableModification;
         } else if (ObjectUtil.isNotEmpty(ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification)) {
-            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification(ModelConstants.MODEL_MIN____________INSTANT);
+            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification(ModelConstants.MODEL_MIN_____INSTANT);
             if (typedModifications.length > 0) {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN____________INSTANT, typedModifications[0].getInstantA());
+                defaultModification.setInstants(ModelConstants.MODEL_MIN_____INSTANT, typedModifications[0].getInstantA());
             } else {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN____________INSTANT, ModelConstants.MODEL_MAX____________INSTANT);
+                defaultModification.setInstants(ModelConstants.MODEL_MIN_____INSTANT, ModelConstants.MODEL_MAX_____INSTANT);
             }
             return defaultModification;
         } else {
@@ -140,7 +107,7 @@ export class Modifications {
                     typedModifications[i].setInstants(typedModifications[i].getInstantA(), typedModifications[i+1].getInstantA());
                 }
                 const lastModification = typedModifications[typedModifications.length - 1];
-                lastModification.setInstants(lastModification.getInstantA(), ModelConstants.MODEL_MAX____________INSTANT);
+                lastModification.setInstants(lastModification.getInstantA(), ModelConstants.MODEL_MAX_____INSTANT);
             }
         });
     }
