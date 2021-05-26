@@ -45,31 +45,4 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     abstract getMaxValue(): number;
 
-    // static rebuildModificationData(): void {
-
-    //     const minChartInstant = SliderModification.getInstance().getMinValue();
-    //     const maxChartInstant = SliderModification.getInstance().getMaxValue();
-
-    //     const modificationData: IModificationData[] = [];
-
-    //     Modifications.getInstance().findModificationsByType(key).forEach(modification => {
-    //         modificationData.push({
-    //             modValueY: modification.getModificationValue(),
-    //             categoryX: TimeUtil.formatCategoryDate(modification.getInstantA())
-    //         });
-    //         modificationData.push({
-    //             modValueY: modification.getModificationValue(),
-    //             categoryX: TimeUtil.formatCategoryDate(modification.getInstantB())
-    //         });
-    //     });
-    //     ChartAgeGroup.getInstance().showModifications({
-    //         min: 0,
-    //         max,
-    //         percent: max === 1,
-    //         text: key,
-    //         color: ControlsConstants.COLORS[key],
-    //         useObjectColors: true,
-    //     }, modificationData);
-    // }
-
 }

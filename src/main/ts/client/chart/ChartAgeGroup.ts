@@ -103,7 +103,7 @@ export class ChartAgeGroup {
 
         this.absTotal = Demographics.getInstance().getAbsTotal();
         this.absValue = 0;
-        this.ageGroupIndex = 3;
+        this.ageGroupIndex = 10;
         this.modelData = [];
         this.chartMode = 'INCIDENCE';
 
@@ -175,7 +175,7 @@ export class ChartAgeGroup {
         ChartUtil.getInstance().configureAxis(this.yAxisModification, 'mods');
         this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
             if (value) {
-                console.log('value', value);
+                // console.log('value', value);
                 value = value.replace(this.chart.language.locale._thousandSeparator, '');
                 value = value.replace(this.chart.language.locale._decimalSeparator, '.');
                 const parsed = parseFloat(value);

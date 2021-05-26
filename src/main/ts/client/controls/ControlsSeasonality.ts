@@ -29,7 +29,7 @@ export class ControlsSeasonality {
 
     handleChange(): void {
         this.modification.acceptUpdate({
-            amount: this.sliderAmount.getValue()
+            seasonality: this.sliderAmount.getValue()
         });
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
     }
@@ -37,7 +37,7 @@ export class ControlsSeasonality {
     acceptModification(modification: ModificationSeasonality): void {
         Controls.acceptModification(modification);
         this.modification = modification;
-        this.sliderAmount.setValue(this.modification.getAmount());
+        this.sliderAmount.setValue(this.modification.getSeasonality());
     }
 
 }

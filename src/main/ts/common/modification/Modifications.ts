@@ -17,6 +17,7 @@ export class Modifications {
         modificationValues.forEach(modificationValue => {
             this.instance.addModification(ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue));
         });
+        this.instance.updateModificationInstants();
     }
 
     static getInstance(): Modifications {
@@ -70,7 +71,7 @@ export class Modifications {
 
     addModification(modification: IModification<IModificationValues>): void {
         this.modifications.push(modification);
-        this.updateModificationInstants();
+        // this.updateModificationInstants();
     }
 
     updateModificationInstants(): void {

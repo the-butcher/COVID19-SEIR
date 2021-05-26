@@ -46,6 +46,10 @@ export class ModelStateIntegrator {
         return this.modelState;
     }
 
+    /**
+     * fill the model with vaccinated individuals until the amount configured in settings is fulfilled
+     * @param multiplier
+     */
     async prefillVaccination(multiplier: number): Promise<void> {
 
         const modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;

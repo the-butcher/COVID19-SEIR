@@ -1,3 +1,5 @@
+import { ModificationSeasonality } from './ModificationSeasonality';
+import { ModificationResolverSeasonality } from './ModificationResolverSeasonality';
 import { ModificationResolverVaccination } from './ModificationResolverVaccination';
 import { ModificationResolverTesting } from './ModificationResolverTesting';
 import { ModificationResolverContact } from './ModificationResolverContact';
@@ -22,6 +24,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private modificationContact: ModificationContact;
     private modificationTesting: ModificationTesting;
     private modificationVaccination: ModificationVaccination;
+    private modificationSeasonality: ModificationSeasonality;
 
     constructor(modificationParams: IModificationValuesTime) {
         super('INSTANT', modificationParams);
@@ -38,16 +41,18 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      */
     setInstants(instantA: number, instantB: number): void {
         super.setInstants(instantA, instantB);
-        // this.modificationContact = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'CONTACT') as ModificationContact;
-        // this.modificationTesting = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'TESTING') as ModificationTesting;
-        // this.modificationVaccination = Modifications.getInstance().findFirstApplicableOrElseDefault(this.getInstantA(), 'VACCINATION') as ModificationVaccination;
         this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA());
         this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
         this.modificationVaccination = new ModificationResolverVaccination().getModification(this.getInstantA());
+        this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
     }
 
     getDosesPerDay(): number {
         return this.modificationVaccination.getDosesPerDay();
+    }
+
+    getSeasonality(): number {
+        return this.modificationSeasonality.getSeasonality();
     }
 
     getTestingRatio(ageGroupIndex: number): number {

@@ -36,13 +36,7 @@ export class SliderModification extends Slider {
             max: ModelConstants.MODEL_MAX_____INSTANT,
             step: TimeUtil.MILLISECONDS_PER____DAY,
             values: [],
-            ticks: [
-                new Date('2021-05-01').getTime(),
-                new Date('2021-06-01').getTime(),
-                new Date('2021-07-01').getTime(),
-                new Date('2021-08-01').getTime(),
-                new Date('2021-09-01').getTime()
-            ],
+            ticks: ModelConstants.RANGE___MODEL_INSTANT,
             label: 'date',
             thumbCreateFunction: (index: number) => {
                 return new IconModification('x', 'CONTACT', 'create'); // TODO could this be optional

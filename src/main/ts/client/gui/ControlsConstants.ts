@@ -159,7 +159,7 @@ export class ControlsConstants {
             });
         }
 
-        console.log('modificationData', modificationData);
+        // console.log('modificationData', modificationData);
 
         const max = modificationResolver.getMaxValue();
         const key = modificationResolver.getKey();

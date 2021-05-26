@@ -11,9 +11,9 @@ current Tasks:
 * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
 * implement
   * import
-  * save
+  * save -> auto save (?), if auto save there needs to be a reset (could be done through local storage history)
   * export
-  * png
+  * ~~png~~
   * csv
 * do performance tests on model integration and try to improve performance
   * will caching compartments on compartmentFilter improve performance

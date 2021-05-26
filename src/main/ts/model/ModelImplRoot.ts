@@ -54,7 +54,14 @@ export class ModelImplRoot implements IModelSeir {
          * get all strain values as currently in modifications instance
          */
         const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
-        const incidences = modificationsStrain.map(m => m.getIncidence());
+
+        /**
+         * start with a clean set of indices
+         */
+        const incidences: number[] = [];
+        for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+            incidences[strainIndex] = modificationsStrain[strainIndex].getIncidence();
+        }
 
         /**
          * adapt first contact modification to have initial conditions even in preload range
@@ -98,15 +105,18 @@ export class ModelImplRoot implements IModelSeir {
                 const totalIncidenceStrain = lastDataItem[`TOTAL_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
                 const totalIncidenceTarget = incidences[strainIndex];
                 const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceStrain;
+                const incidence = modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor;
 
-                const ageGroupIncidences: number[] = [];
+                const ageGroupFactors: number[] = [];
                 demographics.getAgeGroups().forEach(ageGroup => {
-                    const ageGroupIncidence = lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
-                    ageGroupIncidences[ageGroup.getIndex()] = ageGroupIncidence * totalIncidenceFactor;
+                    const ageGroupIncidenceStrain = lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
+                    ageGroupFactors[ageGroup.getIndex()] = ageGroupIncidenceStrain / totalIncidenceStrain;
                 });
+                const ageGroupIncidences = ageGroupFactors.map(f => f * incidence);
+                // console.log('ageGroupFactors', ageGroupFactors, ageGroupIncidences);
 
                 modificationsStrain[strainIndex].acceptUpdate({
-                    incidence:  modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor,
+                    incidence,
                     ageGroupIncidences
                 });
 

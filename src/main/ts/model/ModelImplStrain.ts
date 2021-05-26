@@ -7,6 +7,7 @@ import { ModelImplRoot } from './ModelImplRoot';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { ModelImplIncidence } from './ModelImplIncidence';
+import { TimeUtil } from '../util/TimeUtil';
 
 export class ModelImplStrain implements IModelSeir {
 
@@ -90,69 +91,69 @@ export class ModelImplStrain implements IModelSeir {
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();
-        // if (tT >= this.strain.instant) {
 
-            const absExposedParticipants: number[] = [];
+        // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        //     console.log('seasonality', new Date(tT), modificationTime.getSeasonality());
+        // }
+
+        const absExposedParticipants: number[] = [];
+        this.infectiousModels.forEach(participantInfectiousModel => {
+            absExposedParticipants[participantInfectiousModel.getAgeGroupIndex()] = 0;
+        });
+
+        this.infectiousModels.forEach(contactInfectiousModel => {
+
+            // an absolute number of infectious individuals in the contact group (premultiplied to match dT, r0 and )
+            const absInfectious = contactInfectiousModel.getAbsInfectious(state, dT);
+            // console.log('absInfectiousContacts', contactInfectiousModel.getAgeGroupIndex(), absInfectiousContacts);
+
             this.infectiousModels.forEach(participantInfectiousModel => {
-                absExposedParticipants[participantInfectiousModel.getAgeGroupIndex()] = 0;
-            });
 
-            this.infectiousModels.forEach(contactInfectiousModel => {
+                const absContacts = modificationTime.getContacts(contactInfectiousModel.getAgeGroupIndex(), participantInfectiousModel.getAgeGroupIndex()) * absInfectious;
+                const nrmParticipants = modificationTime.getSeasonality() * absContacts * this.exposuresPerContact / participantInfectiousModel.getAgeGroupTotal();
 
-                // an absolute number of infectious individuals in the contact group (premultiplied to match dT, r0 and )
-                const absInfectious = contactInfectiousModel.getAbsInfectious(state, dT);
-                // console.log('absInfectiousContacts', contactInfectiousModel.getAgeGroupIndex(), absInfectiousContacts);
+                const compartmentsSusceptible = this.getRootModel().getCompartmentsSusceptible(participantInfectiousModel.getAgeGroupIndex());
+                let nrmExposureTotal = 0;
+                compartmentsSusceptible.forEach(compartmentSusceptible => {
 
-                this.infectiousModels.forEach(participantInfectiousModel => {
-
-                    const absContacts = modificationTime.getContacts(contactInfectiousModel.getAgeGroupIndex(), participantInfectiousModel.getAgeGroupIndex()) * absInfectious;
-                    const nrmParticipants = absContacts * this.exposuresPerContact / participantInfectiousModel.getAgeGroupTotal();
-
-                    const compartmentsSusceptible = this.getRootModel().getCompartmentsSusceptible(participantInfectiousModel.getAgeGroupIndex());
-                    let nrmExposureTotal = 0;
-                    compartmentsSusceptible.forEach(compartmentSusceptible => {
-
-                        const nrmExposure = nrmParticipants * state.getNrmValue(compartmentSusceptible);
-                        nrmExposureTotal += nrmExposure;
-                        result.addNrmValue(-nrmExposure, compartmentSusceptible);
-
-                    });
-                    result.addNrmValue(nrmExposureTotal, participantInfectiousModel.getIncomingCompartment());
-
+                    const nrmExposure = nrmParticipants * state.getNrmValue(compartmentSusceptible);
+                    nrmExposureTotal += nrmExposure;
+                    result.addNrmValue(-nrmExposure, compartmentSusceptible);
 
                 });
+                result.addNrmValue(nrmExposureTotal, participantInfectiousModel.getIncomingCompartment());
 
             });
 
-            /**
-             * infectious internal transfer through compartment chain
-             */
-            this.infectiousModels.forEach(infectiousModel => {
-                result.add(infectiousModel.apply(state, dT, tT));
-            });
+        });
 
-            /**
-             * transfer from last infectious compartment to removed (split to discovered and undiscovered)
-             */
-            for (let i=0; i<this.infectiousModels.length; i++) {
+        /**
+         * infectious internal transfer through compartment chain
+         */
+        this.infectiousModels.forEach(infectiousModel => {
+            result.add(infectiousModel.apply(state, dT, tT));
+        });
 
-                const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(i);
-                const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(i);
+        /**
+         * transfer from last infectious compartment to removed (split to discovered and undiscovered)
+         */
+        for (let i=0; i<this.infectiousModels.length; i++) {
 
-                const outgoingCompartment = this.infectiousModels[i].getOutgoingCompartment();
-                const ratioD = modificationTime.getTestingRatio(i);
-                const ratioU = 1 - ratioD;
+            const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(i);
+            const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(i);
 
-                const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
-                const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
+            const outgoingCompartment = this.infectiousModels[i].getOutgoingCompartment();
+            const ratioD = modificationTime.getTestingRatio(i);
+            const ratioU = 1 - ratioD;
 
-                result.addNrmValue(-continuationValue, outgoingCompartment);
-                result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
-                result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
+            const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
+            const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
 
-            }
+            result.addNrmValue(-continuationValue, outgoingCompartment);
+            result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
+            result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
 
-        // }
+        }
 
         this.incidenceModels.forEach(incidenceModel => {
             result.add(incidenceModel.apply(state, dT, tT));
