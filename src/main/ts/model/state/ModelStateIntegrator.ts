@@ -1,3 +1,4 @@
+import { ModificationTime } from './../../common/modification/ModificationTime';
 import { IModificationValuesStrain } from './../../common/modification/IModificationValuesStrain';
 import { Demographics } from '../../common/demographics/Demographics';
 import { Modifications } from '../../common/modification/Modifications';
@@ -8,6 +9,8 @@ import { ECompartmentType } from '../compartment/ECompartmentType';
 import { ModelImplRoot } from '../ModelImplRoot';
 import { IModelState } from './IModelState';
 import { ModelConstants } from '../ModelConstants';
+import { ObjectUtil } from '../../util/ObjectUtil';
+import { ModificationPrefill } from '../../common/modification/ModificationPrefill';
 
 /**
  * definition for a type that hold model progress and, if complete, model data
@@ -39,7 +42,19 @@ export class ModelStateIntegrator {
     }
 
     integrate(dT: number, tT: number): void {
-        this.modelState.add(this.model.apply(this.modelState, dT, tT));
+
+        const modificationTime = new ModificationTime({
+            id: ObjectUtil.createId(),
+            key: 'TIME',
+            instant: tT,
+            name: 'step',
+            deletable: false,
+            draggable: false
+        });
+        modificationTime.setInstants(tT, tT); // tT, tT is by purpose, standing for instant, instant
+
+        this.modelState.add(this.model.apply(this.modelState, dT, tT, modificationTime));
+
     }
 
     getModelState(): IModelState {
@@ -61,13 +76,15 @@ export class ModelStateIntegrator {
         vaccinationRatioCurr = this.modelState.getNrmValueSum(compartmentFilterRemovedVTotal);
         // console.log('vaccinationRatioCurr', vaccinationRatioCurr);
 
+
+
         let vaccinationRatioCurr1;
         let loopBuster = 0;
         while (vaccinationRatioCurr < vaccinationRatioDest && loopBuster < 1000) {
 
             // TODO better exit criteria upon reaching refusal threshold
 
-            this.modelState.add(this.model.applyVaccination(this.modelState, ModelStateIntegrator.DT, -1, 100000));
+            this.modelState.add(this.model.applyVaccination(this.modelState, ModelStateIntegrator.DT, -1, new ModificationPrefill()));
             vaccinationRatioCurr1 = this.modelState.getNrmValueSum(compartmentFilterRemovedVTotal);
             if (vaccinationRatioCurr1 > 0 && vaccinationRatioCurr1 === vaccinationRatioCurr) {
                 break; // probably reached the refusal threshold

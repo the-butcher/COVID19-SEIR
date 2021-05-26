@@ -1,3 +1,4 @@
+import { ModelTask } from './client/ModelTask';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { StorageUtil } from './client/controls/StorageUtil';
 import { ModelActions } from './client/gui/ModelActions';
@@ -6,6 +7,7 @@ import { Modifications } from './common/modification/Modifications';
 import { JsonLoader } from './util/JsonLoader';
 import { Logger } from './util/Logger';
 import { ObjectUtil } from './util/ObjectUtil';
+import { SliderModification } from './client/gui/SliderModification';
 
 
 new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).then(demographicsConfig => {
@@ -24,10 +26,9 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
         ModelActions.getInstance().toggleMode('STRAIN');
         requestAnimationFrame(() => {
             ChartAgeGroup.getInstance();
+            SliderModification.getInstance().updateChartIfApplicable('STRAIN');
         });
     }, 250);
-
-    // http://www.covidsim.de/assets/data/coma16/Austria.json
 
 }).catch(e => {
     console.warn('failed to create model settings due to', e);

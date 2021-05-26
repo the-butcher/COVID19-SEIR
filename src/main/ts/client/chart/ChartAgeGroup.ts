@@ -93,14 +93,6 @@ export class ChartAgeGroup {
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
 
-        // TODO probably needs to be a specific type
-        document.getElementById('chartModeIncidenceDiv').addEventListener('click', () => {
-            this.toggleChartMode('INCIDENCE');
-        });
-        document.getElementById('chartModeSeirDiv').addEventListener('click', () => {
-            this.toggleChartMode('SEIR');
-        });
-
         this.absTotal = Demographics.getInstance().getAbsTotal();
         this.absValue = 0;
         this.ageGroupIndex = 10;
@@ -154,11 +146,24 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.extraMax = 0.00;
         this.yAxisPlotRelative.min = 0.00;
         this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
+
         this.yAxisPlotRelative.renderer.labels.template.adapter.add('text', (value, target) => {
-            return Math.round(parseFloat(value) * 100) + '%';
+            if (value) {
+                value = value.replace(this.chart.language.locale._thousandSeparator, '');
+                value = value.replace(this.chart.language.locale._decimalSeparator, '.');
+                return Math.round(parseFloat(value) * 100) + '%';
+            } else {
+                return value;
+            }
         });
         this.yAxisPlotRelative.tooltip.label.adapter.add('text', (value, target) => {
-            return Math.round(parseFloat(value) * 100) + '%';
+            if (value) {
+                value = value.replace(this.chart.language.locale._thousandSeparator, '');
+                value = value.replace(this.chart.language.locale._decimalSeparator, '.');
+                return Math.round(parseFloat(value) * 100) + '%';
+            } else {
+                return value;
+            }
         });
 
         // incidence axis
@@ -441,6 +446,15 @@ export class ChartAgeGroup {
             };
         });
 
+        // TODO probably needs to be a specific type
+        document.getElementById('chartModeIncidenceDiv').addEventListener('click', () => {
+            this.setChartMode('INCIDENCE');
+        });
+        document.getElementById('chartModeSeirDiv').addEventListener('click', () => {
+            this.setChartMode('SEIR');
+        });
+        this.setChartMode('INCIDENCE');
+
     }
 
     exportToPng(): void {
@@ -513,7 +527,7 @@ export class ChartAgeGroup {
         }
         const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
-        seriesAgeGroup.getSeries().visible = true;
+        seriesAgeGroup.getSeries().visible = this.chartMode === 'INCIDENCE';
         return seriesAgeGroup;
     }
 
@@ -543,14 +557,16 @@ export class ChartAgeGroup {
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
         // specific incidence makes sense only if there is more than one strain
         if (visible && modificationValuesStrain.length > 1) {
+            // turn all active strain back on
             modificationValuesStrain.forEach(strainValues => {
+                console.log('strain to visible', strainValues.name)
                 this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).getSeries().visible = true;
             });
         }
 
     }
 
-    toggleChartMode(chartMode: CHART_MODE______KEY): void {
+    setChartMode(chartMode: CHART_MODE______KEY): void {
 
         this.chartMode = chartMode;
         if (this.chartMode === 'INCIDENCE') {
@@ -606,6 +622,12 @@ export class ChartAgeGroup {
             // be sure there is a series for each strain
             this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues);
         });
+
+        // detach from thread, be sure series visibilities are straight
+        requestAnimationFrame(() => {
+            this.setChartMode(this.chartMode);
+        });
+
 
         this.modelData = modelData;
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {

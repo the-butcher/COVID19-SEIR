@@ -1,3 +1,9 @@
+import { AgeGroup } from '../common/demographics/AgeGroup';
+import { Demographics } from '../common/demographics/Demographics';
+import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
+import { ModificationTime } from '../common/modification/ModificationTime';
+import { ObjectUtil } from '../util/ObjectUtil';
+import { TimeUtil } from '../util/TimeUtil';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
@@ -5,15 +11,16 @@ import { IConnectable } from './compartment/IConnectable';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
 import { ModelImplRoot } from './ModelImplRoot';
-import { AgeGroup } from '../common/demographics/AgeGroup';
+import { ModelImplStrain } from './ModelImplStrain';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
-import { ObjectUtil } from '../util/ObjectUtil';
-import { TimeUtil } from '../util/TimeUtil';
-import { Demographics } from '../common/demographics/Demographics';
-import { ModelImplStrain } from './ModelImplStrain';
-import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 
+/**
+ * submodel for calculating incidence from the cases having occurred over the last 7 days
+ *
+ * @author h.fleischer
+ * @since 26.05.2021
+ */
 export class ModelImplIncidence implements IModelSeir, IConnectable {
 
     private readonly rootModel: ModelImplRoot;
@@ -24,7 +31,7 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
     private readonly compartments: CompartmentBase[];
     private integrationSteps: IModelIntegrationStep[];
 
-    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain) {
+    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, testingRatio: number) {
 
         this.rootModel = parentModel.getRootModel();
         this.compartments = [];
@@ -34,9 +41,9 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
         this.ageGroupIndex = ageGroup.getIndex();
 
         // make some assumptions about initial cases (duplicated code in ModelImplInfectious)
-        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000;
+        let dailyCases = testingRatio * strainValues.incidence * ageGroup.getAbsValue() / 700000;
         if (strainValues.ageGroupIncidences) {
-            dailyCases = strainValues.ageGroupIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
+            dailyCases = testingRatio * strainValues.ageGroupIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
         }
         this.nrmValue = dailyCases * 7 / this.absTotal;
 
@@ -47,8 +54,6 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
         for (let i = 1; i < 7; i++) {
             this.compartments.push(new CompartmentBase(ECompartmentType.X__INCUBATE_N, this.absTotal, dailyCases, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
         }
-
-        // console.log('cl', this.compartments.length);
 
         // connect compartments among each other, last compartment juts looses its population to nowhere without further propagation
         for (let compartmentIndex = 0; compartmentIndex < this.compartments.length; compartmentIndex++) {
@@ -115,13 +120,13 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
     }
 
     isValid(): boolean {
-        throw new Error('Method not implemented.');
+        throw new Error('NI');
     }
 
-    apply(state: IModelState, dT: number, tT: number): IModelState {
+    apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
         const result = ModelState.empty();
         this.integrationSteps.forEach(integrationStep => {
-            result.add(integrationStep.apply(state, dT, tT));
+            result.add(integrationStep.apply(state, dT, tT, modificationTime));
         });
         return result;
     }

@@ -8,5 +8,5 @@ import { IModelState } from './state/IModelState';
  * @since 31.03.2021
  */
 export interface IModelIntegrationStep {
-    apply(state: IModelState, dT: number, tT: number, modificationTime?: ModificationTime): IModelState;
+    apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState;
 }

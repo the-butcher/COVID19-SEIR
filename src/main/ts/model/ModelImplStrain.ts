@@ -1,13 +1,13 @@
 import { Demographics } from '../common/demographics/Demographics';
-import { ModificationTime } from '../common/modification/ModificationTime';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
+import { ModificationTesting } from '../common/modification/ModificationTesting';
+import { ModificationTime } from '../common/modification/ModificationTime';
 import { IModelSeir } from './IModelSeir';
+import { ModelImplIncidence } from './ModelImplIncidence';
 import { ModelImplInfectious } from './ModelImplInfectious';
 import { ModelImplRoot } from './ModelImplRoot';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
-import { ModelImplIncidence } from './ModelImplIncidence';
-import { TimeUtil } from '../util/TimeUtil';
 
 export class ModelImplStrain implements IModelSeir {
 
@@ -24,9 +24,9 @@ export class ModelImplStrain implements IModelSeir {
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly exposuresPerContact: number;
-    private readonly strain: IModificationValuesStrain;
+    // private readonly strainValues: IModificationValuesStrain;
 
-    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain) {
+    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
@@ -38,16 +38,15 @@ export class ModelImplStrain implements IModelSeir {
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
+            const testingRatio = modificationTesting.getTestingRatio(ageGroup.getIndex());
             const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
 
-            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues));
+            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, testingRatio));
 
         });
         this.nrmValue = nrmValue1;
-
-        this.strain = strainValues;
 
     }
 
@@ -131,19 +130,19 @@ export class ModelImplStrain implements IModelSeir {
          * infectious internal transfer through compartment chain
          */
         this.infectiousModels.forEach(infectiousModel => {
-            result.add(infectiousModel.apply(state, dT, tT));
+            result.add(infectiousModel.apply(state, dT, tT, modificationTime));
         });
 
         /**
          * transfer from last infectious compartment to removed (split to discovered and undiscovered)
          */
-        for (let i=0; i<this.infectiousModels.length; i++) {
+        for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
 
-            const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(i);
-            const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(i);
+            const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(ageGroupIndex);
+            const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(ageGroupIndex);
 
-            const outgoingCompartment = this.infectiousModels[i].getOutgoingCompartment();
-            const ratioD = modificationTime.getTestingRatio(i);
+            const outgoingCompartment = this.infectiousModels[ageGroupIndex].getOutgoingCompartment();
+            const ratioD = modificationTime.getTestingRatio(ageGroupIndex);
             const ratioU = 1 - ratioD;
 
             const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
@@ -156,7 +155,7 @@ export class ModelImplStrain implements IModelSeir {
         }
 
         this.incidenceModels.forEach(incidenceModel => {
-            result.add(incidenceModel.apply(state, dT, tT));
+            result.add(incidenceModel.apply(state, dT, tT, modificationTime));
         });
 
         return result;

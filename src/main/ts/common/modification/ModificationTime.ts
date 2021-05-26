@@ -1,14 +1,13 @@
-import { ModificationSeasonality } from './ModificationSeasonality';
-import { ModificationResolverSeasonality } from './ModificationResolverSeasonality';
-import { ModificationResolverVaccination } from './ModificationResolverVaccination';
-import { ModificationResolverTesting } from './ModificationResolverTesting';
-import { ModificationResolverContact } from './ModificationResolverContact';
-import { IModificationValuesTime } from './IModificationValuesTime';
-import { Modifications } from './Modifications';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
 import { AModification } from './AModification';
 import { IContactMatrix } from './IContactMatrix';
+import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationContact } from './ModificationContact';
+import { ModificationResolverContact } from './ModificationResolverContact';
+import { ModificationResolverSeasonality } from './ModificationResolverSeasonality';
+import { ModificationResolverTesting } from './ModificationResolverTesting';
+import { ModificationResolverVaccination } from './ModificationResolverVaccination';
+import { ModificationSeasonality } from './ModificationSeasonality';
 import { ModificationTesting } from './ModificationTesting';
 import { ModificationVaccination } from './ModificationVaccination';
 

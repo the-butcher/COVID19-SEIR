@@ -2,6 +2,7 @@ import { ControlsSeasonality } from '../controls/ControlsSeasonality';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IconSlider } from './IconSlider';
 import { Slider } from './Slider';
+import { ControlsConstants } from './ControlsConstants';
 
 export class SliderSeasonality extends Slider {
 
@@ -24,7 +25,7 @@ export class SliderSeasonality extends Slider {
                 return new IconSlider();
             },
             labelFormatFunction: (index, value, type) => {
-                return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}%`;
+                return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
             },
             valueChangeFunction: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
@@ -36,7 +37,7 @@ export class SliderSeasonality extends Slider {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value) / 100;

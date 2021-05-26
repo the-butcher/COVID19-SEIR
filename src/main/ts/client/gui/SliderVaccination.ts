@@ -1,3 +1,4 @@
+import { ControlsConstants } from './ControlsConstants';
 import { ControlsVaccination } from '../controls/ControlsVaccination';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IconSlider } from './IconSlider';
@@ -30,7 +31,7 @@ export class SliderVaccination extends Slider {
                 return new IconSlider();
             },
             labelFormatFunction: (index, value, type) => {
-                return `${value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}`;
+                return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
             },
             valueChangeFunction: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
@@ -42,7 +43,7 @@ export class SliderVaccination extends Slider {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${value.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}`;
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value);

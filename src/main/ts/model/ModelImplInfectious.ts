@@ -1,3 +1,8 @@
+import { AgeGroup } from '../common/demographics/AgeGroup';
+import { Demographics } from '../common/demographics/Demographics';
+import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
+import { ModificationTime } from '../common/modification/ModificationTime';
+import { StrainUtil } from '../util/StrainUtil';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { CompartmentInfectious } from './compartment/CompartmentInfectious';
 import { ECompartmentType } from './compartment/ECompartmentType';
@@ -7,12 +12,8 @@ import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelImplStrain } from './ModelImplStrain';
-import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
-import { AgeGroup } from '../common/demographics/AgeGroup';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
-import { StrainUtil } from '../util/StrainUtil';
-import { Demographics } from '../common/demographics/Demographics';
 
 export class ModelImplInfectious implements IModelSeir, IConnectable {
 
@@ -52,10 +53,10 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
 
         const compartmentParams = CompartmentChain.getInstance().getStrainedCompartmentParams(strainValues);
 
-        let reproductionSum = 0;
-        let durationSum = 0;
-        let i0NormalSum = 0;
-        let i0AbsoluteSum = 0
+        // let reproductionSum = 0;
+        // let durationSum = 0;
+        // let i0NormalSum = 0;
+        // let i0AbsoluteSum = 0
 
         /**
          * build compartments
@@ -64,14 +65,14 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
 
             const duration = compartmentParam.instantB - compartmentParam.instantA;
 
-            reproductionSum += compartmentParam.reproduction;
-            durationSum += duration;
-            i0NormalSum += compartmentParam.i0Normal;
+            // reproductionSum += compartmentParam.reproduction;
+            // durationSum += duration;
+            // i0NormalSum += compartmentParam.i0Normal;
 
             if (compartmentParam.type === ECompartmentType.E_____EXPOSED) {
                 this.compartments.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absExposed, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
             } else {
-                i0AbsoluteSum += absInfected * compartmentParam.i0Normal;
+                // i0AbsoluteSum += absInfected * compartmentParam.i0Normal;
                 this.compartments.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absInfected * compartmentParam.i0Normal, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
             }
 
@@ -85,19 +86,31 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
             const sourceCompartment = this.compartments[compartmentIndex - 1];
             const targetCompartment = this.compartments[compartmentIndex]; // may resolve to null, in which case values will simply be non-continued in this model
             this.integrationSteps.push({
-                apply: (modelState: IModelState, dT: number, tT: number) => {
+                apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
+
+                    const increments = ModelState.empty();
+
                     const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
                     const continuationValue = continuationRate * modelState.getNrmValue(sourceCompartment);
-                    const increments = ModelState.empty();
+
+                    /**
+                     * move from infectious compartment to next infectious compartment, if any
+                     */
                     increments.addNrmValue(-continuationValue, sourceCompartment);
                     if (targetCompartment) {
                         increments.addNrmValue(continuationValue, targetCompartment);
                     }
+
+                    /**
+                     * at incubation time, copy into infectious model
+                     */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentCases = this.parentModel.getIncidenceModel(this.ageGroupIndex).getIncomingCompartment();
-                        increments.addNrmValue(continuationValue, compartmentCases);
+                        const discoveredNrmCases = continuationValue * modificationTime.getTestingRatio(this.ageGroupIndex);
+                        increments.addNrmValue(discoveredNrmCases, compartmentCases);
                     }
                     return increments;
+
                 }
             });
 
@@ -171,13 +184,13 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
     }
 
     isValid(): boolean {
-        throw new Error('Method not implemented.');
+        throw new Error('NI');
     }
 
-    apply(state: IModelState, dT: number, tT: number): IModelState {
+    apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
         const result = ModelState.empty();
         this.integrationSteps.forEach(integrationStep => {
-            result.add(integrationStep.apply(state, dT, tT));
+            result.add(integrationStep.apply(state, dT, tT, modificationTime));
         });
         return result;
     }

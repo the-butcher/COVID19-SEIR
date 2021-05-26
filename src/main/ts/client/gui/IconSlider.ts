@@ -1,4 +1,4 @@
-import { ModelConstants } from '../../model/ModelConstants';
+import { ControlsConstants } from './ControlsConstants';
 
 export class IconSlider {
 
@@ -48,7 +48,7 @@ export class IconSlider {
         this.bulletGroupElement.appendChild(this.bulletPathOuter);
 
         const iconPathInner = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        iconPathInner.style.fill = ModelConstants.COLOR______BG;
+        iconPathInner.style.fill = ControlsConstants.COLOR______BG;
         iconPathInner.style.opacity = '0.5';
         iconPathInner.setAttributeNS(null, 'd', IconSlider.PATH_INNER);
         this.bulletGroupElement.appendChild(iconPathInner);
@@ -56,7 +56,7 @@ export class IconSlider {
     }
 
     setFocussed(focussed: boolean): void {
-        this.bulletPathOuter.style.fill = focussed ? ModelConstants.COLOR____FONT : '#777777';
+        this.bulletPathOuter.style.fill = focussed ? ControlsConstants.COLOR____FONT : '#777777';
     }
 
     getBulletGroupElement(): SVGGElement {

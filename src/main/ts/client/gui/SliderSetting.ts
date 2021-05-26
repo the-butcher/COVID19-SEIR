@@ -2,6 +2,7 @@ import { ControlsSettings } from '../controls/ControlsSettings';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IconSlider } from './IconSlider';
 import { Slider } from './Slider';
+import { ControlsConstants } from './ControlsConstants';
 
 export class SliderSetting extends Slider {
 
@@ -14,11 +15,11 @@ export class SliderSetting extends Slider {
 
         document.getElementById('slidersSettingsDiv').appendChild(container);
 
-        let labelFormat = ModelConstants.LOCALE_FORMAT_FIXED;
-        let inputFormat = ModelConstants.LOCALE_FORMAT_FLOAT_1;
+        let labelFormat = ControlsConstants.LOCALE_FORMAT_FIXED;
+        let inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
         if (steps < 0.01) {
-            labelFormat = ModelConstants.LOCALE_FORMAT_FLOAT_1;
-            inputFormat = ModelConstants.LOCALE_FORMAT_FLOAT_2;
+            labelFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
+            inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
         }
 
         super({
@@ -34,9 +35,9 @@ export class SliderSetting extends Slider {
             },
             labelFormatFunction: (index, value, type) => {
                 if (type === 'tick') {
-                    return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}%`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
                 } else {
-                    return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
                 }
             },
             valueChangeFunction: (value, index, type) => {
@@ -49,7 +50,7 @@ export class SliderSetting extends Slider {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value) / 100;

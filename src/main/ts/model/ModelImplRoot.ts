@@ -1,13 +1,11 @@
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
+import { ModificationTesting } from '../common/modification/ModificationTesting';
 import { ModificationTime } from '../common/modification/ModificationTime';
-import { Logger } from '../util/Logger';
 import { TimeUtil } from '../util/TimeUtil';
 import { IModificationValuesContact } from './../common/modification/IModificationValuesContact';
-import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
 import { Modifications } from './../common/modification/Modifications';
-import { ObjectUtil } from './../util/ObjectUtil';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
@@ -56,18 +54,16 @@ export class ModelImplRoot implements IModelSeir {
         const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
 
         /**
-         * start with a clean set of indices
+         * start with a clean set of incidences
          */
-        const incidences: number[] = [];
-        for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
-            incidences[strainIndex] = modificationsStrain[strainIndex].getIncidence();
-        }
+        const incidences = modificationsStrain.map(m => m.getIncidence());
 
         /**
          * adapt first contact modification to have initial conditions even in preload range
          */
         const modificationValueContact = Modifications.getInstance().findModificationsByType('CONTACT')[0].getModificationValues() as IModificationValuesContact;
-        const modificationValueTesting = Modifications.getInstance().findModificationsByType('TESTING')[0].getModificationValues() as IModificationValuesTesting;
+        const modificationTesting = Modifications.getInstance().findModificationsByType('TESTING')[0] as ModificationTesting;
+        const modificationValueTesting = modificationTesting.getModificationValues();
 
         modificationValueContact.instant = curInstant;
         modificationValueTesting.instant = curInstant;
@@ -110,7 +106,7 @@ export class ModelImplRoot implements IModelSeir {
                 const ageGroupFactors: number[] = [];
                 demographics.getAgeGroups().forEach(ageGroup => {
                     const ageGroupIncidenceStrain = lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
-                    ageGroupFactors[ageGroup.getIndex()] = ageGroupIncidenceStrain / totalIncidenceStrain;
+                    ageGroupFactors[ageGroup.getIndex()] = ageGroupIncidenceStrain / totalIncidenceStrain / modificationTesting.getTestingRatio(ageGroup.getIndex());
                 });
                 const ageGroupIncidences = ageGroupFactors.map(f => f * incidence);
                 // console.log('ageGroupFactors', ageGroupFactors, ageGroupIncidences);
@@ -164,13 +160,16 @@ export class ModelImplRoot implements IModelSeir {
         this.compartmentsRemovedU = [];
         this.vaccinationModels = [];
 
-        this.demographics = demographics;
-        modifications.findModificationsByType('STRAIN').forEach((modification: ModificationStrain) => {
-            this.strainModels.push(new ModelImplStrain(this, demographics, modification.getModificationValues()));
-        });
-
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
         const settingsValues = modificationSettings.getModificationValues();
+
+        const modificationTesting = modifications.findModificationsByType('TESTING')[0] as ModificationTesting;
+        // const testingValues = modificationSettings.getModificationValues();
+
+        this.demographics = demographics;
+        modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {
+            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTesting));
+        });
 
         demographics.getAgeGroups().forEach(ageGroup => {
 
@@ -216,11 +215,6 @@ export class ModelImplRoot implements IModelSeir {
         return this.compartmentsRemovedU[ageGroupIndex];
     }
 
-    /**
-     * TODO must include susceptible as well
-     * @param ageGroupIndex
-     * @returns
-     */
     getNrmValueGroup(ageGroupIndex: number, excludeSusceptible?: boolean): number {
         let nrmValueGroup = 0;
         if (!excludeSusceptible) {
@@ -277,9 +271,7 @@ export class ModelImplRoot implements IModelSeir {
         return initialState;
     }
 
-
-
-    applyVaccination(state: IModelState, dT: number, tT: number, dosesPerDay: number): IModelState {
+    applyVaccination(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();
 
@@ -308,13 +300,7 @@ export class ModelImplRoot implements IModelSeir {
 
         }
 
-        // // normalize
-        // for (let i = 0; i < this.vaccinationModels.length; i ++) {
-        //     vaccinationPriorities[i] /= totalVaccinationPriority;
-        // }
-
-        const nrmDosesTotal = dosesPerDay * dT / TimeUtil.MILLISECONDS_PER____DAY / this.getAbsTotal();
-        // let nrmDosesAgeGroupTotal = 0;
+        const nrmDosesTotal = modificationTime.getDosesPerDay() * dT / TimeUtil.MILLISECONDS_PER____DAY / this.getAbsTotal();
         for (let i = 0; i < this.vaccinationModels.length; i++) {
 
             // create a share of doses for this age group
@@ -327,12 +313,6 @@ export class ModelImplRoot implements IModelSeir {
                 const nrmIncrS = nrmDosesAgeGroup * vaccinationGroupDataset[i].nrmVaccS / nrmTotal;
                 const nrmIncrD = nrmDosesAgeGroup * vaccinationGroupDataset[i].nrmVaccD / nrmTotal;
                 const nrmIncrU = nrmDosesAgeGroup * vaccinationGroupDataset[i].nrmVaccU / nrmTotal;
-
-                // nrmDosesAgeGroupTotal += nrmIncrS;
-                // nrmDosesAgeGroupTotal += nrmIncrD;
-                // nrmDosesAgeGroupTotal += nrmIncrU;
-
-                // const t = nrmIncrS * 2 + nrmIncrD + nrmIncrU * 2;
 
                 // remove from susceptible and add to immunizing compartment
                 result.addNrmValue(-nrmIncrS, this.compartmentsSusceptible[i]);
@@ -351,34 +331,19 @@ export class ModelImplRoot implements IModelSeir {
         }
 
         this.vaccinationModels.forEach(vaccinationModel => {
-            result.add(vaccinationModel.apply(state, dT, tT));
+            result.add(vaccinationModel.apply(state, dT, tT, modificationTime));
         });
 
         return result;
 
     }
 
-    apply(state: IModelState, dT: number, tT: number): IModelState {
-
-        const modificationTime = new ModificationTime({
-            id: ObjectUtil.createId(),
-            key: 'TIME',
-            instant: tT,
-            name: 'step',
-            deletable: false,
-            draggable: false
-        });
-        // triggers fetching of contact, testing and vaccination modifications
-        modificationTime.setInstants(tT, tT); // tT, tT is by purpose, standing for instant, instant
-
-        const result = this.applyVaccination(state, dT, tT, modificationTime.getDosesPerDay());
-
+    apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
+        const result = this.applyVaccination(state, dT, tT, modificationTime);
         this.strainModels.forEach(strainModel => {
             result.add(strainModel.apply(state, dT, tT, modificationTime));
         });
-
         return result;
-
     }
 
 

@@ -3,12 +3,15 @@ import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
-import { ModelLoader } from './../ModelLoader';
+import { ModelTask } from '../ModelTask';
+import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ControlsConstants } from './ControlsConstants';
 import { IconModification } from './IconModification';
 import { Slider } from './Slider';
 
-
+/**
+ * slider control showing modifications of given types
+ */
 export class SliderModification extends Slider {
 
     // static readonly PATH_D_EDIT = "M 0 12.4 C -6.85 12.4 -12.4 6.85 -12.4 0 S -6.85 -12.4 0 -12.4 S 12.4 -6.85 12.4 0 S 6.85 12.4 0 12.4 Z M 6.8982 -5.1841 L 5.1844 -6.8979 C 4.6498 -7.4325 3.7828 -7.4325 3.2482 -6.8979 L 1.6359 -5.2856 L 5.2859 -1.6356 L 6.8982 -3.2479 C 7.4328 -3.7828 7.4328 -4.6495 6.8982 -5.1841 Z M 0.9904 -4.6407 L -6.9331 3.2823 L -7.2952 6.539 L -6.5402 7.2948 L -3.2858 6.9355 L 4.6403 -0.9906 Z";
@@ -84,13 +87,21 @@ export class SliderModification extends Slider {
         ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
     }
 
+    /**
+     * if the modification type identifiable by the given key has the updateChartOnChange flag set, commit a model-update task
+     * @param key
+     */
     updateChartIfApplicable(key: MODIFICATION____KEY): void {
-        ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart();
         if (ControlsConstants.MODIFICATION_PARAMS[key].updateChartOnChange) { // if that modification type allows updates, the model needs to be rebuilt
-            ModelLoader.commit(Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
+            ModelTask.commit(key, Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
         }
     }
 
+    /**
+     * find the modification with the given index and update it's ending instant
+     * @param index
+     * @param value
+     */
     updateModificationInstant(index: number, value: number): void {
         const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
         const instantA = value;
@@ -98,6 +109,9 @@ export class SliderModification extends Slider {
         modification.setInstants(instantA, instantB);
     }
 
+    /**
+     * update all modification's ending instants, then update the modification chart
+     */
     updateModificationInstants(): void {
         for (let index = 0; index < this.getSliderThumbs().length; index++) {
             this.updateModificationInstant(index, this.getValue(index));
@@ -108,8 +122,7 @@ export class SliderModification extends Slider {
     }
 
     /**
-     * gets all active modification of the given type and shows them on the time slider
-     *
+     * gets all active modification of the given type and shows them on the modification timeslider
      * @param key
      */
     showModifications(key: MODIFICATION____KEY): void {
@@ -137,13 +150,41 @@ export class SliderModification extends Slider {
             this.setCreatorThumb(creatorThumb);
 
             creatorThumb.getContainer().addEventListener('click', e => {
+
+                /**
+                 * get instant a click position
+                 */
                 const position = this.eventToPosition(e);
-                const value = this.positionToValue(position);
-                const modification = ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification(value);
-                this.selectableModificationId = modification.getId(); // store is so the modification gets selected right away
+                const instant = this.positionToValue(position);
+
+                /**
+                 * find previous modification
+                 */
+                const modificationResolver = ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver();
+                const previousModification = modificationResolver.getModification(instant);
+
+                /**
+                 * create new modification with copy of previous modification, but change id, name, instant
+                 */
+                const modificationValuesCopy: IModificationValues = {
+                    ...previousModification.getModificationValues(),
+                    id: ObjectUtil.createId(),
+                    name: `copy of ${previousModification.getName()}`,
+                    instant,
+                    deletable: true,
+                    draggable: true
+                } as IModificationValues; // copy previous values
+
+                const modification = ModelConstants.MODIFICATION_PARAMS[key].createValuesModification(modificationValuesCopy);
+                console.log('modification', modification);
+                /**
+                 * add modification and update modification chart
+                 */
+                this.selectableModificationId = modification.getId(); // store id to have the modification selected once updated modifications display
                 Modifications.getInstance().addModification(modification);
                 this.showModifications(modification.getKey());
                 this.updateChartIfApplicable(key);
+
             });
 
         }
@@ -201,6 +242,7 @@ export class SliderModification extends Slider {
             if (typedModifications[index].isDeletable()) {
                 modificationIcon.getHandleGroupElement().addEventListener('click', () => {
                     Modifications.getInstance().deleteModification(modificationIcon.getId());
+                    this.selectableModificationId = this.modificationIcons[index - 1].getId(); // set previous modification as selectable -> prevent edit controls showing values of a non-existing modification
                     this.showModifications(typedModifications[index].getKey());
                     this.updateChartIfApplicable(key);
                 });
@@ -238,9 +280,9 @@ export class SliderModification extends Slider {
         }
 
         /**
-         * update the modification chart
+         * create a modification resolver of the appropriate type and use it to update the modification chart
          */
-        ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart();
+        ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver());
 
     }
 

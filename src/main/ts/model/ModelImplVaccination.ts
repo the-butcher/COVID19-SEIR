@@ -1,5 +1,6 @@
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
+import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
@@ -127,10 +128,10 @@ export class ModelImplVaccination implements IModelSeir {
      * @param tT
      * @returns
      */
-    apply(state: IModelState, dT: number, tT: number): IModelState {
+    apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();
-        result.add(this.integrationStep.apply(state, dT, tT));
+        result.add(this.integrationStep.apply(state, dT, tT, modificationTime));
         return result;
 
     }

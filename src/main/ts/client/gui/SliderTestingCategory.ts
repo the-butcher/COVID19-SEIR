@@ -1,5 +1,6 @@
-import { ControlsTesting } from '../controls/ControlsTesting';
 import { ModelConstants } from '../../model/ModelConstants';
+import { ControlsTesting } from '../controls/ControlsTesting';
+import { ControlsConstants } from './ControlsConstants';
 import { IconSlider } from './IconSlider';
 import { Slider } from './Slider';
 
@@ -28,9 +29,9 @@ export class SliderTestingCategory extends Slider {
             },
             labelFormatFunction: (index, value, type) => {
                 if (type === 'tick') {
-                    return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED)}%`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
                 } else {
-                    return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
                 }
             },
             valueChangeFunction: (value, index, type) => {
@@ -43,7 +44,7 @@ export class SliderTestingCategory extends Slider {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${(value * 100).toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value) / 100;

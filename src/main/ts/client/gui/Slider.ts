@@ -247,8 +247,13 @@ export class Slider {
     }
 
     setProgress(progress: number): void {
-        this.trackElement1.style.width = `${(1 - progress) * 100}%`;
-        this.trackElement2.style.width = `${progress * 100}%`;
+        if (progress > 0) {
+            this.trackElement1.style.width = `${(1 - progress) * 100}%`;
+            this.trackElement2.style.width = `${progress * 100}%`;
+        } else {
+            this.trackElement1.style.width = '100%';
+            this.trackElement2.style.width = '0%';
+        }
     }
 
     /**

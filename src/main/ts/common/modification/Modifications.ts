@@ -71,7 +71,6 @@ export class Modifications {
 
     addModification(modification: IModification<IModificationValues>): void {
         this.modifications.push(modification);
-        // this.updateModificationInstants();
     }
 
     updateModificationInstants(): void {

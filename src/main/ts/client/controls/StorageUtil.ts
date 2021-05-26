@@ -74,7 +74,7 @@ export class StorageUtil {
             {
                 id: ObjectUtil.createId(),
                 key: 'SETTINGS',
-                name: 'settings',
+                name: 'initial state',
                 instant: ModelConstants.MODEL_MIN_____INSTANT,
                 recoveredD: 0.12,
                 recoveredU: 0.12,

@@ -1,7 +1,7 @@
 import { ModificationTime } from '../../common/modification/ModificationTime';
-import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { Controls } from './Controls';
 
 /**
@@ -41,7 +41,7 @@ export class ControlsTime {
         this.modification = modification;
         this.chartTime.redraw(modification);
 
-        document.getElementById('infoVaccinationSpan').innerHTML = this.modification.getDosesPerDay().toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FIXED);
+        document.getElementById('infoVaccinationSpan').innerHTML = this.modification.getDosesPerDay().toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
 
         // TODO decide how the strain diagram can be presented
         //      NO another part of the time diagram (but then strain might not be pickable)
