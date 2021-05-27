@@ -85,15 +85,19 @@ export class ModelImplRoot implements IModelSeir {
 
             let modelData: IDataItem[];
             let lastDataItem: IDataItem;
+            let dstInstant = -1;
             for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 
-                const dstInstant = modificationsStrain[strainIndex].getInstantA();
-                modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
-                    progressCallback({
-                        ratio: modelProgress.ratio
+                // if the strain identified by index has a date later than the last model iteration
+                if (modificationsStrain[strainIndex].getInstantA() > dstInstant) {
+                    dstInstant = modificationsStrain[strainIndex].getInstantA();
+                    modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
+                        progressCallback({
+                            ratio: modelProgress.ratio
+                        });
                     });
-                });
-                lastDataItem = modelData[modelData.length - 1];
+                    lastDataItem = modelData[modelData.length - 1];
+                }
 
                 /**
                  * adjust incidence by multiplication
@@ -106,10 +110,10 @@ export class ModelImplRoot implements IModelSeir {
                 const ageGroupFactors: number[] = [];
                 demographics.getAgeGroups().forEach(ageGroup => {
                     const ageGroupIncidenceStrain = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()] // lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
-                    ageGroupFactors[ageGroup.getIndex()] = ageGroupIncidenceStrain / totalIncidenceStrain / modificationTesting.getTestingRatio(ageGroup.getIndex());
+                    ageGroupFactors[ageGroup.getIndex()] = ageGroupIncidenceStrain / modificationTesting.getTestingRatio(ageGroup.getIndex()) / totalIncidenceStrain; // modificationTesting.getTestingRatio(ageGroup.getIndex());
                 });
                 const ageGroupIncidences = ageGroupFactors.map(f => f * incidence);
-                // console.log('ageGroupFactors', ageGroupFactors, ageGroupIncidences);
+                console.log('ageGroupFactors', modificationsStrain[strainIndex].getName(), ageGroupFactors, ageGroupIncidences);
 
                 modificationsStrain[strainIndex].acceptUpdate({
                     incidence,
@@ -133,7 +137,7 @@ export class ModelImplRoot implements IModelSeir {
         model = new ModelImplRoot(demographics, modifications);
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
-        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        // await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
 
         return modelStateIntegrator;
 

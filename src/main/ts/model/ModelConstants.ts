@@ -101,7 +101,7 @@ export class ModelConstants {
     static readonly RANGE__PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE__PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
     static readonly RANGE______INCUBATION = [1, 7, 14];
-    static readonly RANGE_______INCIDENCE = [1, 250, 500, 750, 1000];
+    static readonly RANGE_______INCIDENCE = [0, 250, 500, 750, 1000];
     static readonly RANGE_SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
     static readonly RANGE______________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     static readonly RANGE___MODEL_INSTANT = [

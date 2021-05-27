@@ -6,7 +6,7 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* coincident strain instants produce an error when updating model
+* approximation get imprecise or fails when on the backside of the incidence curve
 * bind the 'time' modification to chart cursor
   * show effective contact matrix on a per date basis (base_contact_matrix x reduction_through_testing * nrm_susceptible of the respective age group)
   * disable chart zoom to keep slider and chart aligned
@@ -41,6 +41,7 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~coincident strain instants produce an error when updating model~~
 * ~~rather flip value fields than transforming model data~~
 * ~~check if incidence is evaluated on discovered cases only (doublecheck with model1)~~
 * ~~sizing problem on the progress bar, flickers while approximating~~
