@@ -44,6 +44,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
         this.modificationVaccination = new ModificationResolverVaccination().getModification(this.getInstantA());
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
+        // TODO from current model data get rT (which needs to be calculated yet)
     }
 
     getDosesPerDay(): number {

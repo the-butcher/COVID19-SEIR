@@ -8,7 +8,8 @@ The code has been moved from local storage to github for backup- and documentati
 todo:
 * coincident strain instants produce an error when updating model
 * bind the 'time' modification to chart cursor
-  * show actual contact matrix on a per date basis
+  * show effective contact matrix on a per date basis (base_contact_matrix x reduction_through_testing * nrm_susceptible of the respective age group)
+  * disable chart zoom to keep slider and chart aligned
 * modification chart area
   * find some primary value for strain (if possible use r<sub>t</sub>)
 * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
@@ -27,7 +28,6 @@ todo:
 * performance tests on model integration
   * find and eliminate most prominent hotspots
   * will caching compartments on compartmentFilter improve performance?
-  * rather flip value fields than transforming model data
 * introduce vaccination heatmap
   * controls (where, style, ...)
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
@@ -38,8 +38,10 @@ next:
   * add sliders for priority and refusal
   * add chart showing 2 curves with priority and refusal (?)
 * add immune escape to strain modification (percentage of cases that are susceptible among recovered individuals)
+* zoomable chart and slider
 
 done:
+* ~~rather flip value fields than transforming model data~~
 * ~~check if incidence is evaluated on discovered cases only (doublecheck with model1)~~
 * ~~sizing problem on the progress bar, flickers while approximating~~
 * ~~copy previous modification when creating~~

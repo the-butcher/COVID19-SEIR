@@ -10,6 +10,8 @@ import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
+import { ModelConstants } from './../../model/ModelConstants';
+import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
 
@@ -76,7 +78,7 @@ export class ChartAgeGroup {
     private readonly absTotal: number;
     private absValue: number; // the absolute value of the age-group currently displayed
     private ageGroupIndex: number;
-    private modelData: any[];
+    private modelData: IDataItem[];
     private ageGroupsWithTotal: AgeGroup[];
     private chartMode: CHART_MODE______KEY;
 
@@ -559,7 +561,6 @@ export class ChartAgeGroup {
         if (visible && modificationValuesStrain.length > 1) {
             // turn all active strain back on
             modificationValuesStrain.forEach(strainValues => {
-                console.log('strain to visible', strainValues.name)
                 this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).getSeries().visible = true;
             });
         }
@@ -613,7 +614,7 @@ export class ChartAgeGroup {
 
     }
 
-    async acceptModelData(modelData: any[]): Promise<void> {
+    async acceptModelData(modelData: IDataItem[]): Promise<void> {
 
         // console.log('modelData', modelData);
 
@@ -623,7 +624,7 @@ export class ChartAgeGroup {
             this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues);
         });
 
-        // detach from thread, be sure series visibilities are straight
+        // detach from thread, be sure series visibilities are correct
         requestAnimationFrame(() => {
             this.setChartMode(this.chartMode);
         });
@@ -631,7 +632,7 @@ export class ChartAgeGroup {
 
         this.modelData = modelData;
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
-            name: 'TOTAL',
+            name: ModelConstants.AGEGROUP_NAME_ALL,
             pG: Demographics.getInstance().getAbsTotal(),
             vacc: 0
         })];
@@ -639,9 +640,10 @@ export class ChartAgeGroup {
         let maxIncidence = 0;
         for (const dataItem of this.modelData) {
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
-                maxIncidence = Math.max(maxIncidence, dataItem[ageGroupHeat.getName() + '_INCIDENCE']);
+                maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL]);
             });
         }
+
         this.yAxisPlotIncidence.min = 0;
         this.yAxisPlotIncidence.max = maxIncidence * 1.05;
         this.yAxisPlotIncidence.start = 0;
@@ -662,16 +664,16 @@ export class ChartAgeGroup {
         for (const dataItem of this.modelData) {
 
             // data independent from sub-strains
-            const ageGroupSusceptible = dataItem[`${ageGroupPlot.getName()}_SUSCEPTIBLE`];
-            const ageGroupExposed = dataItem[`${ageGroupPlot.getName()}_EXPOSED`];
-            const ageGroupInfectious = dataItem[`${ageGroupPlot.getName()}_INFECTIOUS`];
-            const ageGroupRemovedI = dataItem[`${ageGroupPlot.getName()}_REMOVED_I`];
-            const ageGroupRemovedV = dataItem[`${ageGroupPlot.getName()}_REMOVED_V`];
-            const ageGroupIncidence = dataItem[`${ageGroupPlot.getName()}_INCIDENCE`];
-            const ageGroupCases = dataItem[`${ageGroupPlot.getName()}_CASES`];
+            const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
+            const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED;
+            const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS;
+            const ageGroupRemovedI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_I;
+            const ageGroupRemovedV = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V;
+            const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
+            const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
             const item = {
-                categoryX: dataItem[ChartAgeGroup.FIELD_CATEGORY_X],
+                categoryX: dataItem.categoryX,
                 ageGroupSusceptible,
                 ageGroupExposed,
                 ageGroupInfectious,
@@ -684,7 +686,7 @@ export class ChartAgeGroup {
 
             // TODO instead of rebuilding the data every time, it maybe could be much easier to change the value fields on the age specific series
             modificationValuesStrain.forEach(modificationValueStrain => {
-                item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem[`${ageGroupPlot.getName()}_INCIDENCE_${modificationValueStrain.id}`];
+                item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
             });
 
             plotData.push(item);
@@ -697,9 +699,9 @@ export class ChartAgeGroup {
 
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
-                const value = dataItem[ageGroupHeat.getName() + '_INCIDENCE'];
+                const value = dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
                 heatData.push({
-                    categoryX: dataItem[ChartAgeGroup.FIELD_CATEGORY_X],
+                    categoryX: dataItem.categoryX,
                     categoryY: ageGroupHeat.getName(),
                     index: ageGroupHeat.getIndex(),
                     value: value + randomVd

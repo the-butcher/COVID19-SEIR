@@ -15,7 +15,7 @@ import { ModelImplStrain } from './ModelImplStrain';
 import { ModelImplVaccination } from './ModelImplVaccination';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
-import { IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
+import { IDataItem, IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
 
 interface IVaccinationGroupData {
     nrmVaccS: number; // susceptible - vaccination of susceptible population
@@ -83,8 +83,8 @@ export class ModelImplRoot implements IModelSeir {
             modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
             modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
 
-            let modelData: any[];
-            let lastDataItem: any;
+            let modelData: IDataItem[];
+            let lastDataItem: IDataItem;
             for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 
                 const dstInstant = modificationsStrain[strainIndex].getInstantA();
@@ -98,14 +98,14 @@ export class ModelImplRoot implements IModelSeir {
                 /**
                  * adjust incidence by multiplication
                  */
-                const totalIncidenceStrain = lastDataItem[`TOTAL_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
+                const totalIncidenceStrain = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[modificationsStrain[strainIndex].getId()]; // lastDataItem[`TOTAL_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
                 const totalIncidenceTarget = incidences[strainIndex];
                 const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceStrain;
                 const incidence = modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor;
 
                 const ageGroupFactors: number[] = [];
                 demographics.getAgeGroups().forEach(ageGroup => {
-                    const ageGroupIncidenceStrain = lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
+                    const ageGroupIncidenceStrain = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()] // lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
                     ageGroupFactors[ageGroup.getIndex()] = ageGroupIncidenceStrain / totalIncidenceStrain / modificationTesting.getTestingRatio(ageGroup.getIndex());
                 });
                 const ageGroupIncidences = ageGroupFactors.map(f => f * incidence);
@@ -119,7 +119,7 @@ export class ModelImplRoot implements IModelSeir {
                 // Logger.getInstance().log(interpolationIndex, ageGroupIncidences, ObjectUtil.normalize(ageGroupIncidences));
 
             };
-            const overallVaccinated = lastDataItem.TOTAL_REMOVED_V;
+            const overallVaccinated = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_V;
 
             // adjust the vaccination multiplier to interpolate to a value that gives a closer match to desired settings
             vaccinationMultiplier *= modificationSettings.getVaccinated() / overallVaccinated;
@@ -175,11 +175,11 @@ export class ModelImplRoot implements IModelSeir {
 
             // TODO initial share of discovery (may split recovered slider)
             const absValueRemovedD = ageGroup.getAbsValue() * settingsValues.recoveredD;
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedD.push(compartmentRemovedD);
 
             const absValueRemovedU = ageGroup.getAbsValue() * settingsValues.recoveredU;
-            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedU.push(compartmentRemovedU);
 
             const shareOfRefusal = 0.40 - 0.25 * ageGroup.getIndex() / demographics.getAgeGroups().length;
@@ -193,7 +193,7 @@ export class ModelImplRoot implements IModelSeir {
         // now find out how many people are already contained in compartments / by age group
         demographics.getAgeGroups().forEach(ageGroup => {
             const absValueSusceptible = ageGroup.getAbsValue() - this.getNrmValueGroup(ageGroup.getIndex(), true) * this.getAbsValue();
-            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsSusceptible.push(compartmentSusceptible);
         });
 

@@ -93,7 +93,9 @@ export class ModelConstants {
     static readonly PRELOAD_________________DAYS = 15;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
-    static readonly STRAIN_ID_ALL = '*****';
+
+    static readonly AGEGROUP_NAME_ALL = 'TOTAL';
+    static readonly STRAIN_ID_____ALL = 'MULTI';
 
     static readonly RANGE__PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE__PERCENTAGE__10 = [0.0, 0.1];
@@ -110,7 +112,8 @@ export class ModelConstants {
         // new Date('2021-09-01').getTime(),
         // new Date('2021-10-01').getTime(),
         // new Date('2021-11-01').getTime(),
-        // new Date('2021-12-01').getTime()
+        // new Date('2021-12-01').getTime(),
+        // new Date('2022-01-01').getTime()
     ];
     static readonly MODEL_MIN_____INSTANT = Math.min(...ModelConstants.RANGE___MODEL_INSTANT);
     static readonly MODEL_MAX_____INSTANT = Math.max(...ModelConstants.RANGE___MODEL_INSTANT);

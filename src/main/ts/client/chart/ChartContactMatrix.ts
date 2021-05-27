@@ -1,11 +1,10 @@
-import { ControlsConstants } from './../gui/ControlsConstants';
 import { CategoryAxis, ColumnSeries, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
 import { color, create, Label, percent, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
-import { ModelConstants } from '../../model/ModelConstants';
 import { IContactMatrix } from '../../common/modification/IContactMatrix';
+import { ControlsConstants } from './../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
 import { IconMatrixAxis } from './IconMatrixAxis';
 
@@ -233,7 +232,6 @@ export class ChartContactMatrix {
 
             }, 100);
         });
-
 
     }
 
