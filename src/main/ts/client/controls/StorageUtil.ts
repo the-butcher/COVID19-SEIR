@@ -101,7 +101,7 @@ export class StorageUtil {
                 intervalScale: 1.0,
                 incidence: 150,
                 deletable: false,
-                draggable: false
+                draggable: true
             },
             // {
             //     id: ObjectUtil.createId(),

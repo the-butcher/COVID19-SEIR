@@ -69,19 +69,21 @@ export class ModelImplRoot implements IModelSeir {
         modificationValueTesting.instant = curInstant;
 
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
-        let vaccinationMultiplier = 1;
+        const vaccinatedTarget = modificationSettings.getVaccinated();
+        const recoveredDTarget = modificationSettings.getRecoveredD();
+        const recoveredUTarget = modificationSettings.getRecoveredU();
 
-        let model;
+        let model: ModelImplRoot = null;
         let modelStateIntegrator: ModelStateIntegrator;
 
         /**
          * 5 interpolation runs
          */
-        for (let interpolationIndex = 0; interpolationIndex < 5; interpolationIndex++) {
+        for (let interpolationIndex = 0; interpolationIndex < 1; interpolationIndex++) {
 
             model = new ModelImplRoot(demographics, modifications);
             modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
-            modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
+            modelStateIntegrator.prefillVaccination();
 
             let modelData: IDataItem[];
             let lastDataItem: IDataItem;
@@ -99,34 +101,51 @@ export class ModelImplRoot implements IModelSeir {
                     lastDataItem = modelData[modelData.length - 1];
                 }
 
-                /**
-                 * adjust incidence by multiplication
-                 */
-                const totalIncidenceStrain = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[modificationsStrain[strainIndex].getId()]; // lastDataItem[`TOTAL_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
-                const totalIncidenceTarget = incidences[strainIndex];
-                const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceStrain;
-                const incidence = modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor;
+                // source model value
+                const totalIncidenceSource = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[modificationsStrain[strainIndex].getId()];
 
-                const ageGroupFactors: number[] = [];
+                // target model value
+                const totalIncidenceTarget = incidences[strainIndex];
+
+                // factor from source to target
+                const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceSource;
+
+                // multiply current setting by factor for better approximation
+                const totalIncidenceResume = modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor;
+
                 demographics.getAgeGroups().forEach(ageGroup => {
-                    const ageGroupIncidenceStrain = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()] // lastDataItem[`${ageGroup.getName()}_INCIDENCE_${modificationsStrain[strainIndex].getId()}`];
-                    ageGroupFactors[ageGroup.getIndex()] = ageGroupIncidenceStrain / modificationTesting.getTestingRatio(ageGroup.getIndex()) / totalIncidenceStrain; // modificationTesting.getTestingRatio(ageGroup.getIndex());
+
+
+
                 });
-                const ageGroupIncidences = ageGroupFactors.map(f => f * incidence);
-                console.log('ageGroupFactors', modificationsStrain[strainIndex].getName(), ageGroupFactors, ageGroupIncidences);
 
                 modificationsStrain[strainIndex].acceptUpdate({
-                    incidence,
-                    ageGroupIncidences
+                    incidence: totalIncidenceResume
                 });
 
                 // Logger.getInstance().log(interpolationIndex, ageGroupIncidences, ObjectUtil.normalize(ageGroupIncidences));
 
             };
-            const overallVaccinated = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_V;
+            const recoveredDModel = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_D;
+            const recoveredDFactor = recoveredDTarget / recoveredDModel;
+            const recoveredD = modificationSettings.getRecoveredD() * recoveredDFactor;
+
+            const recoveredUModel = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_U;
+            const recoveredUFactor = recoveredUTarget / recoveredUModel;
+            const recoveredU = modificationSettings.getRecoveredU() * recoveredUFactor;
+
+            const vaccinatedModel = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_V;
+            const vaccinatedFactor = vaccinatedTarget / vaccinatedModel;
+            const vaccinated = modificationSettings.getVaccinated() * vaccinatedFactor;
 
             // adjust the vaccination multiplier to interpolate to a value that gives a closer match to desired settings
-            vaccinationMultiplier *= modificationSettings.getVaccinated() / overallVaccinated;
+            // vaccinationMultiplier *= modificationSettings.getVaccinated() / overallVaccinated;
+            // removalDMultiplier *= modificationSettings.getRecoveredU() /
+            modificationSettings.acceptUpdate({
+                recoveredU,
+                recoveredD,
+                vaccinated
+            });
 
         }
 
@@ -136,7 +155,7 @@ export class ModelImplRoot implements IModelSeir {
          */
         model = new ModelImplRoot(demographics, modifications);
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
-        modelStateIntegrator.prefillVaccination(vaccinationMultiplier);
+        modelStateIntegrator.prefillVaccination();
         // await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
 
         return modelStateIntegrator;
@@ -201,6 +220,10 @@ export class ModelImplRoot implements IModelSeir {
             this.compartmentsSusceptible.push(compartmentSusceptible);
         });
 
+    }
+
+    findStrainModel(strainId: string): ModelImplStrain {
+        return this.strainModels.find(m => m.getStrainId() === strainId);
     }
 
     getRootModel(): ModelImplRoot {

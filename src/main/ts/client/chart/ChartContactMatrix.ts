@@ -48,11 +48,6 @@ export class ChartContactMatrix {
 
     constructor(container: string) {
 
-        // // @ts-ignore
-        // if (window.am4core && window.am4charts && window.am4themes_dark) {
-        //     // @ts-ignore
-        //     am4core = window.am4core; am4charts = window.am4charts; am4themes_dark = window.am4themes_dark; am4themes_animated = window.am4themes_animated;
-        // }
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
 

@@ -1,3 +1,4 @@
+// import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
 import { AModification } from './AModification';
 import { IContactMatrix } from './IContactMatrix';
@@ -60,11 +61,23 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     }
 
     getContacts(indexContact: number, indexParticipant: number): number {
-        return this.getContactValue(indexContact, indexParticipant) * this.getTestingMultiplier(indexContact) * this.getTestingMultiplier(indexParticipant);
+
+        /**
+         * reduction through people isolating after a positive test
+         */
+        const multiplierTesting = this.getTestingMultiplier(indexContact) * this.getTestingMultiplier(indexParticipant);
+
+        /**
+         * reduction through seasonality
+         */
+        const multiplierSeasonality = this.modificationSeasonality.getSeasonality();
+
+        return this.getContactValue(indexContact, indexParticipant) * multiplierTesting *  multiplierSeasonality;
+
     }
 
     /**
-     * get the value resulting from the effective contact matrix setting
+     * get the underlying contact matrix setting
      * @param indexContact
      * @param indexParticipant
      * @returns

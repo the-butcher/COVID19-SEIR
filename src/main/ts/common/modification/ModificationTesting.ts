@@ -14,6 +14,7 @@ import { AModification } from './AModification';
  */
 export class ModificationTesting extends AModification<IModificationValuesTesting> {
 
+    private readonly absTotal: number;
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
     private readonly ageGroupTotalsByIndexContact: number[];
@@ -27,6 +28,8 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
         this.contactCategories = [];
         this.ageGroupTotalsByIndexContact = [];
         this.testingValsByIndexContact = [];
+
+        this.absTotal = Demographics.getInstance().getAbsTotal();
 
         this.ageGroups.push(...Demographics.getInstance().getAgeGroups());
         this.contactCategories.push(...Demographics.getInstance().getContactCategories());
@@ -54,6 +57,14 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
 
     getTestingRatio(ageGroupIndex: number): number {
         return this.testingValsByIndexContact[ageGroupIndex];
+    }
+
+    getTestingRatioTotal(): number {
+        let totalTestingValue = 0;
+        for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
+            totalTestingValue += this.getTestingRatio(indexContact) * this.ageGroups[indexContact].getAbsValue();
+        }
+        return totalTestingValue / this.absTotal;
     }
 
     private rebuildContactVals(): void {

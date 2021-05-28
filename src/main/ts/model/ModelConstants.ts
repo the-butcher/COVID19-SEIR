@@ -90,7 +90,7 @@ export class ModelConstants {
         }
     };
 
-    static readonly PRELOAD_________________DAYS = 15;
+    static readonly PRELOAD_________________DAYS = 10;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
 
@@ -109,7 +109,7 @@ export class ModelConstants {
         new Date('2021-06-01').getTime(),
         new Date('2021-07-01').getTime(),
         new Date('2021-08-01').getTime(),
-        // new Date('2021-09-01').getTime(),
+        new Date('2021-09-01').getTime(),
         // new Date('2021-10-01').getTime(),
         // new Date('2021-11-01').getTime(),
         // new Date('2021-12-01').getTime(),

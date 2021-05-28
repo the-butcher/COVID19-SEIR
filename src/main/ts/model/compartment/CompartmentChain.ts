@@ -95,9 +95,9 @@ export class CompartmentChain {
 
     }
 
-    getStrainedCompartmentParams(strain: IModificationValuesStrain): ICompartmentParams[] {
+    getStrainedCompartmentParams(strainValues: IModificationValuesStrain): ICompartmentParams[] {
 
-        const mean = strain.serialInterval; // Weibull.getInstance().getNormalizedMean() * strain.getSerialInterval();
+        const mean = strainValues.serialInterval; // Weibull.getInstance().getNormalizedMean() * strain.getSerialInterval();
 
         // const normalizedOffset = Weibull.getInstance().getNormalizedMean() * (1 - CompartmentChain.INCUBATION_TO_MEAN__________RATIO); // TODO static constant to describe dependency
         // // control values
@@ -108,7 +108,7 @@ export class CompartmentChain {
         // console.log('off', normalizedOffset, mean - incubation);
 
         const strainedCompartmentParams: ICompartmentParams[] = [];
-        const toStrainedValue = (normalized: number) => normalized * strain.serialInterval * strain.intervalScale + mean;
+        const toStrainedValue = (normalized: number) => normalized * strainValues.serialInterval * strainValues.intervalScale + mean;
 
         strainedCompartmentParams.push({
             type: ECompartmentType.E_____EXPOSED,
@@ -122,7 +122,7 @@ export class CompartmentChain {
         this.compartmentParams.forEach(compartmentParam => {
             strainedCompartmentParams.push({
                 type: compartmentParam.type,
-                reproduction: compartmentParam.reproduction * strain.r0,
+                reproduction: compartmentParam.reproduction * strainValues.r0,
                 instantA: Math.round(toStrainedValue(compartmentParam.instantA) * TimeUtil.MILLISECONDS_PER____DAY),
                 instantB: Math.round(toStrainedValue(compartmentParam.instantB) * TimeUtil.MILLISECONDS_PER____DAY),
                 i0Normal: compartmentParam.i0Normal,

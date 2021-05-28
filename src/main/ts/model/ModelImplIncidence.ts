@@ -31,7 +31,7 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
     private readonly compartments: CompartmentBase[];
     private integrationSteps: IModelIntegrationStep[];
 
-    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, testingRatio: number) {
+    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain) {
 
         this.rootModel = parentModel.getRootModel();
         this.compartments = [];
@@ -41,10 +41,10 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
         this.ageGroupIndex = ageGroup.getIndex();
 
         // make some assumptions about initial cases (duplicated code in ModelImplInfectious)
-        let dailyCases = testingRatio * strainValues.incidence * ageGroup.getAbsValue() / 700000;
-        if (strainValues.ageGroupIncidences) {
-            dailyCases = testingRatio * strainValues.ageGroupIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
-        }
+        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000;
+        // if (strainValues.ageGroupIncidences) {
+        //     dailyCases = strainValues.ageGroupIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000; // testingRatio *
+        // }
         this.nrmValue = dailyCases * 7 / this.absTotal;
 
         // primary compartment (cases at the point of incubation)
@@ -83,6 +83,10 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
 
     getRootModel(): ModelImplRoot {
         return this.rootModel;
+    }
+
+    getCompartments(): ICompartment[] {
+        return [...this.compartments];
     }
 
     getIncomingCompartment(): ICompartment {

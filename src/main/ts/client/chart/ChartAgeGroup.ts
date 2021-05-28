@@ -145,9 +145,8 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.renderer.grid.template.disabled = true;
         this.yAxisPlotRelative.rangeChangeDuration = 0;
         this.yAxisPlotRelative.strictMinMax = true;
-        this.yAxisPlotRelative.extraMax = 0.00;
         this.yAxisPlotRelative.min = 0.00;
-        this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
+        // this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
 
         this.yAxisPlotRelative.renderer.labels.template.adapter.add('text', (value, target) => {
             if (value) {
@@ -454,6 +453,8 @@ export class ChartAgeGroup {
         });
         document.getElementById('chartModeSeirDiv').addEventListener('click', () => {
             this.setChartMode('SEIR');
+        });document.getElementById('chartModeEiDiv').addEventListener('click', () => {
+            this.setChartMode('EI');
         });
         this.setChartMode('INCIDENCE');
 
@@ -533,16 +534,29 @@ export class ChartAgeGroup {
         return seriesAgeGroup;
     }
 
-    setSeriesSeirVisible(visible: boolean): void {
+    setSeriesSRVisible(visible: boolean): void {
+
         this.yAxisPlotRelative.visible = visible;
         this.yAxisPlotRelative.renderer.grid.template.disabled = !visible;
         this.yAxisPlotRelative.tooltip.disabled = !visible;
+        this.yAxisPlotRelative.max = 1.01;
+
         this.seriesAgeGroupSusceptible.getSeries().visible = visible;
-        this.seriesAgeGroupExposed.getSeries().visible = visible;
-        this.seriesAgeGroupInfectious.getSeries().visible = visible;
         this.seriesAgeGroupRemoved.getSeries().visible = visible;
         this.seriesAgeGroupRemovedI.getSeries().visible = visible;
         this.seriesAgeGroupRemovedV.getSeries().visible = visible;
+
+    }
+    setSeriesEIVisible(visible: boolean): void {
+
+        this.yAxisPlotRelative.visible = visible;
+        this.yAxisPlotRelative.renderer.grid.template.disabled = !visible;
+        this.yAxisPlotRelative.tooltip.disabled = !visible;
+        this.yAxisPlotRelative.max = 0.002;
+
+        this.seriesAgeGroupExposed.getSeries().visible = visible;
+        this.seriesAgeGroupInfectious.getSeries().visible = visible;
+
     }
     setSeriesIncidenceVisible(visible: boolean): void {
 
@@ -573,12 +587,20 @@ export class ChartAgeGroup {
         if (this.chartMode === 'INCIDENCE') {
 
             this.setSeriesIncidenceVisible(true);
-            this.setSeriesSeirVisible(false);
+            this.setSeriesEIVisible(false);
+            this.setSeriesSRVisible(false);
 
         } else if (this.chartMode === 'SEIR') {
 
             this.setSeriesIncidenceVisible(false);
-            this.setSeriesSeirVisible(true);
+            this.setSeriesEIVisible(true);
+            this.setSeriesSRVisible(true);
+
+        } else if (this.chartMode === 'EI') {
+
+            this.setSeriesIncidenceVisible(false);
+            this.setSeriesSRVisible(false);
+            this.setSeriesEIVisible(true);
 
         }
 
@@ -614,6 +636,16 @@ export class ChartAgeGroup {
 
     }
 
+    getNrmSusceptible(instant: number, ageGroupIndex: number): number {
+        const ageGroup = Demographics.getInstance().getAgeGroups()[ageGroupIndex];
+        this.modelData.forEach(dataItem => {
+            if (dataItem.categoryX === TimeUtil.formatCategoryDate(instant)) {
+                return dataItem.valueset[ageGroup.getName()].SUSCEPTIBLE[ModelConstants.STRAIN_ID_____ALL];
+            }
+        });
+        return -1;
+    }
+
     async acceptModelData(modelData: IDataItem[]): Promise<void> {
 
         // console.log('modelData', modelData);
@@ -628,7 +660,6 @@ export class ChartAgeGroup {
         requestAnimationFrame(() => {
             this.setChartMode(this.chartMode);
         });
-
 
         this.modelData = modelData;
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
@@ -667,7 +698,7 @@ export class ChartAgeGroup {
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
             const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED;
             const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS;
-            const ageGroupRemovedI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_I;
+            const ageGroupRemovedI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_D + dataItem.valueset[ageGroupPlot.getName()].REMOVED_U;
             const ageGroupRemovedV = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
             const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;

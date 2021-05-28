@@ -1,3 +1,4 @@
+import { ContactMatrixEffective } from './ContactMatrixEffective';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
@@ -39,7 +40,8 @@ export class ControlsTime {
 
         Controls.acceptModification(modification);
         this.modification = modification;
-        this.chartTime.redraw(modification);
+
+        this.chartTime.redraw(new ContactMatrixEffective(this.modification));
 
         document.getElementById('infoVaccinationSpan').innerHTML = this.modification.getDosesPerDay().toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
 

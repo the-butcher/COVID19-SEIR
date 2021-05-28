@@ -21,10 +21,10 @@ export class SliderVaccination extends Slider {
             values: [0],
             ticks: [
                 0,
-                25000,
                 50000,
-                75000,
-                100000
+                100000,
+                150000,
+                200000
             ],
             label: 'doses per day',
             thumbCreateFunction: (index: number) => {

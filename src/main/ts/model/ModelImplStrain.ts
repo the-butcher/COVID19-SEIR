@@ -21,6 +21,7 @@ export class ModelImplStrain implements IModelSeir {
      */
     private incidenceModels: ModelImplIncidence[];
 
+    private readonly strainId: string;
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly exposuresPerContact: number;
@@ -33,17 +34,18 @@ export class ModelImplStrain implements IModelSeir {
         this.incidenceModels = [];
         this.exposuresPerContact = demographics.getExposuresPerContact();
 
+        this.strainId = strainValues.id;
         this.absTotal = demographics.getAbsTotal();
 
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            const testingRatio = modificationTesting.getTestingRatio(ageGroup.getIndex());
+            // const testingRatio = modificationTesting.getTestingRatio(ageGroup.getIndex());
             const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
 
-            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, testingRatio));
+            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues));
 
         });
         this.nrmValue = nrmValue1;
@@ -54,8 +56,16 @@ export class ModelImplStrain implements IModelSeir {
         return this.parentModel;
     }
 
+    getStrainId(): string {
+        return this.strainId;
+    }
+
     getIncidenceModel(ageGroupIndex: number): ModelImplIncidence {
         return this.incidenceModels[ageGroupIndex];
+    }
+
+    getInfectiousModel(ageGroupIndex: number): ModelImplInfectious {
+        return this.infectiousModels[ageGroupIndex];
     }
 
     getNrmValueGroup(ageGroupIndex: number): number {
@@ -91,10 +101,6 @@ export class ModelImplStrain implements IModelSeir {
 
         const result = ModelState.empty();
 
-        // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-        //     console.log('seasonality', new Date(tT), modificationTime.getSeasonality());
-        // }
-
         const absExposedParticipants: number[] = [];
         this.infectiousModels.forEach(participantInfectiousModel => {
             absExposedParticipants[participantInfectiousModel.getAgeGroupIndex()] = 0;
@@ -109,7 +115,7 @@ export class ModelImplStrain implements IModelSeir {
             this.infectiousModels.forEach(participantInfectiousModel => {
 
                 const absContacts = modificationTime.getContacts(contactInfectiousModel.getAgeGroupIndex(), participantInfectiousModel.getAgeGroupIndex()) * absInfectious;
-                const nrmParticipants = modificationTime.getSeasonality() * absContacts * this.exposuresPerContact / participantInfectiousModel.getAgeGroupTotal();
+                const nrmParticipants = absContacts * this.exposuresPerContact / participantInfectiousModel.getAgeGroupTotal();
 
                 const compartmentsSusceptible = this.getRootModel().getCompartmentsSusceptible(participantInfectiousModel.getAgeGroupIndex());
                 let nrmExposureTotal = 0;

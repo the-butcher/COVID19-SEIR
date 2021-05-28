@@ -24,7 +24,7 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly nrmRefusal: number;
 
     private readonly compartmentImmunizing: CompartmentBase;
-    private readonly compartmentImmunizedS: CompartmentBase;
+    private readonly compartmentImmunizedV: CompartmentBase;
     private readonly compartmentImmunizedD: CompartmentBase;
     private readonly compartmentImmunizedU: CompartmentBase;
     private integrationStep: IModelIntegrationStep;
@@ -39,17 +39,17 @@ export class ModelImplVaccination implements IModelSeir {
         this.nrmRefusal = percentageRefusal * this.ageGroupTotal / this.absTotal;
         // console.log('nrmRefusal', ageGroup.getName(), percentageRefusal);
 
-        this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
-        this.compartmentImmunizedS = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_ALL, CompartmentChain.NO_CONTINUATION);
+        this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
+        this.compartmentImmunizedV = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+        this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+        this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
         this.integrationStep = {
             apply: (modelState: IModelState, dT: number, tT: number) => {
                 const continuationRate = this.compartmentImmunizing.getContinuationRatio().getRate(dT, tT);
                 const continuationValue = continuationRate * modelState.getNrmValue(this.compartmentImmunizing);
                 const increments = ModelState.empty();
                 increments.addNrmValue(-continuationValue, this.compartmentImmunizing);
-                increments.addNrmValue(+continuationValue, this.compartmentImmunizedS);
+                increments.addNrmValue(+continuationValue, this.compartmentImmunizedV);
                 return increments;
             }
         }
@@ -74,7 +74,7 @@ export class ModelImplVaccination implements IModelSeir {
     }
 
     getCompartmentImmunizedS(): CompartmentBase {
-        return this.compartmentImmunizedS;
+        return this.compartmentImmunizedV;
     }
 
     getCompartmentImmunizedD(): CompartmentBase {
@@ -113,7 +113,7 @@ export class ModelImplVaccination implements IModelSeir {
     getInitialState(): IModelState {
         const initialState = ModelState.empty();
         initialState.addNrmValue(this.compartmentImmunizing.getNrmValue(), this.compartmentImmunizing);
-        initialState.addNrmValue(this.compartmentImmunizedS.getNrmValue(), this.compartmentImmunizedS);
+        initialState.addNrmValue(this.compartmentImmunizedV.getNrmValue(), this.compartmentImmunizedV);
         return initialState;
     }
 

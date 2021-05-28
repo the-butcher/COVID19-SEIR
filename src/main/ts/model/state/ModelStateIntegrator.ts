@@ -27,7 +27,8 @@ export interface IDataValues {
     SUSCEPTIBLE: number,
     EXPOSED: number,
     INFECTIOUS: number,
-    REMOVED_I: number,
+    REMOVED_D: number,
+    REMOVED_U: number,
     REMOVED_V: number,
     CASES: number,
     INCIDENCES: { [K: string]: number }
@@ -78,10 +79,10 @@ export class ModelStateIntegrator {
      * fill the model with vaccinated individuals until the amount configured in settings is fulfilled
      * @param multiplier
      */
-    async prefillVaccination(multiplier: number): Promise<void> {
+    async prefillVaccination(): Promise<void> {
 
         const modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
-        const vaccinationRatioDest = modificationSettings.getVaccinated() * multiplier;
+        const vaccinationRatioDest = modificationSettings.getVaccinated();
         let vaccinationRatioCurr = 0;
 
         const compartmentFilterRemovedVTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V));
@@ -126,12 +127,14 @@ export class ModelStateIntegrator {
                 const compartmentFilterSusceptibleTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.S_SUSCEPTIBLE));
                 const compartmentFilterExposedTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E_____EXPOSED));
                 const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I__INFECTIOUS));
-                const compartmentFilterRemovedITotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_D || c.getCompartmentType() === ECompartmentType.R___REMOVED_U));
+                const compartmentFilterRemovedDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_D));
+                const compartmentFilterRemovedUTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_U));
                 const compartmentFilterRemovedVTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V));
                 const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0);
                 const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N));
 
-                const removedITotal = this.modelState.getNrmValueSum(compartmentFilterRemovedITotal);
+                const removedDTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedDTotal);
+                const removedUTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedUTotal);
                 const removedVTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVTotal);
 
                 const incidences: {[K: string]: number} = {};
@@ -148,7 +151,8 @@ export class ModelStateIntegrator {
                     SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptibleTotal),
                     EXPOSED: this.modelState.getNrmValueSum(compartmentFilterExposedTotal),
                     INFECTIOUS: this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal),
-                    REMOVED_I: removedITotal,
+                    REMOVED_D: removedDTotal,
+                    REMOVED_U: removedUTotal,
                     REMOVED_V: removedVTotal,
                     CASES: this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal,
                     INCIDENCES: incidences
@@ -161,12 +165,14 @@ export class ModelStateIntegrator {
                     const compartmentFilterSusceptible = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.S_SUSCEPTIBLE && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterExposed = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.E_____EXPOSED && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterInfectious = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.I__INFECTIOUS && c.getAgeGroupIndex() === ageGroup.getIndex());
-                    const compartmentFilterRemovedI = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_D || c.getCompartmentType() === ECompartmentType.R___REMOVED_U) && c.getAgeGroupIndex() === ageGroup.getIndex());
+                    const compartmentFilterRemovedD = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_D) && c.getAgeGroupIndex() === ageGroup.getIndex());
+                    const compartmentFilterRemovedU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_U) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedV = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterCases = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterIncidence = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N) && c.getAgeGroupIndex() === ageGroup.getIndex());
 
-                    const removedI = this.modelState.getNrmValueSum(compartmentFilterRemovedI) * groupNormalizer;
+                    const removedD = this.modelState.getNrmValueSum(compartmentFilterRemovedD) * groupNormalizer;
+                    const removedU = this.modelState.getNrmValueSum(compartmentFilterRemovedU) * groupNormalizer;
                     const removedV = this.modelState.getNrmValueSum(compartmentFilterRemovedV) * groupNormalizer;
 
                     const incidencesAgeGroup: {[K: string]: number} = {};
@@ -179,7 +185,8 @@ export class ModelStateIntegrator {
                         SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptible) * groupNormalizer,
                         EXPOSED: this.modelState.getNrmValueSum(compartmentFilterExposed) * groupNormalizer,
                         INFECTIOUS: this.modelState.getNrmValueSum(compartmentFilterInfectious) * groupNormalizer,
-                        REMOVED_I: removedI,
+                        REMOVED_D: removedD,
+                        REMOVED_U: removedU,
                         REMOVED_V: removedV,
                         CASES: this.modelState.getNrmValueSum(compartmentFilterCases) * absTotal,
                         INCIDENCES: incidencesAgeGroup

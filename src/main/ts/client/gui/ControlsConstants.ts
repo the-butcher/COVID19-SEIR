@@ -44,7 +44,7 @@ export interface IControlsChartDefinition {
     useObjectColors: boolean;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'SEIR';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'SEIR' | 'EI';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 export class ControlsConstants {

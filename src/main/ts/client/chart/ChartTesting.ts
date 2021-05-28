@@ -121,11 +121,8 @@ export class ChartTesting {
         const chartData = [];
         const ageGroups = demographics.getAgeGroups();
 
-        let totalTestingValue = 0;
-        // full update required after setting all values to 0 (maybe an amcharts bug)
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
             const testingVal = modification.getTestingRatio(indexContact);
-            totalTestingValue += testingVal * ageGroups[indexContact].getAbsValue();
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
                 participantY: Math.max(0.00000000001, testingVal),
@@ -134,7 +131,7 @@ export class ChartTesting {
             });
         }
 
-        this.valueTotalLabel.text = (totalTestingValue * 100 / demographics.getAbsTotal()).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        this.valueTotalLabel.text = (modification.getTestingRatioTotal() * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;
