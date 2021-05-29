@@ -108,7 +108,7 @@ export class Demographics {
         this.exposuresPerContact = this.absTotal / this.matrixSum;
 
         // console.log('this.contactCategories', this.contactCategories);
-        console.log('this.exposuresPerContact', this.exposuresPerContact);
+        // console.log('this.exposuresPerContact', this.exposuresPerContact);
 
         /**
          * evaluate max combined cell value

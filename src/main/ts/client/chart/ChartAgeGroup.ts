@@ -1,3 +1,4 @@
+import { ModificationTime } from './../../common/modification/ModificationTime';
 import { CategoryAxis, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -102,7 +103,11 @@ export class ChartAgeGroup {
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
+        this.chart.zoomOutButton.disabled = true;
+
         ChartUtil.getInstance().configureChartPadding(this.chart);
+        ChartUtil.getInstance().configureSeparators(this.chart);
+
         this.chart.plotContainer.adapter.add('x', (x, target) => {
             if (this.xAxis.dataItems.length > 0) {
                 const firstCategory = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue());
@@ -112,7 +117,18 @@ export class ChartAgeGroup {
             return x;
         });
 
-        ChartUtil.getInstance().configureSeparators(this.chart);
+
+        let plotContainerOutTimeout = -1;
+        this.chart.plotContainer.events.on('out', () => {
+            clearTimeout(plotContainerOutTimeout);
+            plotContainerOutTimeout = setTimeout(() => {
+                const timeInstant = Modifications.getInstance().findModificationsByType('TIME')[0].getInstantA();
+                this.setInstant(timeInstant);
+            }, 100);
+        });
+        this.chart.plotContainer.events.on('over', () => {
+            clearTimeout(plotContainerOutTimeout);
+        });
 
         this.chart.leftAxesContainer.layout = 'absolute';
         this.chart.bottomAxesContainer.layout = 'absolute';
@@ -130,6 +146,7 @@ export class ChartAgeGroup {
 
         this.yAxisPlotAbsolute = this.chart.yAxes.push(new ValueAxis());
         ChartUtil.getInstance().configureAxis(this.yAxisPlotAbsolute, 'population');
+        this.yAxisPlotAbsolute.tooltip.exportable = false;
         this.yAxisPlotAbsolute.rangeChangeDuration = 0;
         this.yAxisPlotAbsolute.strictMinMax = true;
         this.yAxisPlotAbsolute.visible = false;
@@ -138,12 +155,13 @@ export class ChartAgeGroup {
 
         this.yAxisPlotRelative = this.chart.yAxes.push(new ValueAxis());
         ChartUtil.getInstance().configureAxis(this.yAxisPlotRelative, 'Population %');
+        this.yAxisPlotRelative.tooltip.exportable = false;
         this.yAxisPlotRelative.visible = false;
         this.yAxisPlotRelative.renderer.grid.template.disabled = true;
         this.yAxisPlotRelative.rangeChangeDuration = 0;
         this.yAxisPlotRelative.strictMinMax = true;
         this.yAxisPlotRelative.min = 0.00;
-        // this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
+        this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
 
         this.yAxisPlotRelative.renderer.labels.template.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, true);
@@ -158,12 +176,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.strictMinMax = true;
         this.yAxisPlotIncidence.rangeChangeDuration = 0;
         ChartUtil.getInstance().configureAxis(this.yAxisPlotIncidence, '7-day incidence / ' + (100000).toLocaleString());
+        this.yAxisPlotIncidence.tooltip.exportable = false;
 
         // modification indicator axis
         this.yAxisModification = this.chart.yAxes.push(new ValueAxis());
         this.yAxisModification.strictMinMax = true;
         this.yAxisModification.rangeChangeDuration = 0;
         ChartUtil.getInstance().configureAxis(this.yAxisModification, 'mods');
+        this.yAxisModification.tooltip.exportable = false;
         this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent());
         });
@@ -292,6 +312,7 @@ export class ChartAgeGroup {
         });
         this.chart.cursor.lineX.disabled = false;
         this.chart.cursor.lineY.disabled = true;
+        this.chart.cursor.behavior = 'none';
 
         /**
          * heat axis
@@ -437,6 +458,12 @@ export class ChartAgeGroup {
 
     }
 
+    setInstant(instant: number): void {
+        const point = this.xAxis.anyToPoint(TimeUtil.formatCategoryDate(instant));
+        this.chart.cursor.triggerMove(point, 'soft'); // https://www.amcharts.com/docs/v4/tutorials/sticky-chart-cursor/
+        console.warn('inst', new Date(instant));
+    }
+
     exportToPng(): void {
         this.chart.exporting.export("png");
     }
@@ -516,7 +543,6 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.visible = visible;
         this.yAxisPlotRelative.renderer.grid.template.disabled = !visible;
         this.yAxisPlotRelative.tooltip.disabled = !visible;
-        this.yAxisPlotRelative.max = 1.01;
 
         this.seriesAgeGroupSusceptible.getSeries().visible = visible;
         this.seriesAgeGroupRemoved.getSeries().visible = visible;
@@ -529,7 +555,6 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.visible = visible;
         this.yAxisPlotRelative.renderer.grid.template.disabled = !visible;
         this.yAxisPlotRelative.tooltip.disabled = !visible;
-        this.yAxisPlotRelative.max = 0.002;
 
         this.seriesAgeGroupExposed.getSeries().visible = visible;
         this.seriesAgeGroupInfectious.getSeries().visible = visible;

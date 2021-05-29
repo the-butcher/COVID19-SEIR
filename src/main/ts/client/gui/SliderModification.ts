@@ -3,6 +3,7 @@ import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
+import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { ModelTask } from '../ModelTask';
 import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ControlsConstants } from './ControlsConstants';
@@ -286,6 +287,13 @@ export class SliderModification extends Slider {
 
     }
 
-
+    handlePointerMove(e: PointerEvent): void {
+        super.handlePointerMove(e);
+        if (this.creatorVisContainer === 1) {
+            const position = this.eventToPosition(e);
+            let value = this.positionToValue(position);
+            ChartAgeGroup.getInstance().setInstant(value);
+        }
+    }
 
 }

@@ -6,13 +6,10 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* create little colored markers where modifications are on the time slider
 * all testing to zero renders an all zero chart (which is technically OK, if the SEIR curves still are valid)
   * single slider to 1 percent leads to diagram stretching further an further
-* limit incidence range on modifications later than MIN_DATE
-  * implement coincident indicator on modifications, then iterate when selecting -> bring lower incidence up z-wise so it can get selected
-* bind the 'time' modification to chart cursor
-  * ~~show effective contact matrix on a per date basis (base_contact_matrix x reduction_through_testing * nrm_susceptible of the respective age group)~~
-  * disable chart zoom to keep slider and chart aligned
+* limit incidence range on modifications later than MIN_DATE to i.e. 10
 * modification chart area
   * find some primary value for strain (if possible use r<sub>t</sub>)
 * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
@@ -36,6 +33,7 @@ todo:
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
 
 next:
+* implement coincident indicator on modifications, then iterate when selecting -> bring lower incidence up z-wise so it can get selected
 * 'deceased'
 * add controls for vaccination strategy (?)
   * add sliders for priority and refusal
@@ -44,6 +42,10 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~bind chart cursor to the 'time' modification~~
+  * ~~when exiting the chart are, cursor shall be displayed to time modification instant~~
+  * ~~show effective contact matrix on a per date basis (base_contact_matrix x reduction_through_testing * nrm_susceptible of the respective age group)~~
+  * ~~disable chart zoom to keep slider and chart aligned~~
 * ~~modification chart axis renders decimal number~~
 * ~~contact matrix chart calculates 0 percentage~~
 * ~~chart testing y-axis label formatting~~

@@ -92,7 +92,7 @@ export class Slider {
     protected readonly thumbPickedFunction: (index: number) => void;
 
     private creatorThumb: SliderThumb;
-    private creatorVisContainer = 0;
+    protected creatorVisContainer = 0;
     private creatorVisNeighbour = 0;
 
     private focusableThumbIndex: number;
