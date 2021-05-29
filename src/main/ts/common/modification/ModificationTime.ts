@@ -1,3 +1,5 @@
+import { ModificationSettings } from './ModificationSettings';
+import { ModificationResolverSettings } from './ModificationResolverSettings';
 // import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
@@ -26,17 +28,11 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private modificationTesting: ModificationTesting;
     private modificationVaccination: ModificationVaccination;
     private modificationSeasonality: ModificationSeasonality;
+    private modificationSettings: ModificationSettings;
 
     constructor(modificationParams: IModificationValuesTime) {
         super('INSTANT', modificationParams);
     }
-
-    // getColumnSum(ageGroupIndex: number): number {
-    //     return new ContactMatrixSums(this).getColumnSum(ageGroupIndex);
-    // }
-    // getMatrixSum(): number {
-    //     return new ContactMatrixSums(this).getMatrixSum();
-    // }
 
     acceptUpdate(update: Partial<IModificationValuesTime>): void {
         // nothing to be updated
@@ -53,6 +49,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
         this.modificationVaccination = new ModificationResolverVaccination().getModification(this.getInstantA());
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
+        this.modificationSettings = new ModificationResolverSettings().getModifications()[0];
     }
 
     getDosesPerDay(): number {
@@ -72,7 +69,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         /**
          * reduction through people isolating after a positive test
          */
-        const multiplierTesting = this.modificationTesting.getContactMultiplier(indexContact) * this.modificationTesting.getContactMultiplier(indexParticipant);
+        const multiplierTesting = this.getContactMultiplier(indexContact) * this.getContactMultiplier(indexParticipant);
 
         /**
          * reduction through seasonality
@@ -91,6 +88,12 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      */
     getContactValue(indexContact: number, indexParticipant: number): number {
         return this.modificationContact.getContacts(indexContact, indexParticipant);
+    }
+
+    getContactMultiplier(ageGroupIndex: number): number {
+        const shareOfInfectionBeforeIncubation = CompartmentChain.getInstance().getShareOfPresymptomaticInfection();
+        const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
+        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getTestingRatio(ageGroupIndex) * this.modificationSettings.getQuarantine());
     }
 
 }

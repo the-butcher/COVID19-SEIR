@@ -79,6 +79,7 @@ export class StorageUtil {
                 recoveredD: 0.12,
                 recoveredU: 0.12,
                 vaccinated: 0.22,
+                quarantine: 0.50,
                 dead: 0.001,
                 deletable: false,
                 draggable: false

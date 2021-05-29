@@ -21,9 +21,9 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
     private readonly ageGroupTotalsByIndexContact: number[];
     private readonly testingValsByIndexContact: number[];
 
-    constructor(testingParams: IModificationValuesTesting) {
+    constructor(valuesTesting: IModificationValuesTesting) {
 
-        super('RANGE', testingParams);
+        super('RANGE', valuesTesting);
 
         this.ageGroups = [];
         this.contactCategories = [];
@@ -85,8 +85,8 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
         return this.modificationValues.multipliers[contactCategoryName];
     }
 
-    getContactMultiplier(ageGroupIndex: number): number {
-        return 1 - (this.getTestingRatio(ageGroupIndex) * (1 - CompartmentChain.getInstance().getShareOfPresymptomaticInfection()));
-    }
+    // getContactMultiplier(ageGroupIndex: number): number {
+    //     return 1 - (this.getTestingRatio(ageGroupIndex) * (1 - CompartmentChain.getInstance().getShareOfPresymptomaticInfection()));
+    // }
 
 }

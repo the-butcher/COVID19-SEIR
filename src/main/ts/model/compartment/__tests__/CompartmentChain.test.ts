@@ -76,4 +76,8 @@ describe("test value", () => {
         });
         expect(totalReproduction).toBeCloseTo(3.4, 8);
     });
+    it("should return 0.4631 as shareOfPresymptomaticInfection", () => {
+        expect(CompartmentChain.getInstance().getShareOfPresymptomaticInfection()).toBeCloseTo(0.4631, 3);
+    });
+
 });

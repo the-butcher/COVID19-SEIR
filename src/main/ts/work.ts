@@ -13,24 +13,30 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
 
     Logger.setInstance(self.console.log);
 
-    const workerInput: IWorkerInput = event.data;
-    const demographicsConfig = workerInput.demographicsConfig;
-    const modificationValues = workerInput.modificationValues;
+    try {
 
-    // create a demographics singleton (in worker scope, this does not interfere with main scope)
-    Demographics.setInstanceFromConfig(demographicsConfig);
+        const workerInput: IWorkerInput = event.data;
+        const demographicsConfig = workerInput.demographicsConfig;
+        const modificationValues = workerInput.modificationValues;
 
-    // create a modifications single (in worker scope, this does not interfere with main scope)
-    Modifications.setInstanceFromValues(modificationValues);
+        // create a demographics singleton (in worker scope, this does not interfere with main scope)
+        Demographics.setInstanceFromConfig(demographicsConfig);
 
-    const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), modelProgress => {
-        ctx.postMessage(modelProgress);
-    });
+        // create a modifications single (in worker scope, this does not interfere with main scope)
+        Modifications.setInstanceFromValues(modificationValues);
 
-    const minInstant = ModelConstants.MODEL_MIN_____INSTANT;
-    const maxInstant = ModelConstants.MODEL_MAX_____INSTANT;
-    modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-        ctx.postMessage(modelProgress);
-    });
+        const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), modelProgress => {
+            ctx.postMessage(modelProgress);
+        });
+
+        const minInstant = ModelConstants.MODEL_MIN_____INSTANT;
+        const maxInstant = ModelConstants.MODEL_MAX_____INSTANT;
+        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            ctx.postMessage(modelProgress);
+        });
+
+    } catch (error: any) {
+        Logger.getInstance().log('failed to work due to: ', error);
+    }
 
 });

@@ -1,0 +1,83 @@
+[
+    {
+        "id": "sea123",
+        "key": "SEASONALITY",
+        "name": "seasonality",
+        "instant": 1625875200000,
+        "seasonality": 0.90,
+        "deletable": false,
+        "draggable": true
+    },
+    {
+        "id": "set123",
+        "key": "SETTINGS",
+        "name": "initial state",
+        "instant": 1625875200000,
+        "recoveredD": 0.12,
+        "recoveredU": 0.12,
+        "vaccinated": 0.22,
+        "quarantine": 1.00,
+        "dead": 0.001,
+        "deletable": false,
+        "draggable": false
+    },
+    {
+        "id": "tim123",
+        "key": "TIME",
+        "name": "effective settings",
+        "instant": 1625875200000,
+        "deletable": false,
+        "draggable": true
+    },
+    {
+        "id": "str123",
+        "key": "STRAIN",
+        "instant": 1625875200000,
+        "name": "b.1.1.7",
+        "r0": 4.4,
+        "serialInterval": 4.8,
+        "intervalScale": 1.0,
+        "incidence": 150,
+        "deletable": false,
+        "draggable": true
+    },
+    {
+        "id": "ctc123",
+        "key": "CONTACT",
+        "name": "initial NPIs",
+        "instant": 1625875200000,
+        "multipliers": {
+            "family": 0.65,
+            "school": 0.25,
+            "nursing": 0.30,
+            "work": 0.50,
+            "other": 0.20
+        },
+        "deletable": false,
+        "draggable": false
+    },
+    {
+        "id": "tst123",
+        "key": "TESTING",
+        "name": "initial discovery",
+        "instant": 1625875200000,
+        "multipliers": {
+            "family": 0.30,
+            "school": 0.30,
+            "nursing": 0.30,
+            "work": 0.30,
+            "other": 0.30
+        },
+        "deletable": false,
+        "draggable": false
+    },
+    {
+        "id": "vac123",
+        "key": "VACCINATION",
+        "name": "initial vaccinations",
+        "instant": 1625875200000,
+        "doses": 100000,
+        "deletable": false,
+        "draggable": false
+    }
+]

@@ -18,9 +18,8 @@ export class AgeGroup {
     constructor(index: number, ageGroupParams: IAgeGroupConfig) {
         this.index = index;
         this.name = ageGroupParams.name;
-        this.vacc = ageGroupParams.vacc; // appears to give a decent priority for older ages
+        this.vacc = ageGroupParams.vacc;
         this.absValue = ageGroupParams.pG;
-        console.log('vacc', this.vacc);
     }
 
     getIndex(): number {

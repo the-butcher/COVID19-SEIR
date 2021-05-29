@@ -30,6 +30,10 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         return this.modificationValues.vaccinated;
     }
 
+    getQuarantine(): number {
+        return this.modificationValues.quarantine;
+    }
+
     getDead(): number {
         return this.modificationValues.dead;
     }

@@ -1,11 +1,10 @@
-import { ModificationContact } from './../common/modification/ModificationContact';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTesting } from '../common/modification/ModificationTesting';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
-import { IModificationValuesContact } from './../common/modification/IModificationValuesContact';
+import { ModificationContact } from './../common/modification/ModificationContact';
 import { Modifications } from './../common/modification/Modifications';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
@@ -17,8 +16,6 @@ import { ModelImplVaccination } from './ModelImplVaccination';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
-import { DataItem } from '@amcharts/amcharts4/core';
-import { Logger } from '../util/Logger';
 
 interface IVaccinationGroupData {
     nrmVaccS: number; // susceptible - vaccination of susceptible population
@@ -65,6 +62,8 @@ export class ModelImplRoot implements IModelSeir {
          */
         const modificationsStrain = modifications.findModificationsByType('STRAIN').map(m => m as ModificationStrain);
 
+        // const modificationTime = modifications.findModificationsByType('TIME')[0] as ModificationTime;
+        // modificationTime.setInstants(curInstant, curInstant);
 
         const modificationContact = modifications.findModificationsByType('CONTACT')[0] as ModificationContact;
         const modificationValueContact = modificationContact.getModificationValues();
@@ -83,8 +82,8 @@ export class ModelImplRoot implements IModelSeir {
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
             let columnContactsCurr = 0;
             for (let indexParticipant = 0; indexParticipant < ageGroups.length; indexParticipant++) {
-                const tmA = modificationTesting.getContactMultiplier(indexContact);
-                const tmB = modificationTesting.getContactMultiplier(indexParticipant);
+                const tmA = 1; // modificationTime.getContactMultiplier(indexContact);
+                const tmB = 1; // modificationTime.getContactMultiplier(indexParticipant);
                 columnContactsCurr += modificationContact.getContacts(indexContact, indexParticipant) * tmA * tmB;
             }
             columnContacts.push(columnContactsCurr);

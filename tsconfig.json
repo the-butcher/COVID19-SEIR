@@ -25,6 +25,7 @@
     "skipLibCheck": true,
     "downlevelIteration": true,
     "allowJs": true,
+    "resolveJsonModule": true,
     "types": [
       "node",
       "jest"

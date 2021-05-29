@@ -25,6 +25,7 @@ export class ControlsSettings {
     private sliderRecoveredD: SliderSetting;
     private sliderRecoveredU: SliderSetting;
     private sliderVaccinated: SliderSetting;
+    private sliderQuarantine: SliderSetting;
     // private sliderDead: SliderSetting;
 
     private modification: ModificationSettings;
@@ -37,6 +38,7 @@ export class ControlsSettings {
         this.sliderRecoveredD = new SliderSetting("recovered (tested)", ModelConstants.RANGE__PERCENTAGE_100, 0.01);
         this.sliderRecoveredU = new SliderSetting("recovered (asymptomatic)", ModelConstants.RANGE__PERCENTAGE_100, 0.01);
         this.sliderVaccinated = new SliderSetting("vaccinated (1st dose)", ModelConstants.RANGE__PERCENTAGE_100, 0.01);
+        this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE__PERCENTAGE_100, 0.01);
         // this.sliderDead = new SliderSetting("deceased", ModelConstants.RANGE__PERCENTAGE__10, 0.001);
 
     }
@@ -46,11 +48,13 @@ export class ControlsSettings {
         const recoveredD = this.sliderRecoveredD.getValue();
         const recoveredU = this.sliderRecoveredU.getValue();
         const vaccinated = this.sliderVaccinated.getValue();
+        const quarantine = this.sliderQuarantine.getValue();
         const dead = 0; // const dead = this.sliderDead.getValue();
         this.modification.acceptUpdate({
             recoveredD,
             recoveredU,
             vaccinated,
+            quarantine,
             dead
         });
 
@@ -64,6 +68,7 @@ export class ControlsSettings {
         this.sliderRecoveredD.setValue(this.modification.getRecoveredD());
         this.sliderRecoveredU.setValue(this.modification.getRecoveredU());
         this.sliderVaccinated.setValue(this.modification.getVaccinated());
+        this.sliderQuarantine.setValue(this.modification.getQuarantine());
         // this.sliderDead.setValue(this.modification.getDead());
         this.modification = modification;
     }
