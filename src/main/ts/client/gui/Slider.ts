@@ -1,10 +1,11 @@
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { ASliderElement } from './ASliderElement';
 import { IIconSlider } from './IIconSlider';
+import { SliderAsset } from './SliderAsset';
 import { SliderThumb } from './SliderThumb';
 import { SliderTick } from './SliderTick';
 
-export type LABEL__TYPE = 'tick' | 'value';
+export type LABEL__TYPE = 'tick' | 'value' | 'asset';
 export type CHANGE_TYPE = 'drag' | 'stop' | 'input' | 'cursor';
 
 /**
@@ -20,7 +21,7 @@ export interface IInputFunctions {
  */
 export interface ISliderFunctions {
     thumbCreateFunction: (index: number) => IIconSlider;
-    labelFormatFunction: (index: number, value: number, type: LABEL__TYPE) => string;
+    labelFormatFunction?: (index: number, value: number, type: LABEL__TYPE) => string;
     inputFunctions?: IInputFunctions;
 }
 
@@ -46,7 +47,7 @@ export interface ISliderElementParams {
     type: LABEL__TYPE,
     value: number;
     index: number;
-    labelFormatFunction: (index: number, value: number, type: LABEL__TYPE) => string;
+    labelFormatFunction?: (index: number, value: number, type: LABEL__TYPE) => string;
     containerClass: string;
     labelContainerClass: string;
 }
@@ -54,6 +55,11 @@ export interface ISliderElementParams {
 export interface ISliderThumbParams extends ISliderElementParams, ISliderFunctions {
     draggable: boolean;
 }
+
+export interface ISliderAssetParams extends ISliderElementParams {
+    thumbCreateFunction: (index: number) => IIconSlider;
+}
+
 
 
 /**
@@ -63,6 +69,8 @@ export interface ISliderThumbParams extends ISliderElementParams, ISliderFunctio
  * @since 13.05.2021
  */
 export class Slider {
+
+    static readonly Y_OFFSET_THUMB = 8;
 
     private static TAB_INDEX = 100; // start with a generous offset
     private static Z___INDEX = 100; // start with a generous offset
@@ -87,6 +95,7 @@ export class Slider {
 
     private readonly sliderTicks: SliderTick[];
     private readonly sliderThumbs: SliderThumb[];
+    private readonly sliderAssets: SliderAsset[];
 
     private readonly valueChangeFunction: (index: number, value: number, type: CHANGE_TYPE) => void;
     protected readonly thumbPickedFunction: (index: number) => void;
@@ -110,6 +119,7 @@ export class Slider {
 
         this.sliderTicks = [];
         this.sliderThumbs = [];
+        this.sliderAssets = [];
         this.draggableThumbIndex = -1;
         this.clickableThumbIndex = -1;
         this.focusableThumbIndex = -1;
@@ -277,6 +287,13 @@ export class Slider {
         this.sliderThumbs.length = 0;
     }
 
+    clearAssets(): void {
+        this.sliderAssets.forEach(sliderAsset => {
+            this.sliderContainer.removeChild(sliderAsset.getContainer());
+        });
+        this.sliderAssets.length = 0;
+    }
+
     /**
      * creates a single tick ready to be added to the slider
      * @param value
@@ -293,6 +310,18 @@ export class Slider {
             labelContainerClass: Slider.CLASS_TICK_______LABEL
         });
         return sliderTick;
+    }
+
+    createAsset(value: number, index: number, params: ISliderFunctions): SliderTick {
+        const sliderAsset = new SliderAsset({
+            type: 'asset',
+            value,
+            index,
+            thumbCreateFunction: params.thumbCreateFunction,
+            containerClass: Slider.CLASS_THUMB__CONTAINER,
+            labelContainerClass: Slider.CLASS_THUMB______LABEL,
+        });
+        return sliderAsset;
     }
 
     /**
@@ -351,11 +380,19 @@ export class Slider {
         });
     }
 
+    addAsset(sliderAsset: SliderAsset): void {
+        this.sliderAssets.push(sliderAsset);
+        this.sliderContainer.appendChild(sliderAsset.getContainer());
+        requestAnimationFrame(() => { // detached call to allow dom elements to settle
+            this.redrawSliderElement(sliderAsset, Slider.Y_OFFSET_THUMB, false);
+        });
+    }
+
     addThumb(sliderThumb: SliderThumb): void {
         this.sliderThumbs.push(sliderThumb);
         this.sliderContainer.appendChild(sliderThumb.getContainer());
         requestAnimationFrame(() => { // detached call to allow dom elements to settle
-            this.redrawSliderElement(sliderThumb, 7, false);
+            this.redrawSliderElement(sliderThumb, Slider.Y_OFFSET_THUMB, false);
         });
     }
 
@@ -442,7 +479,7 @@ export class Slider {
             this.creatorThumb.getContainer().style.opacity = `${this.creatorVisNeighbour * this.creatorVisContainer}`;
             if (creatorVis) {
                 this.creatorThumb.setValue(value); // just place the creator thumb, don't enforce neighbour thumb values
-                this.redrawSliderElement(this.creatorThumb, 7, false);
+                this.redrawSliderElement(this.creatorThumb, Slider.Y_OFFSET_THUMB, false);
             }
 
         }
@@ -531,8 +568,11 @@ export class Slider {
         this.sliderTicks.forEach(tickElement => {
             this.redrawSliderElement(tickElement, 35, true);
         });
+        this.sliderAssets.forEach(assetElement => {
+            this.redrawSliderElement(assetElement, Slider.Y_OFFSET_THUMB, true);
+        });
         this.sliderThumbs.forEach(thumbElement => {
-            this.redrawSliderElement(thumbElement, 7, true);
+            this.redrawSliderElement(thumbElement, Slider.Y_OFFSET_THUMB, true);
         });
     }
 
@@ -554,7 +594,7 @@ export class Slider {
 
     setValueAndRedraw(index: number, value: number, animated: boolean): void {
         this.sliderThumbs[index].setValue(value);
-        this.redrawSliderElement(this.sliderThumbs[index], 7, animated);
+        this.redrawSliderElement(this.sliderThumbs[index], Slider.Y_OFFSET_THUMB, animated);
     }
 
 }

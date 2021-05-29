@@ -6,7 +6,6 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* create little colored markers where modifications are on the time slider
 * all testing to zero renders an all zero chart (which is technically OK, if the SEIR curves still are valid)
   * single slider to 1 percent leads to diagram stretching further an further
 * limit incidence range on modifications later than MIN_DATE to i.e. 10
@@ -42,6 +41,7 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~create little colored markers where modifications are on the time slider~~
 * ~~bind chart cursor to the 'time' modification~~
   * ~~when exiting the chart are, cursor shall be displayed to time modification instant~~
   * ~~show effective contact matrix on a per date basis (base_contact_matrix x reduction_through_testing * nrm_susceptible of the respective age group)~~

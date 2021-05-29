@@ -49,7 +49,9 @@ export abstract class ASliderElement {
      */
     setValue(value: number): void {
         this.value = value;
-        this.labelContainer.innerHTML = this.labelFormatFunction(this.index, this.value, this.type);
+        if (this.labelFormatFunction) {
+            this.labelContainer.innerHTML = this.labelFormatFunction(this.index, this.value, this.type);
+        }
     }
 
     /**

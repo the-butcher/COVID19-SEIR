@@ -1,3 +1,4 @@
+import { IconModificationMini } from './IconModificationMini';
 import { Demographics } from '../../common/demographics/Demographics';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
@@ -128,14 +129,24 @@ export class SliderModification extends Slider {
      */
     showModifications(key: MODIFICATION____KEY): void {
 
-        // // assign the update function
-        // this.updateModificationChart = ControlsConstants.MODIFICATION_PARAMS[key].updateModificationChart;
-
         const typedModifications = Modifications.getInstance().findModificationsByType(key);
 
         // remove any previous thumbs
         this.clearThumbs();
+        this.clearAssets();
         this.modificationIcons.length = 0;
+
+        const allModifications = Modifications.getInstance().getAllModifications();
+        for (let modificationIndex = 0; modificationIndex < allModifications.length; modificationIndex++) {
+            const modification = allModifications[modificationIndex];
+            if (modification.getKey() !== key) {
+                const modificationIconMini = new IconModificationMini(modification.getKey());
+                const asset = this.createAsset(modification.getInstantA(), modificationIndex, {
+                    thumbCreateFunction: (index: number) => modificationIconMini,
+                })
+                this.addAsset(asset);
+            }
+        }
 
         const isCreatable = ObjectUtil.isNotEmpty(ModelConstants.MODIFICATION_PARAMS[key].createDefaultModification);
         let creatorIcon: IconModification;

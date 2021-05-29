@@ -461,7 +461,6 @@ export class ChartAgeGroup {
     setInstant(instant: number): void {
         const point = this.xAxis.anyToPoint(TimeUtil.formatCategoryDate(instant));
         this.chart.cursor.triggerMove(point, 'soft'); // https://www.amcharts.com/docs/v4/tutorials/sticky-chart-cursor/
-        console.warn('inst', new Date(instant));
     }
 
     exportToPng(): void {
