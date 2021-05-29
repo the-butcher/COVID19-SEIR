@@ -1,4 +1,4 @@
-import { Axis, Chart, Series } from '@amcharts/amcharts4/charts';
+import { Axis, Chart, Series, XYChart } from '@amcharts/amcharts4/charts';
 import { color } from '@amcharts/amcharts4/core';
 import { Color } from '../../util/Color';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -15,6 +15,7 @@ export class ChartUtil {
 
     static readonly PADDING_17 = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
 
+
     static getInstance(): ChartUtil {
         if (ObjectUtil.isEmpty(this.instance)) {
             this.instance = new ChartUtil();
@@ -24,9 +25,28 @@ export class ChartUtil {
     private static instance: ChartUtil;
 
     private readonly colorRepo: string[] = [];
+    private readonly separatorThousand: string;
+    private readonly separatorDecimal: string;
 
     private constructor() {
+        const numberFormat = (10000).toLocaleString();
+        this.separatorThousand = numberFormat.indexOf('1.') >= -1 ? '.' : ',';
+        this.separatorDecimal = numberFormat.indexOf('1.') >= -1 ? ',' : '.';
+    }
 
+    configureSeparators(chart: XYChart): void {
+        chart.language.locale._thousandSeparator = this.separatorThousand;
+        chart.language.locale._decimalSeparator = this.separatorDecimal;
+    }
+
+    formatLabelOrTooltipValue = (value: string, percent: boolean) => {
+        if (value) {
+            value = value.replace(this.separatorThousand, '');
+            value = value.replace(this.separatorDecimal, '.');
+            return percent ? Math.round(parseFloat(value) * 100) + '%' : parseFloat(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
+        } else {
+            return value;
+        }
     }
 
     formatPercentage(value: number): string {

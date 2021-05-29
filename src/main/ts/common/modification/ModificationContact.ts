@@ -5,6 +5,7 @@ import { IModificationValuesContact } from './IModificationValuesContact';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { AModification } from './AModification';
 import { IContactMatrix } from './IContactMatrix';
+import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
 
 /**
  * implementation of IModification for age-group contact matrix
@@ -29,6 +30,14 @@ export class ModificationContact extends AModification<IModificationValuesContac
         this.contactCategories.push(...Demographics.getInstance().getContactCategories());
 
     }
+
+    // getColumnSum(ageGroupIndex: number): number {
+    //     return new ContactMatrixSums(this).getColumnSum(ageGroupIndex);
+    // }
+
+    // getMatrixSum(): number {
+    //     return new ContactMatrixSums(this).getMatrixSum();
+    // }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
         this.modificationValues = {...this.modificationValues, ...update};

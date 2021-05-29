@@ -112,10 +112,7 @@ export class ChartAgeGroup {
             return x;
         });
 
-        const numberFormat = (10000).toLocaleString();
-        this.chart.language.locale._thousandSeparator = numberFormat.indexOf('1.') >= -1 ? '.' : ',';
-        this.chart.language.locale._decimalSeparator = numberFormat.indexOf('1.') >= -1 ? ',' : '.';
-
+        ChartUtil.getInstance().configureSeparators(this.chart);
 
         this.chart.leftAxesContainer.layout = 'absolute';
         this.chart.bottomAxesContainer.layout = 'absolute';
@@ -149,22 +146,10 @@ export class ChartAgeGroup {
         // this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
 
         this.yAxisPlotRelative.renderer.labels.template.adapter.add('text', (value, target) => {
-            if (value) {
-                value = value.replace(this.chart.language.locale._thousandSeparator, '');
-                value = value.replace(this.chart.language.locale._decimalSeparator, '.');
-                return Math.round(parseFloat(value) * 100) + '%';
-            } else {
-                return value;
-            }
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, true);
         });
         this.yAxisPlotRelative.tooltip.label.adapter.add('text', (value, target) => {
-            if (value) {
-                value = value.replace(this.chart.language.locale._thousandSeparator, '');
-                value = value.replace(this.chart.language.locale._decimalSeparator, '.');
-                return Math.round(parseFloat(value) * 100) + '%';
-            } else {
-                return value;
-            }
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, true);
         });
 
         // incidence axis
@@ -180,20 +165,12 @@ export class ChartAgeGroup {
         this.yAxisModification.rangeChangeDuration = 0;
         ChartUtil.getInstance().configureAxis(this.yAxisModification, 'mods');
         this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
-            if (value) {
-                // console.log('value', value);
-                value = value.replace(this.chart.language.locale._thousandSeparator, '');
-                value = value.replace(this.chart.language.locale._decimalSeparator, '.');
-                const parsed = parseFloat(value);
-                if (parsed !== 0 && this.seriesModification.isPercent()) {
-                    return Math.round(parseFloat(value) * 100) + '%';
-                } else {
-                    return parsed.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
-                }
-            } else {
-                return value;
-            }
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent());
         });
+        this.yAxisModification.tooltip.label.adapter.add('text', (value, target) => {
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent());
+        });
+
 
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -638,11 +615,11 @@ export class ChartAgeGroup {
 
     getNrmSusceptible(instant: number, ageGroupIndex: number): number {
         const ageGroup = Demographics.getInstance().getAgeGroups()[ageGroupIndex];
-        this.modelData.forEach(dataItem => {
-            if (dataItem.categoryX === TimeUtil.formatCategoryDate(instant)) {
-                return dataItem.valueset[ageGroup.getName()].SUSCEPTIBLE[ModelConstants.STRAIN_ID_____ALL];
-            }
-        });
+        let categoryX = TimeUtil.formatCategoryDate(instant);
+        const dataItem = this.modelData.find(d => d.categoryX === categoryX);
+        if (dataItem) {
+            return dataItem.valueset[ageGroup.getName()].SUSCEPTIBLE;
+        };
         return -1;
     }
 

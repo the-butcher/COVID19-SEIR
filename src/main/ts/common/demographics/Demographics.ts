@@ -36,7 +36,7 @@ export class Demographics {
     private contactCategories: ContactCategory[];
     private maxCellTotal: number;
     private exposuresPerContact: number;
-    private matrixContactTotal: number;
+    private matrixSum: number;
 
     constructor(demographicsConfig: IDemographicsConfig) {
 
@@ -83,32 +83,32 @@ export class Demographics {
         /**
          * calculate a value total across all categories and age groups
          */
-        let populationContactTotal = 0;
-        this.matrixContactTotal = 0; // the total cell value in the contact matrix
+        // let populationContactTotal = 0;
+        this.matrixSum = 0; // the total cell value in the contact matrix
         let populationG;
         this.contactCategories = [];
 
         contactCategoryParams.forEach(contactCategoryParam => {
-            let populationContactCategory = 0;
-            let matrixCategoryTotal = 0;
+            // let populationContactCategory = 0;
+            let matrixSumCategory = 0;
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
                 populationG = this.ageGroups[indexContact].getAbsValue(); // population of the "contact" age group
                 for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
-                    populationContactCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
-                    matrixCategoryTotal += contactCategoryParam.data[indexContact][indexParticipant];
+                    // populationContactCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
+                    matrixSumCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
                 }
             }
             const contactCategory = new ContactCategory(contactCategoryParam);
             this.contactCategories.push(contactCategory);
-            populationContactTotal += populationContactCategory;
-            this.matrixContactTotal += matrixCategoryTotal;
+            // populationContactTotal += populationContactCategory;
+            this.matrixSum += matrixSumCategory;
         });
 
 
-        this.exposuresPerContact = this.absTotal / populationContactTotal;
+        this.exposuresPerContact = this.absTotal / this.matrixSum;
 
         // console.log('this.contactCategories', this.contactCategories);
-        // console.log('this.exposuresPerContact', this.exposuresPerContact);
+        console.log('this.exposuresPerContact', this.exposuresPerContact);
 
         /**
          * evaluate max combined cell value
@@ -136,8 +136,8 @@ export class Demographics {
         return this.exposuresPerContact;
     }
 
-    getMatrixContactTotal(): number {
-        return this.matrixContactTotal;
+    getMatrixSum(): number {
+        return this.matrixSum;
     }
 
     getMaxCellTotal(): number {

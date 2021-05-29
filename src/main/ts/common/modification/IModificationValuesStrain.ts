@@ -29,5 +29,6 @@ export interface IModificationValuesStrain extends IModificationValues {
      */
     incidence: number;
 
+    modifiers?: number[];
 
 }

@@ -1,3 +1,4 @@
+import { ModificationContact } from './../common/modification/ModificationContact';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
@@ -16,6 +17,8 @@ import { ModelImplVaccination } from './ModelImplVaccination';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
+import { DataItem } from '@amcharts/amcharts4/core';
+import { Logger } from '../util/Logger';
 
 interface IVaccinationGroupData {
     nrmVaccS: number; // susceptible - vaccination of susceptible population
@@ -23,6 +26,13 @@ interface IVaccinationGroupData {
     nrmVaccU: number; // undiscovered - vaccination of cases previously undiscovered -> 2 shots
     nrmTotal: number;
 }
+
+interface IBaseIncidences {
+    overall: number,
+    agewise: number[]
+}
+
+
 
 /**
  * root model holding a set of age-specific submodels
@@ -43,6 +53,8 @@ export class ModelImplRoot implements IModelSeir {
      */
     static async setupInstance(demographics: Demographics, modifications: Modifications, progressCallback: (progress: IModelProgress) => void): Promise<ModelStateIntegrator> {
 
+        const ageGroups = demographics.getAgeGroups();
+
         /**
          * start at minus preload days
          */
@@ -51,24 +63,57 @@ export class ModelImplRoot implements IModelSeir {
         /**
          * get all strain values as currently in modifications instance
          */
-        const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
+        const modificationsStrain = modifications.findModificationsByType('STRAIN').map(m => m as ModificationStrain);
 
-        /**
-         * start with a clean set of incidences
-         */
-        const incidences = modificationsStrain.map(m => m.getIncidence());
 
-        /**
-         * adapt first contact modification to have initial conditions even in preload range
-         */
-        const modificationValueContact = Modifications.getInstance().findModificationsByType('CONTACT')[0].getModificationValues() as IModificationValuesContact;
-        const modificationTesting = Modifications.getInstance().findModificationsByType('TESTING')[0] as ModificationTesting;
+        const modificationContact = modifications.findModificationsByType('CONTACT')[0] as ModificationContact;
+        const modificationValueContact = modificationContact.getModificationValues();
+        const modificationTesting = modifications.findModificationsByType('TESTING')[0] as ModificationTesting;
         const modificationValueTesting = modificationTesting.getModificationValues();
+        const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
 
         modificationValueContact.instant = curInstant;
         modificationValueTesting.instant = curInstant;
 
-        const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
+        /**
+         * from the contact matrix make a guess about initial incidences
+         */
+        const columnContacts = [];
+        let matrixContacts = 0;
+        for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
+            let columnContactsCurr = 0;
+            for (let indexParticipant = 0; indexParticipant < ageGroups.length; indexParticipant++) {
+                const tmA = modificationTesting.getContactMultiplier(indexContact);
+                const tmB = modificationTesting.getContactMultiplier(indexParticipant);
+                columnContactsCurr += modificationContact.getContacts(indexContact, indexParticipant) * tmA * tmB;
+            }
+            columnContacts.push(columnContactsCurr);
+            matrixContacts += columnContactsCurr;
+        }
+        const columnAverage = matrixContacts / ageGroups.length;
+        const columnRelative = columnContacts.map(c => c / columnAverage);
+
+        // ageGroups.forEach(ageGroup => {
+        //     console.log('incidences', ageGroup, modificationTesting.getTestingRatio(ageGroup.getIndex()));
+        // })
+
+        /**
+         * start with a clean set of incidences and keep those as reference
+         * make a first guess about age group case distribution
+         */
+        const incidences: {[K: string]: IBaseIncidences} = {};
+        for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+            incidences[modificationsStrain[strainIndex].getName()] = {
+                overall: modificationsStrain[strainIndex].getIncidence(),
+                agewise: columnRelative.map(c => c * modificationsStrain[strainIndex].getIncidence())
+            }
+            modificationsStrain[strainIndex].acceptUpdate({
+                incidence: modificationsStrain[strainIndex].getIncidence(),
+                modifiers: columnRelative.map(c => c * modificationsStrain[strainIndex].getIncidence())
+            });
+        }
+
+
         const vaccinatedTarget = modificationSettings.getVaccinated();
         const recoveredDTarget = modificationSettings.getRecoveredD();
         const recoveredUTarget = modificationSettings.getRecoveredU();
@@ -79,7 +124,7 @@ export class ModelImplRoot implements IModelSeir {
         /**
          * 5 interpolation runs
          */
-        for (let interpolationIndex = 0; interpolationIndex < 1; interpolationIndex++) {
+        for (let interpolationIndex = 0; interpolationIndex < 5; interpolationIndex++) {
 
             model = new ModelImplRoot(demographics, modifications);
             modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
@@ -105,7 +150,7 @@ export class ModelImplRoot implements IModelSeir {
                 const totalIncidenceSource = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[modificationsStrain[strainIndex].getId()];
 
                 // target model value
-                const totalIncidenceTarget = incidences[strainIndex];
+                const totalIncidenceTarget = incidences[modificationsStrain[strainIndex].getName()].overall;
 
                 // factor from source to target
                 const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceSource;
@@ -113,19 +158,28 @@ export class ModelImplRoot implements IModelSeir {
                 // multiply current setting by factor for better approximation
                 const totalIncidenceResume = modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor;
 
-                demographics.getAgeGroups().forEach(ageGroup => {
+                const ageGroupIncidencesResume: number[] = [];
+                ageGroups.forEach(ageGroup => {
 
+                    // value as in model
+                    const ageGroupIncidenceSource = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()];
 
+                    // age group value in relation to total value
+                    const ageGroupIncidenceFactor = ageGroupIncidenceSource / totalIncidenceSource;
+
+                    // multiplied with total incidence factor
+                    const ageGroupIncidenceResume = totalIncidenceResume * ageGroupIncidenceFactor;
+                    ageGroupIncidencesResume.push(ageGroupIncidenceResume);
 
                 });
 
                 modificationsStrain[strainIndex].acceptUpdate({
-                    incidence: totalIncidenceResume
+                    incidence: totalIncidenceResume,
+                    modifiers: ageGroupIncidencesResume
                 });
 
-                // Logger.getInstance().log(interpolationIndex, ageGroupIncidences, ObjectUtil.normalize(ageGroupIncidences));
-
             };
+
             const recoveredDModel = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_D;
             const recoveredDFactor = recoveredDTarget / recoveredDModel;
             const recoveredD = modificationSettings.getRecoveredD() * recoveredDFactor;
@@ -156,7 +210,7 @@ export class ModelImplRoot implements IModelSeir {
         model = new ModelImplRoot(demographics, modifications);
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination();
-        // await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
 
         return modelStateIntegrator;
 

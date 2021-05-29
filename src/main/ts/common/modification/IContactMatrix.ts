@@ -5,5 +5,11 @@
  * @since 11.04.2021
  */
 export interface IContactMatrix {
+
     getContacts(indexContact: number, indexParticipant: number): number;
+
+    // getColumnSum(ageGroupIndex: number): number;
+
+    // getMatrixSum(): number;
+
 }

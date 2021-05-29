@@ -6,10 +6,12 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* reintroduce refusal and splitting vaccinated to D|U|V (temp removed)
-* approximation gets imprecise or fails when on the backside of the incidence curve
+* all testing to zero renders an all zero chart (which is technically OK, if the SEIR curves still are valid)
+  * single slider to 1 percent leads to diagram stretching further an further
+* limit incidence range on modifications later than MIN_DATE
+  * implement coincident indicator on modifications, then iterate when selecting -> bring lower incidence up z-wise so it can get selected
 * bind the 'time' modification to chart cursor
-  * show effective contact matrix on a per date basis (base_contact_matrix x reduction_through_testing * nrm_susceptible of the respective age group)
+  * ~~show effective contact matrix on a per date basis (base_contact_matrix x reduction_through_testing * nrm_susceptible of the respective age group)~~
   * disable chart zoom to keep slider and chart aligned
 * modification chart area
   * find some primary value for strain (if possible use r<sub>t</sub>)
@@ -42,6 +44,9 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~modification chart axis renders decimal number~~
+* ~~contact matrix chart calculates 0 percentage~~
+* ~~chart testing y-axis label formatting~~
 * ~~coincident strain instants produce an error when updating model~~
 * ~~rather flip value fields than transforming model data~~
 * ~~check if incidence is evaluated on discovered cases only (doublecheck with model1)~~

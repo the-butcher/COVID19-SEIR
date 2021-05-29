@@ -41,8 +41,8 @@ export class ModelImplVaccination implements IModelSeir {
 
         this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
         this.compartmentImmunizedV = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+        this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+        this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
         this.integrationStep = {
             apply: (modelState: IModelState, dT: number, tT: number) => {
                 const continuationRate = this.compartmentImmunizing.getContinuationRatio().getRate(dT, tT);

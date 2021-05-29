@@ -38,9 +38,9 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
 
         // make some assumptions about initial cases (duplicated code in ModelImplIncidence)
         let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000;
-        // if (strainValues.compartmentInfectiousPrefill) { // initial scaling should already be considered here
-        //     dailyCases = strainValues.ageGroupIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
-        // }
+        if (strainValues.modifiers) {
+            dailyCases = strainValues.modifiers[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
+        }
         const daysLatent = StrainUtil.calculateLatency(strainValues.serialInterval, strainValues.intervalScale);
         const daysInfectious = StrainUtil.calculateInfecty(strainValues.serialInterval, strainValues.intervalScale);
 
@@ -105,11 +105,11 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
                     }
 
                     /**
-                     * at incubation time, copy into infectious model
+                     * at incubation time, copy into incidence model
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentCases = this.parentModel.getIncidenceModel(this.ageGroupIndex).getIncomingCompartment();
-                        const discoveredNrmCases = continuationValue; // * modificationTime.getTestingRatio(this.ageGroupIndex);
+                        const discoveredNrmCases = continuationValue * modificationTime.getTestingRatio(this.ageGroupIndex);
                         increments.addNrmValue(discoveredNrmCases, compartmentCases);
                     }
                     return increments;

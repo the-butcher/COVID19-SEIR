@@ -1,4 +1,5 @@
 // import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
+import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
 import { AModification } from './AModification';
 import { IContactMatrix } from './IContactMatrix';
@@ -30,6 +31,13 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         super('INSTANT', modificationParams);
     }
 
+    // getColumnSum(ageGroupIndex: number): number {
+    //     return new ContactMatrixSums(this).getColumnSum(ageGroupIndex);
+    // }
+    // getMatrixSum(): number {
+    //     return new ContactMatrixSums(this).getMatrixSum();
+    // }
+
     acceptUpdate(update: Partial<IModificationValuesTime>): void {
         // nothing to be updated
     }
@@ -45,7 +53,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
         this.modificationVaccination = new ModificationResolverVaccination().getModification(this.getInstantA());
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
-        // TODO from current model data get rT (which needs to be calculated yet)
     }
 
     getDosesPerDay(): number {
@@ -65,7 +72,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         /**
          * reduction through people isolating after a positive test
          */
-        const multiplierTesting = this.getTestingMultiplier(indexContact) * this.getTestingMultiplier(indexParticipant);
+        const multiplierTesting = this.modificationTesting.getContactMultiplier(indexContact) * this.modificationTesting.getContactMultiplier(indexParticipant);
 
         /**
          * reduction through seasonality
@@ -84,18 +91,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      */
     getContactValue(indexContact: number, indexParticipant: number): number {
         return this.modificationContact.getContacts(indexContact, indexParticipant);
-    }
-
-    /**
-     * assume that cases, once found, will infect less people due to isolation
-     * therefore the full compartment sum is reduced (TODO, this has to be reflected in the model properly)
-     * TODO verify this is correct
-     * @param ageGroupIndex
-     * @param indexParticipant
-     * @returns
-     */
-    getTestingMultiplier(ageGroupIndex: number): number {
-        return 1 - (this.modificationTesting.getTestingRatio(ageGroupIndex) * (1 - CompartmentChain.getInstance().getShareOfPresymptomaticInfection()));
     }
 
 }

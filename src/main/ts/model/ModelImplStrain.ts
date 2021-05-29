@@ -45,7 +45,7 @@ export class ModelImplStrain implements IModelSeir {
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
 
-            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues));
+            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, modificationTesting));
 
         });
         this.nrmValue = nrmValue1;

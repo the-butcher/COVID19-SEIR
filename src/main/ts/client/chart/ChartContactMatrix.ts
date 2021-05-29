@@ -1,3 +1,4 @@
+import { ModelConstants } from './../../model/ModelConstants';
 import { CategoryAxis, ColumnSeries, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
 import { color, create, Label, percent, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -17,7 +18,7 @@ export interface IChartData {
     gamma?: number;
     plotX?: string;
     plotY?: number;
-    color?: string;
+    // color?: string;
 }
 
 export type AXIS_DIRECTION = 'CONTACT_PARTICIPANT' | 'PARTICIPANT_CONTACT';
@@ -59,6 +60,7 @@ export class ChartContactMatrix {
         this.chart.bottomAxesContainer.layout = 'absolute';
         this.chart.zoomOutButton.disabled = true;
         ChartUtil.getInstance().configureChartPadding(this.chart);
+        ChartUtil.getInstance().configureSeparators(this.chart);
 
         this.xAxisHeat = this.chart.xAxes.push(new CategoryAxis());
         this.yAxisHeat = this.chart.yAxes.push(new CategoryAxis());
@@ -119,7 +121,7 @@ export class ChartContactMatrix {
         this.yAxisPlot.renderer.grid.template.disabled = false;
 
         this.yAxisPlot.min = 0.00;
-        this.yAxisPlot.max = 50.0; // 0.15;
+        this.yAxisPlot.max = 25.0; // 0.15;
         this.yAxisPlot.strictMinMax = true;
 
         this.yAxisPlot.renderer.minGridDistance = 10;
@@ -139,11 +141,11 @@ export class ChartContactMatrix {
         this.seriesPlot.strokeWidth = 3;
         // this.seriesPlot.stroke = color(ChartUtil.getInstance().toColor(1));
         this.seriesPlot.strokeLinecap = 'round';
-        this.seriesPlot.propertyFields.stroke = 'color';
+        // this.seriesPlot.propertyFields.stroke = 'color';
         this.seriesPlot.strokeOpacity = 1.0;
 
         this.seriesPlot.tooltipText = '{categoryX}';
-        ChartUtil.getInstance().configureSeries(this.seriesPlot, ChartUtil.getInstance().toColor(1), false);
+        ChartUtil.getInstance().configureSeries(this.seriesPlot, ControlsConstants.COLOR____FONT, false);
         this.seriesPlot.adapter.add('tooltipText', (value, target) => {
             const indexCurr = target.tooltipDataItem.index;
             if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
@@ -207,7 +209,7 @@ export class ChartContactMatrix {
             this.yAxisHeat.y = 0;
             this.yAxisHeat.height = 192;
             this.yAxisPlot.y = 192;
-            this.yAxisPlot.height = 70;
+            this.yAxisPlot.height = 65;
 
         });
 
@@ -266,18 +268,19 @@ export class ChartContactMatrix {
         heatRule.minValue = 0;
         heatRule.maxValue = 1;
 
-        const matrixContactTotal = demographics.getMatrixContactTotal();
+        // const matrixContactTotal = demographics.getMatrixSum();
         const maxCellTotal = demographics.getMaxCellTotal();
 
-        let matrixContactCurr = 0;
+        let matrixSum = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {
             let columnContactsCurr = 0;
             for (let indexY = 0; indexY < ageGroups.length; indexY++) {
 
                 let ratio = this.axisDirection === 'CONTACT_PARTICIPANT' ? contactMatrix.getContacts(indexX, indexY) : contactMatrix.getContacts(indexY, indexX);
+                const population = this.axisDirection === 'CONTACT_PARTICIPANT' ? ageGroups[indexX].getAbsValue() : ageGroups[indexY].getAbsValue();
 
                 columnContactsCurr += ratio;
-                matrixContactCurr += ratio;
+                matrixSum += ratio * population;
 
                 ratio = Math.max(0.00000000001, ratio);
                 chartData.push({
@@ -294,7 +297,7 @@ export class ChartContactMatrix {
             plotData.push({
                 plotX: ageGroups[indexX].getName(),
                 plotY: columnContactsCurr,
-                color: ChartUtil.getInstance().toColor(columnContactsCurr * 10 / matrixContactTotal),
+                // color: ChartUtil.getInstance().toColor(columnContactsCurr * 10 / matrixContactTotal),
                 ratio: columnContactsCurr
             });
 
@@ -302,8 +305,8 @@ export class ChartContactMatrix {
 
         chartData.push(...plotData);
 
-        matrixContactCurr = matrixContactCurr / matrixContactTotal;
-        this.valueTotalLabel.text = (matrixContactCurr * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        matrixSum = matrixSum / demographics.getMatrixSum();
+        this.valueTotalLabel.text = (matrixSum * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;
@@ -319,7 +322,7 @@ export class ChartContactMatrix {
         }
 
         // full update required after setting all values to 0 (maybe an amcharts bug)
-        this.fullDataUpdate = matrixContactTotal === 0;
+        this.fullDataUpdate = matrixSum === 0;
 
     }
 

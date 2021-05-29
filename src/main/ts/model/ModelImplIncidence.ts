@@ -1,3 +1,4 @@
+import { ModificationTesting } from './../common/modification/ModificationTesting';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
@@ -31,7 +32,7 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
     private readonly compartments: CompartmentBase[];
     private integrationSteps: IModelIntegrationStep[];
 
-    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain) {
+    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting) {
 
         this.rootModel = parentModel.getRootModel();
         this.compartments = [];
@@ -41,10 +42,10 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
         this.ageGroupIndex = ageGroup.getIndex();
 
         // make some assumptions about initial cases (duplicated code in ModelImplInfectious)
-        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000;
-        // if (strainValues.ageGroupIncidences) {
-        //     dailyCases = strainValues.ageGroupIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000; // testingRatio *
-        // }
+        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000 * modificationTesting.getTestingRatio(this.ageGroupIndex);
+        if (strainValues.modifiers) {
+            dailyCases = strainValues.modifiers[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000 * modificationTesting.getTestingRatio(this.ageGroupIndex);
+        }
         this.nrmValue = dailyCases * 7 / this.absTotal;
 
         // primary compartment (cases at the point of incubation)

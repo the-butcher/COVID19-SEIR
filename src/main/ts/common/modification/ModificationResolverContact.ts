@@ -21,7 +21,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
     getValue(instant: number): number {
         const demographics = Demographics.getInstance();
-        const matrixContactTotal = demographics.getMatrixContactTotal();
+        const matrixContactTotal = demographics.getMatrixSum();
         let matrixContactCurr = 0;
         for (let indexX = 0; indexX < demographics.getAgeGroups().length; indexX++) {
             for (let indexY = 0; indexY < demographics.getAgeGroups().length; indexY++) {

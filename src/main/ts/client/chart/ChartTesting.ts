@@ -39,6 +39,7 @@ export class ChartTesting {
         this.chart = create(container, XYChart);
         this.chart.zoomOutButton.disabled = true;
         ChartUtil.getInstance().configureChartPadding(this.chart);
+        ChartUtil.getInstance().configureSeparators(this.chart);
 
         this.xAxis = this.chart.xAxes.push(new CategoryAxis());
         this.yAxis = this.chart.yAxes.push(new ValueAxis());
@@ -60,11 +61,12 @@ export class ChartTesting {
          ChartUtil.getInstance().configureAxis(this.yAxis, 'cases discovered');
         this.yAxis.tooltip.disabled = true;
         this.yAxis.renderer.labels.template.adapter.add('text', (value, target) => {
-            return (parseFloat(value) * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED) + '%'
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value);
+            // return (parseFloat(value) * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED) + '%'
         });
 
         this.yAxis.min = 0.00;
-        this.yAxis.max = 1.00;
+        this.yAxis.max = 1.01;
         this.yAxis.strictMinMax = true;
 
         this.seriesHeat = this.chart.series.push(new LineSeries());
@@ -76,14 +78,14 @@ export class ChartTesting {
         this.seriesHeat.dataFields.valueY = 'participantY';
         this.seriesHeat.fillOpacity = 0;
         this.seriesHeat.strokeWidth = 3;
-        // this.seriesHeat.stroke = color(ChartUtil.getInstance().toColor(1));
+        // this.seriesHeat.stroke = color(ControlsConstants.COLOR____FONT);
         this.seriesHeat.strokeLinecap = 'round';
-        this.seriesHeat.propertyFields.stroke = 'color';
+        // this.seriesHeat.propertyFields.stroke = 'color';
         this.seriesHeat.strokeOpacity = 1.0;
         this.seriesHeat.tooltip.disabled = false;
         this.seriesHeat.tooltipText = 'contact:\u00A0{categoryX}\npercent:\u00A0{label}';
 
-        ChartUtil.getInstance().configureSeries(this.seriesHeat, ChartUtil.getInstance().toColor(1), false);
+        ChartUtil.getInstance().configureSeries(this.seriesHeat, ControlsConstants.COLOR____FONT, false);
 
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
@@ -142,7 +144,7 @@ export class ChartTesting {
                 if (this.chart.data[i].participantY) {
                     this.chart.data[i].participantY = chartData[i].participantY;
                     this.chart.data[i].label = chartData[i].label;
-                    this.chart.data[i].color = chartData[i].color;
+                    // this.chart.data[i].color = chartData[i].color;
                 }
             }
             this.chart.invalidateRawData();
