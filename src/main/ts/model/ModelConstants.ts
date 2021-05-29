@@ -110,10 +110,10 @@ export class ModelConstants {
         new Date('2021-07-01').getTime(),
         new Date('2021-08-01').getTime(),
         new Date('2021-09-01').getTime(),
-        // new Date('2021-10-01').getTime(),
-        // new Date('2021-11-01').getTime(),
-        // new Date('2021-12-01').getTime(),
-        // new Date('2022-01-01').getTime()
+        new Date('2021-10-01').getTime(),
+        new Date('2021-11-01').getTime(),
+        new Date('2021-12-01').getTime(),
+        new Date('2022-01-01').getTime()
     ];
     static readonly MODEL_MIN_____INSTANT = Math.min(...ModelConstants.RANGE___MODEL_INSTANT);
     static readonly MODEL_MAX_____INSTANT = Math.max(...ModelConstants.RANGE___MODEL_INSTANT);

@@ -26,7 +26,8 @@
     "downlevelIteration": true,
     "allowJs": true,
     "types": [
-
+      "node",
+      "jest"
     ],
     "typeRoots": [
 

@@ -85,7 +85,7 @@ export class ChartUtil {
         series.tooltip.getStrokeFromObject = false;
         if (useObjectColors) {
             series.tooltip.getFillFromObject = true;
-            series.tooltip.background.opacity = 0.65;
+            series.tooltip.background.opacity = 0.85;
         } else {
             series.tooltip.getFillFromObject = false;
             series.tooltip.background.stroke = color(ControlsConstants.COLOR____FONT);

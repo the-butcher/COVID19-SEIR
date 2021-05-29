@@ -732,6 +732,7 @@ export class ChartAgeGroup {
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
                 const value = dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
+                // const value = dataItem.valueset[ageGroupHeat.getName()].REMOVED_V;
                 heatData.push({
                     categoryX: dataItem.categoryX,
                     categoryY: ageGroupHeat.getName(),

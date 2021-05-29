@@ -20,6 +20,7 @@ export class AgeGroup {
         this.name = ageGroupParams.name;
         this.vacc = ageGroupParams.vacc; // appears to give a decent priority for older ages
         this.absValue = ageGroupParams.pG;
+        console.log('vacc', this.vacc);
     }
 
     getIndex(): number {
