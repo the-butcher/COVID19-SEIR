@@ -188,8 +188,8 @@ export class ChartContactMatrix {
         this.seriesHeat.heatRules.push({
             target: columnTemplate,
             property: 'fill',
-            min: color(ChartUtil.getInstance().toColor(0)),
-            max: color(ChartUtil.getInstance().toColor(1)),
+            min: color(ChartUtil.getInstance().toColor(0, ControlsConstants.HEATMAP_______PLAIN)), // INCIDENCE refers to color only, no function meaning
+            max: color(ChartUtil.getInstance().toColor(1, ControlsConstants.HEATMAP_______PLAIN)),
             minValue: 0.00,
             maxValue: 1.00,
         });

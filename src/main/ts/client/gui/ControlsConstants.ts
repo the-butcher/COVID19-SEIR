@@ -27,6 +27,7 @@ import { ModificationResolverStrain } from './../../common/modification/Modifica
 import { ModificationResolverTesting } from './../../common/modification/ModificationResolverTesting';
 import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
+import { ObjectUtil } from './../../util/ObjectUtil';
 import { SliderModification } from './SliderModification';
 
 export interface IControlsDefinitions {
@@ -46,12 +47,19 @@ export interface IControlsChartDefinition {
     useObjectColors: boolean;
 }
 
-export interface IHeatmapChartDefinition {
-    getHeatValue: (dataItem: IDataItem, ageGroupName: string) => number;
+export interface IHeatmapColorDefinition {
+    id: string,
     getHeatColor: (value: number) => string;
+}
+export interface IHeatmapChartDefinition extends IHeatmapColorDefinition {
+    getHeatValue: (dataItem: IDataItem, ageGroupName: string) => number;
     getHeatLabel: (value: number) => string;
     getHeatMax: (maxValue: number) => number;
     visitChart: (chart: ChartAgeGroup) => void;
+}
+
+export interface ILabellingDefinition {
+    format(value: number): string;
 }
 
 export type CHART_MODE______KEY = 'INCIDENCE' | 'SEIR' | 'EI' | 'VACC';
@@ -86,23 +94,31 @@ export class ControlsConstants {
         'SETTINGS': '#687580'
     };
 
+    static readonly HEATMAP_______PLAIN: IHeatmapColorDefinition = {
+        id: ObjectUtil.createId(),
+        getHeatColor: (value) => new Color(0.0, 0.0, Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex()
+    }
+
     static readonly HEATMAP_DATA_PARAMS: {[K in CHART_MODE______KEY]: IHeatmapChartDefinition} = {
         'SEIR': {
+            id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].SUSCEPTIBLE,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (valueSpc) => new Color(0.58, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.58, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+
             getHeatMax: () => 1,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesEIVisible(true);
+                chart.setSeriesEIVisible(false);
                 chart.setSeriesSRVisible(true);
                 chart.setAxisRelativeMax(1.01);
             }
         },
         'EI': {
+            id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (valueSpc) => new Color(0.83, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.83, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
@@ -112,9 +128,10 @@ export class ControlsConstants {
             }
         },
         'INCIDENCE': {
+            id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID_____ALL],
             getHeatLabel: (value) => `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`,
-            getHeatColor: (valueSpc) => new Color(0.12, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.00, 0.00, Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(true);
@@ -123,13 +140,14 @@ export class ControlsConstants {
             }
         },
         'VACC': {
+            id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].REMOVED_V,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (valueSpc) => new Color(0.23, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.23, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: () => 1,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesEIVisible(true);
+                chart.setSeriesEIVisible(false);
                 chart.setSeriesSRVisible(true);
                 chart.setAxisRelativeMax(1.01);
             }
@@ -217,6 +235,18 @@ export class ControlsConstants {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
     };
+
+    static readonly LABEL_PERCENT__FLOAT_2: ILabellingDefinition = {
+        format: value => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`
+    }
+
+    static readonly LABEL_PERCENT___FIXED: ILabellingDefinition = {
+        format: value => value !== 0 ? `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%` : '0'
+    }
+
+    static readonly LABEL_ABSOLUTE_FIXED: ILabellingDefinition = {
+        format: value => value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)
+    }
 
     static rebuildModificationChart(modificationResolver: IModificationResolver<IModificationValues, IModification<IModificationValues>>): void {
 

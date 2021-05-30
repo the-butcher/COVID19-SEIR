@@ -82,12 +82,16 @@ export class ChartAgeGroupSeries {
 
         this.series.adapter.add('tooltipText', (value, target) => {
             const indexCurr = target.tooltipDataItem.index;
-            if (this.isPercent() && indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
+            if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
                 const itemCurr = target.dataItems.values[indexCurr];
                 const valueCurr = itemCurr.dataContext[this.valueField];
-                return this.seriesLabel.text + ': ' + (valueCurr * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%';
+                if (this.isPercent()) {
+                    return `${this.seriesLabel.text}: ${ControlsConstants.LABEL_PERCENT__FLOAT_2.format(valueCurr)}`;
+                } else {
+                    return `${this.seriesLabel.text}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(valueCurr)}`;
+                }
             } else {
-                return this.seriesLabel.text + ': {' + params.valueField + '.formatNumber("#,###.")}'; // "#,###.00";
+                return value;
             }
         });
 

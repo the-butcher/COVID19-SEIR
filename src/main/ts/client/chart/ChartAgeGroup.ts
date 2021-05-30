@@ -164,10 +164,10 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
 
         this.yAxisPlotRelative.renderer.labels.template.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, true);
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotRelative.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
         this.yAxisPlotRelative.tooltip.label.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, true);
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotRelative.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
 
         // incidence axis
@@ -182,13 +182,13 @@ export class ChartAgeGroup {
         this.yAxisModification = this.chart.yAxes.push(new ValueAxis());
         this.yAxisModification.strictMinMax = true;
         this.yAxisModification.rangeChangeDuration = 0;
-        ChartUtil.getInstance().configureAxis(this.yAxisModification, 'mods');
+        ChartUtil.getInstance().configureAxis(this.yAxisModification, 'Mods');
         this.yAxisModification.tooltip.exportable = false;
         this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent());
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent() ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_ABSOLUTE_FIXED);
         });
         this.yAxisModification.tooltip.label.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent());
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent() ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_ABSOLUTE_FIXED);
         });
 
 
@@ -348,8 +348,8 @@ export class ChartAgeGroup {
         this.columnTemplate = this.seriesHeat.columns.template;
         this.columnTemplate.strokeWidth = 0;
         this.columnTemplate.tooltipText = `{${ChartAgeGroup.FIELD_CATEGORY_X}}, {${ChartAgeGroup.FIELD_CATEGORY_Y}}: {label}`;
-        this.columnTemplate.width = percent(105);
-        this.columnTemplate.height = percent(105);
+        this.columnTemplate.width = percent(95);
+        this.columnTemplate.height = percent(95);
         this.columnTemplate.events.on('hit', e => {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
             this.setSeriesAgeGroup(index);
@@ -358,8 +358,8 @@ export class ChartAgeGroup {
         this.seriesHeat.heatRules.push({
             target: this.columnTemplate,
             property: 'fill',
-            min: color(ChartUtil.getInstance().toColor(0, 'INCIDENCE')),
-            max: color(ChartUtil.getInstance().toColor(1, 'INCIDENCE')),
+            min: color(ChartUtil.getInstance().toColor(0, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode])),
+            max: color(ChartUtil.getInstance().toColor(1, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode])),
             minValue: 0,
             maxValue: 1,
         });
@@ -748,8 +748,8 @@ export class ChartAgeGroup {
         const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
         heatRule.minValue = 0;
         heatRule.maxValue = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatMax(maxValue);
-        heatRule.min = color(ChartUtil.getInstance().toColor(0, this.chartMode));
-        heatRule.max = color(ChartUtil.getInstance().toColor(1, this.chartMode));
+        heatRule.min = color(ChartUtil.getInstance().toColor(0, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode]));
+        heatRule.max = color(ChartUtil.getInstance().toColor(1, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode]));
 
         // console.log('chartData', chartData);
 

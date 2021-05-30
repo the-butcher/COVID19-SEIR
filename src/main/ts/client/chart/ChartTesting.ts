@@ -61,7 +61,7 @@ export class ChartTesting {
          ChartUtil.getInstance().configureAxis(this.yAxis, 'cases discovered');
         this.yAxis.tooltip.disabled = true;
         this.yAxis.renderer.labels.template.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, true);
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, ControlsConstants.LABEL_PERCENT___FIXED);
             // return (parseFloat(value) * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED) + '%'
         });
 
@@ -128,8 +128,8 @@ export class ChartTesting {
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
                 participantY: Math.max(0.00000000001, testingVal),
-                label: (testingVal * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%',
-                color: ChartUtil.getInstance().toColor(testingVal, 'INCIDENCE') // INCIDENCE is for color only
+                label: ControlsConstants.LABEL_PERCENT__FLOAT_2.format(testingVal), // (testingVal * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%',
+                color: ChartUtil.getInstance().toColor(testingVal, ControlsConstants.HEATMAP_______PLAIN) // INCIDENCE is for color only
             });
         }
 

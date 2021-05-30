@@ -1,7 +1,7 @@
 import { Axis, Chart, Series, XYChart } from '@amcharts/amcharts4/charts';
 import { color } from '@amcharts/amcharts4/core';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { CHART_MODE______KEY, ControlsConstants } from './../gui/ControlsConstants';
+import { CHART_MODE______KEY, ControlsConstants, IHeatmapColorDefinition, ILabellingDefinition } from './../gui/ControlsConstants';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 
 /**
@@ -38,19 +38,16 @@ export class ChartUtil {
         chart.language.locale._decimalSeparator = this.separatorDecimal;
     }
 
-    formatLabelOrTooltipValue = (value: string, percent: boolean) => {
+    formatLabelOrTooltipValue = (value: string, labellingDefinition: ILabellingDefinition) => {
         if (value) {
             value = value.replace(this.separatorThousand, '');
             value = value.replace(this.separatorDecimal, '.');
-            return this.formatLabelOrTooltipParsed(parseFloat(value), percent);
+            return labellingDefinition.format(parseFloat(value)); // this.formatLabelOrTooltipParsed(parseFloat(value), percent);
         } else {
             return value;
         }
     }
 
-    formatLabelOrTooltipParsed = (parsed: number, percent: boolean) => {
-        return percent ? `${(parsed * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%` : parsed.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
-    }
 
     formatPercentage(value: number): string {
         const raw = (value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%';
@@ -61,22 +58,18 @@ export class ChartUtil {
         return `${caption}:${ChartUtil.PADDING_17.substr(caption.length + value.length)}${value}`;
     }
 
-    toColor(value: number, chartMode: CHART_MODE______KEY): string {
-        const valueSpc = 10 + Math.round(value * 90);
-        const valueKey = `${chartMode}_${valueSpc}` ;
+    toColor(value: number, colorDef: IHeatmapColorDefinition): string {
+        const valueKey = `${colorDef.id}_${value}` ;
         if (ObjectUtil.isEmpty(this.colorRepo[valueKey])) {
-            this.colorRepo[valueKey] = ControlsConstants.HEATMAP_DATA_PARAMS[chartMode].getHeatColor(valueSpc); // new Color(0.0, 0.0, Math.min(1.0, valueSpc / 100)).getHex();
+            this.colorRepo[valueKey] = colorDef.getHeatColor(value); // new Color(0.0, 0.0, Math.min(1.0, valueSpc / 100)).getHex();
         }
         return this.colorRepo[valueKey];
 
     }
 
     configureAgeGroupSeries(series: ChartAgeGroupSeries, hex: string, useObjectColors: boolean): void {
-
         series.getSeriesLabel().fill = color(hex).brighten(0.5);
-
         this.configureSeries(series.getSeries(), hex, useObjectColors);
-
     }
 
     configureSeries(series: Series, hex: string, useObjectColors: boolean): void {
