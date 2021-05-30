@@ -1,8 +1,7 @@
 import { Axis, Chart, Series, XYChart } from '@amcharts/amcharts4/charts';
 import { color } from '@amcharts/amcharts4/core';
-import { Color } from '../../util/Color';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { ControlsConstants } from '../gui/ControlsConstants';
+import { CHART_MODE______KEY, ControlsConstants } from './../gui/ControlsConstants';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 
 /**
@@ -58,10 +57,11 @@ export class ChartUtil {
         return `${caption}:${ChartUtil.PADDING_17.substr(caption.length + value.length)}${value}`;
     }
 
-    toColor(value: number): string {
-        const valueKey = 10 + Math.round(value * 90);
+    toColor(value: number, chartMode: CHART_MODE______KEY): string {
+        const valueSpc = 10 + Math.round(value * 90);
+        const valueKey = `${chartMode}_${valueSpc}` ;
         if (ObjectUtil.isEmpty(this.colorRepo[valueKey])) {
-            this.colorRepo[valueKey] = new Color(0.0, 0.0, Math.min(1.0, valueKey / 100)).getHex();
+            this.colorRepo[valueKey] = ControlsConstants.HEATMAP_DATA_PARAMS[chartMode].getHeatColor(valueSpc); // new Color(0.0, 0.0, Math.min(1.0, valueSpc / 100)).getHex();
         }
         return this.colorRepo[valueKey];
 

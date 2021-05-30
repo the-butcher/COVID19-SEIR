@@ -61,7 +61,7 @@ export class ChartTesting {
          ChartUtil.getInstance().configureAxis(this.yAxis, 'cases discovered');
         this.yAxis.tooltip.disabled = true;
         this.yAxis.renderer.labels.template.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value);
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, true);
             // return (parseFloat(value) * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED) + '%'
         });
 

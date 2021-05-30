@@ -1,4 +1,3 @@
-import { ModificationTime } from './../../common/modification/ModificationTime';
 import { CategoryAxis, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -7,12 +6,12 @@ import { AgeGroup } from '../../common/demographics/AgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
-import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
 import { ModelConstants } from './../../model/ModelConstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
+import { ObjectUtil } from './../../util/ObjectUtil';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
 
@@ -76,7 +75,8 @@ export class ChartAgeGroup {
 
     protected readonly seriesHeat: ColumnSeries;
 
-    private readonly absTotal: number;
+    // private readonly absTotal: number;
+    private maxInfectious: number;
     private absValue: number; // the absolute value of the age-group currently displayed
     private ageGroupIndex: number;
     private modelData: IDataItem[];
@@ -96,7 +96,6 @@ export class ChartAgeGroup {
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
 
-        this.absTotal = Demographics.getInstance().getAbsTotal();
         this.absValue = 0;
         this.ageGroupIndex = 10;
         this.modelData = [];
@@ -121,7 +120,7 @@ export class ChartAgeGroup {
         let plotContainerOutTimeout = -1;
         this.chart.plotContainer.events.on('out', () => {
             clearTimeout(plotContainerOutTimeout);
-            plotContainerOutTimeout = setTimeout(() => {
+            plotContainerOutTimeout = window.setTimeout(() => {
                 const timeInstant = Modifications.getInstance().findModificationsByType('TIME')[0].getInstantA();
                 this.setInstant(timeInstant);
             }, 100);
@@ -330,8 +329,7 @@ export class ChartAgeGroup {
         this.seriesHeat.dataFields.categoryX = ChartAgeGroup.FIELD_CATEGORY_X;
         this.seriesHeat.dataFields.categoryY = ChartAgeGroup.FIELD_CATEGORY_Y;
         this.seriesHeat.dataFields.value = 'value';
-        this.seriesHeat.sequencedInterpolation = true;
-        this.seriesHeat.defaultState.transitionDuration = 3000;
+        this.seriesHeat.interpolationDuration = 0;
         this.seriesHeat.tooltip.disabled = false;
         this.seriesHeat.cursorTooltipEnabled = false; // be sure the contact chart tooltip is hidden from the cursor
         ChartUtil.getInstance().configureSeries(this.seriesHeat, ControlsConstants.COLOR____FONT, false);
@@ -362,8 +360,8 @@ export class ChartAgeGroup {
         this.seriesHeat.heatRules.push({
             target: columnTemplate,
             property: 'fill',
-            min: color(ChartUtil.getInstance().toColor(0)),
-            max: color(ChartUtil.getInstance().toColor(1)),
+            min: color(ChartUtil.getInstance().toColor(0, 'INCIDENCE')),
+            max: color(ChartUtil.getInstance().toColor(1, 'INCIDENCE')),
             minValue: 0,
             maxValue: 1,
         });
@@ -445,13 +443,13 @@ export class ChartAgeGroup {
             };
         });
 
-        // TODO probably needs to be a specific type
         document.getElementById('chartModeIncidenceDiv').addEventListener('click', () => {
             this.setChartMode('INCIDENCE');
         });
         document.getElementById('chartModeSeirDiv').addEventListener('click', () => {
             this.setChartMode('SEIR');
-        });document.getElementById('chartModeEiDiv').addEventListener('click', () => {
+        });
+        document.getElementById('chartModeEiDiv').addEventListener('click', () => {
             this.setChartMode('EI');
         });
         this.setChartMode('INCIDENCE');
@@ -476,7 +474,7 @@ export class ChartAgeGroup {
         await this.renderModelData();
 
         clearInterval(this.intervalHandle);
-        this.intervalHandle = setInterval(() => {
+        this.intervalHandle = window.setInterval(() => {
             if (this.seriesHeat.columns.length > 0) {
 
                 const templateColumn = this.seriesHeat.columns.getIndex(0);
@@ -605,6 +603,19 @@ export class ChartAgeGroup {
 
         }
 
+        if (this.chartMode === 'EI') {
+            this.yAxisPlotRelative.max = this.seriesAgeGroupInfectious.getSeries().max(this.yAxisPlotRelative);
+        } else {
+            this.yAxisPlotRelative.max = 1.01;
+        }
+
+        // no data upon initial call
+        if (ObjectUtil.isNotEmpty(this.modelData)) {
+            requestAnimationFrame(() => {
+                this.renderModelData();
+            });
+        }
+
     }
 
     /**
@@ -670,9 +681,11 @@ export class ChartAgeGroup {
         })];
 
         let maxIncidence = 0;
+        this.maxInfectious = 0;
         for (const dataItem of this.modelData) {
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
                 maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL]);
+                this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS);
             });
         }
 
@@ -731,7 +744,8 @@ export class ChartAgeGroup {
 
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
-                const value = dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
+                const value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
+                // dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
                 // const value = dataItem.valueset[ageGroupHeat.getName()].REMOVED_V;
                 heatData.push({
                     categoryX: dataItem.categoryX,
@@ -752,6 +766,8 @@ export class ChartAgeGroup {
         const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
         heatRule.minValue = 0;
         heatRule.maxValue = maxValue;
+        heatRule.min = color(ChartUtil.getInstance().toColor(0, this.chartMode));
+        heatRule.max = color(ChartUtil.getInstance().toColor(1, this.chartMode));
 
         // console.log('chartData', chartData);
 

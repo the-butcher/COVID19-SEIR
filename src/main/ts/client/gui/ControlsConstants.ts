@@ -10,7 +10,8 @@ import { ModificationStrain } from '../../common/modification/ModificationStrain
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
-import { MODIFICATION____KEY } from '../../model/ModelConstants';
+import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { Color } from '../../util/Color';
 import { TimeUtil } from '../../util/TimeUtil';
 import { ChartAgeGroup, IModificationData } from '../chart/ChartAgeGroup';
 import { ControlsContact } from '../controls/ControlsContact';
@@ -25,6 +26,7 @@ import { ModificationResolverSeasonality } from './../../common/modification/Mod
 import { ModificationResolverStrain } from './../../common/modification/ModificationResolverStrain';
 import { ModificationResolverTesting } from './../../common/modification/ModificationResolverTesting';
 import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
+import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { SliderModification } from './SliderModification';
 
 export interface IControlsDefinitions {
@@ -44,9 +46,21 @@ export interface IControlsChartDefinition {
     useObjectColors: boolean;
 }
 
+export interface IHeatmapChartDefinition {
+    getHeatValue: (dataItem: IDataItem, ageGroupName: string) => number;
+    getHeatColor: (value: number) => string;
+}
+
 export type CHART_MODE______KEY = 'INCIDENCE' | 'SEIR' | 'EI';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
+/**
+ * collection of type specific functionality, think methods on enum-constants
+ * there is another, model specific, class like this: ModelConstants
+ *
+ * @author h.fleischer
+ * @since 30.05.2021
+ */
 export class ControlsConstants {
 
     static readonly COLORS: {[K in COMPARTMENT__COLORS]:string} = {
@@ -69,7 +83,22 @@ export class ControlsConstants {
         'SETTINGS': '#687580'
     };
 
-    static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IControlsDefinitions} = {
+    static readonly HEATMAP_DATA_PARAMS: {[K in CHART_MODE______KEY]: IHeatmapChartDefinition} = {
+        'SEIR': {
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].SUSCEPTIBLE,
+            getHeatColor: (valueSpc) => new Color(0.58, 0.10, Math.min(1.0, valueSpc / 100)).getHex()
+        },
+        'EI': {
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS,
+            getHeatColor: (valueSpc) => new Color(0.23, 0.10, Math.min(1.0, valueSpc / 100)).getHex()
+        },
+        'INCIDENCE': {
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID_____ALL],
+            getHeatColor: (valueSpc) => new Color(0.0, 0.10, Math.min(1.0, valueSpc / 100)).getHex()
+        }
+    }
+
+    static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]: IControlsDefinitions} = {
         'TIME': {
             icon: 'M 4.62 3.25 H 4.62 L 3.62 4.5 A 0.8 0.8 90 0 1 2.5 4.63 H 2.5 L -0.85 2.14 A 2 2 90 0 1 -1.6 0.58 V -7.2 A 0.8 0.8 90 0 1 -0.8 -8 H 0.8 A 0.8 0.8 90 0 1 1.6 -7.2 V 0 L 4.5 2.13 A 0.8 0.8 90 0 1 4.62 3.25 Z',
             container: 'modificationTimeDiv',

@@ -1,9 +1,9 @@
-import { ObjectUtil } from './../../util/ObjectUtil';
 import { LineSeries, StepLineSeries, ValueAxis, XYChart } from "@amcharts/amcharts4/charts";
 import { Label, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { COMPARTMENT__COLORS, ControlsConstants } from '../gui/ControlsConstants';
+import { ObjectUtil } from './../../util/ObjectUtil';
 import { ChartAgeGroup } from './ChartAgeGroup';
 import { ChartUtil } from './ChartUtil';
 
@@ -133,7 +133,7 @@ export class ChartAgeGroupSeries {
         this.series.name = seriesNote;
 
         clearInterval(this.intervalHandle);
-        this.intervalHandle = setInterval(() => {
+        this.intervalHandle = window.setInterval(() => {
             if (this.series.segments.getIndex(0)?.strokeSprite) {
                 this.seriesLabel.path = this.series.segments.getIndex(0).strokeSprite.path;
                 this.seriesLabel.locationOnPath = this.locationOnPath;

@@ -25,6 +25,14 @@ export interface IModificationDefinitions {
     createValuesModification: (modificationValues: IModificationValues) => IModification<IModificationValues>;
 }
 
+/**
+ * collection of type specific functionality, think methods on enum-constants
+ * there is another, gui specific, class like this: ControlsConstants
+ *
+ * @author h.fleischer
+ * @since 30.05.2021
+ */
+
 export class ModelConstants {
 
     static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IModificationDefinitions} = {

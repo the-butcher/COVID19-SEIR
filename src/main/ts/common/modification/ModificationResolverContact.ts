@@ -1,4 +1,5 @@
 import { Demographics } from '../demographics/Demographics';
+import { ContactMatrixSums } from './../../client/controls/ContactMatrixSums';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesContact } from './IModificationValuesContact';
 import { ModificationContact } from './ModificationContact';
@@ -20,15 +21,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
     }
 
     getValue(instant: number): number {
-        const demographics = Demographics.getInstance();
-        const matrixContactTotal = demographics.getMatrixSum();
-        let matrixContactCurr = 0;
-        for (let indexX = 0; indexX < demographics.getAgeGroups().length; indexX++) {
-            for (let indexY = 0; indexY < demographics.getAgeGroups().length; indexY++) {
-                matrixContactCurr += this.getModification(instant).getContacts(indexX, indexY); // TODO premultiply with population to give a more meaningful value;
-            }
-        }
-        return matrixContactCurr / matrixContactTotal;
+        return new ContactMatrixSums(this.getModification(instant)).getMatrixSum() / Demographics.getInstance().getMatrixSum();
     }
 
 }

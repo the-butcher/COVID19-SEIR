@@ -6,29 +6,30 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* all testing to zero renders an all zero chart
-  * single slider to 1 percent leads to diagram stretching further an further
-* limit incidence range on modifications later than MIN_DATE to i.e. 10
+* introduce vaccination heatmap
+  * controls (where, style, ...)
+* create some decent chart model toggle
+  * SEIR-FULL, all seir curves
+  * EXPOSURES exposed/infected
+  * INCIDENCE
+* border cases
+  * all testing sliders on zero renders an all zero chart,
+  * single testing slider on 1 percent leads to diagram stretching further an further
+  * limit incidence range on modifications later than MIN_DATE to i.e. 10
+  * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
+  * keep history in local storage (or internal, reset modification after validation problems)
 * modification chart area
   * find some primary value for strain (if possible use r<sub>t</sub>)
-* validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
-  * keep history in local storage (or internal, reset modification after validation problems)
 * implement
   * import
   * save -> auto save (?), if auto save there needs to be a reset (could be done through local storage history)
   * export
   * ~~png~~
   * csv
-* create some decent chart model toggle
-  * SEIR-FULL, all seir curves
-  * EXPOSURES exposed/infected
-  * INCIDENCE
-* check model for having constant population (some submodel do not count, incidence, ...)
-* performance tests on model integration
-  * find and eliminate most prominent hotspots
+* testing, validity, plausibility
+  * check model for having constant population (some submodel do not count, incidence, ...)
+  * find and eliminate most prominent performance bottlenecks
   * will caching compartments on compartmentFilter improve performance?
-* introduce vaccination heatmap
-  * controls (where, style, ...)
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
 
 next:
@@ -41,6 +42,7 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~modification chart timeline has no values for contact~~
 * ~~create little colored markers where modifications are on the time slider~~
 * ~~bind chart cursor to the 'time' modification~~
   * ~~when exiting the chart are, cursor shall be displayed to time modification instant~~
