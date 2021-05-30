@@ -1,4 +1,4 @@
-import { CategoryAxis, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
+import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
@@ -47,6 +47,7 @@ export class ChartAgeGroup {
     protected readonly yAxisPlotAbsolute: ValueAxis;
     protected readonly yAxisPlotRelative: ValueAxis;
     protected readonly yAxisPlotIncidence: ValueAxis;
+    protected readonly columnTemplate: Column;
 
     protected readonly yAxisHeat: CategoryAxis;
     protected readonly yAxisModification: ValueAxis;
@@ -98,7 +99,7 @@ export class ChartAgeGroup {
 
         this.absValue = 0;
         this.ageGroupIndex = 10;
-        this.modelData = [];
+        // this.modelData = [];
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
@@ -344,21 +345,18 @@ export class ChartAgeGroup {
         this.ageGroupMarker.fill = color(ControlsConstants.COLOR____FONT);
         this.ageGroupMarker.zIndex = 100;
 
-        const columnTemplate = this.seriesHeat.columns.template;
-        columnTemplate.strokeWidth = 0;
-        // columnTemplate.fillOpacity = 0.5;
-        // columnTemplate.strokeOpacity = 0.2;
-        // columnTemplate.stroke = color('#ff0000');
-        columnTemplate.tooltipText = `{${ChartAgeGroup.FIELD_CATEGORY_X}}, {${ChartAgeGroup.FIELD_CATEGORY_Y}}: {value.formatNumber("#,###.")}`; // "#,###.00"
-        columnTemplate.width = percent(105);
-        columnTemplate.height = percent(105);
-        columnTemplate.events.on('hit', e => {
+        this.columnTemplate = this.seriesHeat.columns.template;
+        this.columnTemplate.strokeWidth = 0;
+        this.columnTemplate.tooltipText = `{${ChartAgeGroup.FIELD_CATEGORY_X}}, {${ChartAgeGroup.FIELD_CATEGORY_Y}}: {label}`;
+        this.columnTemplate.width = percent(105);
+        this.columnTemplate.height = percent(105);
+        this.columnTemplate.events.on('hit', e => {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
             this.setSeriesAgeGroup(index);
         });
 
         this.seriesHeat.heatRules.push({
-            target: columnTemplate,
+            target: this.columnTemplate,
             property: 'fill',
             min: color(ChartUtil.getInstance().toColor(0, 'INCIDENCE')),
             max: color(ChartUtil.getInstance().toColor(1, 'INCIDENCE')),
@@ -451,6 +449,9 @@ export class ChartAgeGroup {
         });
         document.getElementById('chartModeEiDiv').addEventListener('click', () => {
             this.setChartMode('EI');
+        });
+        document.getElementById('chartModeVaccDiv').addEventListener('click', () => {
+            this.setChartMode('VACC');
         });
         this.setChartMode('INCIDENCE');
 
@@ -583,39 +584,23 @@ export class ChartAgeGroup {
     setChartMode(chartMode: CHART_MODE______KEY): void {
 
         this.chartMode = chartMode;
-        if (this.chartMode === 'INCIDENCE') {
+        ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
 
-            this.setSeriesIncidenceVisible(true);
-            this.setSeriesEIVisible(false);
-            this.setSeriesSRVisible(false);
-
-        } else if (this.chartMode === 'SEIR') {
-
-            this.setSeriesIncidenceVisible(false);
-            this.setSeriesEIVisible(true);
-            this.setSeriesSRVisible(true);
-
-        } else if (this.chartMode === 'EI') {
-
-            this.setSeriesIncidenceVisible(false);
-            this.setSeriesSRVisible(false);
-            this.setSeriesEIVisible(true);
-
-        }
-
-        if (this.chartMode === 'EI') {
-            this.yAxisPlotRelative.max = this.seriesAgeGroupInfectious.getSeries().max(this.yAxisPlotRelative);
-        } else {
-            this.yAxisPlotRelative.max = 1.01;
-        }
-
-        // no data upon initial call
+        // no data during initial call
         if (ObjectUtil.isNotEmpty(this.modelData)) {
             requestAnimationFrame(() => {
                 this.renderModelData();
             });
         }
 
+    }
+
+    getMaxInfections(): number {
+        return this.maxInfectious;
+    }
+
+    setAxisRelativeMax(max: number): void {
+        this.yAxisPlotRelative.max = max;
     }
 
     /**
@@ -745,18 +730,15 @@ export class ChartAgeGroup {
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
                 const value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
-                // dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
-                // const value = dataItem.valueset[ageGroupHeat.getName()].REMOVED_V;
+                const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
                 heatData.push({
                     categoryX: dataItem.categoryX,
                     categoryY: ageGroupHeat.getName(),
                     index: ageGroupHeat.getIndex(),
-                    value: value + randomVd
+                    value: value + randomVd,
+                    label
                 });
-                if (value > maxValue) {
-                    maxValue = value;
-                }
-
+                maxValue = Math.max(maxValue, value);
             });
 
         }
@@ -765,7 +747,7 @@ export class ChartAgeGroup {
 
         const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
         heatRule.minValue = 0;
-        heatRule.maxValue = maxValue;
+        heatRule.maxValue = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatMax(maxValue);
         heatRule.min = color(ChartUtil.getInstance().toColor(0, this.chartMode));
         heatRule.max = color(ChartUtil.getInstance().toColor(1, this.chartMode));
 

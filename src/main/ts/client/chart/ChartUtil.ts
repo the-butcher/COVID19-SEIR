@@ -42,10 +42,14 @@ export class ChartUtil {
         if (value) {
             value = value.replace(this.separatorThousand, '');
             value = value.replace(this.separatorDecimal, '.');
-            return percent ? Math.round(parseFloat(value) * 100) + '%' : parseFloat(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
+            return this.formatLabelOrTooltipParsed(parseFloat(value), percent);
         } else {
             return value;
         }
+    }
+
+    formatLabelOrTooltipParsed = (parsed: number, percent: boolean) => {
+        return percent ? `${(parsed * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%` : parsed.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
     }
 
     formatPercentage(value: number): string {

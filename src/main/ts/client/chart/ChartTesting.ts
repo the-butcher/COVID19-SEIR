@@ -129,7 +129,7 @@ export class ChartTesting {
                 contactX: ageGroups[indexContact].getName(),
                 participantY: Math.max(0.00000000001, testingVal),
                 label: (testingVal * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%',
-                color: ChartUtil.getInstance().toColor(testingVal)
+                color: ChartUtil.getInstance().toColor(testingVal, 'INCIDENCE') // INCIDENCE is for color only
             });
         }
 

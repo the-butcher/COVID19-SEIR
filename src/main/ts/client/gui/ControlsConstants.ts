@@ -49,9 +49,12 @@ export interface IControlsChartDefinition {
 export interface IHeatmapChartDefinition {
     getHeatValue: (dataItem: IDataItem, ageGroupName: string) => number;
     getHeatColor: (value: number) => string;
+    getHeatLabel: (value: number) => string;
+    getHeatMax: (maxValue: number) => number;
+    visitChart: (chart: ChartAgeGroup) => void;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'SEIR' | 'EI';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'SEIR' | 'EI' | 'VACC';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
@@ -86,15 +89,50 @@ export class ControlsConstants {
     static readonly HEATMAP_DATA_PARAMS: {[K in CHART_MODE______KEY]: IHeatmapChartDefinition} = {
         'SEIR': {
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].SUSCEPTIBLE,
-            getHeatColor: (valueSpc) => new Color(0.58, 0.10, Math.min(1.0, valueSpc / 100)).getHex()
+            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
+            getHeatColor: (valueSpc) => new Color(0.58, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatMax: () => 1,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(false);
+                chart.setSeriesEIVisible(true);
+                chart.setSeriesSRVisible(true);
+                chart.setAxisRelativeMax(1.01);
+            }
         },
         'EI': {
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS,
-            getHeatColor: (valueSpc) => new Color(0.23, 0.10, Math.min(1.0, valueSpc / 100)).getHex()
+            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
+            getHeatColor: (valueSpc) => new Color(0.83, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatMax: (maxValue) => maxValue,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(false);
+                chart.setSeriesSRVisible(false);
+                chart.setSeriesEIVisible(true);
+                chart.setAxisRelativeMax(chart.getMaxInfections());
+            }
         },
         'INCIDENCE': {
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID_____ALL],
-            getHeatColor: (valueSpc) => new Color(0.0, 0.10, Math.min(1.0, valueSpc / 100)).getHex()
+            getHeatLabel: (value) => `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`,
+            getHeatColor: (valueSpc) => new Color(0.12, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatMax: (maxValue) => maxValue,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(true);
+                chart.setSeriesEIVisible(false);
+                chart.setSeriesSRVisible(false);
+            }
+        },
+        'VACC': {
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].REMOVED_V,
+            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
+            getHeatColor: (valueSpc) => new Color(0.23, 0.25, Math.min(1.0, valueSpc / 100)).getHex(),
+            getHeatMax: () => 1,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(false);
+                chart.setSeriesEIVisible(true);
+                chart.setSeriesSRVisible(true);
+                chart.setAxisRelativeMax(1.01);
+            }
         }
     }
 

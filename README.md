@@ -6,12 +6,8 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* introduce vaccination heatmap
-  * controls (where, style, ...)
+* in 'EI' mode axis label should be LOCALE_FORMAT_FLOAT_2 formatted
 * create some decent chart model toggle
-  * SEIR-FULL, all seir curves
-  * EXPOSURES exposed/infected
-  * INCIDENCE
 * border cases
   * all testing sliders on zero renders an all zero chart,
   * single testing slider on 1 percent leads to diagram stretching further an further
@@ -42,6 +38,8 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~introduce vaccination heatmap~~
+* ~~in 'SEIR' mode heatmap range should be 0 to one~~
 * ~~modification chart timeline has no values for contact~~
 * ~~create little colored markers where modifications are on the time slider~~
 * ~~bind chart cursor to the 'time' modification~~

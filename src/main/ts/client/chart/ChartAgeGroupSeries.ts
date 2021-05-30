@@ -92,18 +92,7 @@ export class ChartAgeGroupSeries {
         });
 
         this.series.events.on('ready', () => {
-            // // remove clip-path so thicker line series appear in full width around y==0
-            // // (this.series.element.node.firstChild as SVGGElement).setAttributeNS(null, 'clip-path', '');
-            // if (params.labelled) {
-            //     this.series.segments.getIndex(0).strokeSprite.events.on('propertychanged', e => {
-            //         if (e.property === 'path') {
-            //             this.seriesLabel.path = this.series.segments.getIndex(0).strokeSprite.path;
-            //             setTimeout(() => {
-            //                 this.seriesLabel.locationOnPath = params.locationOnPath;
-            //             }, 3000);
-            //         }
-            //     });
-            // };
+
         });
 
     }
