@@ -33,12 +33,12 @@ export class SliderVaccination extends Slider {
             labelFormatFunction: (index, value, type) => {
                 return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
             },
-            valueChangeFunction: (value, index, type) => {
+            handleValueChange: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
                     ControlsVaccination.getInstance().handleChange();
                 }
             },
-            thumbPickedFunction: (index) => {
+            handleThumbPicked: (index) => {
                 // nothing
             },
             inputFunctions: {

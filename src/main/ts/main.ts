@@ -1,13 +1,12 @@
-import { ModelTask } from './client/ModelTask';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { StorageUtil } from './client/controls/StorageUtil';
+import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { Demographics } from './common/demographics/Demographics';
 import { Modifications } from './common/modification/Modifications';
 import { JsonLoader } from './util/JsonLoader';
 import { Logger } from './util/Logger';
 import { ObjectUtil } from './util/ObjectUtil';
-import { SliderModification } from './client/gui/SliderModification';
 
 
 new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).then(demographicsConfig => {
@@ -26,7 +25,7 @@ new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).th
         ModelActions.getInstance().toggleMode('STRAIN');
         requestAnimationFrame(() => {
             ChartAgeGroup.getInstance();
-            SliderModification.getInstance().updateChartIfApplicable('STRAIN');
+            ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
         });
     }, 250);
 

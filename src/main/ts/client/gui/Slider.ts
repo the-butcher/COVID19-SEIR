@@ -36,8 +36,8 @@ export interface ISliderParams extends ISliderFunctions {
     values: number[];
     ticks: number[];
     label: string,
-    valueChangeFunction: (index: number, value: number, type: CHANGE_TYPE) => void;
-    thumbPickedFunction: (index: number) => void;
+    handleValueChange: (index: number, value: number, type: CHANGE_TYPE) => void;
+    handleThumbPicked: (index: number) => void;
 }
 
 /**
@@ -97,11 +97,15 @@ export class Slider {
     private readonly sliderThumbs: SliderThumb[];
     private readonly sliderAssets: SliderAsset[];
 
-    private readonly valueChangeFunction: (index: number, value: number, type: CHANGE_TYPE) => void;
-    protected readonly thumbPickedFunction: (index: number) => void;
+    private readonly handleValueChange: (index: number, value: number, type: CHANGE_TYPE) => void;
+    protected readonly handleThumbPicked: (index: number) => void;
 
     private creatorThumb: SliderThumb;
-    protected creatorVisContainer = 0;
+
+    /**
+     * mouse is over the slider
+     */
+    protected mouseOverModificationSlider = 0;
     private creatorVisNeighbour = 0;
 
     private focusableThumbIndex: number;
@@ -128,8 +132,8 @@ export class Slider {
         this.maxValue = params.max;
         this.step = params.step;
 
-        this.valueChangeFunction = params.valueChangeFunction;
-        this.thumbPickedFunction = params.thumbPickedFunction;
+        this.handleValueChange = params.handleValueChange;
+        this.handleThumbPicked = params.handleThumbPicked;
 
         this.sliderContainer = params.container instanceof HTMLDivElement ? params.container : document.getElementById(params.container) as HTMLDivElement;
         this.sliderContainer.classList.add(Slider.CLASS_SLIDER_CONTAINER);
@@ -180,7 +184,7 @@ export class Slider {
                     value = this.valueToAvailableValueSpace(index, value); // don't drag across neighbour sliders
 
                     this.setValueAndRedraw(index, value, true);
-                    params.valueChangeFunction(index, value, 'input'); // should be params
+                    params.handleValueChange(index, value, 'input'); // should be params
 
                     return value;
 
@@ -215,13 +219,13 @@ export class Slider {
         // entering the create area
         this.getContainer().addEventListener('pointerover', e => {
             window.clearTimeout(timeoutOut);
-            this.creatorVisContainer = 1;
+            this.mouseOverModificationSlider = 1;
         });
 
         // exiting the create area
         this.getContainer().addEventListener('pointerout', () => {
             timeoutOut = window.setTimeout(() => {
-                this.creatorVisContainer = 0;
+                this.mouseOverModificationSlider = 0;
             }, 25);
         });
 
@@ -241,7 +245,7 @@ export class Slider {
                 if (value !== this.getValue(this.focusableThumbIndex)) {
                     keyupRequire = true;
                     this.setValueAndRedraw(this.focusableThumbIndex, value, false);
-                    this.valueChangeFunction(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'cursor');
+                    this.handleValueChange(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'cursor');
                 }
             }
         });
@@ -249,7 +253,7 @@ export class Slider {
             if (this.focusableThumbIndex >= 0 && keyupRequire && this.sliderThumbs[this.focusableThumbIndex].isDraggable()) {
                 keyupRequire = false;
                 keyupTimeout = window.setTimeout(() => {
-                    this.valueChangeFunction(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'stop');
+                    this.handleValueChange(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'stop');
                 }, 500);
             }
         });
@@ -356,7 +360,7 @@ export class Slider {
             this.focusableThumbIndex = index;
             sliderThumb.setFocussed(true);
             sliderThumb.getContainer().style.zIndex = `${Slider.Z___INDEX++}`;
-            this.thumbPickedFunction(index);
+            this.handleThumbPicked(index);
         });
         sliderThumb.getThumbContentContainer().addEventListener('blur', () => {
             this.focusableThumbIndex = -1;
@@ -462,7 +466,7 @@ export class Slider {
 
             value = this.valueToAvailableValueSpace(this.draggableThumbIndex, value);
             this.setValueAndRedraw(this.draggableThumbIndex, value, false);
-            this.valueChangeFunction(this.draggableThumbIndex, this.getValue(this.draggableThumbIndex), 'drag');
+            this.handleValueChange(this.draggableThumbIndex, this.getValue(this.draggableThumbIndex), 'drag');
 
         }
 
@@ -475,8 +479,8 @@ export class Slider {
                     this.creatorVisNeighbour = 0;
                 }
             });
-            const creatorVis = this.creatorVisNeighbour * this.creatorVisContainer;
-            this.creatorThumb.getContainer().style.opacity = `${this.creatorVisNeighbour * this.creatorVisContainer}`;
+            const creatorVis = this.creatorVisNeighbour * this.mouseOverModificationSlider;
+            this.creatorThumb.getContainer().style.opacity = `${this.creatorVisNeighbour * this.mouseOverModificationSlider}`;
             if (creatorVis) {
                 this.creatorThumb.setValue(value); // just place the creator thumb, don't enforce neighbour thumb values
                 this.redrawSliderElement(this.creatorThumb, Slider.Y_OFFSET_THUMB, false);
@@ -502,8 +506,8 @@ export class Slider {
 
         } else if (this.draggableThumbIndex >= 0) {
 
-            this.valueChangeFunction(this.draggableThumbIndex, this.getValue(this.draggableThumbIndex), 'stop');
-            this.thumbPickedFunction(this.draggableThumbIndex);
+            this.handleValueChange(this.draggableThumbIndex, this.getValue(this.draggableThumbIndex), 'stop');
+            this.handleThumbPicked(this.draggableThumbIndex);
 
         }
 

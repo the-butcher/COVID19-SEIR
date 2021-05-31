@@ -34,12 +34,12 @@ export class SliderTestingCategory extends Slider {
                     return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
                 }
             },
-            valueChangeFunction: (value, index, type) => {
+            handleValueChange: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
                     ControlsTesting.getInstance().handleChange();
                 }
             },
-            thumbPickedFunction: (index) => {
+            handleThumbPicked: (index) => {
                 // nothing
             },
             inputFunctions: {

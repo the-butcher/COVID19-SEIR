@@ -1,10 +1,9 @@
+import { ObjectUtil } from '../../util/ObjectUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
 import { Demographics } from '../demographics/Demographics';
-import { IModificationValuesTesting } from './IModificationValuesTesting';
-import { ObjectUtil } from '../../util/ObjectUtil';
 import { AModification } from './AModification';
-import { CompartmentChain } from '../../model/compartment/CompartmentChain';
+import { IModificationValuesTesting } from './IModificationValuesTesting';
 
 /**
  * implementation of IModification for testing / discovery
@@ -84,9 +83,5 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
         }
         return this.modificationValues.multipliers[contactCategoryName];
     }
-
-    // getContactMultiplier(ageGroupIndex: number): number {
-    //     return 1 - (this.getTestingRatio(ageGroupIndex) * (1 - CompartmentChain.getInstance().getShareOfPresymptomaticInfection()));
-    // }
 
 }

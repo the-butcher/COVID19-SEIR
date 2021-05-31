@@ -27,12 +27,12 @@ export class SliderSeasonality extends Slider {
             labelFormatFunction: (index, value, type) => {
                 return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
             },
-            valueChangeFunction: (value, index, type) => {
+            handleValueChange: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
                     ControlsSeasonality.getInstance().handleChange();
                 }
             },
-            thumbPickedFunction: (index) => {
+            handleThumbPicked: (index) => {
                 // nothing
             },
             inputFunctions: {

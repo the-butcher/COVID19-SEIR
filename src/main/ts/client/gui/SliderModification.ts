@@ -1,15 +1,13 @@
-import { IconModificationMini } from './IconModificationMini';
-import { Demographics } from '../../common/demographics/Demographics';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
-import { ModelTask } from '../ModelTask';
 import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ControlsConstants } from './ControlsConstants';
 import { IconModification } from './IconModification';
-import { Slider } from './Slider';
+import { IconModificationMini } from './IconModificationMini';
+import { Slider, CHANGE_TYPE } from './Slider';
 
 /**
  * slider control showing modifications of given types
@@ -27,11 +25,8 @@ export class SliderModification extends Slider {
     }
     private static instance: SliderModification;
 
-
     private readonly modificationIcons: IconModification[];
     private selectableModificationId: string;
-
-    private updateModificationChart: () => Promise<void>;
 
     constructor() {
 
@@ -49,14 +44,19 @@ export class SliderModification extends Slider {
             labelFormatFunction: (index, value) => {
                 return `${new Date(value).toLocaleDateString()}`;
             },
-            valueChangeFunction: (index, value, type) => {
+            handleValueChange: (index, value, type) => {
+                const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
+                ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].handleModificationDrag(value);
                 if (type === 'stop') {
                     this.updateModificationInstants();
                     this.indicateUpdate(this.modificationIcons[index].getId());
+                    this.handleThumbPicked(index);
                 }
             },
-            thumbPickedFunction: (index) => {
-                this.showInEditor(index);
+            handleThumbPicked: (index) => {
+                console.log('thumb picked');
+                const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
+                ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
             }
         });
 
@@ -71,32 +71,21 @@ export class SliderModification extends Slider {
         });
     }
 
+    /**
+     * wiggle the icon, update primary chart
+     * @param id
+     */
     indicateUpdate(id: string): void {
 
         const modificationIcon = this.modificationIcons.find(m => m.getId() === id);
         modificationIcon.getBulletGroupElement().style.transform = 'rotate(45deg) scale(0.95)';
 
-        this.updateChartIfApplicable(modificationIcon.getKey());
+        ControlsConstants.MODIFICATION_PARAMS[modificationIcon.getKey()].handleModificationUpdate(); // update after a modification was edited
 
         setTimeout(() => {
             modificationIcon.getBulletGroupElement().style.transform = 'rotate(0deg) scale(0.75)';
         }, 300);
 
-    }
-
-    showInEditor(index: number): void {
-        const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
-        ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
-    }
-
-    /**
-     * if the modification type identifiable by the given key has the updateChartOnChange flag set, commit a model-update task
-     * @param key
-     */
-    updateChartIfApplicable(key: MODIFICATION____KEY): void {
-        if (ControlsConstants.MODIFICATION_PARAMS[key].updateChartOnChange) { // if that modification type allows updates, the model needs to be rebuilt
-            ModelTask.commit(key, Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
-        }
     }
 
     /**
@@ -109,6 +98,7 @@ export class SliderModification extends Slider {
         const instantA = value;
         const instantB = (index < this.getSliderThumbs().length - 1) ? this.getSliderThumbs()[index + 1].getValue() : this.getMaxValue();
         modification.setInstants(instantA, instantB);
+
     }
 
     /**
@@ -117,9 +107,6 @@ export class SliderModification extends Slider {
     updateModificationInstants(): void {
         for (let index = 0; index < this.getSliderThumbs().length; index++) {
             this.updateModificationInstant(index, this.getValue(index));
-        }
-        if (this.updateModificationChart) {
-            this.updateModificationChart();
         }
     }
 
@@ -189,13 +176,14 @@ export class SliderModification extends Slider {
 
                 const modification = ModelConstants.MODIFICATION_PARAMS[key].createValuesModification(modificationValuesCopy);
                 console.log('modification', modification);
+
                 /**
                  * add modification and update modification chart
                  */
                 this.selectableModificationId = modification.getId(); // store id to have the modification selected once updated modifications display
                 Modifications.getInstance().addModification(modification);
                 this.showModifications(modification.getKey());
-                this.updateChartIfApplicable(key);
+                ControlsConstants.MODIFICATION_PARAMS[key].handleModificationUpdate(); // update after a modification was created
 
             });
 
@@ -256,7 +244,7 @@ export class SliderModification extends Slider {
                     Modifications.getInstance().deleteModification(modificationIcon.getId());
                     this.selectableModificationId = this.modificationIcons[index - 1].getId(); // set previous modification as selectable -> prevent edit controls showing values of a non-existing modification
                     this.showModifications(typedModifications[index].getKey());
-                    this.updateChartIfApplicable(key);
+                    ControlsConstants.MODIFICATION_PARAMS[key].handleModificationUpdate(); // update after a modification was deleted
                 });
             }
 
@@ -296,15 +284,6 @@ export class SliderModification extends Slider {
          */
         ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver());
 
-    }
-
-    handlePointerMove(e: PointerEvent): void {
-        super.handlePointerMove(e);
-        if (this.creatorVisContainer === 1) {
-            const position = this.eventToPosition(e);
-            let value = this.positionToValue(position);
-            ChartAgeGroup.getInstance().setInstant(value);
-        }
     }
 
 }

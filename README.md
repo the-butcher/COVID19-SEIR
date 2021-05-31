@@ -6,6 +6,7 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* better range on the time modification chart line
 * border cases
   * all testing sliders on zero renders an all zero chart,
   * single testing slider on 1 percent leads to diagram stretching further an further
@@ -36,6 +37,8 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~effective contact matrix does not update when modification is moved by arrow key~~
+* ~~proceed cursor when time modification is moved by arrow key~~
 * ~~create some decent chart mode toggle~~
 * ~~in 'EI' mode axis labels should be LOCALE_FORMAT_FLOAT_2 formatted~~
 * ~~introduce vaccination heatmap~~

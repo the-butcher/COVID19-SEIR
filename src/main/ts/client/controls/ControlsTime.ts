@@ -1,9 +1,11 @@
-import { ContactMatrixEffective } from './ContactMatrixEffective';
+import { SliderModification } from './../gui/SliderModification';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
 import { ControlsConstants } from '../gui/ControlsConstants';
+import { ContactMatrixEffective } from './ContactMatrixEffective';
 import { Controls } from './Controls';
+import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 
 /**
  * controller for editing time modifications (which does not actually change anything, but rather displays state)
@@ -29,7 +31,7 @@ export class ControlsTime {
     }
 
     handleChange(): void {
-        // console.warn('handleChange');
+        // this is usually called when a control (a slider) updates a modification
     }
 
     /**
@@ -44,14 +46,6 @@ export class ControlsTime {
         this.chartTime.redraw(new ContactMatrixEffective(this.modification));
 
         document.getElementById('infoVaccinationSpan').innerHTML = this.modification.getDosesPerDay().toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
-
-        // TODO decide how the strain diagram can be presented
-        //      NO another part of the time diagram (but then strain might not be pickable)
-        //      -- have one section for each "possible" strain in the model in their order of appearance (these can be grayed out per position of time slider)
-        //      -- at full contact matrix one average person infects R₀ other people
-
-        // TODO for the given time
-        console.warn('TODO :: display effective settings (switchable ChartTime + cross section plot)');
 
     }
 

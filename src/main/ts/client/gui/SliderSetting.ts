@@ -40,12 +40,12 @@ export class SliderSetting extends Slider {
                     return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
                 }
             },
-            valueChangeFunction: (value, index, type) => {
+            handleValueChange: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
                     ControlsSettings.getInstance().handleChange();
                 }
             },
-            thumbPickedFunction: (index) => {
+            handleThumbPicked: (index) => {
                 // nothing
             },
             inputFunctions: {

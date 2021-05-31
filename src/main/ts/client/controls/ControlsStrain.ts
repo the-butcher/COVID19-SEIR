@@ -62,14 +62,14 @@ export class ControlsStrain {
                     return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
                 }
             },
-            valueChangeFunction: (index, value, type) => {
+            handleValueChange: (index, value, type) => {
                 this.r0 = value;
                 this.redrawCanvas();
                 if (type === 'stop' || type === 'input') {
                     this.handleChange();
                 }
             },
-            thumbPickedFunction: (index) => {
+            handleThumbPicked: (index) => {
                 // nothing
             },
             inputFunctions: {
@@ -104,7 +104,7 @@ export class ControlsStrain {
                     return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1);
                 }
             },
-            valueChangeFunction: (index, value, type) => {
+            handleValueChange: (index, value, type) => {
                  if (index === 0) {
                     this.intervalScale = StrainUtil.calculateIntervalScale(value, this.serialInterval);
                     this.redrawCanvas();
@@ -117,7 +117,7 @@ export class ControlsStrain {
                     this.handleChange();
                 }
             },
-            thumbPickedFunction: (index) => {
+            handleThumbPicked: (index) => {
                 // nothing
             },
             inputFunctions: {
@@ -145,13 +145,13 @@ export class ControlsStrain {
             labelFormatFunction: (index, value, type) => {
                 return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
             },
-            valueChangeFunction: (index, value, type) => {
+            handleValueChange: (index, value, type) => {
                 this.incidence = value;
                 if (type === 'stop' || type === 'input') {
                     this.handleChange();
                 }
             },
-            thumbPickedFunction: (index) => {
+            handleThumbPicked: (index) => {
                 // nothing
             },
             inputFunctions: {

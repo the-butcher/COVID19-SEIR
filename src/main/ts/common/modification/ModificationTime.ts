@@ -1,7 +1,4 @@
-import { ModificationSettings } from './ModificationSettings';
-import { ModificationResolverSettings } from './ModificationResolverSettings';
-// import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
-import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
+import { ChartAgeGroup } from '../../client/chart/ChartAgeGroup';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
 import { AModification } from './AModification';
 import { IContactMatrix } from './IContactMatrix';
@@ -9,9 +6,11 @@ import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationContact } from './ModificationContact';
 import { ModificationResolverContact } from './ModificationResolverContact';
 import { ModificationResolverSeasonality } from './ModificationResolverSeasonality';
+import { ModificationResolverSettings } from './ModificationResolverSettings';
 import { ModificationResolverTesting } from './ModificationResolverTesting';
 import { ModificationResolverVaccination } from './ModificationResolverVaccination';
 import { ModificationSeasonality } from './ModificationSeasonality';
+import { ModificationSettings } from './ModificationSettings';
 import { ModificationTesting } from './ModificationTesting';
 import { ModificationVaccination } from './ModificationVaccination';
 
