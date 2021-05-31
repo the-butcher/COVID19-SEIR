@@ -219,14 +219,14 @@ export class SliderModification extends Slider {
             svgContainer.addEventListener('pointerover', e => {
                 svgContainer.style.zIndex = `${IconModification.Z_INDEX++}`;
                 clearTimeout(showHandleTimeout);
-                showHandleTimeout = setTimeout(() => {
+                showHandleTimeout = window.setTimeout(() => {
                     modificationIcon.setHandleOpacity(modificationIcon.getLastHandleOpacity());
                 }, 500);
             });
 
             svgContainer.addEventListener('pointerout', e => {
                 clearTimeout(showHandleTimeout);
-                showHandleTimeout = setTimeout(() => {
+                showHandleTimeout = window.setTimeout(() => {
                     modificationIcon.setHandleOpacity(0.0);
                 }, 250);
             });
@@ -239,7 +239,7 @@ export class SliderModification extends Slider {
             });
             modificationIcon.getHandleGroupElement().addEventListener('pointerout', () => {
                 clearTimeout(handleOpacityTimeout);
-                handleOpacityTimeout = setTimeout(() => {
+                handleOpacityTimeout = window.setTimeout(() => {
                     modificationIcon.setHandleOpacity(0.6);
                 }, 25);
             });

@@ -16,9 +16,7 @@ export class IconModelMode {
         this.key = key;
 
         this.svgContainer = document.createElement('div');
-        this.svgContainer.style.width = '30px';
-        this.svgContainer.style.height = '30px';
-        this.svgContainer.style.cursor = 'pointer';
+        this.svgContainer.classList.add('model-mode');
         this.svgContainer.addEventListener('pointerup', e => {
             ModelActions.getInstance().toggleMode(this.key);
         });
@@ -27,7 +25,8 @@ export class IconModelMode {
         svgElement.setAttributeNS(null, 'viewBox', '-15 -15 30 30');
         svgElement.style.width = '28px';
         svgElement.style.height = '28px';
-        svgElement.style.fill = 'var(--color-text)'
+        svgElement.style.fill = 'var(--color-text)';
+
         this.svgContainer.appendChild(svgElement);
 
         const bulletPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");

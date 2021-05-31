@@ -220,7 +220,7 @@ export class Slider {
 
         // exiting the create area
         this.getContainer().addEventListener('pointerout', () => {
-            timeoutOut = setTimeout(() => {
+            timeoutOut = window.setTimeout(() => {
                 this.creatorVisContainer = 0;
             }, 25);
         });
@@ -248,7 +248,7 @@ export class Slider {
         window.addEventListener('keyup', e => {
             if (this.focusableThumbIndex >= 0 && keyupRequire && this.sliderThumbs[this.focusableThumbIndex].isDraggable()) {
                 keyupRequire = false;
-                keyupTimeout = setTimeout(() => {
+                keyupTimeout = window.setTimeout(() => {
                     this.valueChangeFunction(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'stop');
                 }, 500);
             }

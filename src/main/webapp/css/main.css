@@ -1,5 +1,5 @@
 :root {
-  --color-panel-bg: #1a1a1a;
+  --color-panel-bg: #161616;
   --color-dropshadow: #000000;
   --color-text: #d1d1d1;
   --color-text-slider: #999999;
@@ -25,7 +25,7 @@ body {
   padding: 0px;
   margin: 0px;
   overflow: hidden;
-  background: #121212;
+  background: #101010;
   font-family: var(--text-font);
   color: var(--color-text);
 }
@@ -56,6 +56,32 @@ input {
   border: 1px solid grey;
   padding: 1px 0px;
   color: var(--color-text);
+}
+
+.model-mode {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  filter: drop-shadow(2px 2px 3px var(--color-dropshadow));
+}
+.model-mode:hover {
+  filter: drop-shadow(4px 4px 3px var(--color-dropshadow));
+}
+.model-mode:active {
+  filter: drop-shadow(1px 1px 3px var(--color-dropshadow));
+}
+
+.chart-mode {
+  padding: 6px 20px 0px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  filter: drop-shadow(2px 2px 3px var(--color-dropshadow));
+}
+.chart-mode:hover {
+  filter: drop-shadow(4px 4px 3px var(--color-dropshadow));
+}
+.chart-mode:active {
+  filter: drop-shadow(1px 1px 3px var(--color-dropshadow));
 }
 
 .slider-modification {
