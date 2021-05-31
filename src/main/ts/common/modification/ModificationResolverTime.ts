@@ -6,6 +6,7 @@ import { Demographics } from '../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationTime } from './ModificationTime';
+import { IModificationData } from '../../client/chart/ChartAgeGroup';
 
 /**
  * modification resolver for time modifications
@@ -20,8 +21,9 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
         super('TIME');
     }
 
-    getMaxValue(): number {
-        return 1;
+    getMaxValue(data: IModificationData[]): number {
+        const maxValue = Math.max(...data.map(d => d.modValueY));
+        return Math.ceil(maxValue * 10) / 10; // round to the next 0.1nth slot
     }
 
     getValue(instant: number): number {

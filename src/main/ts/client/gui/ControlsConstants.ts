@@ -285,12 +285,12 @@ export class ControlsConstants {
 
         // console.log('modificationData', modificationData);
 
-        const max = modificationResolver.getMaxValue();
+        const max = modificationResolver.getMaxValue(modificationData);
         const key = modificationResolver.getKey();
         ChartAgeGroup.getInstance().showModifications({
             min: 0,
             max,
-            percent: max === 1,
+            percent: max <= 1,
             text: key,
             color: ControlsConstants.COLORS[key],
             useObjectColors: true,

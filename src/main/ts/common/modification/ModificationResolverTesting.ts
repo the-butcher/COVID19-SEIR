@@ -1,3 +1,4 @@
+import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { Demographics } from '../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesTesting } from './IModificationValuesTesting';
@@ -15,7 +16,7 @@ export class ModificationResolverTesting extends AModificationResolver<IModifica
         super('TESTING');
     }
 
-    getMaxValue(): number {
+    getMaxValue(data: IModificationData[]): number {
         return 1;
     }
 

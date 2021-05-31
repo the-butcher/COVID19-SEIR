@@ -1,3 +1,4 @@
+import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
 import { ModificationVaccination } from './ModificationVaccination';
@@ -14,7 +15,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
         super('VACCINATION');
     }
 
-    getMaxValue(): number {
+    getMaxValue(data: IModificationData[]): number {
         return 100000;
     }
 

@@ -1,3 +1,4 @@
+import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { MODIFICATION____KEY } from './../../model/ModelConstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
@@ -30,6 +31,6 @@ export interface IModificationResolver<V extends IModificationValues, M extends 
     /**
      * get the upper limit of the modification chart as suitable for this instance
      */
-    getMaxValue(): number
+    getMaxValue(data: IModificationData[]): number
 
 }

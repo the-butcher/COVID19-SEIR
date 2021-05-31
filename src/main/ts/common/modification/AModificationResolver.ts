@@ -6,6 +6,12 @@ import { IModificationValues } from './IModificationValues';
 import { IModification } from './IModification';
 import { ObjectUtil } from '../../util/ObjectUtil';
 
+/**
+ * base class of modification resolver, managing modification lookup
+ *
+ * @author h.fleischer
+ * @since 31.05.2021
+ */
 export abstract class AModificationResolver<V extends IModificationValues, M extends IModification<V>> implements IModificationResolver<V, M> {
 
     private readonly key: MODIFICATION____KEY;
@@ -43,6 +49,6 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     abstract getValue(instant: number): number;
 
-    abstract getMaxValue(): number;
+    abstract getMaxValue(data: IModificationData[]): number;
 
 }

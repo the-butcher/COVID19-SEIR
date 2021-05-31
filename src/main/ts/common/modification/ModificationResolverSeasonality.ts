@@ -1,3 +1,4 @@
+import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';
@@ -16,7 +17,7 @@ export class ModificationResolverSeasonality extends AModificationResolver<IModi
         super('SEASONALITY');
     }
 
-    getMaxValue(): number {
+    getMaxValue(data: IModificationData[]): number {
         return 1;
     }
 
