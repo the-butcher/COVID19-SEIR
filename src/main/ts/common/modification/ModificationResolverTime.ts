@@ -32,6 +32,7 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
             ...modificationValues,
             instant,
         } as IModificationValuesTime; // copy previous values
+        // TODO this could be done like in ModificationResolverString
         const modificationTime = ModelConstants.MODIFICATION_PARAMS['TIME'].createValuesModification(modificationValuesCopy) as ModificationTime;
         modificationTime.setInstants(instant, instant);
         const contactMatrixEffective = new ContactMatrixEffective(modificationTime);

@@ -42,9 +42,9 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
         this.ageGroupIndex = ageGroup.getIndex();
 
         // make some assumptions about initial cases (duplicated code in ModelImplInfectious)
-        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000 * modificationTesting.getTestingRatio(this.ageGroupIndex);
+        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000; // * modificationTesting.getTestingRatio(this.ageGroupIndex);
         if (strainValues.modifiers) {
-            dailyCases = strainValues.modifiers[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000 * modificationTesting.getTestingRatio(this.ageGroupIndex);
+            dailyCases = strainValues.modifiers[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000; // * modificationTesting.getTestingRatio(this.ageGroupIndex);
         }
         this.nrmValue = dailyCases * 7 / this.absTotal;
 

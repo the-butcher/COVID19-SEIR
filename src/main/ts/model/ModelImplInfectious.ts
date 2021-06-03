@@ -15,6 +15,12 @@ import { ModelImplStrain } from './ModelImplStrain';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 
+/**
+ * submodel for a single strain and single age groups (i.e. all infections with b.1.1.7 in the age-group of 25-34)
+ *
+ * @author h.fleischer
+ * @since 31.05.2021
+ */
 export class ModelImplInfectious implements IModelSeir, IConnectable {
 
     private readonly parentModel: ModelImplStrain;
@@ -67,7 +73,6 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
             // durationSum += duration;
             // i0NormalSum += compartmentParam.i0Normal;
 
-
             if (compartmentParam.type === ECompartmentType.E_____EXPOSED) {
                 this.compartments.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absExposed, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
             } else {
@@ -109,7 +114,7 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentCases = this.parentModel.getIncidenceModel(this.ageGroupIndex).getIncomingCompartment();
-                        const discoveredNrmCases = continuationValue * modificationTime.getTestingRatio(this.ageGroupIndex);
+                        const discoveredNrmCases = continuationValue; // * modificationTime.getTestingRatio(this.ageGroupIndex);
                         increments.addNrmValue(discoveredNrmCases, compartmentCases);
                     }
                     return increments;
@@ -130,15 +135,15 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
         return this.parentModel.getRootModel();
     }
 
-    getIncomingCompartment(): ICompartment {
+    getIncomingCompartment(): CompartmentInfectious {
         return this.compartments[0];
     }
 
-    getOutgoingCompartment(): ICompartment {
+    getOutgoingCompartment(): CompartmentInfectious {
         return this.compartments[this.compartments.length - 1];
     }
 
-    getCompartments(): ICompartment[] {
+    getCompartments(): CompartmentInfectious[] {
         return this.compartments;
     }
 
@@ -156,7 +161,15 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
     getNrmInfectious(modelState: IModelState, dT: number): number {
         let nrmInfectious = 0;
         this.compartments.forEach(compartmentInfectious => {
-            nrmInfectious += modelState.getNrmValue(compartmentInfectious) * compartmentInfectious.getReproductionRatio().getRate(dT); // compartmentInfectious.getReproductionRatio().getR0() * dT / compartmentInfectious.getReproductionRatio().getDuration();
+            nrmInfectious += modelState.getNrmValue(compartmentInfectious) * compartmentInfectious.getReproductionRatio().getRate(dT);
+        });
+        return nrmInfectious;
+    }
+
+    getNrmI(modelState: IModelState, dT: number, tT: number): number {
+        let nrmInfectious = 0;
+        this.compartments.forEach(compartmentInfectious => {
+            nrmInfectious += modelState.getNrmValue(compartmentInfectious) * compartmentInfectious.getContinuationRatio().getRate(dT, tT);
         });
         return nrmInfectious;
     }

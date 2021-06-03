@@ -20,7 +20,6 @@ export type MODIFICATION_NATURE = 'INSTANT' | 'RANGE';
 export type MODIFICATION____KEY = 'TIME' | 'STRAIN' | 'CONTACT' | 'TESTING' | 'VACCINATION' | 'SEASONALITY' | 'SETTINGS';
 
 export interface IModificationDefinitions {
-    // deletable: boolean;
     createDefaultModification?: (instant: number) => IModification<IModificationValues>;
     createValuesModification: (modificationValues: IModificationValues) => IModification<IModificationValues>;
 }
@@ -121,7 +120,11 @@ export class ModelConstants {
         new Date('2021-10-01').getTime(),
         new Date('2021-11-01').getTime(),
         new Date('2021-12-01').getTime(),
-        new Date('2022-01-01').getTime()
+        new Date('2022-01-01').getTime(),
+        // new Date('2022-02-01').getTime(),
+        // new Date('2022-03-01').getTime(),
+        // new Date('2022-04-01').getTime(),
+        // new Date('2022-04-30').getTime()
     ];
     static readonly MODEL_MIN_____INSTANT = Math.min(...ModelConstants.RANGE___MODEL_INSTANT);
     static readonly MODEL_MAX_____INSTANT = Math.max(...ModelConstants.RANGE___MODEL_INSTANT);

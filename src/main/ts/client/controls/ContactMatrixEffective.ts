@@ -11,13 +11,6 @@ export class ContactMatrixEffective implements IContactMatrix {
         this.modificationTime = modificationTime;
     }
 
-    // getColumnSum(ageGroupIndex: number): number {
-    //     return new ContactMatrixSums(this).getColumnSum(ageGroupIndex);
-    // }
-    // getMatrixSum(): number {
-    //     return new ContactMatrixSums(this).getMatrixSum();
-    // }
-
     getContacts(indexContact: number, indexParticipant: number): number {
         const multiplierSusceptibleA = ChartAgeGroup.getInstance().getNrmSusceptible(this.modificationTime.getInstantA(), indexContact);
         const multiplierSusceptibleB = ChartAgeGroup.getInstance().getNrmSusceptible(this.modificationTime.getInstantA(), indexParticipant);

@@ -2,6 +2,8 @@ import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTesting } from '../common/modification/ModificationTesting';
 import { ModificationTime } from '../common/modification/ModificationTime';
+import { ECompartmentType } from './compartment/ECompartmentType';
+import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
 import { ModelImplIncidence } from './ModelImplIncidence';
 import { ModelImplInfectious } from './ModelImplInfectious';
@@ -25,14 +27,17 @@ export class ModelImplStrain implements IModelSeir {
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly exposuresPerContact: number;
-    // private readonly strainValues: IModificationValuesStrain;
+
+    private readonly absDeltas: number[];
 
     constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
         this.incidenceModels = [];
-        this.exposuresPerContact = demographics.getExposuresPerContact();
+        this.exposuresPerContact = strainValues.transmissionRisk;
+
+        this.absDeltas = []
 
         this.strainId = strainValues.id;
         this.absTotal = demographics.getAbsTotal();
@@ -40,7 +45,6 @@ export class ModelImplStrain implements IModelSeir {
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            // const testingRatio = modificationTesting.getTestingRatio(ageGroup.getIndex());
             const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
@@ -97,40 +101,71 @@ export class ModelImplStrain implements IModelSeir {
         throw new Error('Method not implemented.');
     }
 
+    getAbsDeltas(): number[] {
+        return this.absDeltas;
+    }
+
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();
 
-        const absExposedParticipants: number[] = [];
-        this.infectiousModels.forEach(participantInfectiousModel => {
-            absExposedParticipants[participantInfectiousModel.getAgeGroupIndex()] = 0;
-        });
+        /**
+         * calculate infectious contacts between groups
+         */
+        let nrmI: number;
+        let nrmS: number;
+        let nrmE: number;
+        let compartmentE: ICompartment;
 
-        this.infectiousModels.forEach(contactInfectiousModel => {
+        let absSESums: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let abs_ISums: number[] = [];
 
-            // an absolute number of infectious individuals in the contact group (premultiplied to match dT, r0 and )
-            const absInfectious = contactInfectiousModel.getAbsInfectious(state, dT);
-            // console.log('absInfectiousContacts', contactInfectiousModel.getAgeGroupIndex(), absInfectiousContacts);
 
-            this.infectiousModels.forEach(participantInfectiousModel => {
+        this.infectiousModels.forEach(infectiousModelContact => {
 
-                const absContacts = modificationTime.getContacts(contactInfectiousModel.getAgeGroupIndex(), participantInfectiousModel.getAgeGroupIndex()) * absInfectious;
-                const nrmParticipants = absContacts * this.exposuresPerContact / participantInfectiousModel.getAgeGroupTotal();
+            nrmI = 0
+            infectiousModelContact.getCompartments().forEach(compartmentI => {
+                if (compartmentI.getCompartmentType() === ECompartmentType.I__INFECTIOUS) {
+                    nrmI += state.getNrmValue(compartmentI) * compartmentI.getReproductionRatio().getRate(dT);
+                }
+            });
 
-                const compartmentsSusceptible = this.getRootModel().getCompartmentsSusceptible(participantInfectiousModel.getAgeGroupIndex());
-                let nrmExposureTotal = 0;
-                compartmentsSusceptible.forEach(compartmentSusceptible => {
+            abs_ISums[infectiousModelContact.getAgeGroupIndex()] = nrmI;
 
-                    const nrmExposure = nrmParticipants * state.getNrmValue(compartmentSusceptible);
-                    nrmExposureTotal += nrmExposure;
-                    result.addNrmValue(-nrmExposure, compartmentSusceptible);
+            this.infectiousModels.forEach(infectiousModelParticipant => {
+
+                const baseContactRate = modificationTime.getContacts(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
+                compartmentE = infectiousModelParticipant.getIncomingCompartment();
+
+                this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
+
+                    nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
+                    nrmE = baseContactRate * nrmI * nrmS * this.exposuresPerContact;
+
+                    result.addNrmValue(+nrmE, compartmentE);
+                    result.addNrmValue(-nrmE, compartmentS);
+
+                    absSESums[infectiousModelParticipant.getAgeGroupIndex()] += nrmE; // / infectiousModelParticipant.getAgeGroupTotal();
 
                 });
-                result.addNrmValue(nrmExposureTotal, participantInfectiousModel.getIncomingCompartment());
 
             });
 
         });
+
+        this.infectiousModels.forEach(infectiousModelContact => {
+            this.absDeltas[infectiousModelContact.getAgeGroupIndex()] = abs_ISums[infectiousModelContact.getAgeGroupIndex()] / absSESums[infectiousModelContact.getAgeGroupIndex()];
+        });
+
+
+        /**
+         * S->E = S * SUM(I / Tinf)
+         * E->I = lat * E
+         * I->S = I / Tinf
+         */
+
+        // equilibrium if absESum and absRSum are equal
+        // console.log('absSESums', absSESums, 'abs_ISums', abs_ISums, 'absDeltas', absDeltas);
 
         /**
          * infectious internal transfer through compartment chain
@@ -142,10 +177,13 @@ export class ModelImplStrain implements IModelSeir {
         /**
          * transfer from last infectious compartment to removed (split to discovered and undiscovered)
          */
+
+
         for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
 
             const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(ageGroupIndex);
             const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(ageGroupIndex);
+            // const compartmentSusceptible = this.parentModel.getCompartmentsSusceptible(ageGroupIndex)[0];
 
             const outgoingCompartment = this.infectiousModels[ageGroupIndex].getOutgoingCompartment();
             const ratioD = modificationTime.getTestingRatio(ageGroupIndex);
@@ -157,6 +195,10 @@ export class ModelImplStrain implements IModelSeir {
             result.addNrmValue(-continuationValue, outgoingCompartment);
             result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
             result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
+            // result.addNrmValue(continuationValue, compartmentSusceptible);
+
+            // absISSums[ageGroupIndex] = continuationValue; // / this.infectiousModels[ageGroupIndex].getAgeGroupTotal();
+            // absEISums[ageGroupIndex] = this.infectiousModels[ageGroupIndex].getCompartments()[0].getContinuationRatio().getRate(dT, tT) * state.getNrmValue(this.infectiousModels[ageGroupIndex].getCompartments()[0]) * this.absTotal / this.infectiousModels[ageGroupIndex].getAgeGroupTotal();
 
         }
 

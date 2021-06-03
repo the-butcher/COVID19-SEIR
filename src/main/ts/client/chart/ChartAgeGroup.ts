@@ -110,9 +110,11 @@ export class ChartAgeGroup {
 
         this.chart.plotContainer.adapter.add('x', (x, target) => {
             if (this.xAxis.dataItems.length > 0) {
-                const firstCategory = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue());
-                const position = this.xAxis.categoryToPoint(firstCategory);
-                SliderModification.getInstance().setSliderPadding((x as number) + position.x + 4);
+                const categoryMin = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue());
+                const positionMin = this.xAxis.categoryToPoint(categoryMin);
+                const categoryMax = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMaxValue());
+                const positionMax = this.xAxis.categoryToPoint(categoryMax);
+                SliderModification.getInstance().setSliderPadding((x as number) + positionMin.x + 4, this.chart.plotContainer.pixelWidth - positionMax.x + 20);
             }
             return x;
         });
@@ -634,14 +636,18 @@ export class ChartAgeGroup {
     }
 
     getNrmSusceptible(instant: number, ageGroupIndex: number): number {
-        const ageGroup = Demographics.getInstance().getAgeGroups()[ageGroupIndex];
-        let categoryX = TimeUtil.formatCategoryDate(instant);
-        const dataItem = this.modelData.find(d => d.categoryX === categoryX);
-        if (dataItem) {
-            return dataItem.valueset[ageGroup.getName()].SUSCEPTIBLE;
-        };
+        if (ObjectUtil.isNotEmpty(this.modelData)) {
+            const ageGroup = Demographics.getInstance().getAgeGroups()[ageGroupIndex];
+            let categoryX = TimeUtil.formatCategoryDate(instant);
+            const dataItem = this.modelData.find(d => d.categoryX === categoryX);
+            if (dataItem) {
+                return dataItem.valueset[ageGroup.getName()].SUSCEPTIBLE;
+            };
+        }
         return -1;
     }
+
+
 
     async acceptModelData(modelData: IDataItem[]): Promise<void> {
 

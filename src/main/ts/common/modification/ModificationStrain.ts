@@ -18,6 +18,10 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         this.modificationValues = {...this.modificationValues, ...update};
     }
 
+    getR0(): number {
+        return this.modificationValues.r0;
+    }
+
     getIncidence(): number {
         return this.modificationValues.incidence;
     }

@@ -16,7 +16,7 @@ import { IModelState } from './IModelState';
  */
 export interface IModelProgress {
     ratio: number;
-    data?: any[];
+    data?: IDataItem[];
 }
 
 export interface IDataItem {

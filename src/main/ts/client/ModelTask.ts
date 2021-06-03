@@ -1,3 +1,6 @@
+import { IDataItem } from './../model/state/ModelStateIntegrator';
+import { ModelConstants } from './../model/ModelConstants';
+import { Demographics } from './../common/demographics/Demographics';
 import { MODIFICATION____KEY } from '../model/ModelConstants';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
@@ -58,6 +61,9 @@ export class ModelTask {
             const modelProgress: IModelProgress = e.data;
             if (modelProgress.ratio >= 1 && modelProgress.data) {
 
+                // this.logIncidences(modelProgress.data[0]);
+                // this.logIncidences(modelProgress.data[modelProgress.data.length - 1]);
+
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
 
                 // 2. update to be sure that modification chart shows on initial load
@@ -74,5 +80,16 @@ export class ModelTask {
 
 
     }
+
+    // static logIncidences(dataItem: IDataItem) {
+    //     const totalIncidence = dataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
+    //     console.log(ModelConstants.AGEGROUP_NAME_ALL, totalIncidence);
+    //     for (let ageGroupIndex = 0; ageGroupIndex < Demographics.getInstance().getAgeGroups().length; ageGroupIndex++) {
+    //         const ageGroup = Demographics.getInstance().getAgeGroups()[ageGroupIndex];
+    //         const ageGroupIncidence = dataItem.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
+    //         // console.log(ageGroup.getName(), ageGroupIncidence, ageGroupIncidence / totalIncidence, ageGroupIncidence * 500 / totalIncidence);
+    //         console.log(ageGroupIncidence);
+    //     }
+    // }
 
 }

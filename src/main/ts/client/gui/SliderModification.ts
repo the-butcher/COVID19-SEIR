@@ -54,7 +54,7 @@ export class SliderModification extends Slider {
                 }
             },
             handleThumbPicked: (index) => {
-                console.log('thumb picked');
+                // console.log('thumb picked');
                 const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
                 ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
             }
@@ -64,8 +64,9 @@ export class SliderModification extends Slider {
 
     }
 
-    setSliderPadding(paddingLeft: number): void {
+    setSliderPadding(paddingLeft: number, paddingRight: number): void {
         this.getContainer().style.paddingLeft = `${paddingLeft}px`;
+        this.getContainer().style.paddingRight = `${paddingRight}px`;
         requestAnimationFrame(() => {
             this.handleResize();
         });

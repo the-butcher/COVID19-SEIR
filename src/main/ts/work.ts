@@ -23,9 +23,9 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         Demographics.setInstanceFromConfig(demographicsConfig);
 
         // create a modifications single (in worker scope, this does not interfere with main scope)
-        Modifications.setInstanceFromValues(modificationValues);
+        // Modifications.setInstanceFromValues(modificationValues);
 
-        const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), modelProgress => {
+        const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), modificationValues, modelProgress => {
             ctx.postMessage(modelProgress);
         });
 

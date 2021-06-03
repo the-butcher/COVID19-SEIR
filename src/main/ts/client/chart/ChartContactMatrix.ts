@@ -121,8 +121,8 @@ export class ChartContactMatrix {
         this.yAxisPlot.renderer.grid.template.disabled = false;
 
         this.yAxisPlot.min = 0.00;
-        this.yAxisPlot.max = 25.0; // 0.15;
-        this.yAxisPlot.strictMinMax = true;
+        // this.yAxisPlot.max = 25.0; // 0.15;
+        // this.yAxisPlot.strictMinMax = true;
 
         this.yAxisPlot.renderer.minGridDistance = 10;
         this.yAxisPlot.tooltip.disabled = true;
