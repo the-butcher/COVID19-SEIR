@@ -1,3 +1,5 @@
+import { StrainCalibrator } from './model/StrainCalibrator';
+import { ModificationStrain } from './common/modification/ModificationStrain';
 import { Demographics } from './common/demographics/Demographics';
 import { Modifications } from './common/modification/Modifications';
 import { IWorkerInput } from './model/IWorkerInput';
@@ -5,6 +7,7 @@ import { ModelConstants } from './model/ModelConstants';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
+import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 
 const ctx: Worker = self as any;
 
@@ -22,10 +25,18 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         // create a demographics singleton (in worker scope, this does not interfere with main scope)
         Demographics.setInstanceFromConfig(demographicsConfig);
 
-        // create a modifications single (in worker scope, this does not interfere with main scope)
+        // create a modifications singleton (in worker scope, this does not interfere with main scope)
         // Modifications.setInstanceFromValues(modificationValues);
 
-        const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), modificationValues, modelProgress => {
+        // const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
+        modificationValues.filter(m => m.key === 'STRAIN').forEach((modificationValuesStrain: IModificationValuesStrain) => {
+            new StrainCalibrator().calibrate(Demographics.getInstance(), modificationValuesStrain);
+        });
+
+        // recreate singleton, since the calibrator changes things
+        Modifications.setInstanceFromValues(modificationValues);
+
+        const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), modelProgress => {
             ctx.postMessage(modelProgress);
         });
 

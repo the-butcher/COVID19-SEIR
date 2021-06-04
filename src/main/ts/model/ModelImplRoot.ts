@@ -1,14 +1,12 @@
-import { IAnyModificationValue } from './../client/controls/StorageUtil';
-import { IModificationValuesContact } from './../common/modification/IModificationValuesContact';
-import { IModificationValues } from './../common/modification/IModificationValues';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTesting } from '../common/modification/ModificationTesting';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
+import { IModificationValues } from './../common/modification/IModificationValues';
 import { ModificationContact } from './../common/modification/ModificationContact';
-import { Modifications } from './../common/modification/Modifications';
+import { IAnyModificationValue, Modifications } from './../common/modification/Modifications';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { CompartmentFilter } from './compartment/CompartmentFilter';
@@ -50,7 +48,7 @@ export class ModelImplRoot implements IModelSeir {
      * @param progressCallback
      * @returns
      */
-    static async setupInstance(demographics: Demographics, modificationValues: IModificationValues[], progressCallback: (progress: IModelProgress) => void): Promise<ModelStateIntegrator> {
+    static async setupInstance(demographics: Demographics, modifications: Modifications, progressCallback: (progress: IModelProgress) => void): Promise<ModelStateIntegrator> {
 
         const ageGroups = demographics.getAgeGroups();
 
@@ -60,142 +58,9 @@ export class ModelImplRoot implements IModelSeir {
         const curInstant = ModelConstants.MODEL_MIN_____INSTANT; // - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
 
         /**
-         * start with some default
-         */
-        let transmissionRisk = 0.065;
-        let incidence = 150;
-
-        const modifiers = ageGroups.map(g => incidence);
-        const modificationValuesCalibrate: IAnyModificationValue[] = [
-            {
-                id: 'calibrate (seasonality)',
-                key: 'SEASONALITY',
-                name: 'calibrate (seasonality)',
-                instant: new Date('2021-07-10').getTime(),
-                seasonality: 1.00,
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: 'calibrate (strain)',
-                key: 'STRAIN',
-                name: 'calibrate (strain)',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
-                r0: 1,
-                serialInterval: 4.8,
-                intervalScale: 1,
-                incidence,
-                modifiers,
-                transmissionRisk,
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: 'calibrate (contact)',
-                key: 'CONTACT',
-                name: 'calibrate (contact)',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
-                multipliers: {},
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: 'calibrate (testing)',
-                key: 'TESTING',
-                name: 'calibrate (testing)',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
-                multipliers: {
-                    'family': 1.00,
-                    'school': 1.00,
-                    'nursing': 1.00,
-                    'work': 1.00,
-                    'other': 1.00
-                },
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: 'calibrate (settings)',
-                key: 'SETTINGS',
-                name: 'calibrate (settings)',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
-                recoveredD: 0.0,
-                recoveredU: 0.0,
-                quarantine: 0.0,
-                dead: 0.0,
-                vaccinated: 0.0,
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: 'calibrate (time)',
-                key: 'TIME',
-                name: 'calibrate (time)',
-                instant: curInstant,
-                deletable: false,
-                draggable: false
-            }
-        ];
-        Modifications.setInstanceFromValues(modificationValuesCalibrate);
-        const modificationStrainCalibrate = Modifications.getInstance().findModificationsByType('STRAIN')[0] as ModificationStrain;
-
-        const modificationTimeCalibrate = ModelConstants.MODIFICATION_PARAMS['TIME'].createValuesModification({
-            id: 'calibrate (time)',
-            key: 'TIME',
-            name: 'calibrate (time)',
-            instant: curInstant,
-            deletable: false,
-            draggable: false
-        }) as ModificationTime;
-        modificationTimeCalibrate.setInstants(curInstant, curInstant);
-
-        let model: ModelImplRoot = null;
-        let modelStateIntegrator: ModelStateIntegrator;
-
-        for (let interpolationIndex = 0; interpolationIndex < 20; interpolationIndex++) {
-
-            model = new ModelImplRoot(demographics, Modifications.getInstance());
-            modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
-
-            const modelState = modelStateIntegrator.getModelState();
-            const strainModel = model.findStrainModel('calibrate (strain)');
-
-            strainModel.apply(modelState, ModelStateIntegrator.DT, ModelConstants.MODEL_MIN_____INSTANT, modificationTimeCalibrate);
-
-            const absDeltas = strainModel.getAbsDeltas();
-            let absDeltaAvg = 0;
-            for (let i = 0; i < absDeltas.length; i++) {
-                modifiers[i] /= absDeltas[i];
-                absDeltaAvg += absDeltas[i];
-            }
-            absDeltaAvg /= absDeltas.length;
-
-            transmissionRisk *= absDeltaAvg;
-
-            const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N));
-            const modelIncidence = modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * demographics.getAbsTotal() * 100000 / demographics.getAbsTotal();
-
-            const incidenceCorrection = incidence / modelIncidence;
-            for (let i = 0; i < modifiers.length; i++) {
-                modifiers[i] *= incidenceCorrection;
-            }
-
-            modificationStrainCalibrate.acceptUpdate({
-                incidence,
-                modifiers,
-                transmissionRisk
-            });
-
-            // console.log('strainModel', strainModel, strainModel.getAbsDeltas(), modifiers, incidenceCorrection, incidence, transmissionRisk);
-
-        }
-        // console.log('strainModel', modifiers, transmissionRisk);
-
-
-        /**
          * get all strain values as currently in modifications instance
          */
-        Modifications.setInstanceFromValues(modificationValues);
+        // Modifications.setInstanceFromValues(modificationValues);
         const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
         const modificationTime = ModelConstants.MODIFICATION_PARAMS['TIME'].createValuesModification({
             id: 'straintime',
@@ -220,13 +85,16 @@ export class ModelImplRoot implements IModelSeir {
         // const recoveredDTarget = modificationSettings.getRecoveredD();
         // const recoveredUTarget = modificationSettings.getRecoveredU();
 
-        for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
-            modificationsStrain[strainIndex].acceptUpdate({
-                incidence,
-                modifiers,
-                transmissionRisk
-            });
-        }
+        modificationsStrain.forEach(modificationStrain => {
+            console.log('modificationStrain', modificationStrain);
+        });
+        // for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+        //     modificationsStrain[strainIndex].acceptUpdate({
+        //         incidence,
+        //         modifiers,
+        //         transmissionRisk
+        //     });
+        // }
 
 
         // /**
@@ -315,8 +183,8 @@ export class ModelImplRoot implements IModelSeir {
          * final model setup with adapted modifications values,
          * integrate to match model start date
          */
-        model = new ModelImplRoot(demographics, Modifications.getInstance());
-        modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
+        const model = new ModelImplRoot(demographics, Modifications.getInstance());
+        const modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination();
         // await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
 
@@ -337,7 +205,7 @@ export class ModelImplRoot implements IModelSeir {
      */
     private readonly vaccinationModels: ModelImplVaccination[];
 
-    private constructor(demographics: Demographics, modifications: Modifications) {
+    constructor(demographics: Demographics, modifications: Modifications) {
 
         this.strainModels = [];
         this.compartmentsSusceptible = [];

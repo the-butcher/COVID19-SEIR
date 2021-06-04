@@ -1,7 +1,15 @@
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
+import { IModificationValuesContact } from './IModificationValuesContact';
+import { IModificationValuesSeasonality } from './IModificationValuesSeasonality';
+import { IModificationValuesSettings } from './IModificationValuesSettings';
+import { IModificationValuesStrain } from './IModificationValuesStrain';
+import { IModificationValuesTesting } from './IModificationValuesTesting';
+import { IModificationValuesTime } from './IModificationValuesTime';
+import { IModificationValuesVaccination } from './IModificationValuesVaccination';
 
+export type IAnyModificationValue = IModificationValuesTime | IModificationValuesContact | IModificationValuesStrain | IModificationValuesTesting | IModificationValuesSettings | IModificationValuesTesting | IModificationValuesSeasonality | IModificationValuesVaccination;
 
 /**
  * central storage of modification instances of various types

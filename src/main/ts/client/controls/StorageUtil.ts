@@ -1,16 +1,7 @@
 import { IModificationValues } from '../../common/modification/IModificationValues';
-import { IModificationValuesContact } from '../../common/modification/IModificationValuesContact';
-import { IModificationValuesSeasonality } from '../../common/modification/IModificationValuesSeasonality';
-import { IModificationValuesSettings } from '../../common/modification/IModificationValuesSettings';
-import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { IModificationValuesTesting } from '../../common/modification/IModificationValuesTesting';
-import { IModificationValuesTime } from '../../common/modification/IModificationValuesTime';
-import { IModificationValuesVaccination } from '../../common/modification/IModificationValuesVaccination';
-import { Modifications } from '../../common/modification/Modifications';
+import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
-
-export type IAnyModificationValue = IModificationValuesTime | IModificationValuesContact | IModificationValuesStrain | IModificationValuesTesting | IModificationValuesSettings | IModificationValuesTesting | IModificationValuesSeasonality | IModificationValuesVaccination;
 
 /**
  * helper type for writing / loading modifications to / from local storage
