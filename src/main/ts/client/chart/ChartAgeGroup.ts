@@ -61,6 +61,7 @@ export class ChartAgeGroup {
      * incidence series by strain
      */
     protected readonly seriesAgeGroupIncidenceByStrain: Map<string, ChartAgeGroupSeries>;
+    private seriesAgeGroupLabelLocation: number;
 
     protected readonly seriesAgeGroupCases: ChartAgeGroupSeries;
 
@@ -87,6 +88,7 @@ export class ChartAgeGroup {
     private ageGroupMarker: Rectangle;
     private intervalHandle: number;
 
+
     // private xMin = -1;
     // private yMin = -1;
     // private xMax = -1;
@@ -99,7 +101,6 @@ export class ChartAgeGroup {
 
         this.absValue = 0;
         this.ageGroupIndex = 10;
-        // this.modelData = [];
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
@@ -207,6 +208,7 @@ export class ChartAgeGroup {
             percent: false
         });
         this.seriesAgeGroupIncidenceByStrain = new Map();
+        this.seriesAgeGroupLabelLocation = 0.5;
 
         this.seriesAgeGroupCases = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -216,7 +218,7 @@ export class ChartAgeGroup {
             colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.50,
+            locationOnPath: 0.30,
             labelled: true,
             percent: false
         });
@@ -341,7 +343,6 @@ export class ChartAgeGroup {
         });
 
         this.ageGroupMarker = this.chart.plotContainer.createChild(Rectangle);
-        // this.ageGroupMarker.stroke = color(ControlsConstants.COLOR____FONT);
         this.ageGroupMarker.strokeWidth = 0;
         this.ageGroupMarker.fillOpacity = 1;
         this.ageGroupMarker.fill = color(ControlsConstants.COLOR____FONT);
@@ -518,6 +519,7 @@ export class ChartAgeGroup {
     }
 
     getOrCreateSeriesAgeGroupIncidenceStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
+
         if (!this.seriesAgeGroupIncidenceByStrain.has(strainValues.id)) {
             this.seriesAgeGroupIncidenceByStrain.set(strainValues.id, new ChartAgeGroupSeries({
                 chart: this.chart,
@@ -527,11 +529,16 @@ export class ChartAgeGroup {
                 colorKey: 'INCIDENCE',
                 strokeWidth: 1,
                 dashed: true,
-                locationOnPath: 0.3,
+                locationOnPath: this.seriesAgeGroupLabelLocation,
                 labelled: true,
                 percent: false
             }));
+            this.seriesAgeGroupLabelLocation += 0.1;
+            if (this.seriesAgeGroupLabelLocation > 0.8) {
+                this.seriesAgeGroupLabelLocation = 0.5;
+            }
         }
+
         const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
         seriesAgeGroup.getSeries().visible = this.chartMode === 'INCIDENCE';
