@@ -440,7 +440,7 @@ export class ChartAgeGroup {
 
         this.chart.exporting.adapter.add('filePrefix', (value, target) => {
             return {
-                filePrefix: 'timeline_' + Date.now()
+                filePrefix: ObjectUtil.createDownloadName()
             };
         });
 

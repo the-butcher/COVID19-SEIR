@@ -17,6 +17,10 @@ export class ObjectUtil {
         return (data !== null && data !== undefined && data !== "" && data !== []);
     }
 
+    static createDownloadName(): string {
+        return 'timeline_' + Date.now();
+    }
+
     static createId(): string {
         return Math.round(Math.random() * 1000000).toString(16);
     }

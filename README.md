@@ -18,11 +18,11 @@ todo:
 * implement
   * import
   * save -> auto save (?), if auto save there needs to be a reset (could be done through local storage history)
-  * export
+  * ~~export~~
   * ~~png~~
   * csv
 * testing, validity, plausibility
-  * check model for having constant population (some submodel do not count, incidence, ...)
+  * check model for having constant population (some submodels (i.e. incidence) do not count, ...)
   * find and eliminate most prominent performance bottlenecks
   * will caching compartments on compartmentFilter improve performance?
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021

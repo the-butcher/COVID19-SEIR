@@ -84,6 +84,28 @@ input {
   filter: drop-shadow(1px 1px 3px var(--color-dropshadow));
 }
 
+.content-action-container {
+  width: 28px;
+  height: 28px;
+  padding: 0px 0px;
+  cursor: pointer;
+  color: #666666;
+}
+.content-action-container:hover {
+  width: 28px;
+  height: 28px;
+  padding: 0px 0px;
+  cursor: pointer;
+  color: #cccccc;
+}
+.content-action-container:active {
+  width: 28px;
+  height: 28px;
+  padding: 0px 0px;
+  cursor: pointer;
+  color: #999999;
+}
+
 .slider-modification {
   padding: 0px 30px 0px 20px;
 }

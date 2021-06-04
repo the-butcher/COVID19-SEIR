@@ -14,12 +14,12 @@ export class IconAction {
         const container = document.getElementById(params.container) as HTMLDivElement;
         const svgContainer = container.getElementsByTagName('svg').item(0) as SVGSVGElement;
 
-        container.addEventListener('pointerover', () => {
-            svgContainer.style.fill = ControlsConstants.COLOR____FONT;
-        });
-        container.addEventListener('pointerout', () => {
-            svgContainer.style.fill = '#555555';
-        });
+        // container.addEventListener('pointerover', () => {
+        //     svgContainer.style.fill = ControlsConstants.COLOR____FONT;
+        // });
+        // container.addEventListener('pointerout', () => {
+        //     svgContainer.style.fill = '#555555';
+        // });
         container.addEventListener('click', () => {
             params.actionFunction();
         });

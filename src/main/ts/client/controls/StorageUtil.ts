@@ -34,6 +34,22 @@ export class StorageUtil {
         }
     }
 
+    exportModifications(): void {
+
+        const modificationValueJson = JSON.stringify(Modifications.getInstance().buildModificationValues(), null, 2);
+        const modificationValueBlob = new Blob([modificationValueJson], { type: "text/plain;charset=utf-8" });
+
+        const url = window.URL || window.webkitURL;
+        const link = url.createObjectURL(modificationValueBlob);
+        var a = document.createElement("a");
+        a.download = `${ObjectUtil.createDownloadName()}.json`;
+        a.href = link;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+    }
+
     loadModifications(): IModificationValues[] {
 
         if (this.isStorageEnabled()) {

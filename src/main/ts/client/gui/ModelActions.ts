@@ -74,7 +74,7 @@ export class ModelActions {
         this.actionIcons.push(new IconAction({
             container: 'actionDivExportDiv',
             actionFunction: () => {
-                throw new Error('NI');
+                StorageUtil.getInstance().exportModifications();
             }
         }));
 
