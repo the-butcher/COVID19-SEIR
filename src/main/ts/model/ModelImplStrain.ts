@@ -163,8 +163,6 @@ export class ModelImplStrain implements IModelSeir {
          * E->I = lat * E
          * I->S = I / Tinf
          */
-
-        // equilibrium if absESum and absRSum are equal
         // console.log('absSESums', absSESums, 'abs_ISums', abs_ISums, 'absDeltas', absDeltas);
 
         /**
@@ -177,8 +175,6 @@ export class ModelImplStrain implements IModelSeir {
         /**
          * transfer from last infectious compartment to removed (split to discovered and undiscovered)
          */
-
-
         for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
 
             const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(ageGroupIndex);
@@ -196,9 +192,6 @@ export class ModelImplStrain implements IModelSeir {
             result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
             result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
             // result.addNrmValue(continuationValue, compartmentSusceptible);
-
-            // absISSums[ageGroupIndex] = continuationValue; // / this.infectiousModels[ageGroupIndex].getAgeGroupTotal();
-            // absEISums[ageGroupIndex] = this.infectiousModels[ageGroupIndex].getCompartments()[0].getContinuationRatio().getRate(dT, tT) * state.getNrmValue(this.infectiousModels[ageGroupIndex].getCompartments()[0]) * this.absTotal / this.infectiousModels[ageGroupIndex].getAgeGroupTotal();
 
         }
 

@@ -25,12 +25,11 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         // create a demographics singleton (in worker scope, this does not interfere with main scope)
         Demographics.setInstanceFromConfig(demographicsConfig);
 
-        // create a modifications singleton (in worker scope, this does not interfere with main scope)
-        // Modifications.setInstanceFromValues(modificationValues);
-
-        // const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
+        /**
+         * calibrate strain values to have transmission risk set properly (in an SEIS model the strain would then hold equilibrium at R0=1 and the strain's initial incidence)
+         */
         modificationValues.filter(m => m.key === 'STRAIN').forEach((modificationValuesStrain: IModificationValuesStrain) => {
-            new StrainCalibrator().calibrate(Demographics.getInstance(), modificationValuesStrain);
+            StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain);
         });
 
         // recreate singleton, since the calibrator changes things

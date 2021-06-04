@@ -6,7 +6,6 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* work on proper initial incidence slope
 * reintroduce testing multiplier to incidence curve
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME
 * border cases
@@ -39,6 +38,7 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~work on proper initial incidence slope~~
 * ~~calibrate strain wise~~
 * ~~better range on the time modification chart line~~
 * ~~effective contact matrix does not update when modification is moved by arrow key~~

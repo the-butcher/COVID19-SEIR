@@ -13,7 +13,7 @@ export class StrainCalibrator {
 
     }
 
-    calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain): void {
+    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain): void {
 
         const ageGroups = demographics.getAgeGroups();
 
@@ -117,12 +117,12 @@ export class StrainCalibrator {
             const absDeltas = strainModel.getAbsDeltas();
             let absDeltaAvg = 0;
             for (let i = 0; i < absDeltas.length; i++) {
-                modificationValuesStrain.modifiers[i] /= absDeltas[i];
+                modificationValuesStrain.modifiers[i] *= 1 / absDeltas[i]; // this could be a place to calibrate testing-ratio
                 absDeltaAvg += absDeltas[i];
             }
             absDeltaAvg /= absDeltas.length;
 
-            modificationValuesStrain.transmissionRisk *= absDeltaAvg;
+            modificationValuesStrain.transmissionRisk *= absDeltaAvg; // with different incidences there are slightly different transmission risks needed to maintain equilibrium
 
             const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N));
             const modelIncidence = modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * demographics.getAbsTotal() * 100000 / demographics.getAbsTotal();
@@ -132,15 +132,11 @@ export class StrainCalibrator {
                 modificationValuesStrain.modifiers[i] *= incidenceCorrection;
             }
 
-            // modificationStrain.acceptUpdate({
-            //     incidence,
-            //     modifiers,
-            //     transmissionRisk
-            // });
 
             // console.log('strainModel', strainModel, strainModel.getAbsDeltas(), modifiers, incidenceCorrection, incidence, transmissionRisk);
 
         }
+
         modificationValuesStrain.r0 = originalR0;
 
         console.log('modificationValuesStrain', modificationValuesStrain);
