@@ -1,3 +1,4 @@
+import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
 import { StrainCalibrator } from './model/StrainCalibrator';
 import { ModificationStrain } from './common/modification/ModificationStrain';
 import { Demographics } from './common/demographics/Demographics';
@@ -28,8 +29,9 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         /**
          * calibrate strain values to have transmission risk set properly (in an SEIS model the strain would then hold equilibrium at R0=1 and the strain's initial incidence)
          */
+        const modificationValuesTesting = modificationValues.find(m => m.key === 'TESTING') as IModificationValuesTesting;
         modificationValues.filter(m => m.key === 'STRAIN').forEach((modificationValuesStrain: IModificationValuesStrain) => {
-            StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain);
+            StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain, modificationValuesTesting);
         });
 
         // recreate singleton, since the calibrator changes things

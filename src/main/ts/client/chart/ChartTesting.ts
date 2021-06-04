@@ -78,9 +78,7 @@ export class ChartTesting {
         this.seriesHeat.dataFields.valueY = 'participantY';
         this.seriesHeat.fillOpacity = 0;
         this.seriesHeat.strokeWidth = 3;
-        // this.seriesHeat.stroke = color(ControlsConstants.COLOR____FONT);
         this.seriesHeat.strokeLinecap = 'round';
-        // this.seriesHeat.propertyFields.stroke = 'color';
         this.seriesHeat.strokeOpacity = 1.0;
         this.seriesHeat.tooltip.disabled = false;
         this.seriesHeat.tooltipText = 'contact:\u00A0{categoryX}\npercent:\u00A0{label}';
@@ -113,10 +111,6 @@ export class ChartTesting {
 
     }
 
-    /**
-     * TODO color range should probably not be 0-1, but a calculated value from reduction in post positive test compartments
-     * @param modification
-     */
     async redraw(modification: ModificationTesting): Promise<void> {
 
         const demographics = Demographics.getInstance();
@@ -144,7 +138,6 @@ export class ChartTesting {
                 if (this.chart.data[i].participantY) {
                     this.chart.data[i].participantY = chartData[i].participantY;
                     this.chart.data[i].label = chartData[i].label;
-                    // this.chart.data[i].color = chartData[i].color;
                 }
             }
             this.chart.invalidateRawData();

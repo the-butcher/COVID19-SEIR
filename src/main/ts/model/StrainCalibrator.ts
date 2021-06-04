@@ -2,18 +2,28 @@ import { IModificationValuesStrain } from '../common/modification/IModificationV
 import { IAnyModificationValue, Modifications } from '../common/modification/Modifications';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { Demographics } from './../common/demographics/Demographics';
+import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
 import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelStateIntegrator } from './state/ModelStateIntegrator';
+
+/**
+ * utility type that takes care of calibrating a strain with respect to current age groups and testing (discovery) rates
+ * to be in equilibrium in a hypothetical endemic state (SEIS model) at r0=1
+ *
+ * @author h.fleischer
+ * @since 04.06.2021
+ *
+ */
 export class StrainCalibrator {
 
-    constructor() {
-
+    private constructor() {
+        // no public instance
     }
 
-    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain): void {
+    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesTesting): void {
 
         const ageGroups = demographics.getAgeGroups();
 
@@ -51,21 +61,22 @@ export class StrainCalibrator {
                 deletable: false,
                 draggable: false
             },
-            {
-                id: 'calibrate (testing)',
-                key: 'TESTING',
-                name: 'calibrate (testing)',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
-                multipliers: {
-                    'family': 1.00,
-                    'school': 1.00,
-                    'nursing': 1.00,
-                    'work': 1.00,
-                    'other': 1.00
-                },
-                deletable: false,
-                draggable: false
-            },
+            modificationValuesTesting,
+            // {
+            //     id: 'calibrate (testing)',
+            //     key: 'TESTING',
+            //     name: 'calibrate (testing)',
+            //     instant: ModelConstants.MODEL_MIN_____INSTANT,
+            //     multipliers: {
+            //         'family': 1.00,
+            //         'school': 1.00,
+            //         'nursing': 1.00,
+            //         'work': 1.00,
+            //         'other': 1.00
+            //     },
+            //     deletable: false,
+            //     draggable: false
+            // },
             {
                 id: 'calibrate (settings)',
                 key: 'SETTINGS',
@@ -131,7 +142,6 @@ export class StrainCalibrator {
             for (let i = 0; i < modificationValuesStrain.modifiers.length; i++) {
                 modificationValuesStrain.modifiers[i] *= incidenceCorrection;
             }
-
 
             // console.log('strainModel', strainModel, strainModel.getAbsDeltas(), modifiers, incidenceCorrection, incidence, transmissionRisk);
 

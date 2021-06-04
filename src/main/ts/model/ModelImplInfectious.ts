@@ -6,7 +6,6 @@ import { StrainUtil } from '../util/StrainUtil';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { CompartmentInfectious } from './compartment/CompartmentInfectious';
 import { ECompartmentType } from './compartment/ECompartmentType';
-import { ICompartment } from './compartment/ICompartment';
 import { IConnectable } from './compartment/IConnectable';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
@@ -110,11 +109,12 @@ export class ModelImplInfectious implements IModelSeir, IConnectable {
                     }
 
                     /**
-                     * at incubation time, copy into incidence model
+                     * at incubation time (which might be the time that infections are registered) copy the relevant number into the incidence model
+                     * only consider cases that have been discovered
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentCases = this.parentModel.getIncidenceModel(this.ageGroupIndex).getIncomingCompartment();
-                        const discoveredNrmCases = continuationValue; // * modificationTime.getTestingRatio(this.ageGroupIndex);
+                        const discoveredNrmCases = continuationValue * modificationTime.getTestingRatio(this.ageGroupIndex);
                         increments.addNrmValue(discoveredNrmCases, compartmentCases);
                     }
                     return increments;

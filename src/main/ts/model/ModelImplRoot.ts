@@ -4,12 +4,10 @@ import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTesting } from '../common/modification/ModificationTesting';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
-import { IModificationValues } from './../common/modification/IModificationValues';
 import { ModificationContact } from './../common/modification/ModificationContact';
-import { IAnyModificationValue, Modifications } from './../common/modification/Modifications';
+import { Modifications } from './../common/modification/Modifications';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
-import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';
 import { ModelConstants } from './ModelConstants';
@@ -136,29 +134,12 @@ export class ModelImplRoot implements IModelSeir {
                 // factor from source to target
                 const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceSource;
 
-                // a fake value used as initial value in the next interpolation
-                const totalIncidenceResume = modificationsStrain[strainIndex].getIncidence() * totalIncidenceFactor;
-
-                const ageGroupIncidencesResume: number[] = [];
                 ageGroups.forEach(ageGroup => {
-
-                    // // value as in model
-                    // const ageGroupIncidenceSource = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()];
-
-                    // // age group value in relation to total value
-                    // const ageGroupIncidenceFactor = ageGroupIncidenceSource / totalIncidenceSource;
-
-                    // // multiplied with total incidence factor
-                    // const ageGroupIncidenceResume = totalIncidenceResume * ageGroupIncidenceFactor;
-                    // ageGroupIncidencesResume.push(ageGroupIncidenceResume);
                     modifiers[ageGroup.getIndex()] *= totalIncidenceFactor;
-                    // ageGroupIncidencesResume.push(ageGroupIncidenceSource);
-
                 });
-                console.log('totalIncidenceFactor', totalIncidenceFactor, totalIncidenceResume);
+                // console.log('totalIncidenceFactor', totalIncidenceFactor, totalIncidenceResume, modifiers);
 
                 modificationsStrain[strainIndex].acceptUpdate({
-                    // incidence: totalIncidenceResume,
                     modifiers: modifiers
                 });
 
@@ -176,9 +157,6 @@ export class ModelImplRoot implements IModelSeir {
             const vaccinatedFactor = vaccinatedTarget / vaccinatedModel;
             const vaccinated = modificationSettings.getVaccinated() * vaccinatedFactor;
 
-            // adjust the vaccination multiplier to interpolate to a value that gives a closer match to desired settings
-            // vaccinationMultiplier *= modificationSettings.getVaccinated() / overallVaccinated;
-            // removalDMultiplier *= modificationSettings.getRecoveredU() /
             modificationSettings.acceptUpdate({
                 recoveredU,
                 recoveredD,
@@ -188,8 +166,8 @@ export class ModelImplRoot implements IModelSeir {
         }
 
         /**
-         * final model setup with adapted modifications values,
-         * integrate to match model start date
+         * final model setup with adapted modifications values
+         * since the model contains the preload portion, that portion is fast forwarded and the state-integrator is returned being positioned at model-start instant
          */
         model = new ModelImplRoot(demographics, Modifications.getInstance());
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);

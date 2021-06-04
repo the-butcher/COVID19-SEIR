@@ -11,6 +11,13 @@ import { ModelImplRoot } from './ModelImplRoot';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 
+/**
+ * submodel specific to a single strain
+ * handles the cross age-group infection modelling
+ *
+ * @author h.fleischer
+ * @since 04.06.2021
+ */
 export class ModelImplStrain implements IModelSeir {
 
     private readonly parentModel: ModelImplRoot;
@@ -182,11 +189,13 @@ export class ModelImplStrain implements IModelSeir {
             // const compartmentSusceptible = this.parentModel.getCompartmentsSusceptible(ageGroupIndex)[0];
 
             const outgoingCompartment = this.infectiousModels[ageGroupIndex].getOutgoingCompartment();
-            const ratioD = modificationTime.getTestingRatio(ageGroupIndex);
-            const ratioU = 1 - ratioD;
 
             const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
             const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
+
+            // based upon age-group testing ratios move from infectious to known recovery / unknown recovery
+            const ratioD = modificationTime.getTestingRatio(ageGroupIndex);
+            const ratioU = 1 - ratioD;
 
             result.addNrmValue(-continuationValue, outgoingCompartment);
             result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);

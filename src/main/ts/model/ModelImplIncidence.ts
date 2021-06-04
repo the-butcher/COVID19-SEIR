@@ -1,10 +1,10 @@
-import { ModificationTesting } from './../common/modification/ModificationTesting';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from '../util/TimeUtil';
+import { ModificationTesting } from './../common/modification/ModificationTesting';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
@@ -42,9 +42,10 @@ export class ModelImplIncidence implements IModelSeir, IConnectable {
         this.ageGroupIndex = ageGroup.getIndex();
 
         // make some assumptions about initial cases (duplicated code in ModelImplInfectious)
-        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000; // * modificationTesting.getTestingRatio(this.ageGroupIndex);
+        let dailyCases = strainValues.incidence * ageGroup.getAbsValue() / 700000 * modificationTesting.getTestingRatio(this.ageGroupIndex);
         if (strainValues.modifiers) {
-            dailyCases = strainValues.modifiers[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000; // * modificationTesting.getTestingRatio(this.ageGroupIndex);
+            dailyCases = strainValues.modifiers[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000 * modificationTesting.getTestingRatio(this.ageGroupIndex);
+            // console.log('daily cases in', ageGroup.getName(), 'adapted through testing ratio',  modificationTesting.getTestingRatio(this.ageGroupIndex));
         }
         this.nrmValue = dailyCases * 7 / this.absTotal;
 

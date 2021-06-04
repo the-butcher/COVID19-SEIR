@@ -6,7 +6,7 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* reintroduce testing multiplier to incidence curve
+* de-overlay strain incidence labels
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME
 * border cases
   * all testing sliders on zero renders an all zero chart,
@@ -38,6 +38,7 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~reintroduce testing multiplier to incidence curve~~
 * ~~work on proper initial incidence slope~~
 * ~~calibrate strain wise~~
 * ~~better range on the time modification chart line~~
