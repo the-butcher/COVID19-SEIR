@@ -50,7 +50,7 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
 
             const rT = r0 * dataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].SUSCEPTIBLE * matrixRatio;
 
-            // console.log('r0', r0, rT);
+            console.log('r0', new Date(instant), r0, rT);
 
             return rT;
 

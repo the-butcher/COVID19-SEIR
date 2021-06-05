@@ -7,7 +7,7 @@ The code has been moved from local storage to github for backup- and documentati
 
 todo:
 * explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
-* have a second look at R(r) in the strain-modification chart
+* have a second look at R(t) in the strain-modification chart
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME
 * border cases
   * all testing sliders on zero renders an all zero chart,
