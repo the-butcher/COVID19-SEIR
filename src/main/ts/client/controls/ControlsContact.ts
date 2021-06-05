@@ -29,7 +29,7 @@ export class ControlsContact {
 
     constructor() {
 
-        this.chartContact = new ChartContactMatrix('chartContactDiv');
+        this.chartContact = new ChartContactMatrix('chartContactDiv', true);
         this.slidersCategory = [];
 
         Demographics.getInstance().getContactCategories().forEach(contactCategory => {

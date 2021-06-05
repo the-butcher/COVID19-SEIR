@@ -1,4 +1,3 @@
-import { ModelConstants } from './../../model/ModelConstants';
 import { CategoryAxis, ColumnSeries, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
 import { color, create, Label, percent, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -45,14 +44,17 @@ export class ChartContactMatrix {
     private contactMatrix: IContactMatrix;
     private readonly valueTotalLabel: Label;
 
+    private readonly showToggleAndPercentage: boolean;
+
     private axisIcon: IconMatrixAxis;
 
-    constructor(container: string) {
+    constructor(container: string, showToggleAndPercentage: boolean) {
 
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
 
         this.fullDataUpdate = true;
+        this.showToggleAndPercentage = showToggleAndPercentage;
         this.axisDirection = 'CONTACT_PARTICIPANT';
 
         this.chart = create(container, XYChart);
@@ -203,6 +205,7 @@ export class ChartContactMatrix {
         this.valueTotalLabel.x = 50;
         this.valueTotalLabel.y = 287;
         this.valueTotalLabel.horizontalCenter = 'right';
+        this.valueTotalLabel.visible = this.showToggleAndPercentage;
 
         this.chart.leftAxesContainer.events.on('sizechanged', e => {
 
@@ -223,6 +226,7 @@ export class ChartContactMatrix {
                 this.axisIcon.getSvgContainer().addEventListener('pointerup', () => {
                     this.toggleAxes();
                 });
+                this.axisIcon.getSvgContainer().style.display = this.showToggleAndPercentage ? 'block' : 'none';
 
                 this.toggleAxisContact();
 
@@ -269,7 +273,7 @@ export class ChartContactMatrix {
         heatRule.maxValue = 1;
 
         // const matrixContactTotal = demographics.getMatrixSum();
-        const maxCellTotal = demographics.getMaxCellTotal();
+        const maxCellTotal = contactMatrix.getMaxCellTotal();
 
         let matrixSum = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {
@@ -302,6 +306,8 @@ export class ChartContactMatrix {
             });
 
         }
+
+        console.log('matrixSum', matrixSum);
 
         chartData.push(...plotData);
 

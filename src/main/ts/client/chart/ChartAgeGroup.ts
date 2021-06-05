@@ -543,6 +543,7 @@ export class ChartAgeGroup {
         seriesAgeGroup.setBaseLabel(strainValues.name);
         seriesAgeGroup.getSeries().visible = this.chartMode === 'INCIDENCE';
         return seriesAgeGroup;
+
     }
 
     setSeriesSRVisible(visible: boolean): void {
@@ -642,19 +643,25 @@ export class ChartAgeGroup {
 
     }
 
-    getNrmSusceptible(instant: number, ageGroupIndex: number): number {
+    findDataItem(instant: number): IDataItem {
         if (ObjectUtil.isNotEmpty(this.modelData)) {
-            const ageGroup = Demographics.getInstance().getAgeGroups()[ageGroupIndex];
             let categoryX = TimeUtil.formatCategoryDate(instant);
-            const dataItem = this.modelData.find(d => d.categoryX === categoryX);
-            if (dataItem) {
-                return dataItem.valueset[ageGroup.getName()].SUSCEPTIBLE;
-            };
+            return this.modelData.find(d => d.categoryX === categoryX);
         }
-        return -1;
+        return null;
     }
 
+    // getNrmExposed(instant: number, ageGroupIndex: number, strainId: string): number {
+    //     return this.findDataValues(instant, ageGroupIndex).EXPOSED[strainId];
+    // }
 
+    // getNrmInfectious(instant: number, ageGroupIndex: number, strainId: string): number {
+    //     return this.findDataValues(instant, ageGroupIndex).INFECTIOUS[strainId];
+    // }
+
+    // getNrmSusceptible(instant: number, ageGroupIndex: number): number {
+    //     return this.findDataValues(instant, ageGroupIndex).SUSCEPTIBLE;
+    // }
 
     async acceptModelData(modelData: IDataItem[]): Promise<void> {
 
@@ -683,7 +690,7 @@ export class ChartAgeGroup {
         for (const dataItem of this.modelData) {
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
                 maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL]);
-                this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS);
+                this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID_____ALL]);
             });
         }
 
@@ -708,8 +715,8 @@ export class ChartAgeGroup {
 
             // data independent from sub-strains
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
-            const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED;
-            const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS;
+            const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID_____ALL];;
+            const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[ModelConstants.STRAIN_ID_____ALL];
             const ageGroupRemovedI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_D + dataItem.valueset[ageGroupPlot.getName()].REMOVED_U;
             const ageGroupRemovedV = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
@@ -727,7 +734,6 @@ export class ChartAgeGroup {
                 ageGroupCases
             }
 
-            // TODO instead of rebuilding the data every time, it maybe could be much easier to change the value fields on the age specific series
             modificationValuesStrain.forEach(modificationValueStrain => {
                 item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
             });

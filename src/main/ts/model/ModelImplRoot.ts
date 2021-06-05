@@ -173,6 +173,7 @@ export class ModelImplRoot implements IModelSeir {
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination();
         await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        modelStateIntegrator.resetExposure();
 
         return modelStateIntegrator;
 

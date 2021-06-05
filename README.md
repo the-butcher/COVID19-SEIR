@@ -26,6 +26,7 @@ todo:
   * find and eliminate most prominent performance bottlenecks
   * will caching compartments on compartmentFilter improve performance?
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
+* move transmission-risk calculation away from worker
 
 next:
 * implement coincident indicator on modifications, then iterate when selecting -> bring lower incidence up z-wise so it can get selected
@@ -37,6 +38,7 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~exposure matrix on modification~~
 * ~~de-overlay strain incidence labels~~
 * ~~reintroduce testing multiplier to incidence curve~~
 * ~~work on proper initial incidence slope~~

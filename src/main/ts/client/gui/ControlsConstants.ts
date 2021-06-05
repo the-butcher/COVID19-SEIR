@@ -118,7 +118,7 @@ export class ControlsConstants {
         },
         'EI': {
             id: ObjectUtil.createId(),
-            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS,
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS[ModelConstants.STRAIN_ID_____ALL],
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.83, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,

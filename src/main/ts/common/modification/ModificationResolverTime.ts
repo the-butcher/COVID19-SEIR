@@ -1,6 +1,6 @@
 import { ModelConstants } from './../../model/ModelConstants';
 import { ControlsConstants } from './../../client/gui/ControlsConstants';
-import { ContactMatrixEffective } from '../../client/controls/ContactMatrixEffective';
+import { ContactMatrixExposure } from '../../client/controls/ContactMatrixExposure';
 import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
 import { Demographics } from '../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
@@ -27,17 +27,18 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
     }
 
     getValue(instant: number): number {
-        const modificationValues = this.getModifications()[0].getModificationValues();
-        const modificationValuesCopy: IModificationValuesTime = {
-            ...modificationValues,
-            instant,
-        } as IModificationValuesTime; // copy previous values
-        // TODO this could be done like in ModificationResolverString
-        const modificationTime = ModelConstants.MODIFICATION_PARAMS['TIME'].createValuesModification(modificationValuesCopy) as ModificationTime;
-        modificationTime.setInstants(instant, instant);
-        const contactMatrixEffective = new ContactMatrixEffective(modificationTime);
-        const contactMatrixSums = new ContactMatrixSums(contactMatrixEffective);
-        return contactMatrixSums.getMatrixSum() / Demographics.getInstance().getMatrixSum();
+        // const modificationValues = this.getModifications()[0].getModificationValues();
+        // const modificationValuesCopy: IModificationValuesTime = {
+        //     ...modificationValues,
+        //     instant,
+        // } as IModificationValuesTime; // copy previous values
+        // // TODO this could be done like in ModificationResolverString
+        // const modificationTime = ModelConstants.MODIFICATION_PARAMS['TIME'].createValuesModification(modificationValuesCopy) as ModificationTime;
+        // modificationTime.setInstants(instant, instant);
+        // const contactMatrixEffective = new ContactMatrixEffective(modificationTime);
+        // const contactMatrixSums = new ContactMatrixSums(contactMatrixEffective);
+        // return contactMatrixSums.getMatrixSum() / Demographics.getInstance().getMatrixSum();
+        return 0;
     }
 
 }

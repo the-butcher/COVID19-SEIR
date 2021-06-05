@@ -17,6 +17,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
+    private readonly maxCellTotal: number;
 
     constructor(modificationParams: IModificationValuesContact) {
 
@@ -27,7 +28,12 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
         this.ageGroups.push(...Demographics.getInstance().getAgeGroups());
         this.contactCategories.push(...Demographics.getInstance().getContactCategories());
+        this.maxCellTotal = Demographics.getInstance().getMaxCellTotal();
 
+    }
+
+    getMaxCellTotal(): number {
+        return this.maxCellTotal;
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {

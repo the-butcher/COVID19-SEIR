@@ -149,7 +149,7 @@ export class StrainCalibrator {
 
         modificationValuesStrain.r0 = originalR0;
 
-        console.log('modificationValuesStrain', modificationValuesStrain);
+        // console.log('modificationValuesStrain', modificationValuesStrain);
 
     }
 

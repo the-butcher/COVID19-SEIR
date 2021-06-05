@@ -1,14 +1,13 @@
-import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
-import { StrainCalibrator } from './model/StrainCalibrator';
-import { ModificationStrain } from './common/modification/ModificationStrain';
 import { Demographics } from './common/demographics/Demographics';
+import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
+import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
 import { Modifications } from './common/modification/Modifications';
 import { IWorkerInput } from './model/IWorkerInput';
 import { ModelConstants } from './model/ModelConstants';
 import { ModelImplRoot } from './model/ModelImplRoot';
+import { StrainCalibrator } from './model/StrainCalibrator';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
-import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 
 const ctx: Worker = self as any;
 

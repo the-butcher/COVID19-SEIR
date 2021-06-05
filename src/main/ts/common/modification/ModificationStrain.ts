@@ -1,5 +1,9 @@
+import { TimeUtil } from './../../util/TimeUtil';
+import { CompartmentChain } from './../../model/compartment/CompartmentChain';
+import { StrainUtil } from './../../util/StrainUtil';
 import { IModificationValuesStrain } from './IModificationValuesStrain';
 import { AModification } from './AModification';
+import { ECompartmentType } from '../../model/compartment/ECompartmentType';
 
 /**
  * implementation of IModification describing a single virus strain
@@ -24,6 +28,10 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
 
     getIncidence(): number {
         return this.modificationValues.incidence;
+    }
+
+    getSerialInterval(): number {
+        return this.modificationValues.serialInterval;
     }
 
 }

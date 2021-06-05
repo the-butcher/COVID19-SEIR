@@ -1,13 +1,7 @@
-import { ChartAgeGroup, IModificationData } from '../../client/chart/ChartAgeGroup';
-import { ContactMatrixEffective } from '../../client/controls/ContactMatrixEffective';
-import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
-import { ModelConstants } from '../../model/ModelConstants';
-import { Demographics } from '../demographics/Demographics';
+import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesStrain } from './IModificationValuesStrain';
-import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationStrain } from './ModificationStrain';
-import { ModificationTime } from './ModificationTime';
 
 /**
  * modification resolver for strain modifications

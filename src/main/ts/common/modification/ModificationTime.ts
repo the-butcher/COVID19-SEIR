@@ -51,6 +51,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationSettings = new ModificationResolverSettings().getModifications()[0];
     }
 
+    getMaxCellTotal(): number {
+        return this.modificationContact.getMaxCellTotal();
+    }
+
     getDosesPerDay(): number {
         return this.modificationVaccination.getDosesPerDay();
     }

@@ -33,18 +33,19 @@ export class ModelImplStrain implements IModelSeir {
     private readonly strainId: string;
     private readonly absTotal: number;
     private readonly nrmValue: number;
-    private readonly exposuresPerContact: number;
+    private readonly transmissionRisk: number;
 
-    private readonly absDeltas: number[];
+    private readonly nrmDeltas: number[];
+    private nrmExposure: number[][];
 
     constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
         this.incidenceModels = [];
-        this.exposuresPerContact = strainValues.transmissionRisk;
+        this.transmissionRisk = strainValues.transmissionRisk;
 
-        this.absDeltas = []
+        this.nrmDeltas = [];
 
         this.strainId = strainValues.id;
         this.absTotal = demographics.getAbsTotal();
@@ -59,6 +60,16 @@ export class ModelImplStrain implements IModelSeir {
             this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, modificationTesting));
 
         });
+
+        // pre-fill norm exposure
+        this.nrmExposure = [];
+        this.infectiousModels.forEach(infectiousModelContact => {
+            this.nrmExposure[infectiousModelContact.getAgeGroupIndex()] = [];
+            this.infectiousModels.forEach(infectiousModelParticipant => {
+                this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] = 0.0;
+            });
+        });
+
         this.nrmValue = nrmValue1;
 
     }
@@ -109,7 +120,11 @@ export class ModelImplStrain implements IModelSeir {
     }
 
     getAbsDeltas(): number[] {
-        return this.absDeltas;
+        return this.nrmDeltas;
+    }
+
+    getNrmExposure(): number[][] {
+        return this.nrmExposure;
     }
 
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
@@ -124,11 +139,16 @@ export class ModelImplStrain implements IModelSeir {
         let nrmE: number;
         let compartmentE: ICompartment;
 
-        let absSESums: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        let abs_ISums: number[] = [];
+        let nrmSESums: number[] = [];
+        this.infectiousModels.forEach(() => {
+            nrmSESums.push(0.0);
+        });
+        let nrm_ISums: number[] = [];
 
-
+        this.nrmExposure = [];
         this.infectiousModels.forEach(infectiousModelContact => {
+
+            this.nrmExposure[infectiousModelContact.getAgeGroupIndex()] = [];
 
             nrmI = 0
             infectiousModelContact.getCompartments().forEach(compartmentI => {
@@ -136,10 +156,11 @@ export class ModelImplStrain implements IModelSeir {
                     nrmI += state.getNrmValue(compartmentI) * compartmentI.getReproductionRatio().getRate(dT);
                 }
             });
-
-            abs_ISums[infectiousModelContact.getAgeGroupIndex()] = nrmI;
+            nrm_ISums[infectiousModelContact.getAgeGroupIndex()] = nrmI;
 
             this.infectiousModels.forEach(infectiousModelParticipant => {
+
+                this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] = 0;
 
                 const baseContactRate = modificationTime.getContacts(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
                 compartmentE = infectiousModelParticipant.getIncomingCompartment();
@@ -147,12 +168,13 @@ export class ModelImplStrain implements IModelSeir {
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
 
                     nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
-                    nrmE = baseContactRate * nrmI * nrmS * this.exposuresPerContact;
+                    nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk;
 
                     result.addNrmValue(+nrmE, compartmentE);
                     result.addNrmValue(-nrmE, compartmentS);
 
-                    absSESums[infectiousModelParticipant.getAgeGroupIndex()] += nrmE; // / infectiousModelParticipant.getAgeGroupTotal();
+                    nrmSESums[infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
+                    this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
 
                 });
 
@@ -161,9 +183,8 @@ export class ModelImplStrain implements IModelSeir {
         });
 
         this.infectiousModels.forEach(infectiousModelContact => {
-            this.absDeltas[infectiousModelContact.getAgeGroupIndex()] = abs_ISums[infectiousModelContact.getAgeGroupIndex()] / absSESums[infectiousModelContact.getAgeGroupIndex()];
+            this.nrmDeltas[infectiousModelContact.getAgeGroupIndex()] = nrm_ISums[infectiousModelContact.getAgeGroupIndex()] / nrmSESums[infectiousModelContact.getAgeGroupIndex()];
         });
-
 
         /**
          * S->E = S * SUM(I / Tinf)
