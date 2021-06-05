@@ -6,6 +6,8 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
+* have a second look at R(r) in the strain-modification chart
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME
 * border cases
   * all testing sliders on zero renders an all zero chart,
@@ -13,8 +15,6 @@ todo:
   * limit incidence range on modifications later than MIN_DATE to i.e. 10
   * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
   * keep history in local storage (or internal, reset modification after validation problems)
-* modification chart area
-  * find some primary value for strain (if possible use r<sub>t</sub>)
 * implement
   * import
   * save -> auto save (?), if auto save there needs to be a reset (could be done through local storage history)
@@ -38,6 +38,8 @@ next:
 * zoomable chart and slider
 
 done:
+* ~~modification chart area~~
+  * ~~find some primary value for strain (if possible use r<sub>t</sub>)~~
 * ~~exposure matrix on modification~~
 * ~~de-overlay strain incidence labels~~
 * ~~reintroduce testing multiplier to incidence curve~~

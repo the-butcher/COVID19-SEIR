@@ -53,22 +53,4 @@ export class ModelState implements IModelState {
         return normalizedValueSum;
     }
 
-    getR0(tT: number): number {
-
-        // collect all possible strains
-        // TODO SeirModelGroup has such code already
-
-        // TODO calculate a weighed average
-        throw new Error("NI");
-        // const shareOfB117 = this.getShareOfB117();
-        // const shareOfCov2 = 1 - shareOfB117;
-        // const rEfft0 = this.model.getREffCov2() * shareOfCov2 + this.model.getREffB117() * shareOfB117;
-        // return rEfft0 * this.model.getInterventionSet().getMultiplier(tT);
-
-    }
-
-    getRt(tT: number): number {
-        throw new Error("NI"); // return this.getR0(tT) * this.getPopulation(CompartmentFilter.type(ECompartmentType2.S_SUSCEPTIBLE)).getNormalized();
-    }
-
 }

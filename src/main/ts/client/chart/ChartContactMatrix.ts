@@ -17,7 +17,6 @@ export interface IChartData {
     gamma?: number;
     plotX?: string;
     plotY?: number;
-    // color?: string;
 }
 
 export type AXIS_DIRECTION = 'CONTACT_PARTICIPANT' | 'PARTICIPANT_CONTACT';
@@ -141,9 +140,7 @@ export class ChartContactMatrix {
         this.seriesPlot.dataFields.valueY = 'plotY';
         this.seriesPlot.fillOpacity = 0;
         this.seriesPlot.strokeWidth = 3;
-        // this.seriesPlot.stroke = color(ChartUtil.getInstance().toColor(1));
         this.seriesPlot.strokeLinecap = 'round';
-        // this.seriesPlot.propertyFields.stroke = 'color';
         this.seriesPlot.strokeOpacity = 1.0;
 
         this.seriesPlot.tooltipText = '{categoryX}';
@@ -306,8 +303,6 @@ export class ChartContactMatrix {
             });
 
         }
-
-        console.log('matrixSum', matrixSum);
 
         chartData.push(...plotData);
 

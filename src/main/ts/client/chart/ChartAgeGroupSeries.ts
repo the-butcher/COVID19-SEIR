@@ -4,6 +4,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { COMPARTMENT__COLORS, ControlsConstants } from '../gui/ControlsConstants';
 import { ObjectUtil } from './../../util/ObjectUtil';
+import { ILabellingDefinition } from './../gui/ControlsConstants';
 import { ChartAgeGroup } from './ChartAgeGroup';
 import { ChartUtil } from './ChartUtil';
 
@@ -36,7 +37,8 @@ export class ChartAgeGroupSeries {
     private readonly valueField: string;
     private readonly locationOnPath: number;
     private intervalHandle: number;
-    private percent: boolean;
+
+    private labellingDefinition: ILabellingDefinition;
 
     constructor(params: IChartAgeGroupSeriesParams) {
 
@@ -46,7 +48,7 @@ export class ChartAgeGroupSeries {
         this.baseLabel = params.baseLabel;
         this.valueField = params.valueField;
         this.locationOnPath = params.locationOnPath;
-        this.percent = params.percent;
+        this.labellingDefinition = ControlsConstants.LABEL_ABSOLUTE_FIXED;
 
         this.series = params.chart.series.push(new LineSeries());
         this.series.showOnInit = false;
@@ -85,11 +87,7 @@ export class ChartAgeGroupSeries {
             if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
                 const itemCurr = target.dataItems.values[indexCurr];
                 const valueCurr = itemCurr.dataContext[this.valueField];
-                if (this.isPercent()) {
-                    return `${this.seriesLabel.text}: ${ControlsConstants.LABEL_PERCENT__FLOAT_2.format(valueCurr)}`;
-                } else {
-                    return `${this.seriesLabel.text}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(valueCurr)}`;
-                }
+                return `${this.seriesLabel.text}: ${this.labellingDefinition.format(valueCurr)}`;
             } else {
                 return value;
             }
@@ -105,12 +103,12 @@ export class ChartAgeGroupSeries {
         return this.valueField;
     }
 
-    setPercent(percent: boolean): void {
-        this.percent = percent;
+    setLabellingDefinition(labellingDefinition: ILabellingDefinition): void {
+        this.labellingDefinition = labellingDefinition;
     }
 
-    isPercent(): boolean {
-        return this.percent;
+    getLabellingDefinition(): ILabellingDefinition {
+        return this.labellingDefinition;
     }
 
     setBaseLabel(baseLabel: string) {

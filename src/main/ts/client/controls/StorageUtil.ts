@@ -74,7 +74,7 @@ export class StorageUtil {
                 key: 'SEASONALITY',
                 name: 'seasonality',
                 instant: new Date('2021-07-10').getTime(),
-                seasonality: 0.90,
+                seasonality: 0.80,
                 deletable: false,
                 draggable: true
             },
@@ -111,18 +111,6 @@ export class StorageUtil {
                 deletable: false,
                 draggable: true
             },
-            // {
-            //     id: ObjectUtil.createId(),
-            //     key: 'STRAIN',
-            //     instant: new Date('2021-06-01').getTime(),
-            //     name: 'b.1.167.2',
-            //     r0: 6.5,
-            //     serialInterval: 4.8,
-            //     intervalScale: 1.0,
-            //     incidence: 10,
-            //     deletable: true,
-            //     draggable: true
-            // },
             {
                 id: ObjectUtil.createId(),
                 key: 'CONTACT',

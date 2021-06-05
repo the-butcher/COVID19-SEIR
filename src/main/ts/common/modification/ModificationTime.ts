@@ -1,4 +1,3 @@
-import { ChartAgeGroup } from '../../client/chart/ChartAgeGroup';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
 import { AModification } from './AModification';
 import { IContactMatrix } from './IContactMatrix';

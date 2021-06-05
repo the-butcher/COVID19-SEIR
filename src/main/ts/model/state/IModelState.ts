@@ -39,6 +39,4 @@ export interface IModelState {
      */
     getNrmValueSum(compartmentFilter: ICompartmentFilter): number;
 
-    getRt(tT: number): number;
-
 }

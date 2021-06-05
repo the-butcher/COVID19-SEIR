@@ -1,10 +1,10 @@
-import { IModificationData } from './../../client/chart/ChartAgeGroup';
-import { Modifications } from './Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { ObjectUtil } from '../../util/ObjectUtil';
+import { IModificationData } from './../../client/chart/ChartAgeGroup';
+import { IModification } from './IModification';
 import { IModificationResolver } from './IModificationResolver';
 import { IModificationValues } from './IModificationValues';
-import { IModification } from './IModification';
-import { ObjectUtil } from '../../util/ObjectUtil';
+import { Modifications } from './Modifications';
 
 /**
  * base class of modification resolver, managing modification lookup

@@ -188,10 +188,10 @@ export class ChartAgeGroup {
         ChartUtil.getInstance().configureAxis(this.yAxisModification, 'Mods');
         this.yAxisModification.tooltip.exportable = false;
         this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent() ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_ABSOLUTE_FIXED);
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.getLabellingDefinition());
         });
         this.yAxisModification.tooltip.label.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.isPercent() ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_ABSOLUTE_FIXED);
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.getLabellingDefinition());
         });
 
 
@@ -622,7 +622,7 @@ export class ChartAgeGroup {
         // TODO probably needs to move to separate method
         if (modificationDefinition) {
 
-            this.seriesModification.setPercent(modificationDefinition.percent);
+            this.seriesModification.setLabellingDefinition(modificationDefinition.labellingDefinition);
             this.seriesModification.setBaseLabel(modificationDefinition.text);
             this.seriesModification.setSeriesNote('');
             this.seriesModification.getSeries().fill = color(modificationDefinition.color);
@@ -631,6 +631,7 @@ export class ChartAgeGroup {
 
             this.yAxisModification.min = modificationDefinition.min;
             this.yAxisModification.max = modificationDefinition.max;
+            this.yAxisModification.invalidateLabels(); // labels may change from percent to non-percent and need to be invalidated
 
             this.seriesModification.getSeries().stroke = color(modificationDefinition.color);
             this.seriesModification.getSeries().data = modificationData;
