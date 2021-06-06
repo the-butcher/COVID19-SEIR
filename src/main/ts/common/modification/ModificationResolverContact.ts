@@ -17,6 +17,10 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         super('CONTACT');
     }
 
+    getMinValue(data: IModificationData[]): number {
+        return 0;
+    }
+
     getMaxValue(data: IModificationData[]): number {
         return 1;
     }

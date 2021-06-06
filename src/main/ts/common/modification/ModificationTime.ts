@@ -50,6 +50,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationSettings = new ModificationResolverSettings().getModifications()[0];
     }
 
+    getMaxColTotal(): number {
+        return this.modificationContact.getMaxColTotal();
+    }
+
     getMaxCellTotal(): number {
         return this.modificationContact.getMaxCellTotal();
     }

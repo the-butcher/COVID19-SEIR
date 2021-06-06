@@ -34,7 +34,7 @@ export class ControlsTime {
     acceptModification(modification: ModificationTime): void {
         Controls.acceptModification(modification);
         this.modification = modification;
-        this.chartTime.redraw(new ContactMatrixExposure(this.modification));
+        this.chartTime.redraw(new ContactMatrixExposure(modification.getInstantA()));
     }
 
 }

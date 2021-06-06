@@ -16,6 +16,10 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
         super('SETTINGS');
     }
 
+    getMinValue(data: IModificationData[]): number {
+        return 0;
+    }
+
     getMaxValue(data: IModificationData[]): number {
         return 1;
     }

@@ -8,6 +8,8 @@ export interface IContactMatrix {
 
     getContacts(indexContact: number, indexParticipant: number): number;
 
+    getMaxColTotal(): number;
+
     getMaxCellTotal(): number;
 
 }

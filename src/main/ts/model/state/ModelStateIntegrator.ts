@@ -175,7 +175,7 @@ export class ModelStateIntegrator {
                     const compartmentFilterExposedTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E_____EXPOSED) && c.getStrainId() === modificationValueStrain.id);
                     const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I__INFECTIOUS) && c.getStrainId() === modificationValueStrain.id);
 
-                    incidences[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * absTotal * 100000 / absTotal;
+                    incidences[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * 100000;
                     exposed[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterExposedTotal);
                     infectious[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
 
@@ -217,16 +217,21 @@ export class ModelStateIntegrator {
                     const incidencesAgeGroup: {[K: string]: number} = {};
                     const exposedAgeGroup: {[K: string]: number} = {};
                     const infectiousAgeGroup: {[K: string]: number} = {};
+
                     incidencesAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterIncidence) * 100000 * groupNormalizer;
-                    exposedAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterExposed);
-                    infectiousAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectious);
+                    exposedAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterExposed) * groupNormalizer;
+                    infectiousAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectious) * groupNormalizer;
+
                     modificationValuesStrain.forEach(modificationValueStrain => {
+
                         const compartmentFilterIncidence = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N) && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
                         const compartmentFilterExposed = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E_____EXPOSED) && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
                         const compartmentFilterInfectious = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I__INFECTIOUS) && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
+
                         incidencesAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterIncidence) * 100000 * groupNormalizer;
-                        exposedAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterExposed);
-                        infectiousAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterInfectious);
+                        exposedAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterExposed) * groupNormalizer;
+                        infectiousAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterInfectious) * groupNormalizer;
+
                     });
                     dataItem.valueset[ageGroup.getName()] = {
                         SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptible) * groupNormalizer,

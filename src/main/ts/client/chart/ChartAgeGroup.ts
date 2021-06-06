@@ -2,13 +2,13 @@ import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
-import { AgeGroup } from '../../common/demographics/AgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
+import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
@@ -482,6 +482,14 @@ export class ChartAgeGroup {
 
     }
 
+    getAgeGroupName(): string {
+        if (this.ageGroupsWithTotal) {
+            return this.ageGroupsWithTotal[this.ageGroupIndex].getName();
+        } else {
+            return ModelConstants.AGEGROUP_NAME_ALL;
+        }
+    }
+
     setInstant(instant: number): void {
         const point = this.xAxis.anyToPoint(TimeUtil.formatCategoryDate(instant));
         this.chart.cursor.triggerMove(point, 'soft'); // https://www.amcharts.com/docs/v4/tutorials/sticky-chart-cursor/
@@ -539,6 +547,9 @@ export class ChartAgeGroup {
             this.getOrCreateSeriesAgeGroupExposedStrain(strainValues).setSeriesNote(ageGroup.getName());
             this.getOrCreateSeriesAgeGroupInfectiousStrain(strainValues).setSeriesNote(ageGroup.getName());
         });
+
+        // const key = ModelActions.getInstance().getKey();
+        // ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver());
 
     }
 

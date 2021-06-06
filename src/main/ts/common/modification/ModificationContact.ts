@@ -18,6 +18,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
     private readonly maxCellTotal: number;
+    private readonly maxColTotal: number;
 
     constructor(modificationParams: IModificationValuesContact) {
 
@@ -26,10 +27,16 @@ export class ModificationContact extends AModification<IModificationValuesContac
         this.ageGroups = [];
         this.contactCategories = [];
 
-        this.ageGroups.push(...Demographics.getInstance().getAgeGroups());
-        this.contactCategories.push(...Demographics.getInstance().getContactCategories());
-        this.maxCellTotal = Demographics.getInstance().getMaxCellTotal();
+        const demographics = Demographics.getInstance();
+        this.ageGroups.push(...demographics.getAgeGroups());
+        this.contactCategories.push(...demographics.getContactCategories());
+        this.maxCellTotal = demographics.getMaxCellTotal();
+        this.maxColTotal = demographics.getMaxColTotal();
 
+    }
+
+    getMaxColTotal(): number {
+        return this.maxColTotal;
     }
 
     getMaxCellTotal(): number {

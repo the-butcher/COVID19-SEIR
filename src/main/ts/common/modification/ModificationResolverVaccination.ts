@@ -15,8 +15,12 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
         super('VACCINATION');
     }
 
+    getMinValue(data: IModificationData[]): number {
+        return 0;
+    }
+
     getMaxValue(data: IModificationData[]): number {
-        return 100000;
+        return 100000; // TODO this needs to be an expression of max population
     }
 
     getValue(instant: number): number {

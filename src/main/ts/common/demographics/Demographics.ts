@@ -35,6 +35,7 @@ export class Demographics {
     private ageGroups: AgeGroup[];
     private contactCategories: ContactCategory[];
     private maxCellTotal: number;
+    private maxColTotal: number;
     private exposuresPerContact: number;
     private matrixSum: number;
 
@@ -113,17 +114,22 @@ export class Demographics {
         /**
          * evaluate max combined cell value
          */
-        this.maxCellTotal = -1;
+        this.maxCellTotal = 0;
+        this.maxColTotal = 0;
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
+            let colTotal = 0;
             for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
                 let curCombinedCellValue = 0;
                 this.contactCategories.forEach(contactCategory => {
                     curCombinedCellValue += contactCategory.getData(indexContact, indexParticipant);
                 });
-                if (curCombinedCellValue > this.maxCellTotal) {
-                    this.maxCellTotal = curCombinedCellValue;
-                }
+                colTotal += curCombinedCellValue;
+                this.maxCellTotal = Math.max(this.maxCellTotal, curCombinedCellValue);
+                // if (curCombinedCellValue > this.maxCellTotal) {
+                //     this.maxCellTotal = curCombinedCellValue;
+                // }
             }
+            this.maxColTotal = Math.max(this.maxColTotal, colTotal);
         };
 
     }
@@ -138,6 +144,10 @@ export class Demographics {
 
     getMatrixSum(): number {
         return this.matrixSum;
+    }
+
+    getMaxColTotal(): number {
+        return this.maxColTotal;
     }
 
     getMaxCellTotal(): number {

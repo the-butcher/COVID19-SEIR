@@ -17,8 +17,12 @@ export class ModificationResolverSeasonality extends AModificationResolver<IModi
         super('SEASONALITY');
     }
 
+    getMinValue(data: IModificationData[]): number {
+        return Math.min(...data.map(d => d.modValueY)) * 0.95;
+    }
+
     getMaxValue(data: IModificationData[]): number {
-        return 1;
+        return Math.max(...data.map(d => d.modValueY)) * 1.05;
     }
 
     /**

@@ -233,6 +233,10 @@ export class ChartContactMatrix {
 
     }
 
+    exportToPng(): void {
+        this.chart.exporting.export("png");
+    }
+
     toggleAxisContact(): void {
         this.axisDirection = 'CONTACT_PARTICIPANT';
         this.xAxisPlot.title.text = 'contact';
@@ -271,6 +275,7 @@ export class ChartContactMatrix {
 
         // const matrixContactTotal = demographics.getMatrixSum();
         const maxCellTotal = contactMatrix.getMaxCellTotal();
+        this.yAxisPlot.max = contactMatrix.getMaxColTotal();
 
         let matrixSum = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {

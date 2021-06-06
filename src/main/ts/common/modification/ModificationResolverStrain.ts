@@ -1,12 +1,9 @@
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
-import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
 import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
-import { Demographics } from './../demographics/Demographics';
+import { TimeUtil } from './../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesStrain } from './IModificationValuesStrain';
-import { ModificationResolverContact } from './ModificationResolverContact';
-import { ModificationResolverSeasonality } from './ModificationResolverSeasonality';
 import { ModificationStrain } from './ModificationStrain';
 
 /**
@@ -21,42 +18,80 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
         super('STRAIN');
     }
 
+    getMinValue(data: IModificationData[]): number {
+        return Math.min(...data.map(d => d.modValueY)) * 0.95;
+    }
+
     getMaxValue(data: IModificationData[]): number {
-        return Math.max(...data.map(d => d.modValueY)) * 1.01;
+        return Math.max(...data.map(d => d.modValueY)) * 1.05;
     }
 
     getValue(instant: number): number {
 
-        const modificationContact = new ModificationResolverContact().getModification(instant);
-        const modificationSeasonality = new ModificationResolverSeasonality().getModification(instant);
+        const dataItemCur = ChartAgeGroup.getInstance().findDataItem(instant);
+        const dataItemNxt = ChartAgeGroup.getInstance().findDataItem(instant + TimeUtil.MILLISECONDS_PER____DAY);
+        if (dataItemCur && dataItemNxt) {
 
-        const matrixRatio = new ContactMatrixSums(modificationContact).getMatrixSum() * modificationSeasonality.getSeasonality() / Demographics.getInstance().getMatrixSum();
+            // https://en.wikipedia.org/wiki/Basic_reproduction_number;
 
-        const modificationsStrain = this.getModifications();
-        const dataItem = ChartAgeGroup.getInstance().findDataItem(instant);
-        if (dataItem) {
+            const exposedAllStrains = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[ModelConstants.STRAIN_ID_____ALL];
+            let rT = 0;
 
-            const exposedTotal = dataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[ModelConstants.STRAIN_ID_____ALL];
-            let r0 = 0;
+            const modificationsStrain = this.getModifications();
+            for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 
-            // collect exposure by strain-id
-            modificationsStrain.forEach(modificationStrain => {
+                const modificationStrain = modificationsStrain[strainIndex];
+                const exposedStrainCur = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
+                const exposedStrainNxt = dataItemNxt.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
+                const shareOfStrain = exposedStrainCur / exposedAllStrains;
 
-                const exposedStrain = dataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
-                const exposedRatio = exposedStrain / exposedTotal;
-                r0 += modificationStrain.getR0() * exposedRatio;
+                const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
+                rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
 
-            });
+                console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
 
-            const rT = r0 * dataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].SUSCEPTIBLE * matrixRatio;
+            }
 
-            console.log('r0', new Date(instant), r0, rT);
 
-            return rT;
+
+            return rT; // * dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].SUSCEPTIBLE; // / threshold;
 
         }
 
-        return 0;
+        return Number.NaN;
+
+        // const paddingDays = 1;
+        // const ageGroupName = ChartAgeGroup.getInstance().getAgeGroupName();
+        // // reference data item
+        // const instantCur = instant; // - TimeUtil.MILLISECONDS_PER____DAY * paddingDays;
+        // const instantDst = instant + TimeUtil.MILLISECONDS_PER____DAY * paddingDays;
+        // const dataItemCur = ChartAgeGroup.getInstance().findDataItem(instantCur);
+        // const dataItemDst = ChartAgeGroup.getInstance().findDataItem(instantDst);
+
+        // if (dataItemCur && dataItemDst) {
+
+        //     const exposed0 = dataItemCur.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID_____ALL];
+        //     let exposedS = 0;
+
+        //     const modificationsStrain = this.getModifications();
+        //     for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+
+        //         const modificationStrain = modificationsStrain[strainIndex];
+        //         const serialInterval = modificationStrain.getSerialInterval();
+
+        //         const exposedCur = dataItemCur.valueset[ageGroupName].EXPOSED[modificationStrain.getId()];
+        //         const exposedDst = dataItemDst.valueset[ageGroupName].EXPOSED[modificationStrain.getId()];
+        //         const exposedDif = (exposedDst - exposedCur) * serialInterval; // / (paddingDays * 2);
+
+        //         exposedS += (exposedCur + exposedDif)
+
+        //     }
+
+        //     return exposedS / exposed0;
+
+        // } else {
+        //     return Number.NaN;
+        // }
 
     }
 
