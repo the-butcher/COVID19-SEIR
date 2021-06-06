@@ -1,3 +1,5 @@
+import { ControlsTime } from './../controls/ControlsTime';
+import { ChartContactMatrix } from './../chart/ChartContactMatrix';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { ASliderElement } from './ASliderElement';
 import { IIconSlider } from './IIconSlider';

@@ -2,6 +2,7 @@ import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
+import { ControlsTime } from '../controls/ControlsTime';
 import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ControlsConstants } from './ControlsConstants';
 import { IconModification } from './IconModification';
@@ -50,6 +51,9 @@ export class SliderModification extends Slider {
                     this.updateModificationInstants();
                     this.indicateUpdate(this.modificationIcons[index].getId());
                     this.handleThumbPicked(index);
+                }
+                if (type === 'cursor') {
+                    ControlsTime.getInstance().getChartContactMatrix().exportToPng();
                 }
             },
             handleThumbPicked: (index) => {

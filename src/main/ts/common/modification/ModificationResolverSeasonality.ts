@@ -25,6 +25,10 @@ export class ModificationResolverSeasonality extends AModificationResolver<IModi
         return Math.max(...data.map(d => d.modValueY)) * 1.05;
     }
 
+    getTitle(): string {
+        return 'seasonality rate';
+    }
+
     /**
      * seasonality modification works somewhat inside out, the value defines the modification rather than modification providing the value
      * @param instant

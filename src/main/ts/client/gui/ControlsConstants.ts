@@ -306,7 +306,7 @@ export class ControlsConstants {
             min,
             max,
             labellingDefinition: ControlsConstants.MODIFICATION_PARAMS[modificationResolver.getKey()].labellingDefinition,
-            text: key,
+            text: modificationResolver.getTitle(),
             color: ControlsConstants.COLORS[key],
             useObjectColors: true,
         }, modificationData);

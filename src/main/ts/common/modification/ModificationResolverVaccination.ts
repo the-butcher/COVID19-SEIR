@@ -23,6 +23,10 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
         return 100000; // TODO this needs to be an expression of max population
     }
 
+    getTitle(): string {
+        return 'vaccinations / day';
+    }
+
     getValue(instant: number): number {
         return this.getModification(instant).getDosesPerDay(); // TODO could be an interpolated value between this and the next modification
     }

@@ -26,6 +26,10 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
         return Math.max(...data.map(d => d.modValueY)) * 1.05;
     }
 
+    getTitle(): string {
+        return 'r(t)';
+    }
+
     getValue(instant: number): number {
 
         const dataItemCur = ChartAgeGroup.getInstance().findDataItem(instant);

@@ -28,4 +28,8 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
         return 0;
     }
 
+    getTitle(): string {
+        return '';
+    }
+
 }

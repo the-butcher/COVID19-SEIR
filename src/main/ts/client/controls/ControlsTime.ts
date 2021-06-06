@@ -27,6 +27,10 @@ export class ControlsTime {
         this.chartTime = new ChartContactMatrix('chartTimeDiv', false);
     }
 
+    getChartContactMatrix(): ChartContactMatrix {
+        return this.chartTime;
+    }
+
     handleChange(): void {
         // this is usually called when a control (a slider) updates a modification
     }

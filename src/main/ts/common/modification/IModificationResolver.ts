@@ -31,11 +31,16 @@ export interface IModificationResolver<V extends IModificationValues, M extends 
     /**
      * get the lower limit of the modification chart as suitable for this instance
      */
-     getMinValue(data: IModificationData[]): number
+    getMinValue(data: IModificationData[]): number
 
     /**
      * get the upper limit of the modification chart as suitable for this instance
      */
     getMaxValue(data: IModificationData[]): number
+
+    /**
+     * get a meaningful series title for the information provided by this resolver
+     */
+    getTitle(): string;
 
 }

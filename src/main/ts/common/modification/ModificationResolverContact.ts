@@ -25,6 +25,10 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         return 1;
     }
 
+    getTitle(): string {
+        return 'contact rate';
+    }
+
     getValue(instant: number): number {
         return new ContactMatrixSums(this.getModification(instant)).getMatrixSum() / Demographics.getInstance().getMatrixSum();
     }

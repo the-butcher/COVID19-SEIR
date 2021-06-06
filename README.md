@@ -36,6 +36,7 @@ next:
   * add chart showing 2 curves with priority and refusal (?)
 * add immune escape to strain modification (percentage of cases that are susceptible among recovered individuals)
 * zoomable chart and slider
+* color-only pickers for chart-mode
 
 done:
 * ~~have a second look at R(t) in the strain-modification chart~~

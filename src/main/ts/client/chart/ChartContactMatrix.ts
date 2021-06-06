@@ -4,6 +4,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IContactMatrix } from '../../common/modification/IContactMatrix';
+import { ObjectUtil } from '../../util/ObjectUtil';
 import { ControlsConstants } from './../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
 import { IconMatrixAxis } from './IconMatrixAxis';
@@ -62,6 +63,12 @@ export class ChartContactMatrix {
         this.chart.zoomOutButton.disabled = true;
         ChartUtil.getInstance().configureChartPadding(this.chart);
         ChartUtil.getInstance().configureSeparators(this.chart);
+
+        this.chart.exporting.adapter.add('filePrefix', (value, target) => {
+            return {
+                filePrefix: ObjectUtil.createDownloadName()
+            };
+        });
 
         this.xAxisHeat = this.chart.xAxes.push(new CategoryAxis());
         this.yAxisHeat = this.chart.yAxes.push(new CategoryAxis());

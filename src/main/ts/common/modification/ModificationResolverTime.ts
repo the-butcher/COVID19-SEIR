@@ -26,6 +26,10 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
         return Math.max(...data.map(d => d.modValueY)) * 1.05;
     }
 
+    getTitle(): string {
+        return 'exposure / day';
+    }
+
     getValue(instant: number): number {
         const contactMatrixExposure = new ContactMatrixExposure(instant);
         const contactMatrixSums = new ContactMatrixSums(contactMatrixExposure);

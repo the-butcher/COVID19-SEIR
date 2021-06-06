@@ -24,6 +24,10 @@ export class ModificationResolverTesting extends AModificationResolver<IModifica
         return 1;
     }
 
+    getTitle(): string {
+        return 'discovery rate';
+    }
+
     getValue(instant: number): number {
         const demographics = Demographics.getInstance();
         let totalTestingValue = 0;
