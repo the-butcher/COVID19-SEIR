@@ -1,16 +1,13 @@
-import { IDataItem } from './../model/state/ModelStateIntegrator';
-import { ModelConstants } from './../model/ModelConstants';
-import { Demographics } from './../common/demographics/Demographics';
-import { MODIFICATION____KEY } from '../model/ModelConstants';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
 import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IWorkerInput } from '../model/IWorkerInput';
+import { MODIFICATION____KEY } from '../model/ModelConstants';
 import { IModelProgress } from '../model/state/ModelStateIntegrator';
 import { ChartAgeGroup } from './chart/ChartAgeGroup';
-import { SliderModification } from './gui/SliderModification';
 import { ControlsConstants } from './gui/ControlsConstants';
+import { SliderModification } from './gui/SliderModification';
 
 /**
  * utility type that will pass rebuilding of the model to a web-worker

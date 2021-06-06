@@ -6,6 +6,8 @@
  */
 export interface IContactMatrix {
 
+    getInstant(): number;
+
     getContacts(indexContact: number, indexParticipant: number): number;
 
     getMaxColTotal(): number;

@@ -1,4 +1,3 @@
-import { StorageUtil } from './../controls/StorageUtil';
 import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -13,6 +12,7 @@ import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
+import { StorageUtil } from './../controls/StorageUtil';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
 

@@ -1,15 +1,10 @@
-import { StorageUtil } from './../controls/StorageUtil';
-import { ModelTask } from './../ModelTask';
-import { Demographics } from './../../common/demographics/Demographics';
-import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
-import { StorageUtil } from '../controls/StorageUtil';
+import { StorageUtil } from './../controls/StorageUtil';
 import { IconAction } from './IconAction';
 import { IconModelMode } from './IconModelMode';
 import { SliderModification } from './SliderModification';
-import { Modifications } from '../../common/modification/Modifications';
 
 export interface IIconActionParams {
     container: string;

@@ -35,6 +35,10 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
     }
 
+    getInstant(): number {
+        return this.modificationValues.instant;
+    }
+
     getMaxColTotal(): number {
         return this.maxColTotal;
     }

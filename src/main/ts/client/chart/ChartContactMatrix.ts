@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import { CategoryAxis, ColumnSeries, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
 import { color, create, Label, percent, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -209,7 +210,7 @@ export class ChartContactMatrix {
         this.valueTotalLabel.x = 50;
         this.valueTotalLabel.y = 287;
         this.valueTotalLabel.horizontalCenter = 'right';
-        this.valueTotalLabel.visible = this.showToggleAndPercentage;
+        // this.valueTotalLabel.visible = this.showToggleAndPercentage;
 
         this.chart.leftAxesContainer.events.on('sizechanged', e => {
 
@@ -310,7 +311,6 @@ export class ChartContactMatrix {
             plotData.push({
                 plotX: ageGroups[indexX].getName(),
                 plotY: columnContactsCurr,
-                // color: ChartUtil.getInstance().toColor(columnContactsCurr * 10 / matrixContactTotal),
                 ratio: columnContactsCurr
             });
 
@@ -319,7 +319,11 @@ export class ChartContactMatrix {
         chartData.push(...plotData);
 
         matrixSum = matrixSum / demographics.getMatrixSum();
-        this.valueTotalLabel.text = (matrixSum * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        if (this.showToggleAndPercentage) {
+            this.valueTotalLabel.text = (matrixSum * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        } else {
+            this.valueTotalLabel.text = TimeUtil.formatCategoryDate(this.contactMatrix.getInstant());
+        }
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;

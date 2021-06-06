@@ -36,6 +36,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         // nothing to be updated
     }
 
+    getInstant(): number {
+        return this.modificationContact.getInstant();
+    }
+
     /**
      * no model update required
      * @param instantA

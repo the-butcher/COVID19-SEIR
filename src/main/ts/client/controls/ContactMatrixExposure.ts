@@ -5,6 +5,7 @@ import { ModificationTime } from '../../common/modification/ModificationTime';
 
 export class ContactMatrixExposure implements IContactMatrix {
 
+    private readonly instant: number;
     private readonly contacts: number[][];
     private maxCellTotal: number;
     private maxColTotal: number;
@@ -13,6 +14,8 @@ export class ContactMatrixExposure implements IContactMatrix {
 
         const demographics = Demographics.getInstance();
         const ageGroups = demographics.getAgeGroups();
+
+        this.instant = instant;
 
         const dataItem = ChartAgeGroup.getInstance().findDataItem(instant);
         if (dataItem) {
@@ -31,6 +34,10 @@ export class ContactMatrixExposure implements IContactMatrix {
             }
         }
 
+    }
+
+    getInstant(): number {
+        return this.instant;
     }
 
     getMaxCellTotal(): number {

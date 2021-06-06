@@ -1,11 +1,11 @@
-import { ModelTask } from './../ModelTask';
-import { SliderModification } from './../gui/SliderModification';
-import { Demographics } from './../../common/demographics/Demographics';
-import { ModelActions } from './../gui/ModelActions';
 import { IModificationValues } from '../../common/modification/IModificationValues';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { Demographics } from './../../common/demographics/Demographics';
+import { ModelActions } from './../gui/ModelActions';
+import { SliderModification } from './../gui/SliderModification';
+import { ModelTask } from './../ModelTask';
 
 /**
  * helper type for writing / loading modifications to / from local storage

@@ -1,8 +1,8 @@
+import { ControlsTime } from './../controls/ControlsTime';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
-import { ControlsTime } from '../controls/ControlsTime';
 import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ControlsConstants } from './ControlsConstants';
 import { IconModification } from './IconModification';
