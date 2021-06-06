@@ -1,3 +1,4 @@
+import { StorageUtil } from './../controls/StorageUtil';
 import { ModelTask } from './../ModelTask';
 import { Demographics } from './../../common/demographics/Demographics';
 import { IModificationValues } from './../../common/modification/IModificationValues';
@@ -60,54 +61,19 @@ export class ModelActions {
         this.actionIcons.push(new IconAction({
             container: 'actionDivExportCsv',
             actionFunction: () => {
-                throw new Error('NI');
+                ChartAgeGroup.getInstance().exportToJson();
             }
         }));
         this.actionIcons.push(new IconAction({
             container: 'actionDivImportDiv',
             actionFunction: () => {
-                const fileInput = document.getElementById('jsonImportInput') as HTMLInputElement;
-                fileInput.onchange = (e: Event) => {
-
-                    // @ts-ignore
-                    var file = e.target.files[0];
-                    if (!file) {
-                        return;
-                    }
-
-                    var reader = new FileReader();
-                    reader.onload = e => {
-
-                        /**
-                         * read and build modifications
-                         */
-                        const modificationValues: IModificationValues[] = JSON.parse(e.target.result as string);
-                        modificationValues.forEach(modificationValue => {
-                            ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue);
-                        });
-                    	Modifications.setInstanceFromValues(modificationValues);
-
-                        /**
-                         * show in modification sliders
-                         */
-                        SliderModification.getInstance().showModifications(ModelActions.getInstance().getKey());
-
-                        /**
-                         * rebuild chart to reflect changes
-                         */
-                        ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
-
-                    }
-                    reader.readAsText(file);
-
-                }
-                fileInput.click();
+                StorageUtil.getInstance().importModifications();
             }
         }));
         this.actionIcons.push(new IconAction({
             container: 'actionDivSaveDiv',
             actionFunction: () => {
-                StorageUtil.getInstance().saveModifications();
+                StorageUtil.getInstance().storeModifications();
             }
         }));
         this.actionIcons.push(new IconAction({

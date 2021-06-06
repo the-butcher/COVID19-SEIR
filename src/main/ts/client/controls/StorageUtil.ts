@@ -1,3 +1,7 @@
+import { ModelTask } from './../ModelTask';
+import { SliderModification } from './../gui/SliderModification';
+import { Demographics } from './../../common/demographics/Demographics';
+import { ModelActions } from './../gui/ModelActions';
 import { IModificationValues } from '../../common/modification/IModificationValues';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
@@ -27,7 +31,7 @@ export class StorageUtil {
         this.storageEnabled = this.evalStorageEnabled();
     }
 
-    saveModifications(): void {
+    storeModifications(): void {
         if (this.isStorageEnabled()) {
             const modificationValues = Modifications.getInstance().buildModificationValues();
             localStorage.setItem(StorageUtil.STORAGE_KEY_MODIFICATIONS, JSON.stringify(modificationValues));
@@ -35,8 +39,12 @@ export class StorageUtil {
     }
 
     exportModifications(): void {
+        this.exportJson(Modifications.getInstance().buildModificationValues());
+    }
 
-        const modificationValueJson = JSON.stringify(Modifications.getInstance().buildModificationValues(), null, 2);
+    exportJson(object: any): void {
+
+        const modificationValueJson = JSON.stringify(object, null, 2);
         const modificationValueBlob = new Blob([modificationValueJson], { type: "text/plain;charset=utf-8" });
 
         const url = window.URL || window.webkitURL;
@@ -47,6 +55,47 @@ export class StorageUtil {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+    }
+
+    importModifications(): void {
+
+        const fileInput = document.getElementById('jsonImportInput') as HTMLInputElement;
+        fileInput.onchange = (e: Event) => {
+
+            // @ts-ignore
+            var file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = e => {
+
+                /**
+                 * read and build modifications
+                 */
+                const modificationValues: IModificationValues[] = JSON.parse(e.target.result as string);
+                modificationValues.forEach(modificationValue => {
+                    ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue);
+                });
+                Modifications.setInstanceFromValues(modificationValues);
+
+                /**
+                 * show in modification sliders
+                 */
+                SliderModification.getInstance().showModifications(ModelActions.getInstance().getKey());
+
+                /**
+                 * rebuild chart to reflect changes
+                 */
+                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
+
+            }
+            reader.readAsText(file);
+
+        }
+        fileInput.click();
 
     }
 

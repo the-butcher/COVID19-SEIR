@@ -6,30 +6,28 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* wiki on github
+* demographics for germany
 * modification time chart diagram find max values dynamically from dataset
 * explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
-* with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME
+* with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
 * border cases
   * all testing sliders on zero renders an all zero chart,
   * single testing slider on 1 percent leads to diagram stretching further an further
   * limit incidence range on modifications later than MIN_DATE to i.e. 10
   * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
   * keep history in local storage (or internal, reset modification after validation problems)
-* implement
-  * import
-  * save -> auto save (?), if auto save there needs to be a reset (could be done through local storage history)
-  * ~~export~~
-  * ~~png~~
-  * csv
 * testing, validity, plausibility
   * check model for having constant population (some submodels (i.e. incidence) do not count, ...)
   * find and eliminate most prominent performance bottlenecks
   * will caching compartments on compartmentFilter improve performance?
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
-* move transmission-risk calculation away from worker
+* move transmission-risk calculation away from worker (?)
 
 next:
-* implement coincident indicator on modifications, then iterate when selecting -> bring lower incidence up z-wise so it can get selected
+* add strain names to export json
+* auto save (?), if auto save there needs to be a reset (could be done through local storage history)
+* implement coincident indicator on modifications, then iterate when selecting -> bring lower icons up z-wise so it can get selected
 * 'deceased'
 * add controls for vaccination strategy (?)
   * add sliders for priority and refusal
@@ -39,6 +37,12 @@ next:
 * color-only pickers for chart-mode
 
 done:
+* ~~actions~~
+  * ~~import~~
+  * ~~save~~
+  * ~~export~~
+  * ~~png~~
+  * ~~json~~
 * ~~settings slider modification chart~~
 * ~~make vacc-slider max and vacc-modification-chart max a function of max-population~~
 * ~~have a second look at R(t) in the strain-modification chart~~

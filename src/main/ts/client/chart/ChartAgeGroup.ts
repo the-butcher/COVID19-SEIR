@@ -1,3 +1,4 @@
+import { StorageUtil } from './../controls/StorageUtil';
 import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -497,6 +498,10 @@ export class ChartAgeGroup {
 
     exportToPng(): void {
         this.chart.exporting.export("png");
+    }
+
+    exportToJson(): void {
+        StorageUtil.getInstance().exportJson(this.modelData);
     }
 
     async setSeriesAgeGroup(ageGroupIndex: number): Promise<void> {
