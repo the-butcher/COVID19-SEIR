@@ -21,11 +21,11 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
     }
 
     getMaxValue(data: IModificationData[]): number {
-        return 1;
+        return 0;
     }
 
     getValue(instant: number): number {
-        return 0;
+        return Number.NaN;
     }
 
     getTitle(): string {

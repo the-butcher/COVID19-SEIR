@@ -6,6 +6,7 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* modification time chart diagram find max values dynamically from dataset
 * explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME
 * border cases
@@ -38,6 +39,7 @@ next:
 * color-only pickers for chart-mode
 
 done:
+* ~~settings slider modification chart~~
 * ~~make vacc-slider max and vacc-modification-chart max a function of max-population~~
 * ~~have a second look at R(t) in the strain-modification chart~~
 * ~~modification chart area~~

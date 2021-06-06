@@ -1,3 +1,6 @@
+import { ModelTask } from './../ModelTask';
+import { Demographics } from './../../common/demographics/Demographics';
+import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
@@ -5,6 +8,7 @@ import { StorageUtil } from '../controls/StorageUtil';
 import { IconAction } from './IconAction';
 import { IconModelMode } from './IconModelMode';
 import { SliderModification } from './SliderModification';
+import { Modifications } from '../../common/modification/Modifications';
 
 export interface IIconActionParams {
     container: string;
@@ -62,7 +66,42 @@ export class ModelActions {
         this.actionIcons.push(new IconAction({
             container: 'actionDivImportDiv',
             actionFunction: () => {
-                throw new Error('NI');
+                const fileInput = document.getElementById('jsonImportInput') as HTMLInputElement;
+                fileInput.onchange = (e: Event) => {
+
+                    // @ts-ignore
+                    var file = e.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = e => {
+
+                        /**
+                         * read and build modifications
+                         */
+                        const modificationValues: IModificationValues[] = JSON.parse(e.target.result as string);
+                        modificationValues.forEach(modificationValue => {
+                            ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue);
+                        });
+                    	Modifications.setInstanceFromValues(modificationValues);
+
+                        /**
+                         * show in modification sliders
+                         */
+                        SliderModification.getInstance().showModifications(ModelActions.getInstance().getKey());
+
+                        /**
+                         * rebuild chart to reflect changes
+                         */
+                        ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
+
+                    }
+                    reader.readAsText(file);
+
+                }
+                fileInput.click();
             }
         }));
         this.actionIcons.push(new IconAction({

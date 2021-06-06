@@ -52,9 +52,9 @@ export class SliderModification extends Slider {
                     this.indicateUpdate(this.modificationIcons[index].getId());
                     this.handleThumbPicked(index);
                 }
-                if (type === 'cursor') {
-                    ControlsTime.getInstance().getChartContactMatrix().exportToPng();
-                }
+                // if (type === 'cursor') {
+                //     ControlsTime.getInstance().getChartContactMatrix().exportToPng();
+                // }
             },
             handleThumbPicked: (index) => {
                 // console.log('thumb picked');
