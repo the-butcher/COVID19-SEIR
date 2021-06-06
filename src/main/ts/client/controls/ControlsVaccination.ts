@@ -27,8 +27,7 @@ export class ControlsVaccination {
 
     constructor() {
         const absTotal = Demographics.getInstance().getAbsTotal();
-        const exp = Math.round(Math.log10(absTotal)) - 2;
-        const dosesPerDayMax = Math.pow(10, exp);
+        const dosesPerDayMax = ObjectUtil.getMaxVaccinations(absTotal);
         this.sliderDosesPerDay = new SliderVaccination(dosesPerDayMax);
     }
 

@@ -1,16 +1,14 @@
-import { ModificationSettings } from './../ModificationSettings';
-import { ModificationTime } from './../ModificationTime';
-import { IModificationValuesTime } from './../IModificationValuesTime';
-import { Modifications } from './../Modifications';
 import { describe, expect, it } from '@jest/globals';
 import model2config from '../../../../webapp/data/model2-data-at.json';
-import model2testmodifications from '../../../../webapp/data/model2-test-modifications.json'
+import model2testmodifications from '../../../../webapp/data/model2-test-modifications.json';
 import { ModelConstants } from '../../../model/ModelConstants';
 import { ObjectUtil } from '../../../util/ObjectUtil';
-import { ModificationTesting } from '../ModificationTesting';
+import { IModificationValues } from '../IModificationValues';
 import { Demographics } from './../../demographics/Demographics';
 import { IDemographicsConfig } from './../../demographics/IDemographicsConfig';
-import { IModificationValues } from '../IModificationValues';
+import { Modifications } from './../Modifications';
+import { ModificationSettings } from './../ModificationSettings';
+import { ModificationTime } from './../ModificationTime';
 
 describe("test value", () => {
     Demographics.setInstanceFromConfig(model2config as IDemographicsConfig);

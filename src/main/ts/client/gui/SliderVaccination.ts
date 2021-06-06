@@ -13,19 +13,18 @@ export class SliderVaccination extends Slider {
 
         document.getElementById('slidersVaccinationDiv').appendChild(container);
 
+        const tick = max / 4;
+        const ticks = [
+            0, tick, tick * 2, tick * 3 , tick * 4
+        ]
+
         super({
             container,
             min: 0,
             max: max,
             step: 1000,
             values: [0],
-            ticks: [
-                0,
-                50000,
-                100000,
-                150000,
-                200000
-            ],
+            ticks,
             label: 'doses per day',
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();

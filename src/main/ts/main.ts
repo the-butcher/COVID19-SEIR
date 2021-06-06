@@ -8,7 +8,6 @@ import { JsonLoader } from './util/JsonLoader';
 import { Logger } from './util/Logger';
 import { ObjectUtil } from './util/ObjectUtil';
 
-
 new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).then(demographicsConfig => {
 
     Logger.setInstance(console.log);

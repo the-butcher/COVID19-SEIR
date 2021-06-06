@@ -51,4 +51,8 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     abstract getMaxValue(data: IModificationData[]): number;
 
+    abstract getMinValue(data: IModificationData[]): number;
+
+    abstract getTitle(): string;
+
 }

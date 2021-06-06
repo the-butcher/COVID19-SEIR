@@ -26,13 +26,24 @@ export class ObjectUtil {
     }
 
     /**
-     * normalized an array of numbers so that the resulting value array sums up to 1
+     * normalizes an array of numbers so that the resulting value array sums up to 1
      * @param values
      * @returns
      */
     static normalize(values: number[]): number[] {
         const valueSum = values.reduce((a, b) => a + b, 0);
         return values.map(v => v / valueSum);
+    }
+
+    /**
+     * calculate a values for vaccinations suitable to a given population size
+     * @param absTotal
+     * @returns
+     */
+    static getMaxVaccinations(absTotal: number): number {
+        const log = Math.round(Math.log10(absTotal));
+        const div = Math.pow(10, log) * 0.25;
+        return Math.round(absTotal / div) * div * 0.02;
     }
 
 }

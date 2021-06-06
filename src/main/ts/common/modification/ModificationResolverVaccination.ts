@@ -1,7 +1,9 @@
+import { ObjectUtil } from './../../util/ObjectUtil';
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
 import { ModificationVaccination } from './ModificationVaccination';
+import { Demographics } from '../demographics/Demographics';
 
 /**
  * modification resolver for vaccination modifications
@@ -20,7 +22,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
     }
 
     getMaxValue(data: IModificationData[]): number {
-        return 100000; // TODO this needs to be an expression of max population
+        return ObjectUtil.getMaxVaccinations(Demographics.getInstance().getAbsTotal());
     }
 
     getTitle(): string {
