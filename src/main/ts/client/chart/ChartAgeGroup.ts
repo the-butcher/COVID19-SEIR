@@ -212,6 +212,18 @@ export class ChartAgeGroup {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.getLabellingDefinition());
         });
 
+        this.seriesAgeGroupCases = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotAbsolute,
+            baseLabel: 'cases',
+            valueField: 'ageGroupCases',
+            colorKey: 'CASES',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.30,
+            labelled: true,
+            percent: false
+        });
 
         this.seriesAgeGroupLabelLocation = 0.5;
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
@@ -228,18 +240,6 @@ export class ChartAgeGroup {
         });
         this.seriesAgeGroupIncidenceByStrain = new Map();
 
-        this.seriesAgeGroupCases = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotAbsolute,
-            baseLabel: 'cases',
-            valueField: 'ageGroupCases',
-            colorKey: 'CASES',
-            strokeWidth: 2,
-            dashed: false,
-            locationOnPath: 0.30,
-            labelled: true,
-            percent: false
-        });
         this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,

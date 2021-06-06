@@ -52,50 +52,15 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
                 const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
                 rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
 
-                console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
+                // console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
 
             }
-
-
 
             return rT; // * dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].SUSCEPTIBLE; // / threshold;
 
         }
 
         return Number.NaN;
-
-        // const paddingDays = 1;
-        // const ageGroupName = ChartAgeGroup.getInstance().getAgeGroupName();
-        // // reference data item
-        // const instantCur = instant; // - TimeUtil.MILLISECONDS_PER____DAY * paddingDays;
-        // const instantDst = instant + TimeUtil.MILLISECONDS_PER____DAY * paddingDays;
-        // const dataItemCur = ChartAgeGroup.getInstance().findDataItem(instantCur);
-        // const dataItemDst = ChartAgeGroup.getInstance().findDataItem(instantDst);
-
-        // if (dataItemCur && dataItemDst) {
-
-        //     const exposed0 = dataItemCur.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID_____ALL];
-        //     let exposedS = 0;
-
-        //     const modificationsStrain = this.getModifications();
-        //     for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
-
-        //         const modificationStrain = modificationsStrain[strainIndex];
-        //         const serialInterval = modificationStrain.getSerialInterval();
-
-        //         const exposedCur = dataItemCur.valueset[ageGroupName].EXPOSED[modificationStrain.getId()];
-        //         const exposedDst = dataItemDst.valueset[ageGroupName].EXPOSED[modificationStrain.getId()];
-        //         const exposedDif = (exposedDst - exposedCur) * serialInterval; // / (paddingDays * 2);
-
-        //         exposedS += (exposedCur + exposedDif)
-
-        //     }
-
-        //     return exposedS / exposed0;
-
-        // } else {
-        //     return Number.NaN;
-        // }
 
     }
 
