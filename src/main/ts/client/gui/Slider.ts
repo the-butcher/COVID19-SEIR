@@ -1,5 +1,3 @@
-import { ControlsTime } from './../controls/ControlsTime';
-import { ChartContactMatrix } from './../chart/ChartContactMatrix';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { ASliderElement } from './ASliderElement';
 import { IIconSlider } from './IIconSlider';
@@ -444,6 +442,7 @@ export class Slider {
             this.draggableThumbIndex = index;
             this.dragOffset =  e.clientX - this.sliderThumbs[index].getContainer().getBoundingClientRect().left - this.sliderThumbs[index].getContainer().getBoundingClientRect().width / 2;
         }
+        // this.handleThumbPicked(index);
 
     }
 
@@ -503,7 +502,7 @@ export class Slider {
             if (this.inputEnabled && e.target === this.sliderThumbs[this.clickableThumbIndex].getLabelContainer()) {
                 this.sliderThumbs[this.clickableThumbIndex].displayInput();
             } else {
-                // this.thumbPickedFunction(this.clickableThumbIndex); // pick this specific thumb
+                this.handleThumbPicked(this.clickableThumbIndex); // pick this specific thumb
             }
 
         } else if (this.draggableThumbIndex >= 0) {

@@ -138,6 +138,7 @@ export class ModelImplStrain implements IModelSeir {
         let nrmS: number;
         let nrmE: number;
         let compartmentE: ICompartment;
+        let nrmESum: number;
 
         let nrmSESums: number[] = [];
         this.infectiousModels.forEach(() => {
@@ -165,18 +166,21 @@ export class ModelImplStrain implements IModelSeir {
                 const baseContactRate = modificationTime.getContacts(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
                 compartmentE = infectiousModelParticipant.getIncomingCompartment();
 
+                nrmESum = 0;
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
 
                     nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
                     nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk;
 
-                    result.addNrmValue(+nrmE, compartmentE);
+                    // result.addNrmValue(+nrmE, compartmentE);
                     result.addNrmValue(-nrmE, compartmentS);
 
+                    nrmESum += nrmE;
                     nrmSESums[infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
                     this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
 
                 });
+                result.addNrmValue(nrmESum, compartmentE); // wrap total exposure into a single call to save some time
 
             });
 

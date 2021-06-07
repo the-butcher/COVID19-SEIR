@@ -28,10 +28,12 @@ export interface IModelState {
      */
     getNrmValue(compartment: ICompartment): number;
 
-    /**
-     * get all compartments contained in this state that satisfy the given filter
-     */
-    getCompartments(): ICompartment[];
+    // /**
+    //  * get all compartments contained in this state that satisfy the given filter
+    //  */
+    // getCompartments(): ICompartment[];
+
+    getValuesByCompartments(): Map<ICompartment, number>;
 
     /**
      * get the normalized value of all compartments satisfying the given filter

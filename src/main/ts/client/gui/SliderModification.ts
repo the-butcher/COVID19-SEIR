@@ -1,4 +1,3 @@
-import { ControlsTime } from './../controls/ControlsTime';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -50,7 +49,7 @@ export class SliderModification extends Slider {
                 if (type === 'stop') {
                     this.updateModificationInstants();
                     this.indicateUpdate(this.modificationIcons[index].getId());
-                    this.handleThumbPicked(index);
+                    // this.handleThumbPicked(index);
                 }
                 // if (type === 'cursor') {
                 //     ControlsTime.getInstance().getChartContactMatrix().exportToPng();
@@ -273,6 +272,12 @@ export class SliderModification extends Slider {
 
         }
 
+
+        /**
+         * create a modification resolver of the appropriate type and use it to update the modification chart
+         */
+         ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
+
         const sliderThumb = this.findThumbById(this.selectableModificationId);
         if (ObjectUtil.isNotEmpty(sliderThumb)) {
             for (let index = 0; index < this.modificationIcons.length; index++) {
@@ -282,11 +287,6 @@ export class SliderModification extends Slider {
                 }
             }
         }
-
-        /**
-         * create a modification resolver of the appropriate type and use it to update the modification chart
-         */
-        ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
 
     }
 

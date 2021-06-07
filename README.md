@@ -8,7 +8,6 @@ The code has been moved from local storage to github for backup- and documentati
 todo:
 * wiki on github
 * demographics for germany
-* modification time chart diagram find max values dynamically from dataset
 * explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
 * border cases
@@ -37,6 +36,8 @@ next:
 * color-only pickers for chart-mode
 
 done:
+* ~~modification time chart diagram find max values dynamically from dataset~~
+  * ~~when changing a modification, then switching back to "time", the currently displayed value needs to be updated, currently a time-mod drag is required to force update~~
 * ~~actions~~
   * ~~import~~
   * ~~save~~

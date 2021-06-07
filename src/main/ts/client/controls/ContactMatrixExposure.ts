@@ -1,8 +1,13 @@
-import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IContactMatrix } from '../../common/modification/IContactMatrix';
-import { ModificationTime } from '../../common/modification/ModificationTime';
+import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 
+/**
+ * contact matrix showing effective exposure for a given instant
+ *
+ * @author h.fleischer
+ * @since 07.06.2021
+ */
 export class ContactMatrixExposure implements IContactMatrix {
 
     private readonly instant: number;

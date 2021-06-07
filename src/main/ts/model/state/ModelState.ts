@@ -18,14 +18,14 @@ export class ModelState implements IModelState {
         return new ModelState();
     }
 
-    private readonly valuesByCompartments: Map<ICompartment, number>;
+    protected readonly valuesByCompartments: Map<ICompartment, number>;
 
     private constructor() {
         this.valuesByCompartments = new Map();
     }
 
-    getCompartments(): ICompartment[] {
-        return [...this.valuesByCompartments.keys()];
+    getValuesByCompartments(): Map<ICompartment, number> {
+        return this.valuesByCompartments;
     }
 
     addNrmValue(value: number, compartment: ICompartment): void {
@@ -37,8 +37,8 @@ export class ModelState implements IModelState {
     }
 
     add(other: IModelState): IModelState {
-        other.getCompartments().forEach(compartment => {
-            this.addNrmValue(other.getNrmValue(compartment), compartment);
+        other.getValuesByCompartments().forEach((value, compartment) => {
+            this.addNrmValue(value, compartment);
         });
         return this;
     }
@@ -47,7 +47,7 @@ export class ModelState implements IModelState {
         let normalizedValueSum = 0;
         this.valuesByCompartments.forEach((value, compartment) => {
             if (compartmentFilter.test(compartment)) {
-                normalizedValueSum += this.getNrmValue(compartment);
+                normalizedValueSum += value;
             }
         });
         return normalizedValueSum;

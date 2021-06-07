@@ -33,8 +33,6 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     getModificationData(): IModificationData[] {
 
-        this.typedModifications = Modifications.getInstance().findModificationsByType(this.key).map(m => m as M);
-
         const minChartInstant = ModelConstants.MODEL_MIN_____INSTANT;
         const maxChartInstant = ModelConstants.MODEL_MAX_____INSTANT;
 

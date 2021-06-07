@@ -1,5 +1,8 @@
-import { IModificationData } from '../../client/chart/ChartAgeGroup';
-import { ObjectUtil } from '../../util/ObjectUtil';
+import { Demographics } from './../demographics/Demographics';
+import { TimeUtil } from './../../util/TimeUtil';
+import { ModelTotal } from './../../client/controls/ModelTotal';
+import { ModelConstants } from '../../model/ModelConstants';
+import { ChartAgeGroup, IModificationData } from './../../client/chart/ChartAgeGroup';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesSettings } from './IModificationValuesSettings';
 import { ModificationSettings } from './ModificationSettings';
@@ -18,19 +21,24 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
     }
 
     getMinValue(): number {
-        return 0;
+        return Demographics.getInstance().getAbsTotal() * 0.95;
     }
 
     getMaxValue(): number {
-        return 0;
+        return Demographics.getInstance().getAbsTotal() * 1.05;
     }
 
     getValue(instant: number): number {
+
+        const dataItemCur = ChartAgeGroup.getInstance().findDataItem(instant);
+        if (dataItemCur) {
+            return dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].TOTAL;
+        }
         return Number.NaN;
     }
 
     getTitle(): string {
-        return '';
+        return 'total (control value)';
     }
 
 }

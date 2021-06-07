@@ -194,15 +194,16 @@ export class ControlsConstants {
             icon: 'M 4.62 3.25 H 4.62 L 3.62 4.5 A 0.8 0.8 90 0 1 2.5 4.63 H 2.5 L -0.85 2.14 A 2 2 90 0 1 -1.6 0.58 V -7.2 A 0.8 0.8 90 0 1 -0.8 -8 H 0.8 A 0.8 0.8 90 0 1 1.6 -7.2 V 0 L 4.5 2.13 A 0.8 0.8 90 0 1 4.62 3.25 Z',
             container: 'modificationTimeDiv',
             handleModificationUpdate: () => {
-                console.log('time updated')
-                return null;
+                return null; // do nothing
             },
             handleModificationDrag: (instant: number) => {
                 ChartAgeGroup.getInstance().setInstant(instant);
             },
             getModificationResolver: () => {
-                console.log('creating time resolver');
-                return ModificationResolverTime.getInstance();
+                console.log('create or get time resolver');
+                const modificationResolver = ModificationResolverTime.getInstance();
+                modificationResolver.buildModificationData();
+                return modificationResolver;
             },
             showInEditor: modification => {
                 // TODO build an appropriate effective contact matrix here
@@ -270,7 +271,6 @@ export class ControlsConstants {
             },
             handleModificationDrag: () => {},
             getModificationResolver: () => {
-                // ModificationResolverSeasonality.getInstance().buildModificationData();
                 return new ModificationResolverSeasonality();
             },
             showInEditor: modification => ControlsSeasonality.getInstance().acceptModification(modification as ModificationSeasonality),

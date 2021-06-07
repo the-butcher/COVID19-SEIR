@@ -28,7 +28,7 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
     }
 
     getTitle(): string {
-        return 'r(t)';
+        return 'reproduction rate';
     }
 
     getValue(instant: number): number {

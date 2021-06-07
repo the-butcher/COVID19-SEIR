@@ -1,7 +1,7 @@
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
-import { ContactMatrixExposure } from './ContactMatrixExposure';
+import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
 import { Controls } from './Controls';
 
 /**
@@ -20,15 +20,14 @@ export class ControlsTime {
     }
     private static instance: ControlsTime;
 
-    private readonly chartTime: ChartContactMatrix;
-    private modification: ModificationTime;
+    private readonly chartContactMatrix: ChartContactMatrix;
 
     constructor() {
-        this.chartTime = new ChartContactMatrix('chartTimeDiv', false);
+        this.chartContactMatrix = new ChartContactMatrix('chartTimeDiv', false);
     }
 
     getChartContactMatrix(): ChartContactMatrix {
-        return this.chartTime;
+        return this.chartContactMatrix;
     }
 
     handleChange(): void {
@@ -37,8 +36,8 @@ export class ControlsTime {
 
     acceptModification(modification: ModificationTime): void {
         Controls.acceptModification(modification);
-        this.modification = modification;
-        this.chartTime.redraw(new ContactMatrixExposure(modification.getInstantA()));
+        const contactMatrix = ModificationResolverTime.getInstance().findContactMatrix(modification.getInstantA());
+        this.chartContactMatrix.redraw(contactMatrix);
     }
 
 }

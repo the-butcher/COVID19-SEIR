@@ -8,6 +8,7 @@ import { ModificationResolverSeasonality } from './ModificationResolverSeasonali
 import { ModificationResolverSettings } from './ModificationResolverSettings';
 import { ModificationResolverTesting } from './ModificationResolverTesting';
 import { ModificationResolverVaccination } from './ModificationResolverVaccination';
+import { Modifications } from './Modifications';
 import { ModificationSeasonality } from './ModificationSeasonality';
 import { ModificationSettings } from './ModificationSettings';
 import { ModificationTesting } from './ModificationTesting';
@@ -36,8 +37,13 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         // nothing to be updated
     }
 
+    /**
+     * TODO there should be a test for this
+     * must be instant A (the underlying contact modification may have a different time, while still applying to this instance)
+     * @returns
+     */
     getInstant(): number {
-        return this.modificationContact.getInstant();
+        return this.getInstantA();
     }
 
     /**
@@ -51,7 +57,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
         this.modificationVaccination = new ModificationResolverVaccination().getModification(this.getInstantA());
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
-        this.modificationSettings = new ModificationResolverSettings().getModifications()[0];
+        this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
     }
 
     getMaxColTotal(): number {

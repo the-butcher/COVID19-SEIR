@@ -33,7 +33,19 @@ export interface IDataValues {
     INCIDENCES: { [K: string]: number };
     EXPOSED: { [K: string]: number };
     INFECTIOUS: { [K: string]: number };
+    TOTAL: number;
 }
+
+// export interface ICompartmentFilters {
+//     SUSCEPTIBLE: ICompartmentFilter;
+//     EXPOSED: ICompartmentFilter;
+//     INFECTIOUS: ICompartmentFilter;
+//     REMOVED_D: ICompartmentFilter;
+//     REMOVED_U: ICompartmentFilter;
+//     REMOVED_V: ICompartmentFilter;
+//     CASES: ICompartmentFilter;
+//     INCIDENCE: ICompartmentFilter;
+// }
 
 /**
  * performs an euler-integration in 1 hour steps on a model-state
@@ -140,6 +152,7 @@ export class ModelStateIntegrator {
         const compartmentFilterRemovedVTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V));
         const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0);
         const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N));
+        const compartmentFilterModelTotal = new CompartmentFilter(c => (c.getCompartmentType() !== ECompartmentType.X__INCUBATE_0 && c.getCompartmentType() !== ECompartmentType.X__INCUBATE_N));
 
         for (; this.curInstant <= dstInstant; this.curInstant += ModelStateIntegrator.DT) {
 
@@ -194,7 +207,8 @@ export class ModelStateIntegrator {
                     CASES: this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal,
                     INCIDENCES: incidences,
                     EXPOSED: exposed,
-                    INFECTIOUS: infectious
+                    INFECTIOUS: infectious,
+                    TOTAL: this.modelState.getNrmValueSum(compartmentFilterModelTotal) * absTotal,
                 };
 
                 this.model.getDemographics().getAgeGroups().forEach(ageGroup => {
@@ -209,6 +223,7 @@ export class ModelStateIntegrator {
                     const compartmentFilterRemovedV = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterCases = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterIncidence = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N) && c.getAgeGroupIndex() === ageGroup.getIndex());
+                    const compartmentFilterAgeGroupTotal = new CompartmentFilter(c => (c.getCompartmentType() !== ECompartmentType.X__INCUBATE_0 && c.getCompartmentType() !== ECompartmentType.X__INCUBATE_N) && c.getAgeGroupIndex() === ageGroup.getIndex());
 
                     const removedD = this.modelState.getNrmValueSum(compartmentFilterRemovedD) * groupNormalizer;
                     const removedU = this.modelState.getNrmValueSum(compartmentFilterRemovedU) * groupNormalizer;
@@ -241,7 +256,8 @@ export class ModelStateIntegrator {
                         CASES: this.modelState.getNrmValueSum(compartmentFilterCases) * absTotal,
                         INCIDENCES: incidencesAgeGroup,
                         EXPOSED: exposedAgeGroup,
-                        INFECTIOUS: infectiousAgeGroup
+                        INFECTIOUS: infectiousAgeGroup,
+                        TOTAL: this.modelState.getNrmValueSum(compartmentFilterAgeGroupTotal) * groupNormalizer,
                     };
 
 
@@ -269,65 +285,5 @@ export class ModelStateIntegrator {
         return dataSet;
 
     }
-
-    // isValid(): boolean {
-    //     let valid = true;
-    //     this.modelState.isV forEach((value, compartment) => {
-    //         valid = Number.isNaN(value) ? false : valid;
-    //     });
-    //     return valid;
-    // }
-
-    // getValue(index: number): number {
-    //     const valueIterator = this.state.values();
-    //     for (let i=0; i<index; i++) {
-    //         valueIterator.next();
-    //     }
-    //     return valueIterator.next().value;
-    // }
-
-    // getNormalizedValueSum(...compartmentTypes: ECompartmentType2[]): number {
-    //     let normalizedValueSum = 0;
-    //     this.state.forEach((value, compartment) => {
-    //         if (compartmentTypes.indexOf(compartment.getCompartmentType()) >= 0) {
-    //             normalizedValueSum += value;
-    //         }
-    //     });
-    //     return normalizedValueSum;
-    // }
-
-    // getAbsoluteValueSum(...compartmentTypes: ECompartmentType2[]): number {
-    //     return this.getNormalizedValueSum(...compartmentTypes) * this.model.getPn();
-    // }
-
-    // getNormalizedValueSumStrain(strain: IStrain, ...compartmentTypes: ECompartmentType2[]): number {
-    //     let normalizedValueSum = 0;
-    //     this.state.forEach((value, compartment) => {
-    //         if (compartmentTypes.indexOf(compartment.getCompartmentType()) >= 0 && compartment.getStrain() === strain) {
-    //             normalizedValueSum += value;
-    //         }
-    //     });
-    //     return normalizedValueSum;
-    // }
-
-    // getAbsoluteValueSumStrain(strain: IStrain, ...compartmentTypes: ECompartmentType2[]): number {
-    //     return this.getNormalizedValueSumStrain(strain, ...compartmentTypes) * this.model.getPn();
-    // }
-
-    // getR0(tT: number): number {
-    //     // TODO calculate a weighed average
-    //     throw new Error("NI");
-    //     // const shareOfB117 = this.getShareOfB117();
-    //     // const shareOfCov2 = 1 - shareOfB117;
-    //     // const rEfft0 = this.model.getREffCov2() * shareOfCov2 + this.model.getREffB117() * shareOfB117;
-    //     // return rEfft0 * this.model.getInterventionSet().getMultiplier(tT);
-    // }
-
-    // getRT(tT: number): number {
-    //     return this.getR0(tT) * this.getNormalizedValueSum(ECompartmentType2.S_SUSCEPTIBLE);
-    // }
-
-
-
 
 }
