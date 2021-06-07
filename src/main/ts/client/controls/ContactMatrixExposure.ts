@@ -41,11 +41,11 @@ export class ContactMatrixExposure implements IContactMatrix {
     }
 
     getMaxCellTotal(): number {
-        return 0.001; // this.maxCellTotal;
+        return this.maxCellTotal; // 0.001;
     }
 
     getMaxColTotal(): number {
-        return 0.0028; // this.maxCellTotal;
+        return this.maxColTotal; // 0.0028;
     }
 
     getContacts(indexContact: number, indexParticipant: number): number {

@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { IModificationData } from './../../client/chart/ChartAgeGroup';
@@ -15,11 +16,11 @@ import { Modifications } from './Modifications';
 export abstract class AModificationResolver<V extends IModificationValues, M extends IModification<V>> implements IModificationResolver<V, M> {
 
     private readonly key: MODIFICATION____KEY;
-    private readonly typedModifications: M[];
+    private typedModifications: M[];
 
     constructor(key: MODIFICATION____KEY) {
         this.key = key;
-        this.typedModifications = Modifications.getInstance().findModificationsByType(key).map(m => m as M);
+        this.typedModifications = Modifications.getInstance().findModificationsByType(this.key).map(m => m as M);
     }
 
     getKey(): MODIFICATION____KEY {
@@ -28,6 +29,28 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     getModifications(): M[] {
         return this.typedModifications;
+    }
+
+    getModificationData(): IModificationData[] {
+
+        this.typedModifications = Modifications.getInstance().findModificationsByType(this.key).map(m => m as M);
+
+        const minChartInstant = ModelConstants.MODEL_MIN_____INSTANT;
+        const maxChartInstant = ModelConstants.MODEL_MAX_____INSTANT;
+
+        const modificationData = [];
+        for (let instant = minChartInstant; instant <= maxChartInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            const modValueY = this.getValue(instant);
+            if (!Number.isNaN(modValueY)) {
+                modificationData.push({
+                    modValueY,
+                    categoryX: TimeUtil.formatCategoryDate(instant)
+                });
+            }
+        }
+
+        return modificationData;
+
     }
 
     getModification(instant: number): M {
@@ -49,9 +72,9 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     abstract getValue(instant: number): number;
 
-    abstract getMaxValue(data: IModificationData[]): number;
+    abstract getMaxValue(): number;
 
-    abstract getMinValue(data: IModificationData[]): number;
+    abstract getMinValue(): number;
 
     abstract getTitle(): string;
 

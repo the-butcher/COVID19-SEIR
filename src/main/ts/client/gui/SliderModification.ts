@@ -163,7 +163,7 @@ export class SliderModification extends Slider {
                 /**
                  * find previous modification
                  */
-                const modificationResolver = ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver();
+                const modificationResolver = ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver();
                 const previousModification = modificationResolver.getModification(instant);
 
                 /**
@@ -286,7 +286,7 @@ export class SliderModification extends Slider {
         /**
          * create a modification resolver of the appropriate type and use it to update the modification chart
          */
-        ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver());
+        ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
 
     }
 

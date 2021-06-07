@@ -1,4 +1,5 @@
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
+import { ObjectUtil } from '../../util/ObjectUtil';
 import { Demographics } from '../demographics/Demographics';
 import { ContactMatrixSums } from './../../client/controls/ContactMatrixSums';
 import { AModificationResolver } from './AModificationResolver';
@@ -17,11 +18,11 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         super('CONTACT');
     }
 
-    getMinValue(data: IModificationData[]): number {
+    getMinValue(): number {
         return 0;
     }
 
-    getMaxValue(data: IModificationData[]): number {
+    getMaxValue(): number {
         return 1;
     }
 

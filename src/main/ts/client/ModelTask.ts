@@ -25,7 +25,7 @@ export class ModelTask {
     static async commit(key: MODIFICATION____KEY, demographicsConfig: IDemographicsConfig, modificationValues: IModificationValues[]): Promise<void> {
 
         // 1. update for immediate response
-        ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver());
+        ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
 
         // const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance());
         // const minInstant = ModelConstants.MODEL_MIN_______________DATE;
@@ -64,7 +64,7 @@ export class ModelTask {
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
 
                 // 2. update to be sure that modification chart shows on initial load
-                ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].createModificationResolver());
+                ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
 
                 SliderModification.getInstance().setProgress(0);
                 // ModelLoader.worker.terminate();

@@ -13,15 +13,24 @@ import { Demographics } from '../demographics/Demographics';
  */
 export class ModificationResolverVaccination extends AModificationResolver<IModificationValuesVaccination, ModificationVaccination> {
 
+    // static getInstance(): ModificationResolverVaccination {
+    //     // if (ObjectUtil.isEmpty(this.instance)) {
+    //     //     this.instance = new ModificationResolverVaccination();
+    //     // }
+    //     // return this.instance;
+    //     return new ModificationResolverVaccination();
+    // }
+    // private static instance: ModificationResolverVaccination;
+
     constructor() {
         super('VACCINATION');
     }
 
-    getMinValue(data: IModificationData[]): number {
+    getMinValue(): number {
         return 0;
     }
 
-    getMaxValue(data: IModificationData[]): number {
+    getMaxValue(): number {
         return ObjectUtil.getMaxVaccinations(Demographics.getInstance().getAbsTotal());
     }
 

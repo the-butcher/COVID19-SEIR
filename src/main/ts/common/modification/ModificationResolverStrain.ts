@@ -1,3 +1,4 @@
+import { ObjectUtil } from './../../util/ObjectUtil';
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
@@ -18,12 +19,12 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
         super('STRAIN');
     }
 
-    getMinValue(data: IModificationData[]): number {
-        return Math.min(...data.map(d => d.modValueY)) * 0.95;
+    getMinValue(): number {
+        return Math.min(...this.getModificationData().map(d => d.modValueY)) * 0.95;
     }
 
-    getMaxValue(data: IModificationData[]): number {
-        return Math.max(...data.map(d => d.modValueY)) * 1.05;
+    getMaxValue(): number {
+        return Math.max(...this.getModificationData().map(d => d.modValueY)) * 1.05;
     }
 
     getTitle(): string {

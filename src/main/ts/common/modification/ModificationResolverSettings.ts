@@ -1,4 +1,5 @@
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
+import { ObjectUtil } from '../../util/ObjectUtil';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesSettings } from './IModificationValuesSettings';
 import { ModificationSettings } from './ModificationSettings';
@@ -16,11 +17,11 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
         super('SETTINGS');
     }
 
-    getMinValue(data: IModificationData[]): number {
+    getMinValue(): number {
         return 0;
     }
 
-    getMaxValue(data: IModificationData[]): number {
+    getMaxValue(): number {
         return 0;
     }
 

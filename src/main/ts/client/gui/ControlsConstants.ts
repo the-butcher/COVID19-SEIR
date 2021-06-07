@@ -38,7 +38,7 @@ export interface IControlsDefinitions {
     container: string;
     handleModificationUpdate: () => Promise<void>;
     handleModificationDrag: (instant: number) => void;
-    createModificationResolver: () => IModificationResolver<IModificationValues, IModification<IModificationValues>>,
+    getModificationResolver: () => IModificationResolver<IModificationValues, IModification<IModificationValues>>,
     showInEditor?: (modification: IModification<IModificationValues>) => void;
     labellingDefinition: ILabellingDefinition;
 }
@@ -200,8 +200,14 @@ export class ControlsConstants {
             handleModificationDrag: (instant: number) => {
                 ChartAgeGroup.getInstance().setInstant(instant);
             },
-            createModificationResolver: () => new ModificationResolverTime(),
-            showInEditor: modification => ControlsTime.getInstance().acceptModification(modification as ModificationTime),
+            getModificationResolver: () => {
+                console.log('creating time resolver');
+                return ModificationResolverTime.getInstance();
+            },
+            showInEditor: modification => {
+                // TODO build an appropriate effective contact matrix here
+                ControlsTime.getInstance().acceptModification(modification as ModificationTime);
+            },
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         },
         'STRAIN': {
@@ -211,7 +217,9 @@ export class ControlsConstants {
                 return ModelTask.commit('STRAIN', Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
             },
             handleModificationDrag: () => {},
-            createModificationResolver: () => new ModificationResolverStrain(),
+            getModificationResolver: () => {
+                return new ModificationResolverStrain();
+            },
             showInEditor: modification => ControlsStrain.getInstance().acceptModification(modification as ModificationStrain),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         },
@@ -222,7 +230,9 @@ export class ControlsConstants {
                 return ModelTask.commit('CONTACT', Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
             },
             handleModificationDrag: () => {},
-            createModificationResolver: () => new ModificationResolverContact(),
+            getModificationResolver: () => {
+                return new ModificationResolverContact();
+            },
             showInEditor: modification => ControlsContact.getInstance().acceptModification(modification as ModificationContact),
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -233,7 +243,9 @@ export class ControlsConstants {
                 return ModelTask.commit('TESTING', Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
             },
             handleModificationDrag: () => {},
-            createModificationResolver: () => new ModificationResolverTesting(),
+            getModificationResolver: () => {
+                return new ModificationResolverTesting();
+            },
             showInEditor: modification => ControlsTesting.getInstance().acceptModification(modification as ModificationTesting),
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -244,7 +256,9 @@ export class ControlsConstants {
                 return ModelTask.commit('VACCINATION', Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
             },
             handleModificationDrag: () => {},
-            createModificationResolver: () => new ModificationResolverVaccination(),
+            getModificationResolver: () => {
+                return new ModificationResolverVaccination();
+            },
             showInEditor: modification => ControlsVaccination.getInstance().acceptModification(modification as ModificationVaccination),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         },
@@ -255,7 +269,10 @@ export class ControlsConstants {
                 return ModelTask.commit('SEASONALITY', Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
             },
             handleModificationDrag: () => {},
-            createModificationResolver: () => new ModificationResolverSeasonality(),
+            getModificationResolver: () => {
+                // ModificationResolverSeasonality.getInstance().buildModificationData();
+                return new ModificationResolverSeasonality();
+            },
             showInEditor: modification => ControlsSeasonality.getInstance().acceptModification(modification as ModificationSeasonality),
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -266,7 +283,9 @@ export class ControlsConstants {
                 return ModelTask.commit('SETTINGS', Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
             },
             handleModificationDrag: () => {},
-            createModificationResolver: () => new ModificationResolverSettings(),
+            getModificationResolver: () => {
+                return new ModificationResolverSettings();
+            },
             showInEditor: modification => ControlsSettings.getInstance().acceptModification(modification as ModificationSettings),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         }
@@ -284,32 +303,15 @@ export class ControlsConstants {
 
     static rebuildModificationChart(modificationResolver: IModificationResolver<IModificationValues, IModification<IModificationValues>>): void {
 
-        const minChartInstant = SliderModification.getInstance().getMinValue();
-        const maxChartInstant = SliderModification.getInstance().getMaxValue();
-
-        const modificationData: IModificationData[] = [];
-        for (let instant = minChartInstant; instant <= maxChartInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const modValueY = modificationResolver.getValue(instant);
-            if (!Number.isNaN(modValueY)) {
-                modificationData.push({
-                    modValueY,
-                    categoryX: TimeUtil.formatCategoryDate(instant)
-                });
-            }
-        }
-
-        // console.log('modificationData', modificationData);
-        const min = modificationResolver.getMinValue(modificationData);
-        const max = modificationResolver.getMaxValue(modificationData);
         const key = modificationResolver.getKey();
         ChartAgeGroup.getInstance().showModifications({
-            min,
-            max,
+            min: modificationResolver.getMinValue(),
+            max: modificationResolver.getMaxValue(),
             labellingDefinition: ControlsConstants.MODIFICATION_PARAMS[modificationResolver.getKey()].labellingDefinition,
             text: modificationResolver.getTitle(),
             color: ControlsConstants.COLORS[key],
             useObjectColors: true,
-        }, modificationData);
+        }, modificationResolver.getModificationData());
 
     }
 

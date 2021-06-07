@@ -1,5 +1,6 @@
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
+import { ObjectUtil } from '../../util/ObjectUtil';
 import { ContactMatrixExposure } from './../../client/controls/ContactMatrixExposure';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesTime } from './IModificationValuesTime';
@@ -14,16 +15,25 @@ import { ModificationTime } from './ModificationTime';
  */
 export class ModificationResolverTime extends AModificationResolver<IModificationValuesTime, ModificationTime> {
 
-    constructor() {
+    static getInstance(): ModificationResolverTime {
+        if (ObjectUtil.isEmpty(this.instance)) {
+            this.instance = new ModificationResolverTime();
+        }
+        return this.instance;
+        // return new ModificationResolverTime();
+    }
+    private static instance: ModificationResolverTime;
+
+    private constructor() {
         super('TIME');
     }
 
-    getMinValue(data: IModificationData[]): number {
+    getMinValue(): number {
         return 0;
     }
 
-    getMaxValue(data: IModificationData[]): number {
-        return Math.max(...data.map(d => d.modValueY)) * 1.05;
+    getMaxValue(): number {
+        return Math.max(...this.getModificationData().map(d => d.modValueY)) * 1.05;
     }
 
     getTitle(): string {
