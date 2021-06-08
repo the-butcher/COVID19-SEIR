@@ -1,8 +1,6 @@
-import { Demographics } from './../demographics/Demographics';
-import { TimeUtil } from './../../util/TimeUtil';
-import { ModelTotal } from './../../client/controls/ModelTotal';
 import { ModelConstants } from '../../model/ModelConstants';
-import { ChartAgeGroup, IModificationData } from './../../client/chart/ChartAgeGroup';
+import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
+import { Demographics } from './../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesSettings } from './IModificationValuesSettings';
 import { ModificationSettings } from './ModificationSettings';

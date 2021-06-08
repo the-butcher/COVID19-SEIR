@@ -1,3 +1,4 @@
+import { IncidenceData } from './../../model/incidence/IncidenceData';
 import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -868,9 +869,17 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
         for (const dataItem of this.modelData) {
 
+            const incidenceItem = IncidenceData.getInstance().findIncidenceData(dataItem.categoryX);
+            // console.log('incidenceItem', incidenceItem);
+
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
-                const value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
+                let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
+
+                if (incidenceItem) {
+                    value -= incidenceItem[ageGroupHeat.getName()];
+                }
+
                 const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
                 heatData.push({
                     categoryX: dataItem.categoryX,
@@ -880,6 +889,7 @@ export class ChartAgeGroup {
                     label
                 });
                 maxValue = Math.max(maxValue, value);
+
             });
 
         }

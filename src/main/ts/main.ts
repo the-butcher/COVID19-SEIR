@@ -1,3 +1,4 @@
+import { IncidenceData } from './model/incidence/IncidenceData';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { StorageUtil } from './client/controls/StorageUtil';
 import { ControlsConstants } from './client/gui/ControlsConstants';
@@ -9,6 +10,10 @@ import { Logger } from './util/Logger';
 import { ObjectUtil } from './util/ObjectUtil';
 
 new JsonLoader().load(`data/model2-data-at.json?cb=${ObjectUtil.createId()}`).then(demographicsConfig => {
+
+    new JsonLoader().load(`data/heatmap-data-at.json?cb=${ObjectUtil.createId()}`).then(heatmapConfig => {
+        IncidenceData.setupInstance(heatmapConfig);
+    });
 
     Logger.setInstance(console.log);
 

@@ -16,12 +16,8 @@ todo:
   * limit incidence range on modifications later than MIN_DATE to i.e. 10
   * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
   * keep history in local storage (or internal, reset modification after validation problems)
-* testing, validity, plausibility
-  * check model for having constant population (some submodels (i.e. incidence) do not count, ...)
-  * find and eliminate most prominent performance bottlenecks
-  * will caching compartments on compartmentFilter improve performance?
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
-* move transmission-risk calculation away from worker (?)
+* create some heatmap format that allows to show delta between model and reality
 
 next:
 * add strain names to export json
@@ -34,8 +30,13 @@ next:
 * add immune escape to strain modification (percentage of cases that are susceptible among recovered individuals)
 * zoomable chart and slider
 * color-only pickers for chart-mode
+* testing, validity, plausibility
+  * find and eliminate most prominent performance bottlenecks
+  * will caching compartments on compartmentFilter improve performance?
+  * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 done:
+* ~~check model for having constant population (some submodels (i.e. incidence) do not count, ...)~~
 * ~~modification time chart diagram find max values dynamically from dataset~~
   * ~~when changing a modification, then switching back to "time", the currently displayed value needs to be updated, currently a time-mod drag is required to force update~~
 * ~~actions~~
