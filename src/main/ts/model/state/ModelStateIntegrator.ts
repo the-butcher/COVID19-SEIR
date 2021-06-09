@@ -20,6 +20,7 @@ export interface IModelProgress {
 }
 
 export interface IDataItem {
+    instant: number;
     categoryX: string;
     valueset: { [K: string]: IDataValues };
     exposure: number[][];
@@ -195,6 +196,7 @@ export class ModelStateIntegrator {
                 });
 
                 const dataItem: IDataItem = {
+                    instant: this.curInstant,
                     categoryX: TimeUtil.formatCategoryDate(this.curInstant),
                     valueset: {},
                     exposure: this.exposure

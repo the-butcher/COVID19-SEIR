@@ -1,4 +1,4 @@
-import { IncidenceData } from './../../model/incidence/IncidenceData';
+import { BaseData } from '../../model/incidence/BaseData';
 import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -803,7 +803,7 @@ export class ChartAgeGroup {
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
             name: ModelConstants.AGEGROUP_NAME_ALL,
             pG: Demographics.getInstance().getAbsTotal(),
-            vacc: 0
+            prio: 0
         })];
 
         let maxIncidence = 0;
@@ -869,15 +869,17 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
         for (const dataItem of this.modelData) {
 
-            const incidenceItem = IncidenceData.getInstance().findIncidenceData(dataItem.categoryX);
-            // console.log('incidenceItem', incidenceItem);
+            const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
+            const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
+            // console.log('incidenceItem', dataItemA, dataItemB);
 
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
-                if (incidenceItem) {
-                    value -= incidenceItem[ageGroupHeat.getName()];
+                if (dataItemA && dataItemB) {
+                    const baseIncidence = (dataItemB[ageGroupHeat.getName()] - dataItemA[ageGroupHeat.getName()]) * 100000 / ageGroupHeat.getAbsValue();
+                    value -= baseIncidence;
                 }
 
                 const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);

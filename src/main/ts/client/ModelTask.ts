@@ -2,6 +2,7 @@
 import ModelWorker from "worker-loader!./../work";
 import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
 import { IModificationValues } from '../common/modification/IModificationValues';
+import { IBaseDataConfig, IBaseDataItem } from '../model/incidence/BaseData';
 import { IWorkerInput } from '../model/IWorkerInput';
 import { MODIFICATION____KEY } from '../model/ModelConstants';
 import { IModelProgress } from '../model/state/ModelStateIntegrator';
@@ -22,24 +23,18 @@ export class ModelTask {
      */
     private static worker: ModelWorker;
 
-    static async commit(key: MODIFICATION____KEY, demographicsConfig: IDemographicsConfig, modificationValues: IModificationValues[]): Promise<void> {
+    static async commit(key: MODIFICATION____KEY, demographicsConfig: IDemographicsConfig, modificationValues: IModificationValues[], baseDataConfig: IBaseDataConfig): Promise<void> {
 
         // 1. update for immediate response
         ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
-
-        // const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance());
-        // const minInstant = ModelConstants.MODEL_MIN_______________DATE;
-        // const maxInstant = ModelConstants.MODEL_MAX_______________DATE;
-        // const modelData = await modelStateIntegrator.buildModelData(Demographics.getInstance(), minInstant, maxInstant);
-        // Logger.getInstance().log('modelData A', modelData);
-        // ChartAgeGroup.getInstance().acceptModelData(modelData);
 
         /**
          * build worker input
          */
         const workerInput: IWorkerInput = {
             demographicsConfig,
-            modificationValues
+            modificationValues,
+            baseDataConfig,
         }
 
         /**
@@ -58,9 +53,6 @@ export class ModelTask {
             const modelProgress: IModelProgress = e.data;
             if (modelProgress.ratio >= 1 && modelProgress.data) {
 
-                // this.logIncidences(modelProgress.data[0]);
-                // this.logIncidences(modelProgress.data[modelProgress.data.length - 1]);
-
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
 
                 // 2. update to be sure that modification chart shows on initial load
@@ -75,18 +67,6 @@ export class ModelTask {
             }
         };
 
-
     }
-
-    // static logIncidences(dataItem: IDataItem) {
-    //     const totalIncidence = dataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
-    //     console.log(ModelConstants.AGEGROUP_NAME_ALL, totalIncidence);
-    //     for (let ageGroupIndex = 0; ageGroupIndex < Demographics.getInstance().getAgeGroups().length; ageGroupIndex++) {
-    //         const ageGroup = Demographics.getInstance().getAgeGroups()[ageGroupIndex];
-    //         const ageGroupIncidence = dataItem.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
-    //         // console.log(ageGroup.getName(), ageGroupIncidence, ageGroupIncidence / totalIncidence, ageGroupIncidence * 500 / totalIncidence);
-    //         console.log(ageGroupIncidence);
-    //     }
-    // }
 
 }

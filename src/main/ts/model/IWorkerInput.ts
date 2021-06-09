@@ -1,5 +1,6 @@
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
+import { IBaseDataConfig, IBaseDataItem } from './incidence/BaseData';
 
 /**
  * definition for data transfer to the model calculation worker
@@ -13,5 +14,7 @@ export interface IWorkerInput {
     demographicsConfig: IDemographicsConfig;
 
     modificationValues: IModificationValues[];
+
+    baseDataConfig: IBaseDataConfig;
 
 }

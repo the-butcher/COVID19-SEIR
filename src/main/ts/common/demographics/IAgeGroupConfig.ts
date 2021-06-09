@@ -9,7 +9,7 @@ export interface IAgeGroupConfig {
     /**
      * priority for vaccination
      */
-    vacc: number;
+    prio: number;
 
     /**
      * human readable name of the group

@@ -18,12 +18,8 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         this.modificationValues = {...this.modificationValues, ...update};
     }
 
-    getRecoveredD(): number {
-        return this.modificationValues.recoveredD;
-    }
-
-    getRecoveredU(): number {
-        return this.modificationValues.recoveredU;
+    getUndetected(): number {
+        return this.modificationValues.undetected;
     }
 
     getVaccinated(): number {

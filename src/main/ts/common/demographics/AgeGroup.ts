@@ -12,13 +12,13 @@ export class AgeGroup {
 
     private readonly index: number;
     private readonly name: string;
-    private readonly vacc: number;
+    private readonly prio: number;
     private readonly absValue: number;
 
     constructor(index: number, ageGroupParams: IAgeGroupConfig) {
         this.index = index;
         this.name = ageGroupParams.name;
-        this.vacc = ageGroupParams.vacc;
+        this.prio = ageGroupParams.prio;
         this.absValue = ageGroupParams.pG;
     }
 
@@ -30,8 +30,8 @@ export class AgeGroup {
         return this.name;
     }
 
-    getVacc(): number {
-        return this.vacc;
+    getPrio(): number {
+        return this.prio;
     }
 
     getAbsValue(): number {

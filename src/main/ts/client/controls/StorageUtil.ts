@@ -1,3 +1,4 @@
+import { BaseData } from './../../model/incidence/BaseData';
 import { IModificationValues } from '../../common/modification/IModificationValues';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
@@ -89,7 +90,7 @@ export class StorageUtil {
                 /**
                  * rebuild chart to reflect changes
                  */
-                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues());
+                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues(), BaseData.getInstance().getBaseDataConfig());
 
             }
             reader.readAsText(file);
@@ -132,8 +133,7 @@ export class StorageUtil {
                 key: 'SETTINGS',
                 name: 'initial state',
                 instant: ModelConstants.MODEL_MIN_____INSTANT,
-                recoveredD: 0.12,
-                recoveredU: 0.12,
+                undetected: 1.00,
                 vaccinated: 0.22,
                 quarantine: 0.50,
                 dead: 0.001,

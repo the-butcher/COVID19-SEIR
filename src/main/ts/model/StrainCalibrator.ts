@@ -5,6 +5,7 @@ import { Demographics } from './../common/demographics/Demographics';
 import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
 import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { ECompartmentType } from './compartment/ECompartmentType';
+import { IBaseDataItem } from './incidence/BaseData';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelStateIntegrator } from './state/ModelStateIntegrator';
@@ -23,7 +24,7 @@ export class StrainCalibrator {
         // no public instance
     }
 
-    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesTesting): void {
+    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesTesting, baseData: IBaseDataItem): void {
 
         const ageGroups = demographics.getAgeGroups();
 
@@ -82,8 +83,7 @@ export class StrainCalibrator {
                 key: 'SETTINGS',
                 name: 'calibrate (settings)',
                 instant: ModelConstants.MODEL_MIN_____INSTANT,
-                recoveredD: 0.0,
-                recoveredU: 0.0,
+                undetected: 0.0,
                 quarantine: 0.0,
                 dead: 0.0,
                 vaccinated: 0.0,
@@ -116,7 +116,7 @@ export class StrainCalibrator {
 
         for (let interpolationIndex = 0; interpolationIndex < 20; interpolationIndex++) {
 
-            model = new ModelImplRoot(demographics, Modifications.getInstance());
+            model = new ModelImplRoot(demographics, Modifications.getInstance(), baseData);
             modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
 
             const modelState = modelStateIntegrator.getModelState();

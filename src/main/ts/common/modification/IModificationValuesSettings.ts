@@ -6,8 +6,7 @@ import { IModificationValues } from './IModificationValues';
  */
 export interface IModificationValuesSettings extends IModificationValues {
 
-    recoveredD: number; // initial number of recovered individuals
-    recoveredU: number; // initial number of recovered individuals
+    undetected: number; // a multiplier to be used to pre-determine the population of RECOVERED_U
     vaccinated: number; // initial number of vaccinated individuals (1st dose)
     quarantine: number; // percentage of contact reduction after a having tested positive
     dead: number; // initial number of dead

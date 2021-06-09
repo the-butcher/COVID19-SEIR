@@ -97,7 +97,7 @@ export class ModelConstants {
         }
     };
 
-    static readonly PRELOAD_________________DAYS = 14;
+    static readonly PRELOAD_________________DAYS = 0;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
 
@@ -111,6 +111,7 @@ export class ModelConstants {
     static readonly RANGE_______INCIDENCE = [0, 250, 500, 750, 1000];
     static readonly RANGE_SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
     static readonly RANGE______________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    static readonly RANGE______UNDETECTED = [0, 1, 2, 3];
     static readonly RANGE___MODEL_INSTANT = [
         new Date('2021-05-01').getTime(),
         new Date('2021-06-01').getTime(),

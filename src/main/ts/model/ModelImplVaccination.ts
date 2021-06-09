@@ -35,7 +35,7 @@ export class ModelImplVaccination implements IModelSeir {
         this.absTotal = modelSettings.getAbsTotal();
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupTotal = ageGroup.getAbsValue();
-        this.groupPriority = Math.pow(ageGroup.getVacc(), 10);
+        this.groupPriority = Math.pow(ageGroup.getPrio(), 10);
         this.nrmRefusal = percentageRefusal * this.ageGroupTotal / this.absTotal;
         // console.log('nrmRefusal', ageGroup.getName(), percentageRefusal);
 

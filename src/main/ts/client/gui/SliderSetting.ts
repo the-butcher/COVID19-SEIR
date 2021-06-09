@@ -8,7 +8,7 @@ export class SliderSetting extends Slider {
 
     private readonly compartmentName: string;
 
-    constructor(compartmentName: string, range: number[], steps: number) {
+    constructor(compartmentName: string, range: number[], steps: number, percent: boolean) {
 
         const container = document.createElement('div');
         container.className = 'slider-modification';
@@ -24,20 +24,28 @@ export class SliderSetting extends Slider {
 
         super({
             container,
-            min: Math.min(...ModelConstants.RANGE__PERCENTAGE_100),
-            max: Math.max(...ModelConstants.RANGE__PERCENTAGE_100),
-            step: 0.01,
+            min: Math.min(...range),
+            max: Math.max(...range),
+            step: steps,
             values: [1.0],
-            ticks: [...ModelConstants.RANGE__PERCENTAGE_100],
+            ticks: [...range],
             label: compartmentName,
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
             },
             labelFormatFunction: (index, value, type) => {
-                if (type === 'tick') {
-                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
+                if (percent) {
+                    if (type === 'tick') {
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
+                    } else {
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                    }
                 } else {
-                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                    if (type === 'tick') {
+                        return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
+                    } else {
+                        return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1);
+                    }
                 }
             },
             handleValueChange: (value, index, type) => {
@@ -50,10 +58,18 @@ export class SliderSetting extends Slider {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    if (percent) {
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    } else {
+                        return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1);
+                    }
                 },
                 inputHandleFunction: (index, value) => {
-                    return parseFloat(value) / 100;
+                    if (percent) {
+                        return parseFloat(value) / 100;
+                    } else {
+                        return parseFloat(value);
+                    }
                 }
             }
         });
