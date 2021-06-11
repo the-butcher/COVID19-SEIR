@@ -22,8 +22,8 @@ export interface ICompartmentParams {
 export class CompartmentChain {
 
     static readonly INCUBATION_TO_MEAN__________RATIO = 0.9;
-    static readonly COMPARTMENT_COUNT_PRE__INCUBATION = 5; // 5;
-    static readonly COMPARTMENT_COUNT_POST_INCUBATION = 11; // 11;
+    static readonly COMPARTMENT_COUNT_PRE__INCUBATION = 3; // 5;
+    static readonly COMPARTMENT_COUNT_POST_INCUBATION = 6; // 11;
 
     static readonly NO_REPRODUCTION = 0;
     static readonly NO_CONTINUATION = 0;
@@ -77,7 +77,7 @@ export class CompartmentChain {
             instantA = instantB;
         }
         compartmentCount = CompartmentChain.COMPARTMENT_COUNT_POST_INCUBATION;
-        normalizedDuration = (1 - normalizedIncubation) / compartmentCount; // // the duration of each compartment after incubation
+        normalizedDuration = (1 - normalizedIncubation) / compartmentCount; // the duration of each compartment after incubation
         for (let compartmentIndex = 1; compartmentIndex <= compartmentCount; compartmentIndex++) {
             instantB = normalizedIncubation + normalizedDuration * compartmentIndex;
             this.compartmentParams.push({
@@ -129,6 +129,8 @@ export class CompartmentChain {
                 presymptomatic: compartmentParam.presymptomatic
             });
         });
+        // console.log('strainedCompartmentParams', strainedCompartmentParams);
+
         return strainedCompartmentParams;
 
     }

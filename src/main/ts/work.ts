@@ -39,19 +39,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
          */
         const modificationValuesTesting = modificationValues.find(m => m.key === 'TESTING') as IModificationValuesTesting;
         modificationValues.filter(m => m.key === 'STRAIN').forEach((modificationValuesStrain: IModificationValuesStrain) => {
-            StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain, modificationValuesTesting, {
-                "<= 04": 0,
-                "05-14": 0,
-                "15-24": 0,
-                "25-34": 0,
-                "35-44": 0,
-                "45-54": 0,
-                "55-64": 0,
-                "65-74": 0,
-                "75-84": 0,
-                ">= 85": 0,
-                TOTAL: 0
-            });
+            StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain, modificationValuesTesting, BaseData.getInstance());
         });
 
         // recreate singleton, since the calibrator changes things

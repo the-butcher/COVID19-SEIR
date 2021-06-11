@@ -1,3 +1,4 @@
+import { BaseData } from './incidence/BaseData';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTesting } from '../common/modification/ModificationTesting';
@@ -38,7 +39,7 @@ export class ModelImplStrain implements IModelSeir {
     private readonly nrmDeltas: number[];
     private nrmExposure: number[][];
 
-    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting) {
+    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting, baseData: BaseData) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
@@ -53,11 +54,11 @@ export class ModelImplStrain implements IModelSeir {
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues);
+            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, modificationTesting));
+
+            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTesting, baseData);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
-
-            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, modificationTesting));
 
         });
 
@@ -222,7 +223,7 @@ export class ModelImplStrain implements IModelSeir {
             const ratioD = modificationTime.getTestingRatio(ageGroupIndex);
             const ratioU = 1 - ratioD;
 
-            result.addNrmValue(-continuationValue, outgoingCompartment);
+            // removal from last infectious happens in infectious model (TODO find a more readable version)
             result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
             result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
             // result.addNrmValue(continuationValue, compartmentSusceptible);

@@ -1,3 +1,4 @@
+import { StrainUtil } from './../../util/StrainUtil';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
@@ -50,8 +51,10 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
                 const exposedStrainNxt = dataItemNxt.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
                 const shareOfStrain = exposedStrainCur / exposedAllStrains;
 
-                const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
-                rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
+                // const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
+                // rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
+
+                rT += StrainUtil.calculateR0(exposedStrainCur, exposedStrainNxt, instant, instant + TimeUtil.MILLISECONDS_PER____DAY, modificationStrain.getSerialInterval()) * shareOfStrain;
 
                 // console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
 

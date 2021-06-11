@@ -34,4 +34,8 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         return this.modificationValues.serialInterval;
     }
 
+    getIntervalScale(): number {
+        return this.modificationValues.intervalScale;
+    }
+
 }

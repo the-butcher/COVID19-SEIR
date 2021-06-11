@@ -1,3 +1,4 @@
+import { TimeUtil } from './../util/TimeUtil';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { IAnyModificationValue, Modifications } from '../common/modification/Modifications';
 import { ModificationTime } from '../common/modification/ModificationTime';
@@ -5,7 +6,7 @@ import { Demographics } from './../common/demographics/Demographics';
 import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
 import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { ECompartmentType } from './compartment/ECompartmentType';
-import { IBaseDataItem } from './incidence/BaseData';
+import { BaseData, IBaseDataItem } from './incidence/BaseData';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelStateIntegrator } from './state/ModelStateIntegrator';
@@ -24,7 +25,7 @@ export class StrainCalibrator {
         // no public instance
     }
 
-    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesTesting, baseData: IBaseDataItem): void {
+    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesTesting, baseData: BaseData): void {
 
         const ageGroups = demographics.getAgeGroups();
 
@@ -40,7 +41,7 @@ export class StrainCalibrator {
 
         modificationValuesStrain.r0 = 1;
         modificationValuesStrain.transmissionRisk = 0.065;
-        modificationValuesStrain.modifiers = ageGroups.map(g => modificationValuesStrain.incidence);
+        modificationValuesStrain.incidences = ageGroups.map(g => modificationValuesStrain.incidence);
 
         const modificationValuesCalibrate: IAnyModificationValue[] = [
             {
@@ -63,21 +64,6 @@ export class StrainCalibrator {
                 draggable: false
             },
             modificationValuesTesting,
-            // {
-            //     id: 'calibrate (testing)',
-            //     key: 'TESTING',
-            //     name: 'calibrate (testing)',
-            //     instant: ModelConstants.MODEL_MIN_____INSTANT,
-            //     multipliers: {
-            //         'family': 1.00,
-            //         'school': 1.00,
-            //         'nursing': 1.00,
-            //         'work': 1.00,
-            //         'other': 1.00
-            //     },
-            //     deletable: false,
-            //     draggable: false
-            // },
             {
                 id: 'calibrate (settings)',
                 key: 'SETTINGS',
@@ -116,7 +102,19 @@ export class StrainCalibrator {
 
         for (let interpolationIndex = 0; interpolationIndex < 20; interpolationIndex++) {
 
-            model = new ModelImplRoot(demographics, Modifications.getInstance(), baseData);
+            model = new ModelImplRoot(demographics, Modifications.getInstance(), {
+                "<= 04": 0,
+                "05-14": 0,
+                "15-24": 0,
+                "25-34": 0,
+                "35-44": 0,
+                "45-54": 0,
+                "55-64": 0,
+                "65-74": 0,
+                "75-84": 0,
+                ">= 85": 0,
+                TOTAL: 0
+            }, baseData);
             modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
 
             const modelState = modelStateIntegrator.getModelState();
@@ -128,7 +126,7 @@ export class StrainCalibrator {
             const absDeltas = strainModel.getAbsDeltas();
             let absDeltaAvg = 0;
             for (let i = 0; i < absDeltas.length; i++) {
-                modificationValuesStrain.modifiers[i] *= 1 / absDeltas[i]; // this could be a place to calibrate testing-ratio
+                modificationValuesStrain.incidences[i] *= 1 / absDeltas[i]; // this could be a place to calibrate testing-ratio
                 absDeltaAvg += absDeltas[i];
             }
             absDeltaAvg /= absDeltas.length;
@@ -139,8 +137,8 @@ export class StrainCalibrator {
             const modelIncidence = modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * demographics.getAbsTotal() * 100000 / demographics.getAbsTotal();
 
             const incidenceCorrection = modificationValuesStrain.incidence / modelIncidence;
-            for (let i = 0; i < modificationValuesStrain.modifiers.length; i++) {
-                modificationValuesStrain.modifiers[i] *= incidenceCorrection;
+            for (let i = 0; i < modificationValuesStrain.incidences.length; i++) {
+                modificationValuesStrain.incidences[i] *= incidenceCorrection;
             }
 
             // console.log('strainModel', strainModel, strainModel.getAbsDeltas(), modifiers, incidenceCorrection, incidence, transmissionRisk);
@@ -149,7 +147,7 @@ export class StrainCalibrator {
 
         modificationValuesStrain.r0 = originalR0;
 
-        // console.log('modificationValuesStrain', modificationValuesStrain);
+        // console.log('strain incidences', modificationValuesStrain.name, modificationValuesStrain.incidences);
 
     }
 

@@ -1,3 +1,4 @@
+import { StrainUtil } from './../util/StrainUtil';
 import { Logger } from './../util/Logger';
 import { BaseData, IBaseDataItem } from './incidence/BaseData';
 import { Demographics } from '../common/demographics/Demographics';
@@ -56,21 +57,7 @@ export class ModelImplRoot implements IModelSeir {
          * start at minus preload days
          */
         const curInstant = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
-
-        const dataItemA = baseData.findBaseData(TimeUtil.formatCategoryDate(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * 7));
-        const dataItemB = baseData.findBaseData(TimeUtil.formatCategoryDate(ModelConstants.MODEL_MIN_____INSTANT));
         const referenceDataRemoved = baseData.findBaseData(TimeUtil.formatCategoryDate(curInstant));
-
-        // precalculate incidence from actual data
-        const modifiers = ageGroups.map(g =>  (dataItemB[g.getName()] - dataItemA[g.getName()]) * 100000 / g.getAbsValue());
-        // wouldn't it be possible to pre-fill the model with cases since now, with baseData available, there could be enough information to do so
-        /**
-         * shouldn't be a problem to pre-fill the incidence model (with known daily cases 7 days earlier than model_min_date)
-         * what about the infection model?
-         * -- state at incubation time is known just like in incidence-model, so from there on everything should be ok
-         * -- TODO, find out how to "reverse" fill a compartment chain, so it later produces the desired numbers
-         * --
-         */
 
         /**
          * get all strain values as currently in modifications instance
@@ -90,90 +77,127 @@ export class ModelImplRoot implements IModelSeir {
         const modificationValueContact = modificationContact.getModificationValues();
         const modificationTesting = Modifications.getInstance().findModificationsByType('TESTING')[0] as ModificationTesting;
         const modificationValueTesting = modificationTesting.getModificationValues();
-        const modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
 
         modificationValueContact.instant = curInstant;
         modificationValueTesting.instant = curInstant;
 
-        // const vaccinatedTarget = modificationSettings.getVaccinated();
+        const heatmapIncidences07 = ageGroups.map(g => 0);
+        const heatmapIncidences00 = ageGroups.map(g => 0);
+        // const heatmapReproductions = ageGroups.map(g => 0);
+        const minOffsetIndex = -2;
+        const maxOffsetIndex = 3;
+        const difOffsetIndex = maxOffsetIndex - minOffsetIndex;
+        for (let offsetIndex = minOffsetIndex; offsetIndex < maxOffsetIndex; offsetIndex++) {
+
+            const instant14 = curInstant + (offsetIndex - 14) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instant07 = curInstant + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instant00 = curInstant + (offsetIndex) * TimeUtil.MILLISECONDS_PER____DAY;
+
+            ageGroups.forEach(ageGroup => {
+
+                const cases14 = baseData.findBaseData(TimeUtil.formatCategoryDate(instant14))[ageGroup.getName()];
+                const cases07 = baseData.findBaseData(TimeUtil.formatCategoryDate(instant07))[ageGroup.getName()];
+                const cases00 = baseData.findBaseData(TimeUtil.formatCategoryDate(instant00))[ageGroup.getName()];
+
+                const heatmapIncidence07 = (cases07 - cases14) * 100000 / ageGroup.getAbsValue();
+                const heatmapIncidence00 = (cases00 - cases07) * 100000 / ageGroup.getAbsValue();
+
+                heatmapIncidences07[ageGroup.getIndex()] += heatmapIncidence07 / difOffsetIndex;
+                heatmapIncidences00[ageGroup.getIndex()] += heatmapIncidence00 / difOffsetIndex;
+
+            });
+
+        }
+        console.log('heatmapIncidences', difOffsetIndex, heatmapIncidences00, heatmapIncidences07);
+
+
+        const instant07 = curInstant - 7 * TimeUtil.MILLISECONDS_PER____DAY;
+        const instant00 = curInstant;
+        for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+
+            const strainIncidences = [...heatmapIncidences00];
+
+            const strainReproductions: number[] = [];
+            ageGroups.forEach(ageGroup => {
+                strainReproductions.push(StrainUtil.calculateR0(heatmapIncidences07[ageGroup.getIndex()], heatmapIncidences00[ageGroup.getIndex()], instant07, instant00,  modificationsStrain[strainIndex].getSerialInterval() *  modificationsStrain[strainIndex].getIntervalScale()));
+            });
+
+            modificationsStrain[strainIndex].acceptUpdate({
+                incidences: strainIncidences,
+                reproduction: strainReproductions
+            });
+            console.log('targetIndices', modificationsStrain[strainIndex].getName(), strainIncidences, strainReproductions);
+
+        }
 
         /**
          * some interpolation runs
          */
         let model: ModelImplRoot;
         let modelStateIntegrator: ModelStateIntegrator;
-        const incidences = modificationsStrain.map(m => m.getIncidence());
-        for (let interpolationIndex = 0; interpolationIndex < 15; interpolationIndex++) {
+        // for (let interpolationIndex = 0; interpolationIndex < 0; interpolationIndex++) {
 
-            model = new ModelImplRoot(demographics, modifications, referenceDataRemoved);
-            modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
-            modelStateIntegrator.prefillVaccination();
+        //     model = new ModelImplRoot(demographics, modifications, referenceDataRemoved, baseData);
+        //     modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
+        //     modelStateIntegrator.prefillVaccination();
 
-            let modelData: IDataItem[];
-            let lastDataItem: IDataItem;
-            let dstInstant = -1;
-            for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+        //     let modelData: IDataItem[];
+        //     let lastDataItem: IDataItem;
+        //     let dstInstant = -1;
+        //     for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 
-                // const modifiers = modificationsStrain[strainIndex].getModificationValues().modifiers;
+        //         // if the strain identified by index has a date later than the last model iteration -> step forward until incidence reached
+        //         if (modificationsStrain[strainIndex].getInstantA() > dstInstant) {
+        //             dstInstant = modificationsStrain[strainIndex].getInstantA();
+        //             modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
+        //                 progressCallback({
+        //                     ratio: modelProgress.ratio
+        //                 });
+        //             });
+        //             lastDataItem = modelData[modelData.length - 1];
+        //         }
 
-                // if the strain identified by index has a date later than the last model iteration -> step forward until incidence reached
-                if (modificationsStrain[strainIndex].getInstantA() > dstInstant) {
-                    dstInstant = modificationsStrain[strainIndex].getInstantA();
-                    modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
-                        progressCallback({
-                            ratio: modelProgress.ratio
-                        });
-                    });
-                    lastDataItem = modelData[modelData.length - 1];
-                }
+        //         const incidences = modificationsStrain[strainIndex].getModificationValues().incidences;
+        //         ageGroups.forEach(ageGroup => {
 
-                // source model value
-                const totalIncidenceSource = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[modificationsStrain[strainIndex].getId()];
+        //             // source model value
+        //             const ageGroupIncidenceSource = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()];
 
-                // target model value
-                const totalIncidenceTarget = incidences[strainIndex];
+        //             const ageGroupIncidenceTarget = targetIncidences[strainIndex][ageGroup.getIndex()];
 
-                // factor from source to target
-                const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceSource;
 
-                const ageGroupTargetIncidences = ageGroups.map(g =>  (dataItemB[g.getName()] - dataItemA[g.getName()]) * 100000 / g.getAbsValue());
-                const ageGroupSourceIncidences = ageGroups.map(g =>  lastDataItem.valueset[g.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()]);
-                ageGroups.forEach(ageGroup => {
+        //             // factor from source to target
+        //             const ageGroupIncidenceFactor = ageGroupIncidenceTarget / ageGroupIncidenceSource;
 
-                    // source model value
-                    const ageGroupIncidenceSource = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()];
+        //             // console.log(ageGroupIncidenceSource, ageGroupIncidenceTarget, ageGroupIncidenceFactor);
 
-                    const ageGroupIncidenceTarget = (dataItemB[ageGroup.getName()] - dataItemA[ageGroup.getName()]) * 100000 / ageGroup.getAbsValue();
+        //             incidences[ageGroup.getIndex()] *= ageGroupIncidenceFactor;
 
-                    // factor from source to target
-                    const ageGroupIncidenceFactor = ageGroupIncidenceTarget / ageGroupIncidenceSource;
+        //         });
+        //         // console.log('modifiers', modifiers, ageGroupSourceIncidences, ageGroupTargetIncidences);
 
-                    modifiers[ageGroup.getIndex()] *= ageGroupIncidenceFactor;
+        //         modificationsStrain[strainIndex].acceptUpdate({
+        //             incidences
+        //         });
+        //         // console.log(modifiersSP, modifiersSM);
 
-                });
-                console.log('modifiers', modifiers, ageGroupSourceIncidences, ageGroupTargetIncidences);
+        //     };
 
-                modificationsStrain[strainIndex].acceptUpdate({
-                    modifiers: modifiers
-                });
+        //     // const vaccinatedModel = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_V;
+        //     // const vaccinatedFactor = vaccinatedTarget / vaccinatedModel;
+        //     // const vaccinated = modificationSettings.getVaccinated() * vaccinatedFactor;
 
-            };
+        //     // modificationSettings.acceptUpdate({
+        //     //     vaccinated
+        //     // });
 
-            // const vaccinatedModel = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_V;
-            // const vaccinatedFactor = vaccinatedTarget / vaccinatedModel;
-            // const vaccinated = modificationSettings.getVaccinated() * vaccinatedFactor;
-
-            // modificationSettings.acceptUpdate({
-            //     vaccinated
-            // });
-
-        }
+        // }
 
         /**
          * final model setup with adapted modifications values
          * since the model contains the preload portion, that portion is fast forwarded and the state-integrator is returned being positioned at model-start instant
          */
-        model = new ModelImplRoot(demographics, Modifications.getInstance(), referenceDataRemoved);
+        model = new ModelImplRoot(demographics, Modifications.getInstance(), referenceDataRemoved, baseData);
         modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
         modelStateIntegrator.prefillVaccination();
         // await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
@@ -196,7 +220,7 @@ export class ModelImplRoot implements IModelSeir {
      */
     private readonly vaccinationModels: ModelImplVaccination[];
 
-    constructor(demographics: Demographics, modifications: Modifications, referenceDataRemoved: IBaseDataItem) {
+    constructor(demographics: Demographics, modifications: Modifications, referenceDataRemoved: IBaseDataItem, baseData: BaseData) {
 
         this.strainModels = [];
         this.compartmentsSusceptible = [];
@@ -212,7 +236,7 @@ export class ModelImplRoot implements IModelSeir {
 
         this.demographics = demographics;
         modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {
-            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTesting));
+            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTesting, baseData));
         });
 
         demographics.getAgeGroups().forEach(ageGroup => {

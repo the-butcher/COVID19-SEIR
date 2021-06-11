@@ -17,7 +17,7 @@ export class CompartmentBase implements ICompartment {
     private readonly id: string;
     private readonly compartmentType: ECompartmentType;
     private readonly absTotal: number;
-    private readonly nrmValue: number;
+    private nrmValue: number;
     private readonly ageGroupIndex: number;
     private readonly strainId: string;
 
@@ -45,8 +45,16 @@ export class CompartmentBase implements ICompartment {
         return this.absTotal;
     }
 
+    /**
+     * normalized value with respect to full population
+     * @returns
+     */
     getNrmValue(): number {
         return this.nrmValue;
+    }
+
+    setNrmValue(nrmValue: number): void {
+        this.nrmValue = nrmValue;
     }
 
     getAbsValue(): number {
