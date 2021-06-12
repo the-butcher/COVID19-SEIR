@@ -61,13 +61,13 @@ export class CompartmentBase implements ICompartment {
         return this.nrmValue * this.absTotal;
     }
 
-    getIncomingCompartment(): ICompartment {
-        return this;
-    }
+    // getIncomingCompartment(): ICompartment {
+    //     return this;
+    // }
 
-    getOutgoingCompartment(): ICompartment {
-        return this;
-    }
+    // getOutgoingCompartment(): ICompartment {
+    //     return this;
+    // }
 
     getCompartmentType(): ECompartmentType {
         return this.compartmentType;

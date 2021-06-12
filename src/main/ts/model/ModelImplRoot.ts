@@ -81,45 +81,45 @@ export class ModelImplRoot implements IModelSeir {
         modificationValueContact.instant = curInstant;
         modificationValueTesting.instant = curInstant;
 
-        const heatmapIncidences07 = ageGroups.map(g => 0);
         const heatmapIncidences00 = ageGroups.map(g => 0);
+        const heatmapIncidencesP7 = ageGroups.map(g => 0);
         // const heatmapReproductions = ageGroups.map(g => 0);
         const minOffsetIndex = -2;
         const maxOffsetIndex = 3;
         const difOffsetIndex = maxOffsetIndex - minOffsetIndex;
         for (let offsetIndex = minOffsetIndex; offsetIndex < maxOffsetIndex; offsetIndex++) {
 
-            const instant14 = curInstant + (offsetIndex - 14) * TimeUtil.MILLISECONDS_PER____DAY;
-            const instant07 = curInstant + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantM7 = curInstant + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
             const instant00 = curInstant + (offsetIndex) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantP7 = curInstant + (offsetIndex + 7) * TimeUtil.MILLISECONDS_PER____DAY;
 
             ageGroups.forEach(ageGroup => {
 
-                const cases14 = baseData.findBaseData(TimeUtil.formatCategoryDate(instant14))[ageGroup.getName()];
-                const cases07 = baseData.findBaseData(TimeUtil.formatCategoryDate(instant07))[ageGroup.getName()];
+                const casesM7 = baseData.findBaseData(TimeUtil.formatCategoryDate(instantM7))[ageGroup.getName()];
                 const cases00 = baseData.findBaseData(TimeUtil.formatCategoryDate(instant00))[ageGroup.getName()];
+                const casesP7 = baseData.findBaseData(TimeUtil.formatCategoryDate(instantP7))[ageGroup.getName()];
 
-                const heatmapIncidence07 = (cases07 - cases14) * 100000 / ageGroup.getAbsValue();
-                const heatmapIncidence00 = (cases00 - cases07) * 100000 / ageGroup.getAbsValue();
+                const heatmapIncidence00 = (cases00 - casesM7) * 100000 / ageGroup.getAbsValue();
+                const heatmapIncidenceP7 = (casesP7 - cases00) * 100000 / ageGroup.getAbsValue();
 
-                heatmapIncidences07[ageGroup.getIndex()] += heatmapIncidence07 / difOffsetIndex;
                 heatmapIncidences00[ageGroup.getIndex()] += heatmapIncidence00 / difOffsetIndex;
+                heatmapIncidencesP7[ageGroup.getIndex()] += heatmapIncidenceP7 / difOffsetIndex;
 
             });
 
         }
-        console.log('heatmapIncidences', difOffsetIndex, heatmapIncidences00, heatmapIncidences07);
+        console.log('heatmapIncidences', heatmapIncidences00, heatmapIncidences00);
 
 
-        const instant07 = curInstant - 7 * TimeUtil.MILLISECONDS_PER____DAY;
-        const instant00 = curInstant;
+        const instant00 = curInstant
+        const instantP7 = curInstant + 7 * TimeUtil.MILLISECONDS_PER____DAY;;
         for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 
             const strainIncidences = [...heatmapIncidences00];
 
             const strainReproductions: number[] = [];
             ageGroups.forEach(ageGroup => {
-                strainReproductions.push(StrainUtil.calculateR0(heatmapIncidences07[ageGroup.getIndex()], heatmapIncidences00[ageGroup.getIndex()], instant07, instant00,  modificationsStrain[strainIndex].getSerialInterval() *  modificationsStrain[strainIndex].getIntervalScale()));
+                strainReproductions.push(StrainUtil.calculateR0(heatmapIncidences00[ageGroup.getIndex()], heatmapIncidencesP7[ageGroup.getIndex()], instant00, instantP7,  modificationsStrain[strainIndex].getSerialInterval() *  modificationsStrain[strainIndex].getIntervalScale()));
             });
 
             modificationsStrain[strainIndex].acceptUpdate({

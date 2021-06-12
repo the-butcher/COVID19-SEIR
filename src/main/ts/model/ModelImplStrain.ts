@@ -6,7 +6,7 @@ import { ModificationTime } from '../common/modification/ModificationTime';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
-import { ModelImplIncidence } from './ModelImplIncidence';
+import { ModelImplIncidence } from './_ModelImplIncidence';
 import { ModelImplInfectious } from './ModelImplInfectious';
 import { ModelImplRoot } from './ModelImplRoot';
 import { IModelState } from './state/IModelState';
@@ -29,7 +29,7 @@ export class ModelImplStrain implements IModelSeir {
      * 1) a one-day compartment of cases that incubated that day
      * 2) 6 more single day compartments to get a total of 7 -> 7-day incidence
      */
-    private incidenceModels: ModelImplIncidence[];
+    // private incidenceModels: ModelImplIncidence[];
 
     private readonly strainId: string;
     private readonly absTotal: number;
@@ -43,7 +43,7 @@ export class ModelImplStrain implements IModelSeir {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
-        this.incidenceModels = [];
+        // this.incidenceModels = [];
         this.transmissionRisk = strainValues.transmissionRisk;
 
         this.nrmDeltas = [];
@@ -54,7 +54,7 @@ export class ModelImplStrain implements IModelSeir {
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, modificationTesting));
+            // this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, modificationTesting));
 
             const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTesting, baseData);
             this.infectiousModels.push(groupModel);
@@ -83,9 +83,9 @@ export class ModelImplStrain implements IModelSeir {
         return this.strainId;
     }
 
-    getIncidenceModel(ageGroupIndex: number): ModelImplIncidence {
-        return this.incidenceModels[ageGroupIndex];
-    }
+    // getIncidenceModel(ageGroupIndex: number): ModelImplIncidence {
+    //     return this.incidenceModels[ageGroupIndex];
+    // }
 
     getInfectiousModel(ageGroupIndex: number): ModelImplInfectious {
         return this.infectiousModels[ageGroupIndex];
@@ -110,9 +110,9 @@ export class ModelImplStrain implements IModelSeir {
         this.infectiousModels.forEach(groupModel => {
             initialState.add(groupModel.getInitialState());
         });
-        this.incidenceModels.forEach(incidenceModel => {
-            initialState.add(incidenceModel.getInitialState());
-        });
+        // this.incidenceModels.forEach(incidenceModel => {
+        //     initialState.add(incidenceModel.getInitialState());
+        // });
         return initialState;
     }
 
@@ -165,7 +165,7 @@ export class ModelImplStrain implements IModelSeir {
                 this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] = 0;
 
                 const baseContactRate = modificationTime.getContacts(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
-                compartmentE = infectiousModelParticipant.getIncomingCompartment();
+                compartmentE = infectiousModelParticipant.getFirstCompartment();
 
                 nrmESum = 0;
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
@@ -214,7 +214,7 @@ export class ModelImplStrain implements IModelSeir {
             const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(ageGroupIndex);
             // const compartmentSusceptible = this.parentModel.getCompartmentsSusceptible(ageGroupIndex)[0];
 
-            const outgoingCompartment = this.infectiousModels[ageGroupIndex].getOutgoingCompartment();
+            const outgoingCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
 
             const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
             const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
@@ -230,9 +230,9 @@ export class ModelImplStrain implements IModelSeir {
 
         }
 
-        this.incidenceModels.forEach(incidenceModel => {
-            result.add(incidenceModel.apply(state, dT, tT, modificationTime));
-        });
+        // this.incidenceModels.forEach(incidenceModel => {
+        //     result.add(incidenceModel.apply(state, dT, tT, modificationTime));
+        // });
 
         return result;
 

@@ -1,7 +1,6 @@
 import { IValueHolder } from '../IValueHolder';
 import { IRational } from '../rational/IRational';
 import { ECompartmentType } from './ECompartmentType';
-import { IConnectable } from './IConnectable';
 
 /**
  * definition for types that describe a compartment in the model
@@ -9,7 +8,7 @@ import { IConnectable } from './IConnectable';
  * @author h.fleischer
  * @since 16.05.2021
  */
-export interface ICompartment extends IConnectable, IValueHolder {
+export interface ICompartment extends IValueHolder {
 
     /**
      * get a unique id for this compartment

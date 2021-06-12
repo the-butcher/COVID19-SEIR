@@ -34,7 +34,7 @@ describe("test value", () => {
         };
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
         expect(compartmentParams[0].instantB).toBeCloseTo(259200000, -4);
-        expect(compartmentParams[5].instantB).toBeCloseTo(414720000, -3);
+        expect(compartmentParams[5].instantB).toBeCloseTo(526179274, -3);
     });
     it("should return r0 as reproduction value for non-scaled strain", () => {
         const strain: IModificationValuesStrain = {

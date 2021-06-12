@@ -13,7 +13,7 @@ describe("test value", () => {
         expect(StrainUtil.calculateValueB(80, 0.75, 0, 4.8 * TimeUtil.MILLISECONDS_PER____DAY, 4.8)).toBe(60);
     });
     it("should return 45 as value", () => {
-        expect(StrainUtil.calculateValueB(80, 0.75, 0, 4.8 * 2 * TimeUtil.MILLISECONDS_PER____DAY, 4.8)).toBe(60);
+        expect(StrainUtil.calculateValueB(80, 0.75, 0, 4.8 * 2 * TimeUtil.MILLISECONDS_PER____DAY, 4.8)).toBe(45);
     });
 
 });
