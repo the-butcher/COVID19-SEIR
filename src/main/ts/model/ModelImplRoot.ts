@@ -108,7 +108,7 @@ export class ModelImplRoot implements IModelSeir {
             });
 
         }
-        console.log('heatmapIncidences', heatmapIncidences00, heatmapIncidences00);
+        // console.log('heatmapIncidences', heatmapIncidences00, heatmapIncidencesP7);
 
 
         const instant00 = curInstant

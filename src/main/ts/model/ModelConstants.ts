@@ -97,7 +97,7 @@ export class ModelConstants {
         }
     };
 
-    static readonly PRELOAD_________________DAYS = 1;
+    static readonly PRELOAD_________________DAYS = 0;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
 

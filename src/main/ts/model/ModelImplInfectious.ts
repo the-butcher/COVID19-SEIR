@@ -57,131 +57,70 @@ export class ModelImplInfectious implements IModelSeir {
          */
         if (strainValues.incidences) {
             dailyTested = strainValues.incidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
+            console.log('>>', ageGroup.getName(), strainValues.incidences[this.ageGroupIndex]);
         }
-        const dailyActual = dailyTested / modificationTesting.getTestingRatio(ageGroup.getIndex());
 
-        const daysLatent = StrainUtil.calculateLatency(strainValues.serialInterval, strainValues.intervalScale);
-        const daysInfectious = StrainUtil.calculateInfecty(strainValues.serialInterval, strainValues.intervalScale);
+        let incidenceRatio = 1;
+        if (strainValues.reproduction) {
+            let incidenceSum = 0;
+            for (let i = 0; i < 7; i++) {
+                const instantC = TimeUtil.MILLISECONDS_PER____DAY * - (i + 0.5);
+                incidenceSum += StrainUtil.calculateValueB(strainValues.incidences[this.ageGroupIndex], strainValues.reproduction[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
+            }
+            incidenceSum /= 7;
+            incidenceRatio = strainValues.incidences[this.ageGroupIndex] / incidenceSum;
+            console.log('incidence ratio', incidenceRatio);
+        }
 
-        const absExposed = dailyActual * daysLatent; // an estimate for exposure for the age group and strain
-        const absInfectious = dailyActual * daysInfectious;
+
         const compartmentParams = CompartmentChain.getInstance().getStrainedCompartmentParams(strainValues);
 
-        /**
-         * strain contains approximations about reproduction rate
-         */
-        if (strainValues.reproduction) {
+        let absCompartmentInfectiousSum = 0;
+        const incubationOffset = (compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantA + compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantB) / 2;
 
-            // incubation offset is the "reference" offset, where the initial "incidence" associated with this model applies
-            const incubationOffset = (compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantA + compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantB) / 2;
-            console.log('incubationOffset', incubationOffset / TimeUtil.MILLISECONDS_PER____DAY);
-            for (let compartmentIndex = 0; compartmentIndex < compartmentParams.length; compartmentIndex++) {
-
-                const compartmentParam = compartmentParams[compartmentIndex];
-
-            }
-
-        }
-
-        /**
-         * build compartments
-         */
-        // let incubationOffset: number;
-        // let dailyCasesAtIncubation: number;
-        // let r0: number;
-
-        // for (let compartmentIndex = 1; compartmentIndex < compartmentParams.length; compartmentIndex++) {
-        //     if (!compartmentParams[compartmentIndex].presymptomatic) {
-
-        //         const compartmentParam = compartmentParams[compartmentIndex];
-        //         const duration = compartmentParam.instantB - compartmentParam.instantA;
-
-        //         incubationOffset = compartmentParams[compartmentIndex].instantA; // days after exposure (can act as offset when looking into BaseData incidence)
-        //         dailyCasesAtIncubation = dailyCases;
-
-        //         console.log('incubationOffset', incubationOffset);
-
-
-
-
-        //         const rangeDays = 7; // must be a fixed number
-        //         const instantA = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * 7;
-        //         const instantB = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * 0;
-        //         const instantC = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * -7;
-
-        //         const dataItemA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantA));
-        //         const dataItemB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantB));
-        //         const dataItemC = baseData.findBaseData(TimeUtil.formatCategoryDate(instantC));
-        //         const casesA = dataItemA[ageGroup.getName()];
-        //         const casesB = dataItemB[ageGroup.getName()];
-        //         const casesC = dataItemC[ageGroup.getName()];
-
-        //         const dailyCasesB = (casesB - casesA) / (rangeDays * modificationTesting.getTestingRatio(ageGroup.getIndex()));
-        //         const dailyCasesC = (casesC - casesB) / (rangeDays * modificationTesting.getTestingRatio(ageGroup.getIndex()));
-        //         r0 = StrainUtil.calculateR0(dailyCasesB, dailyCasesC, instantB, instantC, strainValues.serialInterval);
-        //         console.log('r0', r0);
-
-        //         /**
-        //          * this actually resembles the number between compartments
-        //          */
-        //         dailyCasesAtIncubation = dailyCases;
-
-        //         // console.log(dailyCasesAtIncubation, dailyCasesB, dailyCasesC)
-
-        //         break;
-
-        //     }
-        // }
-
-
-        let checkPreSymptomatic = true;
         for (let compartmentIndex = 0; compartmentIndex < compartmentParams.length; compartmentIndex++) {
 
             const compartmentParam = compartmentParams[compartmentIndex];
             const duration = compartmentParam.instantB - compartmentParam.instantA;
 
-            // const instantR = 0;
-            // const instantA = incubationOffset - compartmentParam.instantA;
-            // const instantB = incubationOffset - compartmentParam.instantB;
-
-            // const valueA = StrainUtil.calculateValueB(dailyCasesAtIncubation, r0, instantR, instantA, strainValues.serialInterval * strainValues.intervalScale);
-            // const valueB = StrainUtil.calculateValueB(dailyCasesAtIncubation, r0, instantR, instantB, strainValues.serialInterval * strainValues.intervalScale);
-            // const valueD = (valueB + valueA) / 2 * duration / TimeUtil.MILLISECONDS_PER____DAY;
-            // // console.log('valueD', valueA, valueB);
-
-
-            if (compartmentParam.type === ECompartmentType.E_____EXPOSED) {
-                // absExposed
-                this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absExposed, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
-            } else {
-
-                let absInfectiousCompartment =  absInfectious * compartmentParam.i0Normal;
-                // if (checkPreSymptomatic && !compartmentParams[compartmentIndex].presymptomatic)  {
-                //     let absInfectiousCompartment =  absInfectious * compartmentParam.i0Normal;
-                //     console.log(absInfectiousCompartment, dailyCasesAtIncubation);
-                //     checkPreSymptomatic = false;
-                // }
-                // console.log('valueD', valueD, absInfectiousCompartment);
-
-                // absInfectiousCompartment
-                this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absInfectiousCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
-
+            const instantC = incubationOffset - (compartmentParam.instantA + compartmentParam.instantB) / 2;
+            if (strainValues.reproduction) {
+                const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.incidences[this.ageGroupIndex], strainValues.reproduction[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
+                // console.log('  ', ageGroup.getName(), incidenceC);
+                dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
             }
+            const dailyActual = dailyTested / modificationTesting.getTestingRatio(ageGroup.getIndex());
+            const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
+            this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
+
+            absCompartmentInfectiousSum += absCompartment;
 
         };
 
-        this.nrmValue = (absExposed + absInfectious) / this.absTotal;
+        this.nrmValue = absCompartmentInfectiousSum / this.absTotal;
 
         /**
          * compartment for calculating incidence
          */
-        // primary compartment (cases at the point of incubation)
-        this.compartmentsIncidence.push(new CompartmentBase(ECompartmentType.X__INCUBATE_0, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
+        // primary incidence compartment (cases at the point of incubation)
+        // this.compartmentsIncidence.push(new CompartmentBase(ECompartmentType.X__INCUBATE_0, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
 
-        // secondary compartments (cases propagate backwards 7 days, so an incidence can be calculated from the total sum of this model)
-        for (let i = 1; i < 7; i++) {
-            this.compartmentsIncidence.push(new CompartmentBase(ECompartmentType.X__INCUBATE_N, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
+        // secondary incidence compartments (cases propagate backwards 7 days, so an incidence can be calculated from the total sum of this model)
+        for (let i = 0; i < 7; i++) {
+
+            const instantC = TimeUtil.MILLISECONDS_PER____DAY * - (i + 0.5);
+            if (strainValues.reproduction) {
+                const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.incidences[this.ageGroupIndex], strainValues.reproduction[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
+                dailyTested = incidenceC * ageGroup.getAbsValue() / 700000; // // incidenceC
+                // console.log('  ', i, ageGroup.getName(), incidenceC, dailyTested);
+                // console.log('dailyTested', ageGroup.getName(), i, incidenceC, dailyTested);
+            }
+
+            const compartmentType = i == 0 ? ECompartmentType.X__INCUBATE_0 : ECompartmentType.X__INCUBATE_N;
+            this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
+
         }
+        // console.log('incidenceSum', incidenceSum / 7);
 
         /**
          * connect infection compartments among each other
@@ -254,44 +193,6 @@ export class ModelImplInfectious implements IModelSeir {
             });
 
         }
-
-
-        // const modelState = this.getInitialState();
-        // const minInstant = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * 28;
-        // const maxInstant = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * 10;
-        // for (let curInstant = minInstant; curInstant <= maxInstant; curInstant += ModelStateIntegrator.DT) {
-
-        //     const modificationTime = new ModificationTime({
-        //         id: ObjectUtil.createId(),
-        //         key: 'TIME',
-        //         instant: curInstant,
-        //         name: 'step',
-        //         deletable: false,
-        //         draggable: false
-        //     });
-        //     modificationTime.setInstants(curInstant, curInstant); // tT, tT is by purpose, standing for instant, instant
-
-        //     modelState.add(this.apply(modelState, ModelStateIntegrator.DT, curInstant, modificationTime));
-
-        //     const instantA = curInstant;
-        //     const instantB = curInstant + TimeUtil.MILLISECONDS_PER____DAY;
-        //     const baseDataA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantA));
-        //     const baseDataB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantB));
-        //     const casesA = baseDataA[ageGroup.getName()];
-        //     const casesB = baseDataB[ageGroup.getName()];
-        //     // console.log((casesB - casesA) / 24);
-        //     modelState.addNrmValue((casesB - casesA) / 24 / this.absTotal / modificationTesting.getTestingRatio(this.ageGroupIndex), this.getIncomingCompartment());
-
-        //     // modelState.add(modelStateChanges);
-
-        // }
-        // console.log('--------------------------', ageGroup.getName());
-        // this.compartments.forEach(compartment => {
-        //     compartment.setNrmValue(modelState.getNrmValue(compartment));
-        //     console.log(modelState.getNrmValue(compartment) * this.absTotal);
-        // });
-
-
 
     }
 

@@ -6,7 +6,6 @@ import { ModificationTime } from '../common/modification/ModificationTime';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
-import { ModelImplIncidence } from './_ModelImplIncidence';
 import { ModelImplInfectious } from './ModelImplInfectious';
 import { ModelImplRoot } from './ModelImplRoot';
 import { IModelState } from './state/IModelState';
