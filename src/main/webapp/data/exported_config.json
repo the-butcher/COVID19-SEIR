@@ -1,0 +1,154 @@
+[
+  {
+    "id": "b5e7",
+    "key": "SETTINGS",
+    "name": "initial state",
+    "instant": 1619827200000,
+    "undetected": 1.5,
+    "vaccinated": 0.22,
+    "quarantine": 0.5,
+    "dead": 0,
+    "deletable": false,
+    "draggable": false
+  },
+  {
+    "id": "b3f4d",
+    "key": "TIME",
+    "name": "effective settings",
+    "instant": 1619827200000,
+    "deletable": false,
+    "draggable": true
+  },
+  {
+    "id": "71e2e",
+    "key": "STRAIN",
+    "instant": 1619827200000,
+    "name": "b.1.1.7",
+    "r0": 4.4,
+    "serialInterval": 4.8,
+    "intervalScale": 1,
+    "dstIncidence": 40,
+    "deletable": false,
+    "draggable": true
+  },
+  {
+    "id": "6c3d0",
+    "key": "CONTACT",
+    "name": "initial NPIs",
+    "instant": 1619827200000,
+    "multipliers": {
+      "family": 0.75,
+      "school": 0.25,
+      "nursing": 0.25,
+      "work": 0.37,
+      "other": 0.1
+    },
+    "deletable": false,
+    "draggable": false
+  },
+  {
+    "id": "5971a",
+    "key": "TESTING",
+    "name": "initial discovery",
+    "instant": 1619827200000,
+    "multipliers": {
+      "family": 0.65,
+      "school": 0.65,
+      "nursing": 0.75,
+      "work": 0.5,
+      "other": 0.5
+    },
+    "deletable": false,
+    "draggable": false
+  },
+  {
+    "id": "f072",
+    "key": "VACCINATION",
+    "name": "initial vaccinations",
+    "instant": 1619827200000,
+    "doses": 100000,
+    "deletable": false,
+    "draggable": false
+  },
+  {
+    "id": "eb5c4",
+    "key": "CONTACT",
+    "name": "reduce NPIs",
+    "instant": 1621382400000,
+    "multipliers": {
+      "family": 0.75,
+      "school": 0.31,
+      "nursing": 0.25,
+      "work": 0.45,
+      "other": 0.4
+    },
+    "deletable": true,
+    "draggable": true
+  },
+  {
+    "id": "6fedb",
+    "key": "STRAIN",
+    "instant": 1622505600000,
+    "name": "b.1.617.2",
+    "r0": 6.6000000000000005,
+    "serialInterval": 4.8,
+    "intervalScale": 1,
+    "dstIncidence": 1,
+    "deletable": true,
+    "draggable": true
+  },
+  {
+    "id": "625e8",
+    "key": "CONTACT",
+    "name": "lift mask mandate",
+    "instant": 1623715200000,
+    "multipliers": {
+      "family": 0.75,
+      "school": 0.75,
+      "nursing": 0.25,
+      "work": 0.45,
+      "other": 0.4
+    },
+    "deletable": true,
+    "draggable": true
+  },
+  {
+    "id": "31cb8",
+    "key": "CONTACT",
+    "name": "summer break",
+    "instant": 1625097600000,
+    "multipliers": {
+      "family": 0.75,
+      "school": 0.1,
+      "nursing": 0.25,
+      "work": 0.5,
+      "other": 0.5
+    },
+    "deletable": true,
+    "draggable": true
+  },
+  {
+    "id": "ea37",
+    "key": "SEASONALITY",
+    "name": "seasonality",
+    "instant": 1625875200000,
+    "seasonality": 0.8,
+    "deletable": false,
+    "draggable": true
+  },
+  {
+    "id": "a1687",
+    "key": "CONTACT",
+    "name": "copy of summer break",
+    "instant": 1630886400000,
+    "multipliers": {
+      "family": 0.75,
+      "school": 0.75,
+      "nursing": 0.25,
+      "work": 0.5,
+      "other": 0.5
+    },
+    "deletable": true,
+    "draggable": true
+  }
+]

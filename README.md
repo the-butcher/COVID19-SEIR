@@ -6,12 +6,7 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* either have all strains at zero or find a way that strains can be placed on the timeline and still have correct incidence at their respective positions
-* there is a slight bend in cases in the initial model, which indicates a problem with initial compartment fill (?)
-* take care of primary incidence having the correct value (heatmap - sum(other))
-* change modification-resolver-strain to use StrainUtil
 * be sure that strain calibration is still functional
-* better integration of base-data -> have initial incidence from initial-data-item,
 * wiki on github
 * demographics for germany
 * explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
@@ -42,6 +37,11 @@ next:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 done:
+* ~~either have all strains at zero or find a way that strains can be placed on the timeline and still have correct incidence at their respective positions~~
+* ~~there is a slight bend in cases in the initial model, which indicates a problem with initial compartment fill (?)~~
+* ~~take care of primary incidence having the correct value (heatmap - sum(other))~~
+* ~~change modification-resolver-strain to use StrainUtil~~
+* ~~better integration of base-data -> have initial incidence from initial-data-item,~~
 * ~~check model for having constant population (some submodels (i.e. incidence) do not count, ...)~~
 * ~~modification time chart diagram find max values dynamically from dataset~~
   * ~~when changing a modification, then switching back to "time", the currently displayed value needs to be updated, currently a time-mod drag is required to force update~~
