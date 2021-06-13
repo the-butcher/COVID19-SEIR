@@ -1,3 +1,4 @@
+import { ModelConstants } from './ModelConstants';
 import { ObjectUtil } from './../util/ObjectUtil';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
@@ -50,26 +51,33 @@ export class ModelImplInfectious implements IModelSeir {
         this.ageGroupTotal = ageGroup.getAbsValue();
 
         // make some assumptions about initial cases (duplicated code in ModelImplIncidence)
-        let dailyTested = strainValues.incidence * ageGroup.getAbsValue() / 700000;
+        let dailyTested = strainValues.preIncidence * ageGroup.getAbsValue() / 700000;
 
         /**
          * strain modifiers hold target incidences per strain (taken from heatmap data)
          */
-        if (strainValues.incidences) {
-            dailyTested = strainValues.incidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
-            console.log('>>', ageGroup.getName(), strainValues.incidences[this.ageGroupIndex]);
+        if (strainValues.preIncidences) {
+            // with a constant rate, dailyTested would give the correct incidence
+            dailyTested = strainValues.preIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
+            // console.log('>>', ageGroup.getName(), strainValues.incidences[this.ageGroupIndex], dailyTested);
         }
 
         let incidenceRatio = 1;
-        if (strainValues.reproduction) {
+        if (strainValues.preGrowthRate) {
+
+            // incidenceRatio = strainValues.reproduction[this.ageGroupIndex];
+            /**
+             * there must be a much cleaner solution for this, TODO get to terms with the math
+             */
             let incidenceSum = 0;
             for (let i = 0; i < 7; i++) {
-                const instantC = TimeUtil.MILLISECONDS_PER____DAY * - (i + 0.5);
-                incidenceSum += StrainUtil.calculateValueB(strainValues.incidences[this.ageGroupIndex], strainValues.reproduction[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
+                const instantB = TimeUtil.MILLISECONDS_PER____DAY * - (i + 1.5);
+                incidenceSum += StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantB, strainValues.serialInterval * strainValues.intervalScale);
             }
             incidenceSum /= 7;
-            incidenceRatio = strainValues.incidences[this.ageGroupIndex] / incidenceSum;
-            console.log('incidence ratio', incidenceRatio);
+            incidenceRatio = strainValues.preIncidences[this.ageGroupIndex] / incidenceSum;
+            // console.log('r0: ', strainValues.reproduction[this.ageGroupIndex], 'rR: ', incidenceRatio, incidenceRatio / strainValues.reproduction[this.ageGroupIndex]);
+
         }
 
 
@@ -78,16 +86,19 @@ export class ModelImplInfectious implements IModelSeir {
         let absCompartmentInfectiousSum = 0;
         const incubationOffset = (compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantA + compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantB) / 2;
 
+        let weeklyPlusB = 0;
         for (let compartmentIndex = 0; compartmentIndex < compartmentParams.length; compartmentIndex++) {
 
             const compartmentParam = compartmentParams[compartmentIndex];
             const duration = compartmentParam.instantB - compartmentParam.instantA;
 
             const instantC = incubationOffset - (compartmentParam.instantA + compartmentParam.instantB) / 2;
-            if (strainValues.reproduction) {
-                const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.incidences[this.ageGroupIndex], strainValues.reproduction[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
+            if (strainValues.preGrowthRate) {
+
+                const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
                 // console.log('  ', ageGroup.getName(), incidenceC);
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
+
             }
             const dailyActual = dailyTested / modificationTesting.getTestingRatio(ageGroup.getIndex());
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
@@ -97,28 +108,18 @@ export class ModelImplInfectious implements IModelSeir {
 
         };
 
+
         this.nrmValue = absCompartmentInfectiousSum / this.absTotal;
-
-        /**
-         * compartment for calculating incidence
-         */
-        // primary incidence compartment (cases at the point of incubation)
-        // this.compartmentsIncidence.push(new CompartmentBase(ECompartmentType.X__INCUBATE_0, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
-
-        // secondary incidence compartments (cases propagate backwards 7 days, so an incidence can be calculated from the total sum of this model)
         for (let i = 0; i < 7; i++) {
-
-            const instantC = TimeUtil.MILLISECONDS_PER____DAY * - (i + 0.5);
-            if (strainValues.reproduction) {
-                const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.incidences[this.ageGroupIndex], strainValues.reproduction[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
+            const instantB = TimeUtil.MILLISECONDS_PER____DAY * - (i + 1.5);
+            if (strainValues.preGrowthRate) {
+                const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantB, strainValues.serialInterval * strainValues.intervalScale);
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000; // // incidenceC
                 // console.log('  ', i, ageGroup.getName(), incidenceC, dailyTested);
                 // console.log('dailyTested', ageGroup.getName(), i, incidenceC, dailyTested);
             }
-
             const compartmentType = i == 0 ? ECompartmentType.X__INCUBATE_0 : ECompartmentType.X__INCUBATE_N;
             this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
-
         }
         // console.log('incidenceSum', incidenceSum / 7);
 

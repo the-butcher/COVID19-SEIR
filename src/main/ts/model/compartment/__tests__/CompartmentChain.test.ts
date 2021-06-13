@@ -28,7 +28,7 @@ describe("test value", () => {
             intervalScale: 1.13402,
             serialInterval: 5.0,
             name: 'test',
-            incidence: 1,
+            dstIncidence: 1,
             deletable: true,
             draggable: true
         };
@@ -45,7 +45,7 @@ describe("test value", () => {
             intervalScale: 1.0,
             serialInterval: 5.0,
             name: 'test',
-            incidence: 1,
+            dstIncidence: 1,
             deletable: true,
             draggable: true
         };
@@ -65,7 +65,7 @@ describe("test value", () => {
             intervalScale: 1.25,
             serialInterval: 5.0,
             name: 'test',
-            incidence: 1,
+            dstIncidence: 1,
             deletable: true,
             draggable: true
         };

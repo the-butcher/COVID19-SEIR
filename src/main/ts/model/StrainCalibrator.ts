@@ -41,7 +41,7 @@ export class StrainCalibrator {
 
         modificationValuesStrain.r0 = 1;
         modificationValuesStrain.transmissionRisk = 0.065;
-        modificationValuesStrain.incidences = ageGroups.map(g => modificationValuesStrain.incidence);
+        modificationValuesStrain.preIncidences = ageGroups.map(g => modificationValuesStrain.dstIncidence);
 
         const modificationValuesCalibrate: IAnyModificationValue[] = [
             {
@@ -126,7 +126,7 @@ export class StrainCalibrator {
             const absDeltas = strainModel.getAbsDeltas();
             let absDeltaAvg = 0;
             for (let i = 0; i < absDeltas.length; i++) {
-                modificationValuesStrain.incidences[i] *= 1 / absDeltas[i]; // this could be a place to calibrate testing-ratio
+                modificationValuesStrain.preIncidences[i] *= 1 / absDeltas[i]; // this could be a place to calibrate testing-ratio
                 absDeltaAvg += absDeltas[i];
             }
             absDeltaAvg /= absDeltas.length;
@@ -136,9 +136,9 @@ export class StrainCalibrator {
             const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N));
             const modelIncidence = modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * demographics.getAbsTotal() * 100000 / demographics.getAbsTotal();
 
-            const incidenceCorrection = modificationValuesStrain.incidence / modelIncidence;
-            for (let i = 0; i < modificationValuesStrain.incidences.length; i++) {
-                modificationValuesStrain.incidences[i] *= incidenceCorrection;
+            const incidenceCorrection = modificationValuesStrain.dstIncidence / modelIncidence;
+            for (let i = 0; i < modificationValuesStrain.preIncidences.length; i++) {
+                modificationValuesStrain.preIncidences[i] *= incidenceCorrection;
             }
 
             // console.log('strainModel', strainModel, strainModel.getAbsDeltas(), modifiers, incidenceCorrection, incidence, transmissionRisk);

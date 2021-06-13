@@ -27,10 +27,25 @@ export interface IModificationValuesStrain extends IModificationValues {
     /**
      * the initial incidence of this strain
      */
-    incidence: number;
+    dstIncidence: number;
 
-    incidences?: number[];
-    reproduction?: number[];
+    preIncidence?: number;
+
+    /**
+     * calculated incidences at preload time
+     */
+    preIncidences?: number[];
+
+    /**
+     * target reproduction rates at preload time
+     */
+    preGrowthRate?: number[];
+
+    /**
+     * target incidences at model-min-time
+     */
+    // dstIncidences?: number[];
+
     transmissionRisk?: number
 
 }

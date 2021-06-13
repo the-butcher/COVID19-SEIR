@@ -179,7 +179,7 @@ export class ControlsStrain {
         this.r0 = strain.r0;
         this.serialInterval = strain.serialInterval;
         this.intervalScale = strain.intervalScale;
-        this.incidence = strain.incidence;
+        this.incidence = strain.dstIncidence;
 
         this.sliderSerialInterval.setValueAndRedraw(0, StrainUtil.calculateLatency(this.serialInterval, this.intervalScale), true); // = [Strain.calculateLatency(this.serialInterval, this.intervalScale), this.serialInterval];
         this.sliderSerialInterval.setValueAndRedraw(1, this.serialInterval, true);
@@ -195,7 +195,7 @@ export class ControlsStrain {
             r0: this.r0,
             serialInterval: this.serialInterval,
             intervalScale: this.intervalScale,
-            incidence: this.incidence
+            dstIncidence: this.incidence
         });
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
@@ -242,7 +242,7 @@ export class ControlsStrain {
             r0: this.r0,
             serialInterval: this.serialInterval,
             intervalScale: this.intervalScale,
-            incidence: -1,
+            dstIncidence: -1,
             deletable: false,
             draggable: false
         };

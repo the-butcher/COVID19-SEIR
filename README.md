@@ -6,6 +6,9 @@ This app currently is in a pre-alpha state where various feature have to be adde
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* either have all strains at zero or find a way that strains can be placed on the timeline and still have correct incidence at their respective positions
+* there is a slight bend in cases in the initial model, which indicates a problem with initial compartment fill (?)
+* take care of primary incidence having the correct value (heatmap - sum(other))
 * change modification-resolver-strain to use StrainUtil
 * be sure that strain calibration is still functional
 * better integration of base-data -> have initial incidence from initial-data-item,

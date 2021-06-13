@@ -32,29 +32,32 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
         return 'reproduction rate';
     }
 
-    getValue(instant: number): number {
+    getValue(instantA: number): number {
 
-        const dataItemCur = ChartAgeGroup.getInstance().findDataItem(instant);
-        const dataItemNxt = ChartAgeGroup.getInstance().findDataItem(instant + TimeUtil.MILLISECONDS_PER____DAY);
-        if (dataItemCur && dataItemNxt) {
+        // const interval = TimeUtil.MILLISECONDS_PER____DAY;
+
+        const instantB = instantA + TimeUtil.MILLISECONDS_PER____DAY * 5;
+        const dataItemA = ChartAgeGroup.getInstance().findDataItem(instantA);
+        const dataItemB = ChartAgeGroup.getInstance().findDataItem(instantB);
+        if (dataItemA && dataItemB) {
 
             // https://en.wikipedia.org/wiki/Basic_reproduction_number;
 
-            const exposedAllStrains = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[ModelConstants.STRAIN_ID_____ALL];
+            const exposedAllStrains = dataItemA.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[ModelConstants.STRAIN_ID_____ALL];
             let rT = 0;
 
             const modificationsStrain = this.getModifications();
             for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 
                 const modificationStrain = modificationsStrain[strainIndex];
-                const exposedStrainCur = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
-                const exposedStrainNxt = dataItemNxt.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
-                const shareOfStrain = exposedStrainCur / exposedAllStrains;
+                const exposedStrainA = dataItemA.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
+                const exposedStrainB = dataItemB.valueset[ModelConstants.AGEGROUP_NAME_ALL].EXPOSED[modificationStrain.getId()];
+                const shareOfStrain = exposedStrainA / exposedAllStrains;
 
                 // const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
                 // rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
 
-                rT += StrainUtil.calculateR0(exposedStrainCur, exposedStrainNxt, instant, instant + TimeUtil.MILLISECONDS_PER____DAY, modificationStrain.getSerialInterval()) * shareOfStrain;
+                rT += StrainUtil.calculateR0(exposedStrainA, exposedStrainB, instantA, instantB, modificationStrain.getSerialInterval()) * shareOfStrain;
 
                 // console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
 

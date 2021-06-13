@@ -48,7 +48,7 @@ export class ModelConstants {
                 r0: 4.4,
                 serialInterval: 4.8,
                 intervalScale: 1.0,
-                incidence: 1,
+                dstIncidence: 1,
                 deletable: true,
                 draggable: true
             }),
@@ -97,7 +97,8 @@ export class ModelConstants {
         }
     };
 
-    static readonly PRELOAD_________________DAYS = 0;
+    static readonly PRELOAD_________________DAYS = 7;
+    static readonly APPROXIMATION_________CYCLES = 3;
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
 
@@ -117,10 +118,10 @@ export class ModelConstants {
         new Date('2021-06-01').getTime(),
         new Date('2021-07-01').getTime(),
         new Date('2021-08-01').getTime(),
-        // new Date('2021-09-01').getTime(),
-        // new Date('2021-10-01').getTime(),
-        // new Date('2021-11-01').getTime(),
-        // new Date('2021-12-01').getTime(),
+        new Date('2021-09-01').getTime(),
+        new Date('2021-10-01').getTime(),
+        new Date('2021-11-01').getTime(),
+        new Date('2021-12-01').getTime(),
         // new Date('2022-01-01').getTime(),
         // new Date('2022-02-01').getTime(),
         // new Date('2022-03-01').getTime(),

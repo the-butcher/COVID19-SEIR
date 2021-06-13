@@ -1,3 +1,4 @@
+import { AgeGroup } from './../common/demographics/AgeGroup';
 import { StrainUtil } from './../util/StrainUtil';
 import { Logger } from './../util/Logger';
 import { BaseData, IBaseDataItem } from './incidence/BaseData';
@@ -19,6 +20,8 @@ import { ModelImplVaccination } from './ModelImplVaccination';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
+import { stringify } from '@amcharts/amcharts4/.internal/core/utils/Utils';
+import { last } from '@amcharts/amcharts4/.internal/core/utils/Array';
 
 interface IVaccinationGroupData {
     nrmVaccS: number; // susceptible - vaccination of susceptible population
@@ -56,8 +59,9 @@ export class ModelImplRoot implements IModelSeir {
         /**
          * start at minus preload days
          */
-        const curInstant = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
-        const referenceDataRemoved = baseData.findBaseData(TimeUtil.formatCategoryDate(curInstant));
+        const instantDst = ModelConstants.MODEL_MIN_____INSTANT;
+        const instantPre = instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
+        const referenceDataRemoved = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPre));
 
         /**
          * get all strain values as currently in modifications instance
@@ -65,76 +69,277 @@ export class ModelImplRoot implements IModelSeir {
         const modificationsStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m as ModificationStrain);
         const modificationTime = ModelConstants.MODIFICATION_PARAMS['TIME'].createValuesModification({
             id: 'straintime',
-            instant: curInstant,
+            instant: instantPre,
             key: 'TIME',
             name: 'straintime',
             deletable: true,
             draggable: true
         }) as ModificationTime;
-        modificationTime.setInstants(curInstant, curInstant);
+        modificationTime.setInstants(instantPre, instantPre);
 
         const modificationContact = Modifications.getInstance().findModificationsByType('CONTACT')[0] as ModificationContact;
         const modificationValueContact = modificationContact.getModificationValues();
         const modificationTesting = Modifications.getInstance().findModificationsByType('TESTING')[0] as ModificationTesting;
         const modificationValueTesting = modificationTesting.getModificationValues();
 
-        modificationValueContact.instant = curInstant;
-        modificationValueTesting.instant = curInstant;
+        modificationValueContact.instant = instantPre;
+        modificationValueTesting.instant = instantPre;
 
-        const heatmapIncidences00 = ageGroups.map(g => 0);
-        const heatmapIncidencesP7 = ageGroups.map(g => 0);
-        // const heatmapReproductions = ageGroups.map(g => 0);
+        // fill with zeroes for each age group
+        const heatmapPreIncidencesB = ageGroups.map(() => 0);
+        const heatmapPreIncidencesC = ageGroups.map(() => 0);
+
+        /**
+         * once filled this value remains constant, it reflects the target incidence for each age group, but not respective shares of distinct strains, since not known at this point
+         */
+        const heatmapDstIncidencesB = ageGroups.map(() => 0);
+
+        let heatmapPreIncidenceTotal = 0;
+        let heatmapDstIncidenceTotal = 0;
+
         const minOffsetIndex = -2;
         const maxOffsetIndex = 3;
-        const difOffsetIndex = maxOffsetIndex - minOffsetIndex;
+
+        /**
+         * calculate target total incidence from existing data
+         * incidence is calculated from one intervals one week before model start date
+         * reproduction is calculated from two intervals one week before and one week after model start date
+         */
+        const offsetIndexCount = maxOffsetIndex - minOffsetIndex;
+        const casesToIncidence = (cases: number, population: number) => cases / offsetIndexCount * 100000 / population;
         for (let offsetIndex = minOffsetIndex; offsetIndex < maxOffsetIndex; offsetIndex++) {
 
-            const instantM7 = curInstant + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
-            const instant00 = curInstant + (offsetIndex) * TimeUtil.MILLISECONDS_PER____DAY;
-            const instantP7 = curInstant + (offsetIndex + 7) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantPreA = instantPre + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantPreB = instantPre + (offsetIndex) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantPreC = instantPre + (offsetIndex + 7) * TimeUtil.MILLISECONDS_PER____DAY;
+
+            const instantDstA = instantDst + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantDstB = instantDst + offsetIndex * TimeUtil.MILLISECONDS_PER____DAY;
 
             ageGroups.forEach(ageGroup => {
 
-                const casesM7 = baseData.findBaseData(TimeUtil.formatCategoryDate(instantM7))[ageGroup.getName()];
-                const cases00 = baseData.findBaseData(TimeUtil.formatCategoryDate(instant00))[ageGroup.getName()];
-                const casesP7 = baseData.findBaseData(TimeUtil.formatCategoryDate(instantP7))[ageGroup.getName()];
+                // cases at preload
+                const casesPreA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ageGroup.getName()];
+                const casesPreB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ageGroup.getName()];
+                const casesPreC = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreC))[ageGroup.getName()];
 
-                const heatmapIncidence00 = (cases00 - casesM7) * 100000 / ageGroup.getAbsValue();
-                const heatmapIncidenceP7 = (casesP7 - cases00) * 100000 / ageGroup.getAbsValue();
+                // cases at model-min
+                const casesDstA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ageGroup.getName()];
+                const casesDstB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ageGroup.getName()];
 
-                heatmapIncidences00[ageGroup.getIndex()] += heatmapIncidence00 / difOffsetIndex;
-                heatmapIncidencesP7[ageGroup.getIndex()] += heatmapIncidenceP7 / difOffsetIndex;
+                // case diff at preload
+                const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
+                const heatmapCasesDeltaPreBC = casesPreC - casesPreB;
+
+                // case diff a model-min
+                const heatmapCasesDeltaDstAB = casesDstB - casesDstA;
+
+                // incidences at preload
+                heatmapPreIncidencesB[ageGroup.getIndex()] += casesToIncidence(heatmapCasesDeltaPreAB, ageGroup.getAbsValue());
+                heatmapPreIncidencesC[ageGroup.getIndex()] += casesToIncidence(heatmapCasesDeltaPreBC, ageGroup.getAbsValue());
+
+                // incidence at model-min
+                heatmapDstIncidencesB[ageGroup.getIndex()] += casesToIncidence(heatmapCasesDeltaDstAB, ageGroup.getAbsValue());
 
             });
+
+            // total incidence at preload
+            const casesPreA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ModelConstants.AGEGROUP_NAME_ALL];
+            const casesPreB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ModelConstants.AGEGROUP_NAME_ALL];
+            const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
+
+            // total case diff at model-min
+            const casesDstA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ModelConstants.AGEGROUP_NAME_ALL];
+            const casesDstB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ModelConstants.AGEGROUP_NAME_ALL];
+            const heatmapCasesDeltaDstAB = casesDstB - casesDstA;
+
+            heatmapPreIncidenceTotal += casesToIncidence(heatmapCasesDeltaPreAB, demographics.getAbsTotal());
+            heatmapDstIncidenceTotal += casesToIncidence(heatmapCasesDeltaDstAB, demographics.getAbsTotal());
 
         }
-        // console.log('heatmapIncidences', heatmapIncidences00, heatmapIncidencesP7);
+        console.log(`pre incidence (ages age-groups, strains: ALL, date: ${TimeUtil.formatCategoryDate(instantPre)})`, heatmapPreIncidencesB, heatmapPreIncidenceTotal);
+        console.log(`dst incidence (ages age-groups, strains: ALL, date: ${TimeUtil.formatCategoryDate(instantDst)})`, heatmapDstIncidencesB, heatmapDstIncidenceTotal);
 
+        let primaryStrainPreIncidence = heatmapPreIncidenceTotal;
+        let primaryStrainDstIncidence = heatmapDstIncidenceTotal;
 
-        const instant00 = curInstant
-        const instantP7 = curInstant + 7 * TimeUtil.MILLISECONDS_PER____DAY;;
-        for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+        // strains other than primary
+        for (let strainIndexA = 1; strainIndexA < modificationsStrain.length; strainIndexA++) {
 
-            const strainIncidences = [...heatmapIncidences00];
+            const strainPreIncidence = modificationsStrain[strainIndexA].getModificationValues().dstIncidence / heatmapDstIncidenceTotal * heatmapPreIncidenceTotal;
+            const strainDstIncidence = modificationsStrain[strainIndexA].getModificationValues().dstIncidence;
 
-            const strainReproductions: number[] = [];
-            ageGroups.forEach(ageGroup => {
-                strainReproductions.push(StrainUtil.calculateR0(heatmapIncidences00[ageGroup.getIndex()], heatmapIncidencesP7[ageGroup.getIndex()], instant00, instantP7,  modificationsStrain[strainIndex].getSerialInterval() *  modificationsStrain[strainIndex].getIntervalScale()));
+            primaryStrainPreIncidence -= strainPreIncidence;
+            primaryStrainDstIncidence -= strainDstIncidence;
+
+            // update primary strain to hold remaining incidence
+            modificationsStrain[strainIndexA].acceptUpdate({
+                preIncidence: strainPreIncidence,
+                dstIncidence: strainDstIncidence
             });
+            console.log(`pre incidence (strain: ${modificationsStrain[strainIndexA].getName()}, date: ${TimeUtil.formatCategoryDate(instantPre)})`, modificationsStrain[strainIndexA].getIncidence());
+            console.log(`dst incidence (strain: ${modificationsStrain[strainIndexA].getName()}, date: ${TimeUtil.formatCategoryDate(instantDst)})`, modificationsStrain[strainIndexA].getIncidence());
 
-            modificationsStrain[strainIndex].acceptUpdate({
-                incidences: strainIncidences,
-                reproduction: strainReproductions
+        }
+
+        // update primary strain to hold remaining incidence
+        modificationsStrain[0].acceptUpdate({
+            preIncidence: primaryStrainPreIncidence,
+            dstIncidence: primaryStrainDstIncidence,
+        });
+        console.log(`pre incidence (strain: ${modificationsStrain[0].getName()}, date: ${TimeUtil.formatCategoryDate(instantPre)})`, modificationsStrain[0].getIncidence());
+        console.log(`dst incidence (strain: ${modificationsStrain[0].getName()}, date: ${TimeUtil.formatCategoryDate(instantDst)})`, modificationsStrain[0].getIncidence());
+
+        for (let strainIndexA = 0; strainIndexA < modificationsStrain.length; strainIndexA++) {
+
+            const strainSharePreA = modificationsStrain[strainIndexA].getModificationValues().preIncidence / heatmapPreIncidenceTotal;
+
+            // initial strain incidences as of incidence config
+            const strainPreIncidences = heatmapPreIncidencesB.map(i => i * strainSharePreA);
+
+            modificationsStrain[strainIndexA].acceptUpdate({
+                preIncidences: strainPreIncidences,
             });
-            console.log('targetIndices', modificationsStrain[strainIndex].getName(), strainIncidences, strainReproductions);
 
         }
 
         /**
-         * some interpolation runs
+         * approximate in multiple steps
          */
         let model: ModelImplRoot;
         let modelStateIntegrator: ModelStateIntegrator;
+
+        for (let approximationIndex = 0; approximationIndex < ModelConstants.APPROXIMATION_________CYCLES; approximationIndex++) {
+
+            const instantB = instantPre
+            const instantC = instantPre + 7 * TimeUtil.MILLISECONDS_PER____DAY;
+            for (let strainIndexA = 0; strainIndexA < modificationsStrain.length; strainIndexA++) {
+
+                /**
+                 * r0 = r0A * shareA + r0B * shareB + r0C * shareC
+                 * r0 = r0A * shareA + (r0A / ratioOfReproductionAB) * shareB + (r0A / ratioOfReproductionAC) * shareC
+                 * r0 = r0A * shareA + r0A * shareB / ratioOfReproductionAB + r0A * shareC / ratioOfReproductionAC
+                 * r0 = r0A * (shareA + shareB / ratioOfReproductionAB + shareC / ratioOfReproductionAC
+                 */
+                let reproductionRatio = 0;
+                for (let strainIndexB = 0; strainIndexB < modificationsStrain.length; strainIndexB++) {
+
+                    const ratioAB = modificationsStrain[strainIndexA].getR0() / modificationsStrain[strainIndexB].getR0();
+                    const strainShareB = modificationsStrain[strainIndexB].getModificationValues().preIncidence / heatmapPreIncidenceTotal;
+                    reproductionRatio += strainShareB / ratioAB;
+                    // console.log('ratio', modificationsStrain[strainIndexB].getName(), modificationsStrain[strainIndexA].getName(), ratioAB);
+
+                }
+
+                const strainReproductions: number[] = [];
+                ageGroups.forEach(ageGroup => {
+                    const strainReproduction = StrainUtil.calculateR0(heatmapPreIncidencesB[ageGroup.getIndex()], heatmapPreIncidencesC[ageGroup.getIndex()], instantB, instantC,  modificationsStrain[strainIndexA].getSerialInterval() *  modificationsStrain[strainIndexA].getIntervalScale());
+                    strainReproductions.push(strainReproduction / reproductionRatio);
+                });
+
+                modificationsStrain[strainIndexA].acceptUpdate({
+                    preGrowthRate: strainReproductions
+                });
+
+            }
+
+            // build a model with current data
+            model = new ModelImplRoot(demographics, modifications, referenceDataRemoved, baseData);
+            modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
+            modelStateIntegrator.prefillVaccination();
+
+            let modelData: IDataItem[];
+            let dstInstant = -1;
+
+            // modifications are sorted instant-wise
+            // does strain calculation of preIncidences require consideration in other strains?
+            // maybe yes, since the primary strains needs to adjust with other strain giving or requiring incidence
+            const lastDataItems: IDataItem[] = [];
+            for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+
+                // console.log('strain mod at init of approx cycle', approximationIndex, modificationsStrain[strainIndex]);
+
+                // iterate if there is time between strains
+                if (modificationsStrain[strainIndex].getInstantA() > dstInstant) {
+                    dstInstant = modificationsStrain[strainIndex].getInstantA();
+                    modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
+                        progressCallback({
+                            ratio: modelProgress.ratio
+                        });
+                    });
+
+                    //get a data-item that contains the information at strain config instant
+                    lastDataItems[strainIndex] = modelData[modelData.length - 1];
+
+                }
+
+            }
+
+            for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
+
+                const lastDataItem = lastDataItems[strainIndex];
+
+                // look at each age group separately
+                const preIncidences: number[] = [...modificationsStrain[strainIndex].getModificationValues().preIncidences];
+
+                // any strain other than primary should be able to "float" through age groups, so actually it should not constrain to strain specific values
+                if (strainIndex > 0) {
+
+                    // what it came to be in the model
+                    const totalIncidenceSource = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[modificationsStrain[strainIndex].getId()];
+
+                    // what it should be at strain config time
+                    const totalIncidenceTarget = modificationsStrain[strainIndex].getModificationValues().dstIncidence;
+
+                    // a correction applicable to current incidence settings
+                    const totalIncidenceFactor = totalIncidenceTarget / totalIncidenceSource;
+
+                    ageGroups.forEach(ageGroup => {
+                        preIncidences[ageGroup.getIndex()] *= totalIncidenceFactor;
+                    });
+
+                    modificationsStrain[strainIndex].acceptUpdate({
+                        preIncidences,
+                    });
+
+                } else {
+
+                    // primary strain!!
+                    const otherIncidencesAtPrimaryStrainTime: number[] = ageGroups.map(() => 0); // by age group
+                    for (let strainIndexB = 1; strainIndexB < modificationsStrain.length; strainIndexB++) {
+
+                        // collect other strain's incidences for that time
+                        ageGroups.forEach(ageGroup => {
+                            otherIncidencesAtPrimaryStrainTime[ageGroup.getIndex()] += lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndexB].getId()];
+                        });
+
+                    }
+
+                    ageGroups.forEach(ageGroup => {
+
+                        // what it came to be in the model
+                        const ageGroupIncidenceSource = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()];
+
+                        // what it should be at strain config time
+                        const ageGroupIncidenceTarget = heatmapDstIncidencesB[ageGroup.getIndex()] - otherIncidencesAtPrimaryStrainTime[ageGroup.getIndex()];
+
+                        // a correction applicable to current incidence settings
+                        const ageGroupIncidenceFactor = ageGroupIncidenceTarget / ageGroupIncidenceSource;
+
+                        preIncidences[ageGroup.getIndex()] *= ageGroupIncidenceFactor;
+
+                    });
+
+                    modificationsStrain[strainIndex].acceptUpdate({
+                        preIncidences,
+                    });
+
+                }
+
+            }
+
+        }
+
         // for (let interpolationIndex = 0; interpolationIndex < 0; interpolationIndex++) {
 
         //     model = new ModelImplRoot(demographics, modifications, referenceDataRemoved, baseData);
@@ -198,9 +403,9 @@ export class ModelImplRoot implements IModelSeir {
          * since the model contains the preload portion, that portion is fast forwarded and the state-integrator is returned being positioned at model-start instant
          */
         model = new ModelImplRoot(demographics, Modifications.getInstance(), referenceDataRemoved, baseData);
-        modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
+        modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
         modelStateIntegrator.prefillVaccination();
-        // await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
         modelStateIntegrator.resetExposure();
 
         return modelStateIntegrator;

@@ -156,7 +156,7 @@ export class StorageUtil {
                 r0: 4.4,
                 serialInterval: 4.8,
                 intervalScale: 1.0,
-                incidence: 150,
+                dstIncidence: 150,
                 deletable: false,
                 draggable: true
             },
