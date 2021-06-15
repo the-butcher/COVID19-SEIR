@@ -185,6 +185,14 @@ export class ControlsStrain {
         this.sliderSerialInterval.setValueAndRedraw(1, this.serialInterval, true);
         this.sliderReproduction.setValueAndRedraw(0, this.r0, true);
         this.sliderIncidence.setValueAndRedraw(0, this.incidence, true);
+
+        requestAnimationFrame(() => {
+            this.sliderIncidence.handleResize();
+            this.sliderReproduction.handleResize();
+            this.sliderReproduction.handleResize();
+            this.sliderIncidence.setDisabled(modification.isPrimaryStrain());
+        });
+
         this.redrawCanvas();
 
     }
@@ -244,7 +252,8 @@ export class ControlsStrain {
             intervalScale: this.intervalScale,
             dstIncidence: -1,
             deletable: false,
-            draggable: false
+            draggable: false,
+            primary: false
         };
         const compartmentParams = CompartmentChain.getInstance().getStrainedCompartmentParams(strain);
         compartmentParams.forEach(compartmentParam => {

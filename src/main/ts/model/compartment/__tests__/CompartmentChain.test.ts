@@ -30,7 +30,8 @@ describe("test value", () => {
             name: 'test',
             dstIncidence: 1,
             deletable: true,
-            draggable: true
+            draggable: true,
+            primary: false
         };
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
         expect(compartmentParams[0].instantB).toBeCloseTo(259200000, -4);
@@ -47,7 +48,8 @@ describe("test value", () => {
             name: 'test',
             dstIncidence: 1,
             deletable: true,
-            draggable: true
+            draggable: true,
+            primary: false
         };
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
         let totalReproduction = 0;
@@ -67,7 +69,8 @@ describe("test value", () => {
             name: 'test',
             dstIncidence: 1,
             deletable: true,
-            draggable: true
+            draggable: true,
+            primary: false
         };
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
         let totalReproduction = 0;

@@ -158,7 +158,8 @@ export class StorageUtil {
                 intervalScale: 1.0,
                 dstIncidence: 150,
                 deletable: false,
-                draggable: true
+                draggable: true,
+                primary: true,
             },
             {
                 id: ObjectUtil.createId(),

@@ -119,6 +119,8 @@ export class Slider {
     private maxValue: number;
     private readonly step: number;
 
+    private disabled: boolean;
+
     constructor(params: ISliderParams) {
 
         this.sliderTicks = [];
@@ -131,6 +133,7 @@ export class Slider {
         this.minValue = params.min;
         this.maxValue = params.max;
         this.step = params.step;
+        this.disabled = false;
 
         this.handleValueChange = params.handleValueChange;
         this.handleThumbPicked = params.handleThumbPicked;
@@ -232,8 +235,12 @@ export class Slider {
         let keyupTimeout = -1;
         let keyupRequire = false;
         window.addEventListener('keydown', e => {
-            if (this.focusableThumbIndex >= 0 && this.sliderThumbs[this.focusableThumbIndex].isDraggable()) {
 
+            if (this.disabled) {
+                return;
+            }
+
+            if (this.focusableThumbIndex >= 0 && this.sliderThumbs[this.focusableThumbIndex].isDraggable()) {
                 window.clearTimeout(keyupTimeout);
                 let value = this.getValue(this.focusableThumbIndex);
                 if (e.key === 'ArrowLeft') {
@@ -248,14 +255,22 @@ export class Slider {
                     this.handleValueChange(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'cursor');
                 }
             }
+
         });
+
         window.addEventListener('keyup', e => {
+
+            if (this.disabled) {
+                return;
+            }
+
             if (this.focusableThumbIndex >= 0 && keyupRequire && this.sliderThumbs[this.focusableThumbIndex].isDraggable()) {
                 keyupRequire = false;
                 keyupTimeout = window.setTimeout(() => {
                     this.handleValueChange(this.focusableThumbIndex, this.getValue(this.focusableThumbIndex), 'stop');
                 }, 500);
             }
+
         });
 
     }
@@ -458,6 +473,10 @@ export class Slider {
 
     handlePointerMove(e: PointerEvent): void {
 
+        if (this.disabled) {
+            return;
+        }
+
         const position = this.eventToPosition(e);
         let value = this.positionToValue(position); // transform into value space and clamp to slider bounds
         // value = this.valueToStep(value);
@@ -495,6 +514,10 @@ export class Slider {
      * handle a pointerup anywhere in the document
      */
      handlePointerUp(e: PointerEvent): void {
+
+        if (this.disabled) {
+            return;
+        }
 
         if (this.clickableThumbIndex >= 0) {
 
@@ -565,6 +588,13 @@ export class Slider {
         }
     }
 
+    setDisabled(disabled: boolean): void {
+        this.sliderContainer.style.opacity = disabled ? '0.5' : '1.0';
+        this.sliderThumbs.forEach(sliderThumb => {
+            sliderThumb.setDisabled(disabled);
+        })
+        this.disabled = disabled;
+    }
 
     /**
      * all elements need to be repositioned on resize

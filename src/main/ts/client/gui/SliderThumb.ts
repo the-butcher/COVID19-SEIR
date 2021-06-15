@@ -18,6 +18,8 @@ export class SliderThumb extends ASliderElement {
     private readonly inputFormatFunction: (index: number, value: number) => string;
     private readonly inputHandleFunction: (index: number, value: string) => number;
 
+    private disabled: boolean;
+
     constructor(id: string, params: ISliderThumbParams) {
 
         super(params);
@@ -68,13 +70,28 @@ export class SliderThumb extends ASliderElement {
         if (this.draggable) {
             this.thumbContentContainer.style.cursor = 'grab';
             this.thumbContentContainer.addEventListener('pointerdown', e => {
+
+                if (this.disabled) {
+                    return;
+                }
                 this.thumbContentContainer.style.cursor = 'grabbing';
+
             });
             document.body.addEventListener('pointerup', e => {
+
+                if (this.disabled) {
+                    return;
+                }
                 this.thumbContentContainer.style.cursor = 'grab';
+
             });
         }
 
+    }
+
+    setDisabled(disabled: boolean): void {
+        this.disabled = disabled;
+        this.thumbContentContainer.style.cursor = disabled ? 'auto' : 'grab';
     }
 
     getId(): string {

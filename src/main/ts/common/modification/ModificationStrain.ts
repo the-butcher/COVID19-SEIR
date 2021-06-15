@@ -14,6 +14,10 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         super('INSTANT', modificationValues);
     }
 
+    isPrimaryStrain(): boolean {
+        return this.modificationValues.primary;
+    }
+
     acceptUpdate(update: Partial<IModificationValuesStrain>): void {
         this.modificationValues = {...this.modificationValues, ...update};
     }

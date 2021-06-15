@@ -29,7 +29,8 @@
     "intervalScale": 1,
     "dstIncidence": 40,
     "deletable": false,
-    "draggable": true
+    "draggable": true,
+    "primary": true
   },
   {
     "id": "6c3d0",
@@ -95,7 +96,8 @@
     "intervalScale": 1,
     "dstIncidence": 1,
     "deletable": true,
-    "draggable": true
+    "draggable": true,
+    "primary": false
   },
   {
     "id": "625e8",

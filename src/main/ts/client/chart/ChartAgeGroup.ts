@@ -880,7 +880,6 @@ export class ChartAgeGroup {
                 if (dataItemA && dataItemB) {
                     const baseIncidence = (dataItemB[ageGroupHeat.getName()] - dataItemA[ageGroupHeat.getName()]) * 100000 / ageGroupHeat.getAbsValue();
                     // value -= baseIncidence;
-                    // value = Math.abs(value);
                 }
 
                 const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);

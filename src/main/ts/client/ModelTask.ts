@@ -1,8 +1,10 @@
+import { ModificationResolverStrain } from './../common/modification/ModificationResolverStrain';
+import { ModelConstants } from './../model/ModelConstants';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
 import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
 import { IModificationValues } from '../common/modification/IModificationValues';
-import { IBaseDataConfig, IBaseDataItem } from '../model/incidence/BaseData';
+import { IBaseDataConfig } from '../model/incidence/BaseData';
 import { IWorkerInput } from '../model/IWorkerInput';
 import { MODIFICATION____KEY } from '../model/ModelConstants';
 import { IModelProgress } from '../model/state/ModelStateIntegrator';
@@ -54,6 +56,15 @@ export class ModelTask {
             if (modelProgress.ratio >= 1 && modelProgress.data) {
 
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
+
+                /**
+                 * primary strain has a "floating value", update the value on the gui instance of that modification
+                 */
+                const primaryStrainModification = new ModificationResolverStrain().getModifications()[0];
+                const dstIncidence = modelProgress.data[0].valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[primaryStrainModification.getId()];
+                primaryStrainModification.acceptUpdate({
+                    dstIncidence
+                });
 
                 // 2. update to be sure that modification chart shows on initial load
                 ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());

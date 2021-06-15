@@ -15,6 +15,11 @@ export interface IModificationValuesStrain extends IModificationValues {
     r0: number;
 
     /**
+     * is this the primary strain in the model;
+     */
+    primary: boolean;
+
+    /**
      * get the serial interval of this strain
      */
     serialInterval: number;

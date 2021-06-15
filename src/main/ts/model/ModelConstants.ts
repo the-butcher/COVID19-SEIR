@@ -50,7 +50,8 @@ export class ModelConstants {
                 intervalScale: 1.0,
                 dstIncidence: 1,
                 deletable: true,
-                draggable: true
+                draggable: true,
+                primary: false
             }),
         },
         'CONTACT': {
@@ -118,8 +119,8 @@ export class ModelConstants {
         new Date('2021-06-01').getTime(),
         new Date('2021-07-01').getTime(),
         new Date('2021-08-01').getTime(),
-        new Date('2021-09-01').getTime(),
-        new Date('2021-10-01').getTime(),
+        // new Date('2021-09-01').getTime(),
+        // new Date('2021-10-01').getTime(),
         // new Date('2021-11-01').getTime(),
         // new Date('2021-12-01').getTime(),
         // new Date('2022-01-01').getTime(),
