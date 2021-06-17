@@ -49,8 +49,8 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        const minInstant = ModelConstants.MODEL_MIN_____INSTANT;
-        const maxInstant = ModelConstants.MODEL_MAX_____INSTANT;
+        const minInstant = ModelConstants.MODEL_MIN_______INSTANT;
+        const maxInstant = ModelConstants.MODEL_MAX_______INSTANT;
         modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             ctx.postMessage(modelProgress);
         });

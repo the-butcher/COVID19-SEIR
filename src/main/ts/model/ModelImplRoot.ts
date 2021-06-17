@@ -1,7 +1,3 @@
-import { AgeGroup } from './../common/demographics/AgeGroup';
-import { StrainUtil } from './../util/StrainUtil';
-import { Logger } from './../util/Logger';
-import { BaseData, IBaseDataItem } from './incidence/BaseData';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
@@ -10,24 +6,25 @@ import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
 import { ModificationContact } from './../common/modification/ModificationContact';
 import { Modifications } from './../common/modification/Modifications';
+import { StrainUtil } from './../util/StrainUtil';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';
+import { BaseData, IBaseDataItem } from './incidence/BaseData';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplStrain } from './ModelImplStrain';
 import { ModelImplVaccination } from './ModelImplVaccination';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
-import { stringify } from '@amcharts/amcharts4/.internal/core/utils/Utils';
-import { last } from '@amcharts/amcharts4/.internal/core/utils/Array';
 
 interface IVaccinationGroupData {
-    nrmVaccS: number; // susceptible - vaccination of susceptible population
+    nrmVaccS: number; // susceptible - vaccination of susceptible population -> 2 shots
     nrmVaccD: number; // discovered - vaccination of cases previously discovered -> 1 shot
     nrmVaccU: number; // undiscovered - vaccination of cases previously undiscovered -> 2 shots
-    nrmTotal: number;
+    nrmVaccT: number; // total number of shots that would be consumed
+    priority: number;
 }
 
 interface IBaseIncidences {
@@ -59,9 +56,9 @@ export class ModelImplRoot implements IModelSeir {
         /**
          * start at minus preload days
          */
-        const instantDst = ModelConstants.MODEL_MIN_____INSTANT;
+        const instantDst = ModelConstants.MODEL_MIN_______INSTANT;
         const instantPre = instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
-        const referenceDataRemoved = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPre));
+        const referenceDataRemoved = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPre));
 
         /**
          * get all strain values as currently in modifications instance
@@ -119,13 +116,13 @@ export class ModelImplRoot implements IModelSeir {
             ageGroups.forEach(ageGroup => {
 
                 // cases at preload
-                const casesPreA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ageGroup.getName()];
-                const casesPreB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ageGroup.getName()];
-                const casesPreC = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreC))[ageGroup.getName()];
+                const casesPreA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesPreB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesPreC = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreC))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
 
                 // cases at model-min
-                const casesDstA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ageGroup.getName()];
-                const casesDstB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ageGroup.getName()];
+                const casesDstA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesDstB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
 
                 // case diff at preload
                 const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
@@ -144,13 +141,13 @@ export class ModelImplRoot implements IModelSeir {
             });
 
             // total incidence at preload
-            const casesPreA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ModelConstants.AGEGROUP_NAME_ALL];
-            const casesPreB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ModelConstants.AGEGROUP_NAME_ALL];
+            const casesPreA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const casesPreB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
             const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
 
             // total case diff at model-min
-            const casesDstA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ModelConstants.AGEGROUP_NAME_ALL];
-            const casesDstB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ModelConstants.AGEGROUP_NAME_ALL];
+            const casesDstA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const casesDstB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
             const heatmapCasesDeltaDstAB = casesDstB - casesDstA;
 
             heatmapPreIncidenceTotal += casesToIncidence(heatmapCasesDeltaPreAB, demographics.getAbsTotal());
@@ -286,7 +283,7 @@ export class ModelImplRoot implements IModelSeir {
                 if (strainIndex > 0) {
 
                     // what it came to be in the model
-                    const totalIncidenceSource = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[modificationsStrain[strainIndex].getId()];
+                    const totalIncidenceSource = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL].INCIDENCES[modificationsStrain[strainIndex].getId()];
 
                     // what it should be at strain config time
                     const totalIncidenceTarget = modificationsStrain[strainIndex].getModificationValues().dstIncidence;
@@ -340,64 +337,6 @@ export class ModelImplRoot implements IModelSeir {
 
         }
 
-        // for (let interpolationIndex = 0; interpolationIndex < 0; interpolationIndex++) {
-
-        //     model = new ModelImplRoot(demographics, modifications, referenceDataRemoved, baseData);
-        //     modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
-        //     modelStateIntegrator.prefillVaccination();
-
-        //     let modelData: IDataItem[];
-        //     let lastDataItem: IDataItem;
-        //     let dstInstant = -1;
-        //     for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
-
-        //         // if the strain identified by index has a date later than the last model iteration -> step forward until incidence reached
-        //         if (modificationsStrain[strainIndex].getInstantA() > dstInstant) {
-        //             dstInstant = modificationsStrain[strainIndex].getInstantA();
-        //             modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
-        //                 progressCallback({
-        //                     ratio: modelProgress.ratio
-        //                 });
-        //             });
-        //             lastDataItem = modelData[modelData.length - 1];
-        //         }
-
-        //         const incidences = modificationsStrain[strainIndex].getModificationValues().incidences;
-        //         ageGroups.forEach(ageGroup => {
-
-        //             // source model value
-        //             const ageGroupIncidenceSource = lastDataItem.valueset[ageGroup.getName()].INCIDENCES[modificationsStrain[strainIndex].getId()];
-
-        //             const ageGroupIncidenceTarget = targetIncidences[strainIndex][ageGroup.getIndex()];
-
-
-        //             // factor from source to target
-        //             const ageGroupIncidenceFactor = ageGroupIncidenceTarget / ageGroupIncidenceSource;
-
-        //             // console.log(ageGroupIncidenceSource, ageGroupIncidenceTarget, ageGroupIncidenceFactor);
-
-        //             incidences[ageGroup.getIndex()] *= ageGroupIncidenceFactor;
-
-        //         });
-        //         // console.log('modifiers', modifiers, ageGroupSourceIncidences, ageGroupTargetIncidences);
-
-        //         modificationsStrain[strainIndex].acceptUpdate({
-        //             incidences
-        //         });
-        //         // console.log(modifiersSP, modifiersSM);
-
-        //     };
-
-        //     // const vaccinatedModel = lastDataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL].REMOVED_V;
-        //     // const vaccinatedFactor = vaccinatedTarget / vaccinatedModel;
-        //     // const vaccinated = modificationSettings.getVaccinated() * vaccinatedFactor;
-
-        //     // modificationSettings.acceptUpdate({
-        //     //     vaccinated
-        //     // });
-
-        // }
-
         /**
          * final model setup with adapted modifications values
          * since the model contains the preload portion, that portion is fast forwarded and the state-integrator is returned being positioned at model-start instant
@@ -405,7 +344,7 @@ export class ModelImplRoot implements IModelSeir {
         model = new ModelImplRoot(demographics, Modifications.getInstance(), referenceDataRemoved, baseData);
         modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
         modelStateIntegrator.prefillVaccination();
-        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_______INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
         modelStateIntegrator.resetExposure();
 
         return modelStateIntegrator;
@@ -446,31 +385,30 @@ export class ModelImplRoot implements IModelSeir {
 
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            const absValueRemovedD = referenceDataRemoved[ageGroup.getName()];
+            const absValueRemovedD = referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_REMOVED];
             const absValueRemovedU = absValueRemovedD * modificationSettings.getUndetected();
 
             // TODO initial share of discovery (may split recovered slider)
             // const absValueRemovedD = ageGroup.getAbsValue() * settingsValues.recoveredD;
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedD.push(compartmentRemovedD);
 
             // const absValueRemovedU = ageGroup.getAbsValue() * settingsValues.recoveredU;
-            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedU.push(compartmentRemovedU);
 
             // configurable
-            const shareOfRefusal = 0.40 - 0.25 * ageGroup.getIndex() / demographics.getAgeGroups().length;
-            const vaccinationModel = new ModelImplVaccination(this, demographics, ageGroup, shareOfRefusal);
+            const vaccinationModel = new ModelImplVaccination(this, demographics, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
-            // console.log('vaccinationModel', vaccinationModel.getAgeGroupIndex(), vaccinationModel.getNrmRefusal() * vaccinationModel.getAbsTotal(), vaccinationModel.getNrmRefusal() * vaccinationModel.getAbsTotal() / vaccinationModel.getAgeGroupTotal());
+            // console.log('vaccinationModel', ageGroup.getName(), ageGroup.getIndex(), demographics.getAgeGroups().length);
 
         });
 
         // now find out how many people are already contained in compartments / by age group
         demographics.getAgeGroups().forEach(ageGroup => {
             const absValueSusceptible = ageGroup.getAbsValue() - this.getNrmValueGroup(ageGroup.getIndex(), true) * this.getAbsValue();
-            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsSusceptible.push(compartmentSusceptible);
         });
 
@@ -559,42 +497,95 @@ export class ModelImplRoot implements IModelSeir {
 
         // collect a total vaccination priority
         const vaccinationGroupDataset: IVaccinationGroupData[] = [];
-
-        let totalVaccinationPriority = 0;
+        let totalPriority = 0;
 
         for (let i = 0; i < this.vaccinationModels.length; i++) {
 
-            // normalized refusal with regard to group size
-            const nrmRefusal = this.vaccinationModels[i].getNrmRefusal();
+            const grpVaccMax = this.vaccinationModels[i].getGrpAccept(); // / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+            const grpVaccAct = (state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizing()) + state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizedV())) * this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal();
+            const grpVaccDif = (grpVaccMax - grpVaccAct);
+            // const grpVaccMlt = grpVaccDif / grpVaccMax;
 
-            const nrmVaccS = Math.max(0, state.getNrmValue(this.compartmentsSusceptible[i]) - nrmRefusal);
-            const nrmVaccD = Math.max(0, state.getNrmValue(this.compartmentsRemovedD[i]) - nrmRefusal);
-            const nrmVaccU = Math.max(0, state.getNrmValue(this.compartmentsRemovedU[i]) - nrmRefusal);
-            const nrmTotal = this.vaccinationModels[i].getGroupPriority() * (nrmVaccS * 2 + nrmVaccD + nrmVaccU * 2);
-            const vaccinationGroupData: IVaccinationGroupData = {
-                nrmVaccS,
-                nrmVaccD,
-                nrmVaccU,
-                nrmTotal
-            };
-            vaccinationGroupDataset.push(vaccinationGroupData);
-            totalVaccinationPriority += nrmTotal;
+            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
+            //     console.log('nrmVaccT', i, TimeUtil.formatCategoryDate(tT), grpVaccMax, grpVaccAct, grpVaccDif, grpVaccMlt);
+            // }
+
+            const nrmVaccGrp = grpVaccDif / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
+            //     console.log('nrmVaccT', i, TimeUtil.formatCategoryDate(tT), nrmVaccMax * this.getAbsTotal(), nrmVaccAct * this.getAbsTotal(), nrmVaccDif * this.getAbsTotal());
+            // }
+
+            if (nrmVaccGrp > 0) {
+
+                let nrmVaccS = state.getNrmValue(this.compartmentsSusceptible[i]) * 2;
+                let nrmVaccD = state.getNrmValue(this.compartmentsRemovedD[i]);
+                let nrmVaccU = state.getNrmValue(this.compartmentsRemovedU[i]) * 2;
+                let nrmVaccT = nrmVaccS + nrmVaccD + nrmVaccU;
+
+                // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
+                //     console.warn('nrmVaccSDU', i, TimeUtil.formatCategoryDate(tT), nrmVaccGrp, nrmVaccS * this.getAbsTotal(), this.compartmentsSusceptible[i]);
+                // }
+
+                nrmVaccS *= nrmVaccGrp / nrmVaccT;
+                nrmVaccD *= nrmVaccGrp / nrmVaccT;
+                nrmVaccU *= nrmVaccGrp / nrmVaccT;
+                nrmVaccT = nrmVaccS + nrmVaccD + nrmVaccU;
+
+                const priority = nrmVaccT * this.vaccinationModels[i].getGroupPriority();
+                vaccinationGroupDataset.push({
+                    nrmVaccS,
+                    nrmVaccD,
+                    nrmVaccU,
+                    nrmVaccT,
+                    priority
+                });
+                totalPriority += priority;
+
+
+            } else {
+
+                vaccinationGroupDataset.push({
+                    nrmVaccS: 0,
+                    nrmVaccD: 0,
+                    nrmVaccU: 0,
+                    nrmVaccT: 0,
+                    priority: 0
+                });
+
+            }
+
+            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
+            //     console.log('nrmVaccDif', i, TimeUtil.formatCategoryDate(tT),  nrmVaccGrp, vaccinationGroupDataset[vaccinationGroupDataset.length - 1]);
+            // }
+
 
         }
 
-        const nrmDosesTotal = modificationTime.getDosesPerDay() * dT / TimeUtil.MILLISECONDS_PER____DAY / this.getAbsTotal();
-        for (let i = 0; i < this.vaccinationModels.length; i++) {
 
-            // create a share of doses for this age group
-            const nrmDosesAgeGroup = nrmDosesTotal * vaccinationGroupDataset[i].nrmTotal / totalVaccinationPriority; // divide by two to simulate 2 shots
-            if (nrmDosesAgeGroup > 0) {
+        let nrmDosesTotal = modificationTime.getDosesPerDay() * dT / TimeUtil.MILLISECONDS_PER____DAY / this.getAbsTotal();
+        // let nrmDosesCheck = 0;
+        for (let i = this.vaccinationModels.length - 1; i >= 0; i--) {
 
-                const nrmTotal = this.vaccinationModels[i].getGroupPriority() > 0 ? vaccinationGroupDataset[i].nrmTotal / this.vaccinationModels[i].getGroupPriority() : 0;
+            const ageGroupShare = vaccinationGroupDataset[i].priority / totalPriority;
+            const nrmGroupDoses = nrmDosesTotal * ageGroupShare;
+            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+            //     console.log('nrmTotal', i, state.getNrmValue(this.compartmentsSusceptible[i]), ageGroupShare);
+            // }
 
-                // // distribute share to
-                const nrmIncrS = nrmDosesAgeGroup * vaccinationGroupDataset[i].nrmVaccS / nrmTotal;
-                const nrmIncrD = nrmDosesAgeGroup * vaccinationGroupDataset[i].nrmVaccD / nrmTotal;
-                const nrmIncrU = nrmDosesAgeGroup * vaccinationGroupDataset[i].nrmVaccU / nrmTotal;
+            if (nrmGroupDoses > 0) {
+
+                // actual shares being shifted between compartments
+                const nrmIncrS = nrmGroupDoses * vaccinationGroupDataset[i].nrmVaccS / vaccinationGroupDataset[i].nrmVaccT / 2;
+                const nrmIncrD = nrmGroupDoses * vaccinationGroupDataset[i].nrmVaccD / vaccinationGroupDataset[i].nrmVaccT;
+                const nrmIncrU = nrmGroupDoses * vaccinationGroupDataset[i].nrmVaccU / vaccinationGroupDataset[i].nrmVaccT / 2;
+
+                // nrmDosesCheck += nrmIncrS;
+                // nrmDosesCheck += nrmIncrD;
+                // nrmDosesCheck += nrmIncrU;
+
+                // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
+                //     console.log('nrmVaccT', i, vaccinationGroupDataset[i]);
+                // }
 
                 // remove from susceptible and add to immunizing compartment
                 result.addNrmValue(-nrmIncrS, this.compartmentsSusceptible[i]);
@@ -602,15 +593,18 @@ export class ModelImplRoot implements IModelSeir {
 
                 // remove from discovered and add to vaccinated compartment
                 result.addNrmValue(-nrmIncrD, this.compartmentsRemovedD[i]);
-                result.addNrmValue(+nrmIncrD, this.vaccinationModels[i].getCompartmentImmunizedD());
+                result.addNrmValue(+nrmIncrD, this.vaccinationModels[i].getCompartmentImmunizedV());
 
                 // remove from undiscovered and add to vaccinated compartment
                 result.addNrmValue(-nrmIncrU, this.compartmentsRemovedU[i]);
-                result.addNrmValue(+nrmIncrU, this.vaccinationModels[i].getCompartmentImmunizedU());
+                result.addNrmValue(+nrmIncrU, this.vaccinationModels[i].getCompartmentImmunizedV());
 
             }
 
         }
+        // if (tT % (TimeUtil.MILLISECONDS_PER____DAY) === 0) {
+        //     console.log('nrmGroupCheck', nrmDosesTotal, nrmDosesCheck);
+        // }
 
         this.vaccinationModels.forEach(vaccinationModel => {
             result.add(vaccinationModel.apply(state, dT, tT, modificationTime));

@@ -4,17 +4,17 @@ export interface IBaseDataConfig {
 }
 
 export interface IBaseDataItem {
-    "TOTAL": number;
-    "<= 04": number;
-    "05-14": number;
-    "15-24": number;
-    "25-34": number;
-    "35-44": number;
-    "45-54": number;
-    "55-64": number;
-    "65-74": number;
-    "75-84": number;
-    ">= 85": number;
+    "TOTAL": number[];
+    "<= 04": number[];
+    "05-14": number[];
+    "15-24": number[];
+    "25-34": number[];
+    "35-44": number[];
+    "45-54": number[];
+    "55-64": number[];
+    "65-74": number[];
+    "75-84": number[];
+    ">= 85": number[];
 }
 
 export class BaseData {
@@ -32,21 +32,15 @@ export class BaseData {
     private readonly baseDataset: {[K: string]: IBaseDataItem};
 
     constructor(baseDataset: {[K: string]: IBaseDataItem}) {
-
         this.baseDataset = baseDataset;
-
-        // const initialInstant = ModelConstants.MODEL_MIN_____INSTANT - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
-        // const initialCategory = TimeUtil.formatCategoryDate(initialInstant);
-
     }
 
-    getBaseDataConfig(): IBaseDataConfig {
+    getBaseDataConfig2(): IBaseDataConfig {
         return this.baseDataset;
     }
 
-    findBaseData(categoryX: string): IBaseDataItem {
+    findBaseData2(categoryX: string): IBaseDataItem {
         return this.baseDataset[categoryX];
     }
-
 
 }

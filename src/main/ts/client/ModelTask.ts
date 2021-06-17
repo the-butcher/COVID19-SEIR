@@ -61,7 +61,7 @@ export class ModelTask {
                  * primary strain has a "floating value", update the value on the gui instance of that modification
                  */
                 const primaryStrainModification = new ModificationResolverStrain().getModifications()[0];
-                const dstIncidence = modelProgress.data[0].valueset[ModelConstants.AGEGROUP_NAME_ALL].INCIDENCES[primaryStrainModification.getId()];
+                const dstIncidence = modelProgress.data[0].valueset[ModelConstants.AGEGROUP_NAME_______ALL].INCIDENCES[primaryStrainModification.getId()];
                 primaryStrainModification.acceptUpdate({
                     dstIncidence
                 });

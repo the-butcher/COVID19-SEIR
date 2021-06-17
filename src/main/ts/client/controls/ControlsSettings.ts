@@ -35,9 +35,9 @@ export class ControlsSettings {
         // const absTotal = Demographics.getInstance().getAbsTotal();
         // const exp = Math.round(Math.log10(absTotal));
 
-        this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE______UNDETECTED, 0.1, false);
-        this.sliderVaccinated = new SliderSetting("vaccinated (1st dose)", ModelConstants.RANGE__PERCENTAGE_100, 0.01, true);
-        this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE__PERCENTAGE_100, 0.01, true);
+        this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false);
+        this.sliderVaccinated = new SliderSetting("vaccinated (1st dose)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true);
+        this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true);
         // this.sliderDead = new SliderSetting("deceased", ModelConstants.RANGE__PERCENTAGE__10, 0.001);
 
     }

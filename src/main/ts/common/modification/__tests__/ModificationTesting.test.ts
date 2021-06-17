@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import model2config from '../../../../webapp/data/model2-data-at.json';
+import model2config from '../../../../webapp/data/model-data-at.json';
 import { ModelConstants } from '../../../model/ModelConstants';
 import { ObjectUtil } from '../../../util/ObjectUtil';
 import { ModificationTesting } from '../ModificationTesting';
@@ -13,7 +13,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_____INSTANT,
+            instant: ModelConstants.MODEL_MIN_______INSTANT,
             multipliers: {
                 'family': 0.30,
                 'school': 0.30,
@@ -36,7 +36,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_____INSTANT,
+            instant: ModelConstants.MODEL_MIN_______INSTANT,
             multipliers: {
                 'family': 0.50,
                 'school': 0.50,
@@ -59,7 +59,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_____INSTANT,
+            instant: ModelConstants.MODEL_MIN_______INSTANT,
             multipliers: {
                 'family': 0.70,
                 'school': 0.70,

@@ -33,8 +33,8 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     getModificationData(): IModificationData[] {
 
-        const minChartInstant = ModelConstants.MODEL_MIN_____INSTANT;
-        const maxChartInstant = ModelConstants.MODEL_MAX_____INSTANT;
+        const minChartInstant = ModelConstants.MODEL_MIN_______INSTANT;
+        const maxChartInstant = ModelConstants.MODEL_MAX_______INSTANT;
 
         const modificationData = [];
         for (let instant = minChartInstant; instant <= maxChartInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
@@ -56,11 +56,11 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
         if (ObjectUtil.isNotEmpty(applicableModification)) {
             return applicableModification;
         } else if (ObjectUtil.isNotEmpty(ModelConstants.MODIFICATION_PARAMS[this.key].createDefaultModification)) {
-            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[this.key].createDefaultModification(ModelConstants.MODEL_MIN_____INSTANT) as M;
+            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[this.key].createDefaultModification(ModelConstants.MODEL_MIN_______INSTANT) as M;
             if (this.typedModifications.length > 0) {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_____INSTANT, this.typedModifications[0].getInstantA());
+                defaultModification.setInstants(ModelConstants.MODEL_MIN_______INSTANT, this.typedModifications[0].getInstantA());
             } else {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_____INSTANT, ModelConstants.MODEL_MAX_____INSTANT);
+                defaultModification.setInstants(ModelConstants.MODEL_MIN_______INSTANT, ModelConstants.MODEL_MAX_______INSTANT);
             }
             return defaultModification;
         } else {

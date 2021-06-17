@@ -103,24 +103,28 @@ export class ModelConstants {
     static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
     static readonly AGE_GROUP_ALL = -1;
 
-    static readonly AGEGROUP_NAME_ALL = 'TOTAL';
-    static readonly STRAIN_ID_____ALL = 'MULTI';
+    static readonly AGEGROUP_NAME_______ALL = 'TOTAL';
+    static readonly STRAIN_ID___________ALL = 'MULTI';
 
-    static readonly RANGE__PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
-    static readonly RANGE__PERCENTAGE__10 = [0.0, 0.1];
-    static readonly RANGE__PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
-    static readonly RANGE______INCUBATION = [1, 7, 14];
-    static readonly RANGE_______INCIDENCE = [0, 250, 500, 750, 1000];
-    static readonly RANGE_SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
-    static readonly RANGE______________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    static readonly RANGE______UNDETECTED = [0, 1, 2, 3];
-    static readonly RANGE___MODEL_INSTANT = [
+    static readonly BASE_DATA_INDEX_EXPOSED = 0;
+    static readonly BASE_DATA_INDEX_REMOVED = 1;
+    static readonly BASE_DATA_INDEX_VACC2ND = 2;
+
+    static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
+    static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
+    static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
+    static readonly RANGE________INCUBATION = [1, 7, 14];
+    static readonly RANGE_________INCIDENCE = [0, 250, 500, 750, 1000];
+    static readonly RANGE___SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
+    static readonly RANGE________________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    static readonly RANGE________UNDETECTED = [0, 1, 2, 3];
+    static readonly RANGE_____MODEL_INSTANT = [
         new Date('2021-05-01').getTime(),
         new Date('2021-06-01').getTime(),
         new Date('2021-07-01').getTime(),
         new Date('2021-08-01').getTime(),
-        // new Date('2021-09-01').getTime(),
-        // new Date('2021-10-01').getTime(),
+        new Date('2021-09-01').getTime(),
+        new Date('2021-10-01').getTime(),
         // new Date('2021-11-01').getTime(),
         // new Date('2021-12-01').getTime(),
         // new Date('2022-01-01').getTime(),
@@ -129,8 +133,8 @@ export class ModelConstants {
         // new Date('2022-04-01').getTime(),
         // new Date('2022-04-30').getTime()
     ];
-    static readonly MODEL_MIN_____INSTANT = Math.min(...ModelConstants.RANGE___MODEL_INSTANT);
-    static readonly MODEL_MAX_____INSTANT = Math.max(...ModelConstants.RANGE___MODEL_INSTANT);
+    static readonly MODEL_MIN_______INSTANT = Math.min(...ModelConstants.RANGE_____MODEL_INSTANT);
+    static readonly MODEL_MAX_______INSTANT = Math.max(...ModelConstants.RANGE_____MODEL_INSTANT);
 
 
 }

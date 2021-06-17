@@ -90,7 +90,7 @@ export class StorageUtil {
                 /**
                  * rebuild chart to reflect changes
                  */
-                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues(), BaseData.getInstance().getBaseDataConfig());
+                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues(), BaseData.getInstance().getBaseDataConfig2());
 
             }
             reader.readAsText(file);
@@ -132,7 +132,7 @@ export class StorageUtil {
                 id: ObjectUtil.createId(),
                 key: 'SETTINGS',
                 name: 'initial state',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 undetected: 1.00,
                 vaccinated: 0.22,
                 quarantine: 0.50,
@@ -144,28 +144,28 @@ export class StorageUtil {
                 id: ObjectUtil.createId(),
                 key: 'TIME',
                 name: 'effective settings',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 deletable: false,
                 draggable: true
             },
             {
                 id: ObjectUtil.createId(),
                 key: 'STRAIN',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 name: 'b.1.1.7',
                 r0: 4.4,
                 serialInterval: 4.8,
                 intervalScale: 1.0,
                 dstIncidence: 150,
                 deletable: false,
-                draggable: true,
+                draggable: false,
                 primary: true,
             },
             {
                 id: ObjectUtil.createId(),
                 key: 'CONTACT',
                 name: 'initial NPIs',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 multipliers: {
                     'family': 0.65,
                     'school': 0.25,
@@ -180,7 +180,7 @@ export class StorageUtil {
                 id: ObjectUtil.createId(),
                 key: 'TESTING',
                 name: 'initial discovery',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 multipliers: {
                     'family': 0.40,
                     'school': 0.60,
@@ -195,7 +195,7 @@ export class StorageUtil {
                 id: ObjectUtil.createId(),
                 key: 'VACCINATION',
                 name: 'initial vaccinations',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 doses: 100000,
                 deletable: false,
                 draggable: false

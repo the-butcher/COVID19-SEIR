@@ -32,7 +32,7 @@ export class StrainCalibrator {
         /**
          * start at minus preload days
          */
-        const curInstant = ModelConstants.MODEL_MIN_____INSTANT; // - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
+        const curInstant = ModelConstants.MODEL_MIN_______INSTANT; // - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
 
         /**
          * start with some default
@@ -58,7 +58,7 @@ export class StrainCalibrator {
                 id: 'calibrate (contact)',
                 key: 'CONTACT',
                 name: 'calibrate (contact)',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 multipliers: {},
                 deletable: false,
                 draggable: false
@@ -68,7 +68,7 @@ export class StrainCalibrator {
                 id: 'calibrate (settings)',
                 key: 'SETTINGS',
                 name: 'calibrate (settings)',
-                instant: ModelConstants.MODEL_MIN_____INSTANT,
+                instant: ModelConstants.MODEL_MIN_______INSTANT,
                 undetected: 0.0,
                 quarantine: 0.0,
                 dead: 0.0,
@@ -103,17 +103,17 @@ export class StrainCalibrator {
         for (let interpolationIndex = 0; interpolationIndex < 20; interpolationIndex++) {
 
             model = new ModelImplRoot(demographics, Modifications.getInstance(), {
-                "<= 04": 0,
-                "05-14": 0,
-                "15-24": 0,
-                "25-34": 0,
-                "35-44": 0,
-                "45-54": 0,
-                "55-64": 0,
-                "65-74": 0,
-                "75-84": 0,
-                ">= 85": 0,
-                TOTAL: 0
+                "<= 04": [0, 0, 0],
+                "05-14": [0, 0, 0],
+                "15-24": [0, 0, 0],
+                "25-34": [0, 0, 0],
+                "35-44": [0, 0, 0],
+                "45-54": [0, 0, 0],
+                "55-64": [0, 0, 0],
+                "65-74": [0, 0, 0],
+                "75-84": [0, 0, 0],
+                ">= 85": [0, 0, 0],
+                "TOTAL": [0, 0, 0]
             }, baseData);
             modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
 
@@ -121,7 +121,7 @@ export class StrainCalibrator {
             const strainModel = model.findStrainModel(modificationValuesStrain.id);
 
             // single step on the strain model
-            strainModel.apply(modelState, ModelStateIntegrator.DT, ModelConstants.MODEL_MIN_____INSTANT, modificationTimeCalibrate);
+            strainModel.apply(modelState, ModelStateIntegrator.DT, ModelConstants.MODEL_MIN_______INSTANT, modificationTimeCalibrate);
 
             const absDeltas = strainModel.getAbsDeltas();
             let absDeltaAvg = 0;

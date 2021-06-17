@@ -21,28 +21,28 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly ageGroupTotal: number;
 
     private readonly groupPriority: number;
-    private readonly nrmRefusal: number;
+    private readonly grpAccept: number;
 
     private readonly compartmentImmunizing: CompartmentBase;
     private readonly compartmentImmunizedV: CompartmentBase;
-    private readonly compartmentImmunizedD: CompartmentBase;
-    private readonly compartmentImmunizedU: CompartmentBase;
+    // private readonly compartmentImmunizedD: CompartmentBase;
+    // private readonly compartmentImmunizedU: CompartmentBase;
     private integrationStep: IModelIntegrationStep;
 
-    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, ageGroup: AgeGroup, percentageRefusal: number) {
+    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, ageGroup: AgeGroup) {
 
         this.parentModel = parentModel;
         this.absTotal = modelSettings.getAbsTotal();
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupTotal = ageGroup.getAbsValue();
-        this.groupPriority = Math.pow(ageGroup.getPrio(), 10);
-        this.nrmRefusal = percentageRefusal * this.ageGroupTotal / this.absTotal;
-        // console.log('nrmRefusal', ageGroup.getName(), percentageRefusal);
+        this.groupPriority = ageGroup.getPrio();
+        this.grpAccept = ageGroup.getAcpt();
+        // console.log('nrmAccept', this.ageGroupIndex, this.nrmAccept);
 
-        this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
-        this.compartmentImmunizedV = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID_____ALL, CompartmentChain.NO_CONTINUATION);
+        this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
+        this.compartmentImmunizedV = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+        // this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+        // this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
         this.integrationStep = {
             apply: (modelState: IModelState, dT: number, tT: number) => {
                 const continuationRate = this.compartmentImmunizing.getContinuationRatio().getRate(dT, tT);
@@ -73,20 +73,20 @@ export class ModelImplVaccination implements IModelSeir {
         return this.compartmentImmunizing;
     }
 
-    getCompartmentImmunizedS(): CompartmentBase {
+    getCompartmentImmunizedV(): CompartmentBase {
         return this.compartmentImmunizedV;
     }
 
-    getCompartmentImmunizedD(): CompartmentBase {
-        return this.compartmentImmunizedD;
-    }
+    // getCompartmentImmunizedD(): CompartmentBase {
+    //     return this.compartmentImmunizedD;
+    // }
 
-    getCompartmentImmunizedU(): CompartmentBase {
-        return this.compartmentImmunizedU;
-    }
+    // getCompartmentImmunizedU(): CompartmentBase {
+    //     return this.compartmentImmunizedU;
+    // }
 
-    getNrmRefusal(): number {
-        return this.nrmRefusal;
+    getGrpAccept(): number {
+        return this.grpAccept;
     }
 
     getNrmValueGroup(ageGroupIndex: number): number {

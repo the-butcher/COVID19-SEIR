@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
-import model2config from '../../../../webapp/data/model2-data-at.json';
-import model2testmodifications from '../../../../webapp/data/model2-test-modifications.json';
+import model2config from '../../../../webapp/data/model-data-at.json';
+import model2testmodifications from '../../../../webapp/data/model-test-modifications.json';
 import { ModelConstants } from '../../../model/ModelConstants';
 import { ObjectUtil } from '../../../util/ObjectUtil';
 import { IModificationValues } from '../IModificationValues';
@@ -19,7 +19,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_____INSTANT,
+            instant: ModelConstants.MODEL_MIN_______INSTANT,
             deletable: false,
             draggable: false
         });
@@ -40,7 +40,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_____INSTANT,
+            instant: ModelConstants.MODEL_MIN_______INSTANT,
             deletable: false,
             draggable: false
         });

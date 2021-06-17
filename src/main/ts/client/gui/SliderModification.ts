@@ -31,11 +31,11 @@ export class SliderModification extends Slider {
 
         super({
             container: 'sliderDivTime',
-            min: ModelConstants.MODEL_MIN_____INSTANT,
-            max: ModelConstants.MODEL_MAX_____INSTANT,
+            min: ModelConstants.MODEL_MIN_______INSTANT,
+            max: ModelConstants.MODEL_MAX_______INSTANT,
             step: TimeUtil.MILLISECONDS_PER____DAY,
             values: [],
-            ticks: ModelConstants.RANGE___MODEL_INSTANT,
+            ticks: ModelConstants.RANGE_____MODEL_INSTANT,
             label: 'date',
             thumbCreateFunction: (index: number) => {
                 return new IconModification('x', 'CONTACT', 'create'); // TODO could this be optional
@@ -174,7 +174,8 @@ export class SliderModification extends Slider {
                     name: `copy of ${previousModification.getName()}`,
                     instant,
                     deletable: true,
-                    draggable: true
+                    draggable: true,
+                    primary: false
                 } as IModificationValues; // copy previous values
 
                 const modification = ModelConstants.MODIFICATION_PARAMS[key].createValuesModification(modificationValuesCopy);

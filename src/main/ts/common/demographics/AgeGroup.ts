@@ -13,13 +13,16 @@ export class AgeGroup {
     private readonly index: number;
     private readonly name: string;
     private readonly prio: number;
+    private readonly acpt: number;
     private readonly absValue: number;
 
     constructor(index: number, ageGroupParams: IAgeGroupConfig) {
         this.index = index;
         this.name = ageGroupParams.name;
-        this.prio = ageGroupParams.prio;
+        this.prio = Math.pow(1.1, index) - 1;
+        this.acpt = ageGroupParams.acpt;
         this.absValue = ageGroupParams.pG;
+        console.log('acceptance in', this.name, this.acpt, this.prio);
     }
 
     getIndex(): number {
@@ -32,6 +35,10 @@ export class AgeGroup {
 
     getPrio(): number {
         return this.prio;
+    }
+
+    getAcpt(): number  {
+        return this.acpt;
     }
 
     getAbsValue(): number {

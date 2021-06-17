@@ -297,7 +297,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedI = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'recovered',
+            baseLabel: 'removed',
             valueField: 'ageGroupRemovedI',
             colorKey: 'REMOVED',
             strokeWidth: 1,
@@ -488,7 +488,7 @@ export class ChartAgeGroup {
         if (this.ageGroupsWithTotal) {
             return this.ageGroupsWithTotal[this.ageGroupIndex].getName();
         } else {
-            return ModelConstants.AGEGROUP_NAME_ALL;
+            return ModelConstants.AGEGROUP_NAME_______ALL;
         }
     }
 
@@ -801,17 +801,17 @@ export class ChartAgeGroup {
 
         this.modelData = modelData;
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
-            name: ModelConstants.AGEGROUP_NAME_ALL,
+            name: ModelConstants.AGEGROUP_NAME_______ALL,
             pG: Demographics.getInstance().getAbsTotal(),
-            prio: 0
+            acpt: 0
         })];
 
         let maxIncidence = 0;
         this.maxInfectious = 0;
         for (const dataItem of this.modelData) {
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
-                maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL]);
-                this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID_____ALL]);
+                maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+                this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
             });
         }
 
@@ -836,11 +836,11 @@ export class ChartAgeGroup {
 
             // data independent from sub-strains
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
-            const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID_____ALL];;
-            const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[ModelConstants.STRAIN_ID_____ALL];
+            const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID___________ALL];;
+            const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupRemovedI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_D + dataItem.valueset[ageGroupPlot.getName()].REMOVED_U;
             const ageGroupRemovedV = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V;
-            const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID_____ALL];
+            const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
             const item = {
@@ -869,8 +869,8 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
         for (const dataItem of this.modelData) {
 
-            const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
-            const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
+            const dataItemA = BaseData.getInstance().findBaseData2(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
+            const dataItemB = BaseData.getInstance().findBaseData2(TimeUtil.formatCategoryDate(dataItem.instant));
             // console.log('incidenceItem', dataItemA, dataItemB);
 
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
@@ -878,8 +878,10 @@ export class ChartAgeGroup {
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
                 if (dataItemA && dataItemB) {
-                    const baseIncidence = (dataItemB[ageGroupHeat.getName()] - dataItemA[ageGroupHeat.getName()]) * 100000 / ageGroupHeat.getAbsValue();
+                    const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
                     // value -= baseIncidence;
+                    // const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND] / ageGroupHeat.getAbsValue();
+                    // value -= baseVaccination;
                 }
 
                 const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
@@ -920,3 +922,4 @@ export class ChartAgeGroup {
     }
 
 }
+

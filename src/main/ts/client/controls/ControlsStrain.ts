@@ -46,11 +46,11 @@ export class ControlsStrain {
 
         this.sliderReproduction = new Slider({
             container: 'sliderReproductionDiv',
-            min: Math.min(...ModelConstants.RANGE______________R0),
-            max: Math.max(...ModelConstants.RANGE______________R0),
+            min: Math.min(...ModelConstants.RANGE________________R0),
+            max: Math.max(...ModelConstants.RANGE________________R0),
             step: 0.01,
             values: [1.0],
-            ticks: [...ModelConstants.RANGE_SERIAL_INTERVAL],
+            ticks: [...ModelConstants.RANGE___SERIAL_INTERVAL],
             label: 'R<sub>0</sub>',
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
@@ -88,7 +88,7 @@ export class ControlsStrain {
             max: Math.max(14),
             step: 0.1,
             values: [2.0, 5.0],
-            ticks: [...ModelConstants.RANGE_SERIAL_INTERVAL],
+            ticks: [...ModelConstants.RANGE___SERIAL_INTERVAL],
             label: 'serial interval',
             thumbCreateFunction: (index: number) => {
                 const iconSlider = new IconSlider();
@@ -133,11 +133,11 @@ export class ControlsStrain {
 
         this.sliderIncidence = new Slider({
             container: 'sliderIncidenceDiv',
-            min: Math.min(...ModelConstants.RANGE_______INCIDENCE),
-            max: Math.max(...ModelConstants.RANGE_______INCIDENCE),
+            min: Math.min(...ModelConstants.RANGE_________INCIDENCE),
+            max: Math.max(...ModelConstants.RANGE_________INCIDENCE),
             step: 1.0,
             values: [0.0],
-            ticks: [...ModelConstants.RANGE_______INCIDENCE],
+            ticks: [...ModelConstants.RANGE_________INCIDENCE],
             label: 'initial incidence',
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
@@ -210,11 +210,11 @@ export class ControlsStrain {
     }
 
     getMinSerialInterval(): number {
-        return Math.min(...ModelConstants.RANGE_SERIAL_INTERVAL);
+        return Math.min(...ModelConstants.RANGE___SERIAL_INTERVAL);
     }
 
     getMaxSerialInterval(): number {
-        return Math.max(...ModelConstants.RANGE_SERIAL_INTERVAL);
+        return Math.max(...ModelConstants.RANGE___SERIAL_INTERVAL);
     }
 
     getSerialInterval(): number {

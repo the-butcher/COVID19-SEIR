@@ -18,11 +18,11 @@ export class SliderTestingCategory extends Slider {
 
         super({
             container,
-            min: Math.min(...ModelConstants.RANGE__PERCENTAGE_100),
-            max: Math.max(...ModelConstants.RANGE__PERCENTAGE_100),
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
             step: 0.01,
             values: [1.0],
-            ticks: [...ModelConstants.RANGE__PERCENTAGE_100],
+            ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
             label: group,
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();

@@ -42,8 +42,8 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
 
     buildModificationData(): void {
 
-        const minChartInstant = ModelConstants.MODEL_MIN_____INSTANT;
-        const maxChartInstant = ModelConstants.MODEL_MAX_____INSTANT;
+        const minChartInstant = ModelConstants.MODEL_MIN_______INSTANT;
+        const maxChartInstant = ModelConstants.MODEL_MAX_______INSTANT;
 
         this.contactMatrices = [];
         this.modificationData = [];

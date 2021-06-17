@@ -6,11 +6,8 @@ This app currently is in a alpha state where i review some features for plausibi
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* replace full vacc build with values from base-data
 * can there be in general, an age-wise "control-curve" for incidence, recovery?
-* redefine BaseData
-  * 2nd shot data vaccination, could then prefill vaccination until 2nd shot data is fulfilled and start into the model with that status (initial percentage slider would then be obsolete)
-  * exposed (which is already there)
-  * recovered
 * check vaccination model against real vaccination
   * there would be enough overlap into the model to adjust vaccination parameters accordingly
 * better recovered
@@ -46,6 +43,11 @@ next:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 done:
+* ~~redefine BaseData~~
+  * ~~2nd shot data vaccination, could then prefill vaccination until 2nd shot data is fulfilled and start into the model with that status (initial percentage slider would then be obsolete)~~
+  * ~~exposed (which is already there and used)~~
+  * ~~recovered (for prefill with )~~
+
 * ~~the disabled primary strain slider should show the value that is currently applicable~~
 * ~~create some heatmap format that allows to show delta between model and reality~~
 * ~~either have all strains at zero or find a way that strains can be placed on the timeline and still have correct incidence at their respective positions~~

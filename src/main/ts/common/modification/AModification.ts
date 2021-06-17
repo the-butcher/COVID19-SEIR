@@ -21,7 +21,7 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     appliesToInstant(instant: number): boolean {
-        return instant >= this.modificationValues.instant && (this.instantB === ModelConstants.MODEL_MAX_____INSTANT || instant < this.instantB);
+        return instant >= this.modificationValues.instant && (this.instantB === ModelConstants.MODEL_MAX_______INSTANT || instant < this.instantB);
     }
 
     getId(): string {

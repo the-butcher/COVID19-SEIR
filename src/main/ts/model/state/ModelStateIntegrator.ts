@@ -104,17 +104,18 @@ export class ModelStateIntegrator {
         const compartmentFilterRemovedVTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V));
 
         vaccinationRatioCurr = this.modelState.getNrmValueSum(compartmentFilterRemovedVTotal);
-        // console.log('vaccinationRatioCurr', vaccinationRatioCurr);
+        // console.log('vaccinationRatioCurr 1', vaccinationRatioCurr, vaccinationRatioDest);
 
         let vaccinationRatioCurr1;
         let loopBuster = 0;
-        while (vaccinationRatioCurr < vaccinationRatioDest && loopBuster < 1000) {
+        while (vaccinationRatioCurr < vaccinationRatioDest && loopBuster < 10000) {
 
             // TODO better exit criteria upon reaching refusal threshold
 
             this.modelState.add(this.model.applyVaccination(this.modelState, ModelStateIntegrator.DT, -1, new ModificationPrefill()));
             vaccinationRatioCurr1 = this.modelState.getNrmValueSum(compartmentFilterRemovedVTotal);
             if (vaccinationRatioCurr1 > 0 && vaccinationRatioCurr1 === vaccinationRatioCurr) {
+                // console.log('abort at vaccinationRatioCurr1', vaccinationRatioCurr1);
                 break; // probably reached the refusal threshold
             }
             vaccinationRatioCurr = vaccinationRatioCurr1;
@@ -122,6 +123,8 @@ export class ModelStateIntegrator {
             loopBuster++;
 
         }
+        // console.log('vaccinationRatioCurr 2', vaccinationRatioCurr, vaccinationRatioDest);
+
 
     }
 
@@ -179,9 +182,9 @@ export class ModelStateIntegrator {
                 const exposed: {[K: string]: number} = {};
                 const infectious: {[K: string]: number} = {};
 
-                incidences[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * absTotal * 100000 / absTotal;
-                exposed[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterExposedTotal);
-                infectious[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
+                incidences[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * absTotal * 100000 / absTotal;
+                exposed[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterExposedTotal);
+                infectious[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
 
                 modificationValuesStrain.forEach(modificationValueStrain => {
 
@@ -201,7 +204,7 @@ export class ModelStateIntegrator {
                     valueset: {},
                     exposure: this.exposure
                 };
-                dataItem.valueset[ModelConstants.AGEGROUP_NAME_ALL] = {
+                dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
                     SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptibleTotal),
                     REMOVED_D: removedDTotal,
                     REMOVED_U: removedUTotal,
@@ -235,9 +238,9 @@ export class ModelStateIntegrator {
                     const exposedAgeGroup: {[K: string]: number} = {};
                     const infectiousAgeGroup: {[K: string]: number} = {};
 
-                    incidencesAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterIncidence) * 100000 * groupNormalizer;
-                    exposedAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterExposed) * groupNormalizer;
-                    infectiousAgeGroup[ModelConstants.STRAIN_ID_____ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectious) * groupNormalizer;
+                    incidencesAgeGroup[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterIncidence) * 100000 * groupNormalizer;
+                    exposedAgeGroup[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterExposed) * groupNormalizer;
+                    infectiousAgeGroup[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectious) * groupNormalizer;
 
                     modificationValuesStrain.forEach(modificationValueStrain => {
 
@@ -273,14 +276,14 @@ export class ModelStateIntegrator {
 
             if (this.curInstant % TimeUtil.MILLISECONDS_PER____DAY * 7 === 0) {
                 progressCallback({
-                    ratio: (this.curInstant - ModelConstants.MODEL_MIN_____INSTANT) / (ModelConstants.MODEL_MAX_____INSTANT - ModelConstants.MODEL_MIN_____INSTANT)
+                    ratio: (this.curInstant - ModelConstants.MODEL_MIN_______INSTANT) / (ModelConstants.MODEL_MAX_______INSTANT - ModelConstants.MODEL_MIN_______INSTANT)
                 });
             }
 
         }
 
         progressCallback({
-            ratio: (this.curInstant - ModelConstants.MODEL_MIN_____INSTANT) / (ModelConstants.MODEL_MAX_____INSTANT - ModelConstants.MODEL_MIN_____INSTANT),
+            ratio: (this.curInstant - ModelConstants.MODEL_MIN_______INSTANT) / (ModelConstants.MODEL_MAX_______INSTANT - ModelConstants.MODEL_MIN_______INSTANT),
             data: dataSet
         });
 
