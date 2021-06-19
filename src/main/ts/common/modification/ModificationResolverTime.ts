@@ -1,3 +1,4 @@
+import { ModelInstants } from './../../model/ModelInstants';
 import { ContactMatrixDelegate } from '../../client/controls/ContactMatrixDelegate';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
@@ -42,8 +43,8 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
 
     buildModificationData(): void {
 
-        const minChartInstant = ModelConstants.MODEL_MIN_______INSTANT;
-        const maxChartInstant = ModelConstants.MODEL_MAX_______INSTANT;
+        const minChartInstant = ModelInstants.getInstance().getMinInstant();
+        const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
 
         this.contactMatrices = [];
         this.modificationData = [];

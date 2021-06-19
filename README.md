@@ -6,9 +6,10 @@ This app currently is in a alpha state where i review some features for plausibi
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* y-axis modes in relative chart (max, age-group-max, manual)
 * be sure that strain calibration is still functional
 * wiki on github
-* demographics for germany
+* demographics for germany (check the default priority value 10000 in ModelImplVaccination)
 * explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
 * border cases
@@ -40,6 +41,8 @@ next:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 done:
+* ~~in the current vaccination model there is no share in 5-14~~
+* ~~when the vaccination rate hits threshold there may be an edge~~
 * ~~change chart range when a file is imported~~
 * ~~strain slider range (1-10)~~
 * ~~replace full vacc build with values from base-data~~

@@ -7,18 +7,18 @@ import { TimeUtil } from '../util/TimeUtil';
 import { ModificationContact } from './../common/modification/ModificationContact';
 import { Modifications } from './../common/modification/Modifications';
 import { StrainUtil } from './../util/StrainUtil';
+import { BaseData, IBaseDataItem } from './basedata/BaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';
-import { BaseData, IBaseDataItem } from './basedata/BaseData';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplStrain } from './ModelImplStrain';
 import { ModelImplVaccination } from './ModelImplVaccination';
+import { ModelInstants } from './ModelInstants';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
-import { ModelInstants } from './ModelInstants';
 
 interface IVaccinationGroupData {
     nrmVaccS: number; // susceptible - vaccination of susceptible population -> 2 shots
@@ -500,21 +500,36 @@ export class ModelImplRoot implements IModelSeir {
 
         for (let i = 0; i < this.vaccinationModels.length; i++) {
 
-            const grpVaccMax = this.vaccinationModels[i].getGrpAccept(); // / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+            /**
+             * maximum percentage that this age-groups accepts (by configuration)
+             */
+            const grpVaccMax = this.vaccinationModels[i].getGrpAccept();
+
+            /**
+             * already in a vaccination state (susceptible in the beginning, protected after a while)
+             */
             const grpVaccAct = (state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizing()) + state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizedV())) * this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal();
+
+            /**
+             * share that still want to get vaccinated
+             */
             const grpVaccDif = (grpVaccMax - grpVaccAct);
-            // const grpVaccMlt = grpVaccDif / grpVaccMax;
+            const grpVaccMlt = grpVaccDif / grpVaccMax;
 
-            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
-            //     console.log('nrmVaccT', i, TimeUtil.formatCategoryDate(tT), grpVaccMax, grpVaccAct, grpVaccDif, grpVaccMlt);
-            // }
+            if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 1) {
+                console.log('grpVaccDif', i, TimeUtil.formatCategoryDate(tT), grpVaccDif);
+            }
 
-            const nrmVaccGrp = grpVaccDif / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+            /**
+             * to model normalized scope
+             */
+            const nrmVaccDif = grpVaccDif / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+
             // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
             //     console.log('nrmVaccT', i, TimeUtil.formatCategoryDate(tT), nrmVaccMax * this.getAbsTotal(), nrmVaccAct * this.getAbsTotal(), nrmVaccDif * this.getAbsTotal());
             // }
 
-            if (nrmVaccGrp > 0) {
+            if (nrmVaccDif > 0) {
 
                 let nrmVaccS = state.getNrmValue(this.compartmentsSusceptible[i]) * 2;
                 let nrmVaccD = state.getNrmValue(this.compartmentsRemovedD[i]);
@@ -525,12 +540,12 @@ export class ModelImplRoot implements IModelSeir {
                 //     console.warn('nrmVaccSDU', i, TimeUtil.formatCategoryDate(tT), nrmVaccGrp, nrmVaccS * this.getAbsTotal(), this.compartmentsSusceptible[i]);
                 // }
 
-                nrmVaccS *= nrmVaccGrp / nrmVaccT;
-                nrmVaccD *= nrmVaccGrp / nrmVaccT;
-                nrmVaccU *= nrmVaccGrp / nrmVaccT;
+                nrmVaccS *= nrmVaccDif / nrmVaccT;
+                nrmVaccD *= nrmVaccDif / nrmVaccT;
+                nrmVaccU *= nrmVaccDif / nrmVaccT;
                 nrmVaccT = nrmVaccS + nrmVaccD + nrmVaccU;
 
-                const priority = nrmVaccT * this.vaccinationModels[i].getGroupPriority();
+                const priority = nrmVaccT * this.vaccinationModels[i].getGroupPriority() * grpVaccMlt; // grpVaccMlt here smoothens the transition from some still vaccinateable
                 vaccinationGroupDataset.push({
                     nrmVaccS,
                     nrmVaccD,

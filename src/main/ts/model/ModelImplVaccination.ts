@@ -47,11 +47,15 @@ export class ModelImplVaccination implements IModelSeir {
         const vacc1 = BaseData.getInstance().findBaseData(category1)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
         const vacc2 = BaseData.getInstance().findBaseData(category2)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
 
-        const vaccM = this.ageGroupTotal * this.grpAccept; // vaccination maximum
-        const vaccR = vacc2 / vaccM; // vaccination ratio
-        this.groupPriority = vaccR < 1 ? (vacc1 - vacc2) / (1 - vaccR) : 1; // rough estimation of priority
+        if (vacc1 > 0 && vacc2 > 0) {
+            const vaccM = this.ageGroupTotal * this.grpAccept; // vaccination maximum
+            const vaccR = vacc2 / vaccM; // vaccination ratio
+            this.groupPriority = vaccR < 1 ? (vacc1 - vacc2) / (1 - vaccR) : 1; // rough estimation of priority
+        } else {
+            this.groupPriority = 10000; // TODO magic number, don't know if another settings would be fine with that number too
+        }
 
-        // console.log('fillTarget', TimeUtil.formatCategoryDate(tT),  this.ageGroupIndex, vacc1, vacc2, this.groupPriority);
+        console.log('vaccR',  this.ageGroupIndex, this.groupPriority);
 
         this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, vacc1 - vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
         this.compartmentImmunizedV = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
