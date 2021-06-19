@@ -1,6 +1,4 @@
-import { ModificationPrefill } from '../../common/modification/ModificationPrefill';
 import { Modifications } from '../../common/modification/Modifications';
-import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
@@ -36,17 +34,6 @@ export interface IDataValues {
     INFECTIOUS: { [K: string]: number };
     TOTAL: number;
 }
-
-// export interface ICompartmentFilters {
-//     SUSCEPTIBLE: ICompartmentFilter;
-//     EXPOSED: ICompartmentFilter;
-//     INFECTIOUS: ICompartmentFilter;
-//     REMOVED_D: ICompartmentFilter;
-//     REMOVED_U: ICompartmentFilter;
-//     REMOVED_V: ICompartmentFilter;
-//     CASES: ICompartmentFilter;
-//     INCIDENCE: ICompartmentFilter;
-// }
 
 /**
  * performs an euler-integration in 1 hour steps on a model-state
@@ -89,43 +76,6 @@ export class ModelStateIntegrator {
 
     getModelState(): IModelState {
         return this.modelState;
-    }
-
-    /**
-     * fill the model with vaccinated individuals until the amount configured in settings is fulfilled
-     * @param multiplier
-     */
-    async prefillVaccination(): Promise<void> {
-
-        const modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
-        const vaccinationRatioDest = modificationSettings.getVaccinated();
-        let vaccinationRatioCurr = 0;
-
-        const compartmentFilterRemovedVTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V));
-
-        vaccinationRatioCurr = this.modelState.getNrmValueSum(compartmentFilterRemovedVTotal);
-        // console.log('vaccinationRatioCurr 1', vaccinationRatioCurr, vaccinationRatioDest);
-
-        let vaccinationRatioCurr1;
-        let loopBuster = 0;
-        while (vaccinationRatioCurr < vaccinationRatioDest && loopBuster < 10000) {
-
-            // TODO better exit criteria upon reaching refusal threshold
-
-            this.modelState.add(this.model.applyVaccination(this.modelState, ModelStateIntegrator.DT, -1, new ModificationPrefill()));
-            vaccinationRatioCurr1 = this.modelState.getNrmValueSum(compartmentFilterRemovedVTotal);
-            if (vaccinationRatioCurr1 > 0 && vaccinationRatioCurr1 === vaccinationRatioCurr) {
-                // console.log('abort at vaccinationRatioCurr1', vaccinationRatioCurr1);
-                break; // probably reached the refusal threshold
-            }
-            vaccinationRatioCurr = vaccinationRatioCurr1;
-
-            loopBuster++;
-
-        }
-        // console.log('vaccinationRatioCurr 2', vaccinationRatioCurr, vaccinationRatioDest);
-
-
     }
 
     resetExposure(): void {

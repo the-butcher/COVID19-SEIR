@@ -14,7 +14,7 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         super('INSTANT', modificationValues);
     }
 
-    isPrimaryStrain(): boolean {
+    isPrimary(): boolean {
         return this.modificationValues.primary;
     }
 

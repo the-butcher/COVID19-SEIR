@@ -133,11 +133,11 @@ export class ControlsStrain {
 
         this.sliderIncidence = new Slider({
             container: 'sliderIncidenceDiv',
-            min: Math.min(...ModelConstants.RANGE_________INCIDENCE),
-            max: Math.max(...ModelConstants.RANGE_________INCIDENCE),
+            min: Math.min(...ModelConstants.RANGE____INCIDENCE_1000),
+            max: Math.max(...ModelConstants.RANGE____INCIDENCE_1000),
             step: 1.0,
             values: [0.0],
-            ticks: [...ModelConstants.RANGE_________INCIDENCE],
+            ticks: [...ModelConstants.RANGE____INCIDENCE_1000],
             label: 'initial incidence',
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
@@ -174,6 +174,12 @@ export class ControlsStrain {
         Controls.acceptModification(modification);
         this.modification = modification;
 
+        if (this.modification.isPrimary()) {
+            this.sliderIncidence.setRange(ModelConstants.RANGE____INCIDENCE_1000);
+        } else {
+            this.sliderIncidence.setRange(ModelConstants.RANGE_____INCIDENCE__10);
+        }
+
         const strain = modification.getModificationValues();
 
         this.r0 = strain.r0;
@@ -190,7 +196,7 @@ export class ControlsStrain {
             this.sliderIncidence.handleResize();
             this.sliderReproduction.handleResize();
             this.sliderReproduction.handleResize();
-            this.sliderIncidence.setDisabled(modification.isPrimaryStrain());
+            this.sliderIncidence.setDisabled(modification.isPrimary());
         });
 
         this.redrawCanvas();

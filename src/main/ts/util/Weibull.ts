@@ -68,7 +68,9 @@ export class Weibull {
         return this.getDistribution(x * this.maxX);
     }
 
-    // https://stackoverflow.com/questions/15454183/how-to-make-a-function-that-computes-the-factorial-for-numbers-with-decimals
+    /**
+     * https://stackoverflow.com/questions/15454183/how-to-make-a-function-that-computes-the-factorial-for-numbers-with-decimals
+     */
     gamma(z: number): number {
         if (z < 0.5) {
             return Math.PI / (Math.sin(Math.PI * z) * this.gamma(1 - z));

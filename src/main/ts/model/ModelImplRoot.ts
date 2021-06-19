@@ -11,7 +11,7 @@ import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';
-import { BaseData, IBaseDataItem } from './incidence/BaseData';
+import { BaseData, IBaseDataItem } from './basedata/BaseData';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplStrain } from './ModelImplStrain';
 import { ModelImplVaccination } from './ModelImplVaccination';
@@ -58,7 +58,7 @@ export class ModelImplRoot implements IModelSeir {
          */
         const instantDst = ModelConstants.MODEL_MIN_______INSTANT;
         const instantPre = instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
-        const referenceDataRemoved = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPre));
+        const referenceDataRemoved = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPre));
 
         /**
          * get all strain values as currently in modifications instance
@@ -116,13 +116,13 @@ export class ModelImplRoot implements IModelSeir {
             ageGroups.forEach(ageGroup => {
 
                 // cases at preload
-                const casesPreA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-                const casesPreB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-                const casesPreC = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreC))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesPreA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesPreB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesPreC = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreC))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
 
                 // cases at model-min
-                const casesDstA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-                const casesDstB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesDstA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesDstB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
 
                 // case diff at preload
                 const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
@@ -141,13 +141,13 @@ export class ModelImplRoot implements IModelSeir {
             });
 
             // total incidence at preload
-            const casesPreA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-            const casesPreB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantPreB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const casesPreA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const casesPreB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
             const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
 
             // total case diff at model-min
-            const casesDstA = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-            const casesDstB = baseData.findBaseData2(TimeUtil.formatCategoryDate(instantDstB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const casesDstA = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const casesDstB = baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
             const heatmapCasesDeltaDstAB = casesDstB - casesDstA;
 
             heatmapPreIncidenceTotal += casesToIncidence(heatmapCasesDeltaPreAB, demographics.getAbsTotal());
@@ -243,7 +243,6 @@ export class ModelImplRoot implements IModelSeir {
             // build a model with current data
             model = new ModelImplRoot(demographics, modifications, referenceDataRemoved, baseData);
             modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
-            modelStateIntegrator.prefillVaccination();
 
             let modelData: IDataItem[];
             let dstInstant = -1;
@@ -253,8 +252,6 @@ export class ModelImplRoot implements IModelSeir {
             // maybe yes, since the primary strains needs to adjust with other strain giving or requiring incidence
             const lastDataItems: IDataItem[] = [];
             for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
-
-                // console.log('strain mod at init of approx cycle', approximationIndex, modificationsStrain[strainIndex]);
 
                 // iterate if there is time between strains
                 if (modificationsStrain[strainIndex].getInstantA() > dstInstant) {
@@ -343,7 +340,6 @@ export class ModelImplRoot implements IModelSeir {
          */
         model = new ModelImplRoot(demographics, Modifications.getInstance(), referenceDataRemoved, baseData);
         modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
-        modelStateIntegrator.prefillVaccination();
         await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_______INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
         modelStateIntegrator.resetExposure();
 
@@ -441,9 +437,11 @@ export class ModelImplRoot implements IModelSeir {
         }
         nrmValueGroup += this.compartmentsRemovedD[ageGroupIndex].getNrmValue();
         nrmValueGroup += this.compartmentsRemovedU[ageGroupIndex].getNrmValue();
-        // no initial vaccination value, model initializes, prefills with vaccination
         this.strainModels.forEach(strainModel => {
             nrmValueGroup += strainModel.getNrmValueGroup(ageGroupIndex);
+        });
+        this.vaccinationModels.forEach(vaccinationModel => {
+            nrmValueGroup += vaccinationModel.getNrmValueGroup(ageGroupIndex);
         });
         return nrmValueGroup;
     }

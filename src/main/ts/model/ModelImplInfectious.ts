@@ -1,5 +1,3 @@
-import { ModelConstants } from './ModelConstants';
-import { ObjectUtil } from './../util/ObjectUtil';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
@@ -7,13 +5,13 @@ import { ModificationTesting } from '../common/modification/ModificationTesting'
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { StrainUtil } from '../util/StrainUtil';
 import { TimeUtil } from './../util/TimeUtil';
+import { BaseData } from './basedata/BaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { CompartmentInfectious } from './compartment/CompartmentInfectious';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
-import { BaseData } from './incidence/BaseData';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelImplStrain } from './ModelImplStrain';
 import { IModelState } from './state/IModelState';
@@ -57,15 +55,12 @@ export class ModelImplInfectious implements IModelSeir {
          * strain modifiers hold target incidences per strain (taken from heatmap data)
          */
         if (strainValues.preIncidences) {
-            // with a constant rate, dailyTested would give the correct incidence
             dailyTested = strainValues.preIncidences[this.ageGroupIndex] * ageGroup.getAbsValue() / 700000;
-            // console.log('>>', ageGroup.getName(), strainValues.incidences[this.ageGroupIndex], dailyTested);
         }
 
         let incidenceRatio = 1;
         if (strainValues.preGrowthRate) {
 
-            // incidenceRatio = strainValues.reproduction[this.ageGroupIndex];
             /**
              * there must be a much cleaner solution for this, TODO get to terms with the math
              */
@@ -96,7 +91,6 @@ export class ModelImplInfectious implements IModelSeir {
             if (strainValues.preGrowthRate) {
 
                 const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantC, strainValues.serialInterval * strainValues.intervalScale);
-                // console.log('  ', ageGroup.getName(), incidenceC);
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
 
             }
@@ -115,8 +109,6 @@ export class ModelImplInfectious implements IModelSeir {
             if (strainValues.preGrowthRate) {
                 const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantB, strainValues.serialInterval * strainValues.intervalScale);
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000; // // incidenceC
-                // console.log('  ', i, ageGroup.getName(), incidenceC, dailyTested);
-                // console.log('dailyTested', ageGroup.getName(), i, incidenceC, dailyTested);
             }
             const compartmentType = i == 0 ? ECompartmentType.X__INCUBATE_0 : ECompartmentType.X__INCUBATE_N;
             this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, TimeUtil.MILLISECONDS_PER____DAY));
@@ -138,10 +130,6 @@ export class ModelImplInfectious implements IModelSeir {
 
                     const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
                     const continuationValue = continuationRate * modelState.getNrmValue(sourceCompartment);
-
-                    // if (tT % TimeUtil.MILLISECONDS_PER____DAY && TimeUtil.formatCategoryDate(tT) === '01.05.') {
-                    //     console.log('continuationRate', continuationRate, continuationValue);
-                    // }
 
                     /**
                      * move from infectious compartment to next infectious compartment, if any
@@ -232,14 +220,6 @@ export class ModelImplInfectious implements IModelSeir {
         return nrmInfectious;
     }
 
-    // getNrmI(modelState: IModelState, dT: number, tT: number): number {
-    //     let nrmInfectious = 0;
-    //     this.compartments.forEach(compartmentInfectious => {
-    //         nrmInfectious += modelState.getNrmValue(compartmentInfectious) * compartmentInfectious.getContinuationRatio().getRate(dT, tT);
-    //     });
-    //     return nrmInfectious;
-    // }
-
     getNrmValueGroup(ageGroupIndex: number): number {
         return ageGroupIndex === this.ageGroupIndex ? this.nrmValue : 0;
     }
@@ -277,21 +257,11 @@ export class ModelImplInfectious implements IModelSeir {
     }
 
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
-
-        // if (tT % TimeUtil.MILLISECONDS_PER____DAY && TimeUtil.formatCategoryDate(tT) === '01.05.') {
-        //     console.log('--------------------------', this.ageGroupIndex);
-        //     this.compartments.forEach(compartment => {
-        //         compartment.setNrmValue(state.getNrmValue(compartment));
-        //         console.log(state.getNrmValue(compartment) * this.absTotal);
-        //     });
-        // }
-
         const result = ModelState.empty();
         this.integrationSteps.forEach(integrationStep => {
             result.add(integrationStep.apply(state, dT, tT, modificationTime));
         });
         return result;
-
     }
 
 }

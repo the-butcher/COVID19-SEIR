@@ -4,7 +4,7 @@ import { ModelConstants } from './../model/ModelConstants';
 import ModelWorker from "worker-loader!./../work";
 import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
 import { IModificationValues } from '../common/modification/IModificationValues';
-import { IBaseDataConfig } from '../model/incidence/BaseData';
+import { IBaseDataConfig } from '../model/basedata/BaseData';
 import { IWorkerInput } from '../model/IWorkerInput';
 import { MODIFICATION____KEY } from '../model/ModelConstants';
 import { IModelProgress } from '../model/state/ModelStateIntegrator';

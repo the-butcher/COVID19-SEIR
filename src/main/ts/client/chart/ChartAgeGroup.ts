@@ -1,4 +1,3 @@
-import { BaseData } from '../../model/incidence/BaseData';
 import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -6,6 +5,7 @@ import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
+import { BaseData } from '../../model/basedata/BaseData';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
@@ -13,7 +13,7 @@ import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
-import { StorageUtil } from './../controls/StorageUtil';
+import { StorageUtil } from '../storage/StorageUtil';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
 
@@ -297,7 +297,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedI = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'removed',
+            baseLabel: 'recovered or dead',
             valueField: 'ageGroupRemovedI',
             colorKey: 'REMOVED',
             strokeWidth: 1,
@@ -770,18 +770,6 @@ export class ChartAgeGroup {
         return null;
     }
 
-    // getNrmExposed(instant: number, ageGroupIndex: number, strainId: string): number {
-    //     return this.findDataValues(instant, ageGroupIndex).EXPOSED[strainId];
-    // }
-
-    // getNrmInfectious(instant: number, ageGroupIndex: number, strainId: string): number {
-    //     return this.findDataValues(instant, ageGroupIndex).INFECTIOUS[strainId];
-    // }
-
-    // getNrmSusceptible(instant: number, ageGroupIndex: number): number {
-    //     return this.findDataValues(instant, ageGroupIndex).SUSCEPTIBLE;
-    // }
-
     async acceptModelData(modelData: IDataItem[]): Promise<void> {
 
         // console.log('modelData', modelData);
@@ -869,8 +857,8 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
         for (const dataItem of this.modelData) {
 
-            const dataItemA = BaseData.getInstance().findBaseData2(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
-            const dataItemB = BaseData.getInstance().findBaseData2(TimeUtil.formatCategoryDate(dataItem.instant));
+            const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
+            const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
             // console.log('incidenceItem', dataItemA, dataItemB);
 
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
@@ -878,7 +866,7 @@ export class ChartAgeGroup {
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
                 if (dataItemA && dataItemB) {
-                    const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
+                    // const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
                     // value -= baseIncidence;
                     // const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND] / ageGroupHeat.getAbsValue();
                     // value -= baseVaccination;

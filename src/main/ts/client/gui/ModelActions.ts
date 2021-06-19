@@ -1,7 +1,7 @@
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
-import { StorageUtil } from './../controls/StorageUtil';
+import { StorageUtil } from '../storage/StorageUtil';
 import { IconAction } from './IconAction';
 import { IconModelMode } from './IconModelMode';
 import { SliderModification } from './SliderModification';

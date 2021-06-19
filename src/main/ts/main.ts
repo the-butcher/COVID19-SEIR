@@ -1,6 +1,6 @@
-import { BaseData } from './model/incidence/BaseData';
+import { BaseData } from './model/basedata/BaseData';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
-import { StorageUtil } from './client/controls/StorageUtil';
+import { StorageUtil } from './client/storage/StorageUtil';
 import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { Demographics } from './common/demographics/Demographics';

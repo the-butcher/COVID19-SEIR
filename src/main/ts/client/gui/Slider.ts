@@ -117,6 +117,7 @@ export class Slider {
     private dragOffset: number
     private minValue: number;
     private maxValue: number;
+    private readonly tickParams: ISliderFunctions;
     private readonly step: number;
 
     private disabled: boolean;
@@ -132,6 +133,7 @@ export class Slider {
         this.dragOffset  = 0;
         this.minValue = params.min;
         this.maxValue = params.max;
+        this.tickParams = params;
         this.step = params.step;
         this.disabled = false;
 
@@ -169,7 +171,7 @@ export class Slider {
          * construct slider ticks
          */
         for (let index = 0; index < params.ticks.length; index++) {
-            const sliderTick = this.createTick(params.ticks[index], index, params);
+            const sliderTick = this.createTick(params.ticks[index], index);
             this.addTick(sliderTick);
         };
 
@@ -275,6 +277,16 @@ export class Slider {
 
     }
 
+    setRange(range: number[]): void {
+        this.minValue = Math.min(...range);
+        this.maxValue = Math.max(...range);
+        this.clearTicks();
+        for (let index = 0; index < range.length; index++) {
+            const sliderTick = this.createTick(range[index], index);
+            this.addTick(sliderTick);
+        };
+    }
+
     setProgress(progress: number): void {
         if (progress > 0) {
             this.trackElement1.style.width = `${(1 - progress) * 100}%`;
@@ -293,6 +305,13 @@ export class Slider {
      */
     findThumbById(id: string): SliderThumb {
         return this.sliderThumbs.find(sliderThumb => sliderThumb.getId() === id);
+    }
+
+    clearTicks(): void {
+        this.sliderTicks.forEach(sliderTick => {
+            this.sliderContainer.removeChild(sliderTick.getContainer());
+        });
+        this.sliderTicks.length = 0;
     }
 
     clearThumbs(): void {
@@ -319,12 +338,12 @@ export class Slider {
      * @param index
      * @param params
      */
-    createTick(value: number, index: number, params: ISliderFunctions): SliderTick {
+    createTick(value: number, index: number): SliderTick {
         const sliderTick = new SliderTick({
             type: 'tick',
             value,
             index,
-            labelFormatFunction: params.labelFormatFunction,
+            labelFormatFunction: this.tickParams.labelFormatFunction,
             containerClass: Slider.CLASS_TICK___CONTAINER,
             labelContainerClass: Slider.CLASS_TICK_______LABEL
         });

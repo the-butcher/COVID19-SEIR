@@ -35,11 +35,11 @@ export class BaseData {
         this.baseDataset = baseDataset;
     }
 
-    getBaseDataConfig2(): IBaseDataConfig {
+    getBaseDataConfig(): IBaseDataConfig {
         return this.baseDataset;
     }
 
-    findBaseData2(categoryX: string): IBaseDataItem {
+    findBaseData(categoryX: string): IBaseDataItem {
         return this.baseDataset[categoryX];
     }
 

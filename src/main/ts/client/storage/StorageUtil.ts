@@ -1,12 +1,12 @@
-import { BaseData } from './../../model/incidence/BaseData';
+import { BaseData } from '../../model/basedata/BaseData';
 import { IModificationValues } from '../../common/modification/IModificationValues';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { Demographics } from './../../common/demographics/Demographics';
-import { ModelActions } from './../gui/ModelActions';
-import { SliderModification } from './../gui/SliderModification';
-import { ModelTask } from './../ModelTask';
+import { Demographics } from '../../common/demographics/Demographics';
+import { ModelActions } from '../gui/ModelActions';
+import { SliderModification } from '../gui/SliderModification';
+import { ModelTask } from '../ModelTask';
 
 /**
  * helper type for writing / loading modifications to / from local storage
@@ -90,7 +90,7 @@ export class StorageUtil {
                 /**
                  * rebuild chart to reflect changes
                  */
-                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues(), BaseData.getInstance().getBaseDataConfig2());
+                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues(), BaseData.getInstance().getBaseDataConfig());
 
             }
             reader.readAsText(file);

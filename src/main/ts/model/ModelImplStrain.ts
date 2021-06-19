@@ -1,4 +1,4 @@
-import { BaseData } from './incidence/BaseData';
+import { BaseData } from './basedata/BaseData';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTesting } from '../common/modification/ModificationTesting';
@@ -52,13 +52,9 @@ export class ModelImplStrain implements IModelSeir {
 
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
-
-            // this.incidenceModels.push(new ModelImplIncidence(this, demographics, ageGroup, strainValues, modificationTesting));
-
             const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTesting, baseData);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
-
         });
 
         // pre-fill norm exposure
@@ -81,10 +77,6 @@ export class ModelImplStrain implements IModelSeir {
     getStrainId(): string {
         return this.strainId;
     }
-
-    // getIncidenceModel(ageGroupIndex: number): ModelImplIncidence {
-    //     return this.incidenceModels[ageGroupIndex];
-    // }
 
     getInfectiousModel(ageGroupIndex: number): ModelImplInfectious {
         return this.infectiousModels[ageGroupIndex];
@@ -109,9 +101,6 @@ export class ModelImplStrain implements IModelSeir {
         this.infectiousModels.forEach(groupModel => {
             initialState.add(groupModel.getInitialState());
         });
-        // this.incidenceModels.forEach(incidenceModel => {
-        //     initialState.add(incidenceModel.getInitialState());
-        // });
         return initialState;
     }
 
@@ -228,10 +217,6 @@ export class ModelImplStrain implements IModelSeir {
             // result.addNrmValue(continuationValue, compartmentSusceptible);
 
         }
-
-        // this.incidenceModels.forEach(incidenceModel => {
-        //     result.add(incidenceModel.apply(state, dT, tT, modificationTime));
-        // });
 
         return result;
 

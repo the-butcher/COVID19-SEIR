@@ -5,7 +5,7 @@
     "name": "initial state",
     "instant": 1619827200000,
     "undetected": 1.5,
-    "vaccinated": 0.22,
+    "vaccinated": 0.09,
     "quarantine": 0.5,
     "dead": 0,
     "deletable": false,
@@ -27,9 +27,9 @@
     "r0": 4.4,
     "serialInterval": 4.8,
     "intervalScale": 1,
-    "dstIncidence": 40,
+    "dstIncidence": 148.02588032986677,
     "deletable": false,
-    "draggable": true,
+    "draggable": false,
     "primary": true
   },
   {
@@ -38,11 +38,11 @@
     "name": "initial NPIs",
     "instant": 1619827200000,
     "multipliers": {
-      "family": 0.75,
-      "school": 0.25,
-      "nursing": 0.25,
-      "work": 0.37,
-      "other": 0.1
+      "family": 0.7000000000000001,
+      "school": 0.3,
+      "nursing": 0.05,
+      "work": 0.41000000000000003,
+      "other": 0.14
     },
     "deletable": false,
     "draggable": false
@@ -53,11 +53,11 @@
     "name": "initial discovery",
     "instant": 1619827200000,
     "multipliers": {
-      "family": 0.65,
+      "family": 0.6,
       "school": 0.65,
-      "nursing": 0.75,
-      "work": 0.5,
-      "other": 0.5
+      "nursing": 0.8,
+      "work": 0.4,
+      "other": 0.4
     },
     "deletable": false,
     "draggable": false
@@ -65,26 +65,27 @@
   {
     "id": "f072",
     "key": "VACCINATION",
-    "name": "initial vaccinations",
+    "name": "daily vaccinations",
     "instant": 1619827200000,
-    "doses": 100000,
+    "doses": 80000,
     "deletable": false,
     "draggable": false
   },
   {
-    "id": "eb5c4",
+    "id": "be71c",
     "key": "CONTACT",
-    "name": "reduce NPIs",
+    "name": "copy of initial NPIs",
     "instant": 1621382400000,
     "multipliers": {
-      "family": 0.75,
-      "school": 0.31,
-      "nursing": 0.25,
-      "work": 0.45,
-      "other": 0.4
+      "family": 0.7000000000000001,
+      "school": 0.35000000000000003,
+      "nursing": 0.05,
+      "work": 0.5,
+      "other": 0.3
     },
     "deletable": true,
-    "draggable": true
+    "draggable": true,
+    "primary": false
   },
   {
     "id": "6fedb",
@@ -96,61 +97,63 @@
     "intervalScale": 1,
     "dstIncidence": 1,
     "deletable": true,
+    "draggable": true
+  },
+  {
+    "id": "80032",
+    "key": "CONTACT",
+    "name": "copy of initial NPIs",
+    "instant": 1623715200000,
+    "multipliers": {
+      "family": 0.7000000000000001,
+      "school": 0.55,
+      "nursing": 0.05,
+      "work": 0.5,
+      "other": 0.3
+    },
+    "deletable": true,
     "draggable": true,
     "primary": false
   },
   {
-    "id": "625e8",
+    "id": "6e78f",
     "key": "CONTACT",
-    "name": "lift mask mandate",
-    "instant": 1623715200000,
-    "multipliers": {
-      "family": 0.75,
-      "school": 0.75,
-      "nursing": 0.25,
-      "work": 0.45,
-      "other": 0.4
-    },
-    "deletable": true,
-    "draggable": true
-  },
-  {
-    "id": "31cb8",
-    "key": "CONTACT",
-    "name": "summer break",
+    "name": "copy of initial NPIs",
     "instant": 1625097600000,
     "multipliers": {
-      "family": 0.75,
-      "school": 0.1,
-      "nursing": 0.25,
-      "work": 0.5,
-      "other": 0.5
+      "family": 0.8,
+      "school": 0.05,
+      "nursing": 0.05,
+      "work": 0.75,
+      "other": 0.75
     },
     "deletable": true,
-    "draggable": true
+    "draggable": true,
+    "primary": false
   },
   {
     "id": "ea37",
     "key": "SEASONALITY",
     "name": "seasonality",
     "instant": 1625875200000,
-    "seasonality": 0.8,
+    "seasonality": 0.7000000000000001,
     "deletable": false,
     "draggable": true
   },
   {
-    "id": "a1687",
+    "id": "2d860",
     "key": "CONTACT",
-    "name": "copy of summer break",
-    "instant": 1630886400000,
+    "name": "copy of copy of initial NPIs",
+    "instant": 1630972800000,
     "multipliers": {
-      "family": 0.75,
-      "school": 0.75,
-      "nursing": 0.25,
-      "work": 0.5,
-      "other": 0.5
+      "family": 0.8,
+      "school": 0.8,
+      "nursing": 0.05,
+      "work": 0.8,
+      "other": 0.8
     },
     "deletable": true,
-    "draggable": true
+    "draggable": true,
+    "primary": false
   }
 ]

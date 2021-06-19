@@ -1,4 +1,4 @@
-import { BaseData } from './model/incidence/BaseData';
+import { BaseData } from './model/basedata/BaseData';
 import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
