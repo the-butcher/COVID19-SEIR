@@ -10,6 +10,7 @@ import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplRoot } from './ModelImplRoot';
+import { ModelInstants } from './ModelInstants';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 
@@ -38,7 +39,7 @@ export class ModelImplVaccination implements IModelSeir {
         this.ageGroupName = ageGroup.getName();
         this.grpAccept = ageGroup.getAcpt();
 
-        const instantDst = ModelConstants.MODEL_MIN_______INSTANT;
+        const instantDst = ModelInstants.getInstance().getMinInstant();
         const instantPre = instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
         const category1 = TimeUtil.formatCategoryDate(instantPre + TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
         const category2 = TimeUtil.formatCategoryDate(instantPre);

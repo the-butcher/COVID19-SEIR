@@ -1,3 +1,4 @@
+import { ModelInstants } from './ModelInstants';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { IAnyModificationValue, Modifications } from '../common/modification/Modifications';
 import { ModificationTime } from '../common/modification/ModificationTime';
@@ -31,7 +32,7 @@ export class StrainCalibrator {
         /**
          * start at minus preload days
          */
-        const curInstant = ModelConstants.MODEL_MIN_______INSTANT; // - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
+        const curInstant = ModelInstants.getInstance().getMinInstant(); // - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
 
         /**
          * start with some default
@@ -57,7 +58,7 @@ export class StrainCalibrator {
                 id: 'calibrate (contact)',
                 key: 'CONTACT',
                 name: 'calibrate (contact)',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
+                instant: curInstant,
                 multipliers: {},
                 deletable: false,
                 draggable: false
@@ -67,11 +68,10 @@ export class StrainCalibrator {
                 id: 'calibrate (settings)',
                 key: 'SETTINGS',
                 name: 'calibrate (settings)',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
+                instant: curInstant,
                 undetected: 0.0,
                 quarantine: 0.0,
                 dead: 0.0,
-                vaccinated: 0.0,
                 deletable: false,
                 draggable: false
             },
@@ -120,7 +120,7 @@ export class StrainCalibrator {
             const strainModel = model.findStrainModel(modificationValuesStrain.id);
 
             // single step on the strain model
-            strainModel.apply(modelState, ModelStateIntegrator.DT, ModelConstants.MODEL_MIN_______INSTANT, modificationTimeCalibrate);
+            strainModel.apply(modelState, ModelStateIntegrator.DT, curInstant, modificationTimeCalibrate);
 
             const absDeltas = strainModel.getAbsDeltas();
             let absDeltaAvg = 0;

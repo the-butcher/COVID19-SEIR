@@ -277,6 +277,10 @@ export class Slider {
 
     }
 
+    getTickValues(): number[] {
+        return this.sliderTicks.map(t => t.getValue());
+    }
+
     setRange(range: number[]): void {
         this.minValue = Math.min(...range);
         this.maxValue = Math.max(...range);

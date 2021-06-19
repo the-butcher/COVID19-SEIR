@@ -92,7 +92,7 @@ export class Modifications {
                     typedModifications[i].setInstants(typedModifications[i].getInstantA(), typedModifications[i+1].getInstantA());
                 }
                 const lastModification = typedModifications[typedModifications.length - 1];
-                lastModification.setInstants(lastModification.getInstantA(), ModelConstants.MODEL_MAX_______INSTANT);
+                lastModification.setInstants(lastModification.getInstantA(), Number.MAX_SAFE_INTEGER);
             }
         });
     }

@@ -1,4 +1,5 @@
 import { Modifications } from '../../common/modification/Modifications';
+import { Logger } from '../../util/Logger';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
@@ -7,6 +8,7 @@ import { ModelConstants } from '../ModelConstants';
 import { ModelImplRoot } from '../ModelImplRoot';
 import { IModificationValuesStrain } from './../../common/modification/IModificationValuesStrain';
 import { ModificationTime } from './../../common/modification/ModificationTime';
+import { ModelInstants } from './../ModelInstants';
 import { IModelState } from './IModelState';
 
 /**
@@ -34,6 +36,17 @@ export interface IDataValues {
     INFECTIOUS: { [K: string]: number };
     TOTAL: number;
 }
+
+// export interface ICompartmentFilters {
+//     SUSCEPTIBLE: ICompartmentFilter;
+//     EXPOSED: ICompartmentFilter;
+//     INFECTIOUS: ICompartmentFilter;
+//     REMOVED_D: ICompartmentFilter;
+//     REMOVED_U: ICompartmentFilter;
+//     REMOVED_V: ICompartmentFilter;
+//     CASES: ICompartmentFilter;
+//     INCIDENCE: ICompartmentFilter;
+// }
 
 /**
  * performs an euler-integration in 1 hour steps on a model-state
@@ -92,6 +105,9 @@ export class ModelStateIntegrator {
 
         const dataSet: IDataItem[] = [];
         const absTotal = this.model.getDemographics().getAbsTotal();
+
+        const minChartInstant = ModelInstants.getInstance().getMinInstant();
+        const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
 
         // const compartmentFilterRemovedVInit = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V));
         // console.log('v-init', this.modelState.getNrmValueSum(compartmentFilterRemovedVInit));
@@ -215,7 +231,6 @@ export class ModelStateIntegrator {
                         TOTAL: this.modelState.getNrmValueSum(compartmentFilterAgeGroupTotal) * groupNormalizer,
                     };
 
-
                 });
 
                 this.resetExposure();
@@ -226,14 +241,14 @@ export class ModelStateIntegrator {
 
             if (this.curInstant % TimeUtil.MILLISECONDS_PER____DAY * 7 === 0) {
                 progressCallback({
-                    ratio: (this.curInstant - ModelConstants.MODEL_MIN_______INSTANT) / (ModelConstants.MODEL_MAX_______INSTANT - ModelConstants.MODEL_MIN_______INSTANT)
+                    ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant)
                 });
             }
 
         }
 
         progressCallback({
-            ratio: (this.curInstant - ModelConstants.MODEL_MIN_______INSTANT) / (ModelConstants.MODEL_MAX_______INSTANT - ModelConstants.MODEL_MIN_______INSTANT),
+            ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant),
             data: dataSet
         });
 

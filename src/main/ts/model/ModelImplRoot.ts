@@ -18,6 +18,7 @@ import { ModelImplVaccination } from './ModelImplVaccination';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
+import { ModelInstants } from './ModelInstants';
 
 interface IVaccinationGroupData {
     nrmVaccS: number; // susceptible - vaccination of susceptible population -> 2 shots
@@ -56,7 +57,7 @@ export class ModelImplRoot implements IModelSeir {
         /**
          * start at minus preload days
          */
-        const instantDst = ModelConstants.MODEL_MIN_______INSTANT;
+        const instantDst = ModelInstants.getInstance().getMinInstant();
         const instantPre = instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
         const referenceDataRemoved = baseData.findBaseData(TimeUtil.formatCategoryDate(instantPre));
 
@@ -340,7 +341,7 @@ export class ModelImplRoot implements IModelSeir {
          */
         model = new ModelImplRoot(demographics, Modifications.getInstance(), referenceDataRemoved, baseData);
         modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
-        await modelStateIntegrator.buildModelData(ModelConstants.MODEL_MIN_______INSTANT - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
         modelStateIntegrator.resetExposure();
 
         return modelStateIntegrator;

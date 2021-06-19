@@ -1,3 +1,4 @@
+import { JsonLoader } from '../../util/JsonLoader';
 
 export interface IBaseDataConfig {
     [K: string]: IBaseDataItem;
@@ -19,8 +20,13 @@ export interface IBaseDataItem {
 
 export class BaseData {
 
-    static async setInstanceFromConfig(baseDataset: {[K: string]: IBaseDataItem}): Promise<void> {
-        this.instance = new BaseData(baseDataset);
+    static async setInstanceFromPath(path: string): Promise<void> {
+        const baseData = await new JsonLoader().load(path);
+        BaseData.setInstanceFromConfig(path, baseData);
+    }
+
+    static setInstanceFromConfig(path: string, baseDataset: {[K: string]: IBaseDataItem}): void {
+        this.instance = new BaseData(path, baseDataset);
     }
 
     static getInstance(): BaseData {
@@ -29,10 +35,16 @@ export class BaseData {
 
     private static instance: BaseData;
 
+    private readonly path: string;
     private readonly baseDataset: {[K: string]: IBaseDataItem};
 
-    constructor(baseDataset: {[K: string]: IBaseDataItem}) {
+    constructor(path: string, baseDataset: {[K: string]: IBaseDataItem}) {
+        this.path = path;
         this.baseDataset = baseDataset;
+    }
+
+    getPath(): string {
+        return this.path;
     }
 
     getBaseDataConfig(): IBaseDataConfig {

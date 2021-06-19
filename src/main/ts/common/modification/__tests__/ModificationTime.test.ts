@@ -1,3 +1,4 @@
+import { ModelInstants } from './../../../model/ModelInstants';
 import { describe, expect, it } from '@jest/globals';
 import model2config from '../../../../webapp/data/model-data-at.json';
 import model2testmodifications from '../../../../webapp/data/model-test-modifications.json';
@@ -11,7 +12,9 @@ import { ModificationSettings } from './../ModificationSettings';
 import { ModificationTime } from './../ModificationTime';
 
 describe("test value", () => {
-    Demographics.setInstanceFromConfig(model2config as IDemographicsConfig);
+
+    ModelInstants.setInstanceFromValues([new Date('2021-05-01').getTime(), new Date('2021-07-01').getTime()])
+    Demographics.setInstanceFromConfig('test', model2config as IDemographicsConfig);
     Modifications.setInstanceFromValues(model2testmodifications as IModificationValues[]);
 
     it("should return 0.3 as testing ratio, 0.839 as contact multiplier", () => {
@@ -19,7 +22,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_______INSTANT,
+            instant: new Date('2021-05-01').getTime(),
             deletable: false,
             draggable: false
         });
@@ -40,7 +43,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_______INSTANT,
+            instant: new Date('2021-05-01').getTime(),
             deletable: false,
             draggable: false
         });

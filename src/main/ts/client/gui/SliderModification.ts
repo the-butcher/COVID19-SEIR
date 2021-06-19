@@ -3,6 +3,7 @@ import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants'
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { IModificationValues } from './../../common/modification/IModificationValues';
+import { ModelInstants } from './../../model/ModelInstants';
 import { ControlsConstants } from './ControlsConstants';
 import { IconModification } from './IconModification';
 import { IconModificationMini } from './IconModificationMini';
@@ -29,13 +30,14 @@ export class SliderModification extends Slider {
 
     constructor() {
 
+        const ticks = ModelInstants.getInstance().getTicks();
         super({
             container: 'sliderDivTime',
-            min: ModelConstants.MODEL_MIN_______INSTANT,
-            max: ModelConstants.MODEL_MAX_______INSTANT,
+            min: Math.min(...ticks),
+            max: Math.max(...ticks),
             step: TimeUtil.MILLISECONDS_PER____DAY,
             values: [],
-            ticks: ModelConstants.RANGE_____MODEL_INSTANT,
+            ticks,
             label: 'date',
             thumbCreateFunction: (index: number) => {
                 return new IconModification('x', 'CONTACT', 'create'); // TODO could this be optional
@@ -65,6 +67,7 @@ export class SliderModification extends Slider {
         this.modificationIcons = [];
 
     }
+
 
     setSliderPadding(paddingLeft: number, paddingRight: number): void {
         this.getContainer().style.paddingLeft = `${paddingLeft}px`;

@@ -6,6 +6,7 @@ This app currently is in a alpha state where i review some features for plausibi
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
+* change chart range when a file is imported
 * be sure that strain calibration is still functional
 * wiki on github
 * demographics for germany

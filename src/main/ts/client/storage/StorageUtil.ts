@@ -1,3 +1,5 @@
+import { IStoredConfig } from './IStoredConfig';
+import { TimeUtil } from './../../util/TimeUtil';
 import { BaseData } from '../../model/basedata/BaseData';
 import { IModificationValues } from '../../common/modification/IModificationValues';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
@@ -7,6 +9,7 @@ import { Demographics } from '../../common/demographics/Demographics';
 import { ModelActions } from '../gui/ModelActions';
 import { SliderModification } from '../gui/SliderModification';
 import { ModelTask } from '../ModelTask';
+import { ControlsConstants } from '../gui/ControlsConstants';
 
 /**
  * helper type for writing / loading modifications to / from local storage
@@ -34,13 +37,21 @@ export class StorageUtil {
 
     storeModifications(): void {
         if (this.isStorageEnabled()) {
-            const modificationValues = Modifications.getInstance().buildModificationValues();
-            localStorage.setItem(StorageUtil.STORAGE_KEY_MODIFICATIONS, JSON.stringify(modificationValues));
+            localStorage.setItem(StorageUtil.STORAGE_KEY_MODIFICATIONS, JSON.stringify(this.createStorableConfig()));
+        }
+    }
+
+    createStorableConfig(): IStoredConfig {
+        return {
+            model______basedata: BaseData.getInstance().getPath(),
+            model__demographics: Demographics.getInstance().getPath(),
+            model_____daterange: SliderModification.getInstance().getTickValues().map(t => TimeUtil.formatConfigDate(t)),
+            model_modifications: Modifications.getInstance().buildModificationValues()
         }
     }
 
     exportModifications(): void {
-        this.exportJson(Modifications.getInstance().buildModificationValues());
+        this.exportJson(this.createStorableConfig());
     }
 
     exportJson(object: any): void {
@@ -90,7 +101,7 @@ export class StorageUtil {
                 /**
                  * rebuild chart to reflect changes
                  */
-                ModelTask.commit(ModelActions.getInstance().getKey(), Demographics.getInstance().getDemographicsConfig(), Modifications.getInstance().buildModificationValues(), BaseData.getInstance().getBaseDataConfig());
+                ModelTask.commit(ModelActions.getInstance().getKey(), ControlsConstants.createWorkerInput());
 
             }
             reader.readAsText(file);
@@ -100,7 +111,7 @@ export class StorageUtil {
 
     }
 
-    loadModifications(): IModificationValues[] {
+    loadConfig(): IStoredConfig {
 
         if (this.isStorageEnabled()) {
 
@@ -108,101 +119,120 @@ export class StorageUtil {
             if (ObjectUtil.isNotEmpty(modificationValues)) {
                 return JSON.parse(modificationValues);
             } else {
-                return this.createDefaultModificationValues();
+                return this.createDefaultConfig();
             }
 
         } else {
-            return this.createDefaultModificationValues();
+            return this.createDefaultConfig();
         }
+
     }
 
-    createDefaultModificationValues(): IModificationValues[] {
+    createDefaultConfig(): IStoredConfig {
 
-        const modificationValues: IAnyModificationValue[] = [
-            {
-                id: ObjectUtil.createId(),
-                key: 'SEASONALITY',
-                name: 'seasonality',
-                instant: new Date('2021-07-10').getTime(),
-                seasonality: 0.80,
-                deletable: false,
-                draggable: true
-            },
-            {
-                id: ObjectUtil.createId(),
-                key: 'SETTINGS',
-                name: 'initial state',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
-                undetected: 1.00,
-                vaccinated: 0.22,
-                quarantine: 0.50,
-                dead: 0.001,
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: ObjectUtil.createId(),
-                key: 'TIME',
-                name: 'effective settings',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
-                deletable: false,
-                draggable: true
-            },
-            {
-                id: ObjectUtil.createId(),
-                key: 'STRAIN',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
-                name: 'b.1.1.7',
-                r0: 4.4,
-                serialInterval: 4.8,
-                intervalScale: 1.0,
-                dstIncidence: 150,
-                deletable: false,
-                draggable: false,
-                primary: true,
-            },
-            {
-                id: ObjectUtil.createId(),
-                key: 'CONTACT',
-                name: 'initial NPIs',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
-                multipliers: {
-                    'family': 0.65,
-                    'school': 0.25,
-                    'nursing': 0.30,
-                    'work': 0.50,
-                    'other': 0.20
+        const minInstant = new Date('2021-05-01').getTime();
+        return {
+            model______basedata: `data/heatmap-data-at.json?cb=${ObjectUtil.createId()}`,
+            model__demographics: `data/model-data-at.json?cb=${ObjectUtil.createId()}`,
+            model_____daterange: [
+                '2021-05-01',
+                '2021-06-01',
+                '2021-07-01',
+                '2021-08-01',
+                '2021-09-01',
+                '2021-10-01',
+                //'2021-11-01',
+                //'2021-12-01',
+                //'2022-01-01',
+                //'2022-02-01',
+                //'2022-03-01',
+                //'2022-04-01',
+                //'2022-04-30'
+            ],
+            model_modifications: [
+                {
+                    id: ObjectUtil.createId(),
+                    key: 'SEASONALITY',
+                    name: 'seasonality',
+                    instant: new Date('2021-07-10').getTime(),
+                    seasonality: 0.80,
+                    deletable: false,
+                    draggable: true
                 },
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: ObjectUtil.createId(),
-                key: 'TESTING',
-                name: 'initial discovery',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
-                multipliers: {
-                    'family': 0.40,
-                    'school': 0.60,
-                    'nursing': 0.75,
-                    'work': 0.10,
-                    'other': 0.10
+                {
+                    id: ObjectUtil.createId(),
+                    key: 'SETTINGS',
+                    name: 'initial state',
+                    instant: minInstant,
+                    undetected: 1.00,
+                    quarantine: 0.50,
+                    dead: 0.001,
+                    deletable: false,
+                    draggable: false
                 },
-                deletable: false,
-                draggable: false
-            },
-            {
-                id: ObjectUtil.createId(),
-                key: 'VACCINATION',
-                name: 'initial vaccinations',
-                instant: ModelConstants.MODEL_MIN_______INSTANT,
-                doses: 100000,
-                deletable: false,
-                draggable: false
-            }
-        ];
+                {
+                    id: ObjectUtil.createId(),
+                    key: 'TIME',
+                    name: 'effective settings',
+                    instant: minInstant,
+                    deletable: false,
+                    draggable: true
+                },
+                {
+                    id: ObjectUtil.createId(),
+                    key: 'STRAIN',
+                    instant: minInstant,
+                    name: 'b.1.1.7',
+                    r0: 4.4,
+                    serialInterval: 4.8,
+                    intervalScale: 1.0,
+                    dstIncidence: 150,
+                    deletable: false,
+                    draggable: false,
+                    primary: true,
+                },
+                {
+                    id: ObjectUtil.createId(),
+                    key: 'CONTACT',
+                    name: 'initial NPIs',
+                    instant: minInstant,
+                    multipliers: {
+                        'family': 0.65,
+                        'school': 0.25,
+                        'nursing': 0.30,
+                        'work': 0.50,
+                        'other': 0.20
+                    },
+                    deletable: false,
+                    draggable: false
+                },
+                {
+                    id: ObjectUtil.createId(),
+                    key: 'TESTING',
+                    name: 'initial discovery',
+                    instant: minInstant,
+                    multipliers: {
+                        'family': 0.40,
+                        'school': 0.60,
+                        'nursing': 0.75,
+                        'work': 0.10,
+                        'other': 0.10
+                    },
+                    deletable: false,
+                    draggable: false
+                },
+                {
+                    id: ObjectUtil.createId(),
+                    key: 'VACCINATION',
+                    name: 'initial vaccinations',
+                    instant: minInstant,
+                    doses: 100000,
+                    deletable: false,
+                    draggable: false
+                }
+            ]
+        }
 
-        return modificationValues;
 
     }
 

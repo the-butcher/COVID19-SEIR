@@ -1,11 +1,11 @@
-import { BaseData } from './model/basedata/BaseData';
 import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
 import { Modifications } from './common/modification/Modifications';
+import { BaseData } from './model/basedata/BaseData';
 import { IWorkerInput } from './model/IWorkerInput';
-import { ModelConstants } from './model/ModelConstants';
 import { ModelImplRoot } from './model/ModelImplRoot';
+import { ModelInstants } from './model/ModelInstants';
 import { StrainCalibrator } from './model/StrainCalibrator';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
@@ -20,19 +20,26 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
     try {
 
         const workerInput: IWorkerInput = event.data;
+
+        const minInstant = workerInput.minInstant;
+        const maxInstant = workerInput.maxInstant;
+        // Logger.getInstance().log('minInstant', minInstant, 'maxInstant', maxInstant);
+
         const demographicsConfig = workerInput.demographicsConfig;
         const modificationValues = workerInput.modificationValues;
         const baseDataConfig = workerInput.baseDataConfig;
 
+        ModelInstants.setInstanceFromValues([minInstant, maxInstant]);
+
         /**
          * create a demographics singleton (in worker scope, this does not interfere with main scope)
          */
-        Demographics.setInstanceFromConfig(demographicsConfig);
+        Demographics.setInstanceFromConfig('worker', demographicsConfig);
 
         /**
          * create a base-data singleton (in worker scope, this does not interfere with main scope)
          */
-        BaseData.setInstanceFromConfig(baseDataConfig);
+        BaseData.setInstanceFromConfig('worker', baseDataConfig);
 
         /**
          * calibrate strain values to have transmission risk set properly (in an SEIS model the strain would then hold equilibrium at R0=1 and the strain's initial incidence)
@@ -49,8 +56,6 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        const minInstant = ModelConstants.MODEL_MIN_______INSTANT;
-        const maxInstant = ModelConstants.MODEL_MAX_______INSTANT;
         modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             ctx.postMessage(modelProgress);
         });

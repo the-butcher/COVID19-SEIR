@@ -1,3 +1,4 @@
+import { JsonLoader } from '../../util/JsonLoader';
 import { AgeGroup } from './AgeGroup';
 import { ContactCategory } from './ContactCategory';
 import { IContactMatrixConfig } from './IContactMatrixConfig';
@@ -13,8 +14,13 @@ import { IDemographicsConfig } from './IDemographicsConfig';
  */
 export class Demographics {
 
-    static setInstanceFromConfig(demographicsConfig: IDemographicsConfig): void {
-        this.instance = new Demographics(demographicsConfig);
+    static async setInstanceFromPath(path: string): Promise<void> {
+        const baseData = await new JsonLoader().load(path);
+        Demographics.setInstanceFromConfig(path, baseData);
+    }
+
+    static setInstanceFromConfig(path: string, demographicsConfig: IDemographicsConfig): void {
+        this.instance = new Demographics(path, demographicsConfig);
     }
 
     static getInstance(): Demographics {
@@ -23,6 +29,7 @@ export class Demographics {
 
     private static instance: Demographics;
 
+    private readonly path: string;
     /**
      * the config instance that was used to construct this instance
      */
@@ -39,7 +46,10 @@ export class Demographics {
     private exposuresPerContact: number;
     private matrixSum: number;
 
-    constructor(demographicsConfig: IDemographicsConfig) {
+    constructor(path: string, demographicsConfig: IDemographicsConfig) {
+
+        this.path = path;
+        // console.log('done loading demographics from path', this.path, demographicsConfig);
 
         this.demographicsConfig = demographicsConfig;
         this.ageGroups = [];
@@ -132,6 +142,10 @@ export class Demographics {
             this.maxColTotal = Math.max(this.maxColTotal, colTotal);
         };
 
+    }
+
+    getPath(): string {
+        return this.path;
     }
 
     getDemographicsConfig(): IDemographicsConfig {

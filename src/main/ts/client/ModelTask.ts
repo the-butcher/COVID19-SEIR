@@ -1,13 +1,10 @@
-import { ModificationResolverStrain } from './../common/modification/ModificationResolverStrain';
-import { ModelConstants } from './../model/ModelConstants';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
-import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
-import { IModificationValues } from '../common/modification/IModificationValues';
-import { IBaseDataConfig } from '../model/basedata/BaseData';
 import { IWorkerInput } from '../model/IWorkerInput';
 import { MODIFICATION____KEY } from '../model/ModelConstants';
 import { IModelProgress } from '../model/state/ModelStateIntegrator';
+import { ModificationResolverStrain } from './../common/modification/ModificationResolverStrain';
+import { ModelConstants } from './../model/ModelConstants';
 import { ChartAgeGroup } from './chart/ChartAgeGroup';
 import { ControlsConstants } from './gui/ControlsConstants';
 import { SliderModification } from './gui/SliderModification';
@@ -25,19 +22,10 @@ export class ModelTask {
      */
     private static worker: ModelWorker;
 
-    static async commit(key: MODIFICATION____KEY, demographicsConfig: IDemographicsConfig, modificationValues: IModificationValues[], baseDataConfig: IBaseDataConfig): Promise<void> {
+    static async commit(key: MODIFICATION____KEY, workerInput: IWorkerInput): Promise<void> {
 
         // 1. update for immediate response
         ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
-
-        /**
-         * build worker input
-         */
-        const workerInput: IWorkerInput = {
-            demographicsConfig,
-            modificationValues,
-            baseDataConfig,
-        }
 
         /**
          * terminate any running worker

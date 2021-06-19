@@ -10,11 +10,9 @@ import { IBaseDataConfig, IBaseDataItem } from './basedata/BaseData';
  *
  */
 export interface IWorkerInput {
-
+    minInstant: number;
+    maxInstant: number;
     demographicsConfig: IDemographicsConfig;
-
     modificationValues: IModificationValues[];
-
     baseDataConfig: IBaseDataConfig;
-
 }

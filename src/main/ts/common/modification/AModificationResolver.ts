@@ -1,3 +1,4 @@
+import { ModelInstants } from './../../model/ModelInstants';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -33,8 +34,8 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     getModificationData(): IModificationData[] {
 
-        const minChartInstant = ModelConstants.MODEL_MIN_______INSTANT;
-        const maxChartInstant = ModelConstants.MODEL_MAX_______INSTANT;
+        const minChartInstant = ModelInstants.getInstance().getMinInstant();
+        const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
 
         const modificationData = [];
         for (let instant = minChartInstant; instant <= maxChartInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
@@ -52,15 +53,19 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
     }
 
     getModification(instant: number): M {
+
+        const minChartInstant = ModelInstants.getInstance().getMinInstant();
+        const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
+
         const applicableModification = this.typedModifications.find(m => m.appliesToInstant(instant));
         if (ObjectUtil.isNotEmpty(applicableModification)) {
             return applicableModification;
         } else if (ObjectUtil.isNotEmpty(ModelConstants.MODIFICATION_PARAMS[this.key].createDefaultModification)) {
-            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[this.key].createDefaultModification(ModelConstants.MODEL_MIN_______INSTANT) as M;
+            const defaultModification =  ModelConstants.MODIFICATION_PARAMS[this.key].createDefaultModification(minChartInstant) as M;
             if (this.typedModifications.length > 0) {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_______INSTANT, this.typedModifications[0].getInstantA());
+                defaultModification.setInstants(minChartInstant, this.typedModifications[0].getInstantA());
             } else {
-                defaultModification.setInstants(ModelConstants.MODEL_MIN_______INSTANT, ModelConstants.MODEL_MAX_______INSTANT);
+                defaultModification.setInstants(minChartInstant, maxChartInstant);
             }
             return defaultModification;
         } else {

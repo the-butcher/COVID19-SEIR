@@ -7,13 +7,13 @@ import { Demographics } from './../../demographics/Demographics';
 import { IDemographicsConfig } from './../../demographics/IDemographicsConfig';
 
 describe("test value", () => {
-    Demographics.setInstanceFromConfig(model2config as IDemographicsConfig);
+    Demographics.setInstanceFromConfig('test', model2config as IDemographicsConfig);
     it("should return 0.3 as testing ratio, 0.839 as contact multiplier", () => {
         const modificationTesting = new ModificationTesting({
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_______INSTANT,
+            instant: new Date('2021-05-01').getTime(),
             multipliers: {
                 'family': 0.30,
                 'school': 0.30,
@@ -36,7 +36,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_______INSTANT,
+            instant: new Date('2021-05-01').getTime(),
             multipliers: {
                 'family': 0.50,
                 'school': 0.50,
@@ -59,7 +59,7 @@ describe("test value", () => {
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
-            instant: ModelConstants.MODEL_MIN_______INSTANT,
+            instant: new Date('2021-05-01').getTime(),
             multipliers: {
                 'family': 0.70,
                 'school': 0.70,
