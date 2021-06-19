@@ -62,7 +62,7 @@ export class ModelActions {
         this.actionIcons.push(new IconAction({
             container: 'actionDivImportDiv',
             actionFunction: () => {
-                StorageUtil.getInstance().importModifications();
+                StorageUtil.getInstance().importConfig();
             }
         }));
         this.actionIcons.push(new IconAction({

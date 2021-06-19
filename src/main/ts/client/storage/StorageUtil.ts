@@ -1,15 +1,13 @@
-import { IStoredConfig } from './IStoredConfig';
-import { TimeUtil } from './../../util/TimeUtil';
-import { BaseData } from '../../model/basedata/BaseData';
-import { IModificationValues } from '../../common/modification/IModificationValues';
-import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
-import { ModelConstants } from '../../model/ModelConstants';
-import { ObjectUtil } from '../../util/ObjectUtil';
 import { Demographics } from '../../common/demographics/Demographics';
+import { Modifications } from '../../common/modification/Modifications';
+import { BaseData } from '../../model/basedata/BaseData';
+import { ObjectUtil } from '../../util/ObjectUtil';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { ModelActions } from '../gui/ModelActions';
 import { SliderModification } from '../gui/SliderModification';
 import { ModelTask } from '../ModelTask';
-import { ControlsConstants } from '../gui/ControlsConstants';
+import { TimeUtil } from './../../util/TimeUtil';
+import { IStoredConfig } from './IStoredConfig';
 
 /**
  * helper type for writing / loading modifications to / from local storage
@@ -70,7 +68,7 @@ export class StorageUtil {
 
     }
 
-    importModifications(): void {
+    importConfig(): void {
 
         const fileInput = document.getElementById('jsonImportInput') as HTMLInputElement;
         fileInput.onchange = (e: Event) => {
@@ -78,6 +76,7 @@ export class StorageUtil {
             // @ts-ignore
             var file = e.target.files[0];
             if (!file) {
+                console.warn('no file');
                 return;
             }
 
@@ -87,11 +86,12 @@ export class StorageUtil {
                 /**
                  * read and build modifications
                  */
-                const modificationValues: IModificationValues[] = JSON.parse(e.target.result as string);
-                modificationValues.forEach(modificationValue => {
-                    ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue);
-                });
-                Modifications.setInstanceFromValues(modificationValues);
+                const importedConfig: IStoredConfig = JSON.parse(e.target.result as string);
+                SliderModification.getInstance().setRange(importedConfig.model_____daterange.map(d => new Date(d).getTime()));
+                // importedConfig.model_modifications.forEach(modificationValue => {
+                //     ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue); // just a check
+                // });
+                Modifications.setInstanceFromValues(importedConfig.model_modifications);
 
                 /**
                  * show in modification sliders
@@ -115,9 +115,9 @@ export class StorageUtil {
 
         if (this.isStorageEnabled()) {
 
-            const modificationValues = localStorage.getItem(StorageUtil.STORAGE_KEY_MODIFICATIONS);
-            if (ObjectUtil.isNotEmpty(modificationValues)) {
-                return JSON.parse(modificationValues);
+            const loadedConfig = localStorage.getItem(StorageUtil.STORAGE_KEY_MODIFICATIONS);
+            if (ObjectUtil.isNotEmpty(loadedConfig)) {
+                return JSON.parse(loadedConfig);
             } else {
                 return this.createDefaultConfig();
             }

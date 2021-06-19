@@ -6,7 +6,6 @@ This app currently is in a alpha state where i review some features for plausibi
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
 todo:
-* change chart range when a file is imported
 * be sure that strain calibration is still functional
 * wiki on github
 * demographics for germany
@@ -22,7 +21,7 @@ todo:
 
 
 next:
-* can there be in general, an age-wise "control-curve" for incidence, recovery?
+* can there be a general concept for an age-wise "control-curve" [incidence, recovery, ...]
 * clarify parts of the model where i.e. vaccination is handled in ModelImplRoot, attempt to get everything to the most intuitive location
 * "float" mode where base-data is not relevant
 * add strain names to export json
@@ -41,6 +40,7 @@ next:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 done:
+* ~~change chart range when a file is imported~~
 * ~~strain slider range (1-10)~~
 * ~~replace full vacc build with values from base-data~~
 * ~~check vaccination model against real vaccination~~
