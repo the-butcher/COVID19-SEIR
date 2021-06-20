@@ -1,3 +1,4 @@
+import { JsonLoader } from './../../util/JsonLoader';
 import { Demographics } from '../../common/demographics/Demographics';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
@@ -88,9 +89,6 @@ export class StorageUtil {
                  */
                 const importedConfig: IStoredConfig = JSON.parse(e.target.result as string);
                 SliderModification.getInstance().setRange(importedConfig.model_____daterange.map(d => new Date(d).getTime()));
-                // importedConfig.model_modifications.forEach(modificationValue => {
-                //     ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue); // just a check
-                // });
                 Modifications.setInstanceFromValues(importedConfig.model_modifications);
 
                 /**
@@ -111,7 +109,7 @@ export class StorageUtil {
 
     }
 
-    loadConfig(): IStoredConfig {
+    async loadConfig(): Promise<IStoredConfig> {
 
         if (this.isStorageEnabled()) {
 
@@ -119,119 +117,121 @@ export class StorageUtil {
             if (ObjectUtil.isNotEmpty(loadedConfig)) {
                 return JSON.parse(loadedConfig);
             } else {
-                return this.createDefaultConfig();
+                return this.loadDefaultConfig();
             }
 
         } else {
-            return this.createDefaultConfig();
+            return this.loadDefaultConfig();
         }
 
     }
 
-    createDefaultConfig(): IStoredConfig {
+    async loadDefaultConfig(): Promise<IStoredConfig> {
 
-        const minInstant = new Date('2021-05-01').getTime();
-        return {
-            model______basedata: `data/heatmap-data-at.json?cb=${ObjectUtil.createId()}`,
-            model__demographics: `data/model-data-at.json?cb=${ObjectUtil.createId()}`,
-            model_____daterange: [
-                '2021-05-01',
-                '2021-06-01',
-                '2021-07-01',
-                '2021-08-01',
-                '2021-09-01',
-                '2021-10-01',
-                //'2021-11-01',
-                //'2021-12-01',
-                //'2022-01-01',
-                //'2022-02-01',
-                //'2022-03-01',
-                //'2022-04-01',
-                //'2022-04-30'
-            ],
-            model_modifications: [
-                {
-                    id: ObjectUtil.createId(),
-                    key: 'SEASONALITY',
-                    name: 'seasonality',
-                    instant: new Date('2021-07-10').getTime(),
-                    seasonality: 0.80,
-                    deletable: false,
-                    draggable: true
-                },
-                {
-                    id: ObjectUtil.createId(),
-                    key: 'SETTINGS',
-                    name: 'initial state',
-                    instant: minInstant,
-                    undetected: 1.00,
-                    quarantine: 0.50,
-                    dead: 0.001,
-                    deletable: false,
-                    draggable: false
-                },
-                {
-                    id: ObjectUtil.createId(),
-                    key: 'TIME',
-                    name: 'effective settings',
-                    instant: minInstant,
-                    deletable: false,
-                    draggable: true
-                },
-                {
-                    id: ObjectUtil.createId(),
-                    key: 'STRAIN',
-                    instant: minInstant,
-                    name: 'b.1.1.7',
-                    r0: 4.4,
-                    serialInterval: 4.8,
-                    intervalScale: 1.0,
-                    dstIncidence: 150,
-                    deletable: false,
-                    draggable: false,
-                    primary: true,
-                },
-                {
-                    id: ObjectUtil.createId(),
-                    key: 'CONTACT',
-                    name: 'initial NPIs',
-                    instant: minInstant,
-                    multipliers: {
-                        'family': 0.65,
-                        'school': 0.25,
-                        'nursing': 0.30,
-                        'work': 0.50,
-                        'other': 0.20
-                    },
-                    deletable: false,
-                    draggable: false
-                },
-                {
-                    id: ObjectUtil.createId(),
-                    key: 'TESTING',
-                    name: 'initial discovery',
-                    instant: minInstant,
-                    multipliers: {
-                        'family': 0.40,
-                        'school': 0.60,
-                        'nursing': 0.75,
-                        'work': 0.10,
-                        'other': 0.10
-                    },
-                    deletable: false,
-                    draggable: false
-                },
-                {
-                    id: ObjectUtil.createId(),
-                    key: 'VACCINATION',
-                    name: 'initial vaccinations',
-                    instant: minInstant,
-                    doses: 100000,
-                    deletable: false,
-                    draggable: false
-                }
-            ]
-        }
+        return await new JsonLoader().load(`data/default-config.json?cb=${ObjectUtil.createId()}`);
+
+        // const minInstant = new Date('2021-05-01').getTime();
+        // return {
+        //     model______basedata: `data/heatmap-data-at.json?cb=${ObjectUtil.createId()}`,
+        //     model__demographics: `data/model-data-at.json?cb=${ObjectUtil.createId()}`,
+        //     model_____daterange: [
+        //         '2021-05-01',
+        //         '2021-06-01',
+        //         '2021-07-01',
+        //         '2021-08-01',
+        //         '2021-09-01',
+        //         '2021-10-01',
+        //         //'2021-11-01',
+        //         //'2021-12-01',
+        //         //'2022-01-01',
+        //         //'2022-02-01',
+        //         //'2022-03-01',
+        //         //'2022-04-01',
+        //         //'2022-04-30'
+        //     ],
+        //     model_modifications: [
+        //         {
+        //             id: ObjectUtil.createId(),
+        //             key: 'SEASONALITY',
+        //             name: 'seasonality',
+        //             instant: new Date('2021-07-10').getTime(),
+        //             seasonality: 0.80,
+        //             deletable: false,
+        //             draggable: true
+        //         },
+        //         {
+        //             id: ObjectUtil.createId(),
+        //             key: 'SETTINGS',
+        //             name: 'initial state',
+        //             instant: minInstant,
+        //             undetected: 1.00,
+        //             quarantine: 0.50,
+        //             dead: 0.001,
+        //             deletable: false,
+        //             draggable: false
+        //         },
+        //         {
+        //             id: ObjectUtil.createId(),
+        //             key: 'TIME',
+        //             name: 'effective settings',
+        //             instant: minInstant,
+        //             deletable: false,
+        //             draggable: true
+        //         },
+        //         {
+        //             id: ObjectUtil.createId(),
+        //             key: 'STRAIN',
+        //             instant: minInstant,
+        //             name: 'b.1.1.7',
+        //             r0: 4.4,
+        //             serialInterval: 4.8,
+        //             intervalScale: 1.0,
+        //             dstIncidence: 150,
+        //             deletable: false,
+        //             draggable: false,
+        //             primary: true,
+        //         },
+        //         {
+        //             id: ObjectUtil.createId(),
+        //             key: 'CONTACT',
+        //             name: 'initial NPIs',
+        //             instant: minInstant,
+        //             multipliers: {
+        //                 'family': 0.65,
+        //                 'school': 0.25,
+        //                 'nursing': 0.30,
+        //                 'work': 0.50,
+        //                 'other': 0.20
+        //             },
+        //             deletable: false,
+        //             draggable: false
+        //         },
+        //         {
+        //             id: ObjectUtil.createId(),
+        //             key: 'TESTING',
+        //             name: 'initial discovery',
+        //             instant: minInstant,
+        //             multipliers: {
+        //                 'family': 0.40,
+        //                 'school': 0.60,
+        //                 'nursing': 0.75,
+        //                 'work': 0.10,
+        //                 'other': 0.10
+        //             },
+        //             deletable: false,
+        //             draggable: false
+        //         },
+        //         {
+        //             id: ObjectUtil.createId(),
+        //             key: 'VACCINATION',
+        //             name: 'initial vaccinations',
+        //             instant: minInstant,
+        //             doses: 100000,
+        //             deletable: false,
+        //             draggable: false
+        //         }
+        //     ]
+        // }
 
 
     }

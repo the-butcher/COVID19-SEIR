@@ -4,13 +4,13 @@
 * ### Timeline
 
 * ### Modifications
-  * #### <a href="#anchor_time">TIME</a>
-  * #### <a href="#anchor_strain">STRAIN</a>
-  * #### <a href="#anchor_contact">CONTACT</a>
-  * #### <a href="#anchor_testing">TESTING</a>
-  * #### <a href="#anchor_vaccination">VACCINATION</a>
-  * #### <a href="#anchor_seasonality">SEASONALITY</a>
-  * #### <a href="#anchor_settings">SETTINGS</a>
+  * #### <a href="#anchor_time">Time</a>
+  * #### <a href="#anchor_strain">Strain</a>
+  * #### <a href="#anchor_contact">Contact</a>
+  * #### <a href="#anchor_testing">Testing</a>
+  * #### <a href="#anchor_vaccination">Vaccination</a>
+  * #### <a href="#anchor_seasonality">Seasonality</a>
+  * #### <a href="#anchor_settings">Settings</a>
 * ### Actions
   * #### <a href="#anchor_action_export_png">Export to PNG</a>
   * #### <a href="#anchor_action_export_data">Export data to JSON</a>
@@ -29,40 +29,30 @@
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider.png?raw=true)
 
 An area where you can place "modifications" of different types. These modifications are used to alter the model by i.e. changing contact levels, adding new strains, definition seasonality.
+To change configuration of a modification click the modification. A configuration area of the modification will appear in the upper right area of your browser.
 To create a modification move your mouse over the timeline area. Modification types that are creatable will show a "create" thumb underneath the mouse.
 
-![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_create.png?raw=true)
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_create2.png?raw=true)
 
-To delete a modification move your mouse over the modification that you want to delete. Modifications that are deletable will display a delete button. Click the unfolded delete button to delete the modification.
+To delete a modification move your mouse over the modification that you want to delete. Modifications that are deletable will display a delete button. Click the unfolded delete button to delete the modification without further notification.
 
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_delete.png?raw=true)
 
+### Modifications
 
-### <a name="anchor_time">TIME</a>
-   first line paragraph
-   second line paragraph
-### <a name="anchor_strain">STRAIN</a>
-### <a name="anchor_contact">CONTACT</a>
-### <a name="anchor_testing">TESTING</a>
-### <a name="anchor_vaccination">VACCINATION</a>
-### <a name="anchor_seasonality">SEASONALITY</a>
-### <a name="anchor_settings">SETTINGS</a>
-
-
-![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/screenshot01.png?raw=true)
+Modifications are the configuration of the model. Except "Time", each type of modification allows to alter the behaviour of the model by changing specific settings of modification.
+#### <a name="anchor_time">Time</a>
+#### <a name="anchor_strain">Strain</a>
+#### <a name="anchor_contact">Contact</a>
+#### <a name="anchor_testing">Testing</a>
+#### <a name="anchor_vaccination">Vaccination</a>
+#### <a name="anchor_seasonality">Seasonality</a>
+#### <a name="anchor_settings">Settings</a>
 
 
-
-```This app currently is in a alpha state where i review some features for plausibility and validity against historic data
-
-The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
-
-todo:
-* y-axis modes in relative chart (max, age-group-max, manual)
+#### <a name="anchor_strain">Current issues:</a>
 * be sure that strain calibration is still functional
 * wiki on github
-* demographics for germany (check the default priority value 10000 in ModelImplVaccination)
-* explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
 * border cases
   * all testing sliders on zero renders an all zero chart,
@@ -73,7 +63,10 @@ todo:
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
 
 
-next:
+#### <a name="anchor_strain">Backlog:</a>
+* y-axis modes in relative chart (max, age-group-max, manual)
+* demographics for germany (check the default priority value 10000 in ModelImplVaccination)
+* explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
 * can there be a general concept for an age-wise "control-curve" [incidence, recovery, ...]
 * clarify parts of the model where i.e. vaccination is handled in ModelImplRoot, attempt to get everything to the most intuitive location
 * "float" mode where base-data is not relevant
@@ -92,9 +85,9 @@ next:
   * will caching compartments on compartmentFilter improve performance?
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
-
-
-done:
+#### <a name="anchor_strain">Solved issues:</a>
+* ~~proper default configuration~~
+* ~~have a link to this readme~~
 * ~~some modification-min-charts don't have values for last item~~
 * ~~in the current vaccination model there is no share in 5-14~~
 * ~~when the vaccination rate hits threshold there may be an edge~~

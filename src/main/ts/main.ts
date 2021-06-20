@@ -8,30 +8,35 @@ import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 
-const modelConfig = StorageUtil.getInstance().loadConfig();
-BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
-    Demographics.setInstanceFromPath(modelConfig.model__demographics).then(() => {
+StorageUtil.getInstance().loadConfig().then(modelConfig => {
+    BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
+        Demographics.setInstanceFromPath(modelConfig.model__demographics).then(() => {
 
-        Logger.setInstance(console.log);
+            Logger.setInstance(console.log);
 
-        ModelInstants.setInstanceFromValues(modelConfig.model_____daterange.map(d => new Date(d).getTime()))
-        Modifications.setInstanceFromValues(modelConfig.model_modifications);
+            ModelInstants.setInstanceFromValues(modelConfig.model_____daterange.map(d => new Date(d).getTime()))
+            Modifications.setInstanceFromValues(modelConfig.model_modifications);
 
-        // initialize model mode
-        ModelActions.getInstance();
+            // initialize model mode
+            ModelActions.getInstance();
 
-        setTimeout(() => {
-            ModelActions.getInstance().toggleModelMode('STRAIN');
-            ModelActions.getInstance().toggleChartMode('INCIDENCE');
-            requestAnimationFrame(() => {
-                ChartAgeGroup.getInstance();
-                ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
-            });
-        }, 250);
+            setTimeout(() => {
+                ModelActions.getInstance().toggleModelMode('STRAIN');
+                ModelActions.getInstance().toggleChartMode('INCIDENCE');
+                requestAnimationFrame(() => {
+                    ChartAgeGroup.getInstance();
+                    ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
+                });
+            }, 250);
 
+        }).catch(e => {
+            console.warn('failed to load demographics data due to', e);
+        });
+    }).catch(e => {
+        console.warn('failed to load base data due to', e);
     });
-
 }).catch(e => {
-    console.warn('failed to create model settings due to', e);
+    console.warn('failed to create model config due to', e);
 });
+
 
