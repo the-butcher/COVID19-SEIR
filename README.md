@@ -35,7 +35,7 @@ To create a modification move your mouse over the timeline area. Modification ty
 
 To delete a modification move your mouse over the modification that you want to delete. Modifications that are deletable will display a delete button. Click the unfolded delete button to delete the modification.
 
-![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_create.png?raw=true)
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_delete.png?raw=true)
 
 
 ### <a name="anchor_time">TIME</a>
