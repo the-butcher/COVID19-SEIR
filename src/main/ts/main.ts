@@ -21,7 +21,8 @@ BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
         ModelActions.getInstance();
 
         setTimeout(() => {
-            ModelActions.getInstance().toggleMode('STRAIN');
+            ModelActions.getInstance().toggleModelMode('STRAIN');
+            ModelActions.getInstance().toggleChartMode('INCIDENCE');
             requestAnimationFrame(() => {
                 ChartAgeGroup.getInstance();
                 ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();

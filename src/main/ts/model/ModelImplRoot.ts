@@ -516,9 +516,9 @@ export class ModelImplRoot implements IModelSeir {
             const grpVaccDif = (grpVaccMax - grpVaccAct);
             const grpVaccMlt = grpVaccDif / grpVaccMax;
 
-            if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 1) {
-                console.log('grpVaccDif', i, TimeUtil.formatCategoryDate(tT), grpVaccDif);
-            }
+            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 1) {
+            //     console.log('grpVaccDif', i, TimeUtil.formatCategoryDate(tT), grpVaccDif);
+            // }
 
             /**
              * to model normalized scope

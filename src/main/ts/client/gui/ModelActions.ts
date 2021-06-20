@@ -2,13 +2,20 @@ import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants'
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { StorageUtil } from '../storage/StorageUtil';
+import { CHART_MODE______KEY } from './ControlsConstants';
 import { IconAction } from './IconAction';
+import { IconChartMode } from './IconChartMode';
 import { IconModelMode } from './IconModelMode';
 import { SliderModification } from './SliderModification';
 
 export interface IIconActionParams {
     container: string;
     actionFunction: () => void;
+}
+
+export interface IChartModeParams {
+    label: string;
+    chartMode: CHART_MODE______KEY;
 }
 
 /**
@@ -29,12 +36,14 @@ export class ModelActions {
 
     private key: MODIFICATION____KEY;
     private readonly modelModeIcons: IconModelMode[];
+    private readonly chartModeIcons: IconChartMode[];
 
     private readonly actionIcons: IconAction[];
 
     constructor() {
 
         this.modelModeIcons = [];
+        this.chartModeIcons = [];
         this.actionIcons = [];
 
         Object.keys(ModelConstants.MODIFICATION_PARAMS).forEach((key: MODIFICATION____KEY) => {
@@ -78,13 +87,37 @@ export class ModelActions {
             }
         }));
 
+        this.chartModeIcons.push(new IconChartMode({
+            label: 'INCIDENCE',
+            chartMode: 'INCIDENCE'
+        }));
+        this.chartModeIcons.push(new IconChartMode({
+            label: 'SUSCEPTIBLE',
+            chartMode: 'SEIR'
+        }));
+        this.chartModeIcons.push(new IconChartMode({
+            label: 'EXPOSED',
+            chartMode: 'EI'
+        }));
+        this.chartModeIcons.push(new IconChartMode({
+            label: 'VACCINATED',
+            chartMode: 'VACC'
+        }));
+
+    }
+
+    toggleChartMode(chartMode: CHART_MODE______KEY): void {
+        this.chartModeIcons.forEach(chartModeIcon => {
+            chartModeIcon.setActive(chartModeIcon.getChartMode() === chartMode);
+        });
+        ChartAgeGroup.getInstance().setChartMode(chartMode);
     }
 
     getKey(): MODIFICATION____KEY {
         return this.key;
     }
 
-    toggleMode(key: MODIFICATION____KEY): void {
+    toggleModelMode(key: MODIFICATION____KEY): void {
         this.key = key;
         this.modelModeIcons.forEach(modelModeIcon => {
             modelModeIcon.toggle(modelModeIcon.getKey() === key);

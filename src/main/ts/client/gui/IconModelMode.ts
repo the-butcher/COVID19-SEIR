@@ -18,7 +18,7 @@ export class IconModelMode {
         this.svgContainer = document.createElement('div');
         this.svgContainer.classList.add('model-mode');
         this.svgContainer.addEventListener('pointerup', e => {
-            ModelActions.getInstance().toggleMode(this.key);
+            ModelActions.getInstance().toggleModelMode(this.key);
         });
 
         const svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");

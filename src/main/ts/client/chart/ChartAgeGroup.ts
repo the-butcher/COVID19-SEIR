@@ -124,7 +124,6 @@ export class ChartAgeGroup {
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
-        this.chart.zoomOutButton.disabled = true;
 
         ChartUtil.getInstance().configureChartPadding(this.chart);
         ChartUtil.getInstance().configureSeparators(this.chart);
@@ -340,7 +339,10 @@ export class ChartAgeGroup {
         });
         this.chart.cursor.lineX.disabled = false;
         this.chart.cursor.lineY.disabled = true;
+
         this.chart.cursor.behavior = 'none';
+        this.chart.zoomOutButton.disabled = true;
+        this.chart.mouseWheelBehavior = 'none';
 
         /**
          * heat axis
@@ -468,19 +470,7 @@ export class ChartAgeGroup {
             };
         });
 
-        document.getElementById('chartModeIncidenceDiv').addEventListener('click', () => {
-            this.setChartMode('INCIDENCE');
-        });
-        document.getElementById('chartModeSeirDiv').addEventListener('click', () => {
-            this.setChartMode('SEIR');
-        });
-        document.getElementById('chartModeEiDiv').addEventListener('click', () => {
-            this.setChartMode('EI');
-        });
-        document.getElementById('chartModeVaccDiv').addEventListener('click', () => {
-            this.setChartMode('VACC');
-        });
-        this.setChartMode('INCIDENCE');
+        // this.setChartMode('INCIDENCE');
 
     }
 

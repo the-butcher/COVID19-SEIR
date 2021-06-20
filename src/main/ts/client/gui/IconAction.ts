@@ -1,4 +1,3 @@
-import { ControlsConstants } from './ControlsConstants';
 import { IIconActionParams } from './ModelActions';
 
 /**

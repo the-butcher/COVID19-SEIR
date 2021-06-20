@@ -72,17 +72,17 @@ input {
 }
 
 .chart-mode {
-  padding: 6px 20px 0px 10px;
+  padding: 5px;
   font-size: 12px;
   cursor: pointer;
-  filter: drop-shadow(2px 2px 3px var(--color-dropshadow));
+  filter: unset;
 }
-.chart-mode:hover {
+/* .chart-mode:hover {
   filter: drop-shadow(4px 4px 3px var(--color-dropshadow));
 }
 .chart-mode:active {
   filter: drop-shadow(1px 1px 3px var(--color-dropshadow));
-}
+} */
 
 .content-action-container {
   width: 28px;

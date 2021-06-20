@@ -64,129 +64,128 @@
                 </div>
             </div>
         </div>
-        <div id="layoutDivCenter" style="flex-grow: 100; display: flex; flex-direction: column; padding: 10px 5px 10px 0px; z-index: 100;">
+        <div id="layoutDivCenter" style="flex-grow: 100; display: flex; flex-direction: column; padding: 10px 0px 10px 0px; z-index: 100;">
             <div id="sliderDivTime" class="slider-container panel-container" style="padding: 0px 26px 0px 81.3px;">
 
             </div>
             <div class="sliderspace"></div>
-            <div id="chartDivAgeGroupPlot" style="flex-grow: 100; background-color: var(--color-panel-bg); filter: drop-shadow(2px 2px 3px var(--color-dropshadow))">
-                <!-- seir chart -->
+            <div style="flex-grow: 100; background-color: var(--color-panel-bg); filter: drop-shadow(2px 2px 3px var(--color-dropshadow))">
+                <!-- not sure if true, but unset of drop-shadow in inner container appears to improve performance -->
+                <div id="chartDivAgeGroupPlot" style="width: 100%; height: 100%; background-color: unset; filter: unset">
+                    <!-- seir chart -->
+                </div>
             </div>
         </div>
-        <div id="layoutDivRight" style="display: flex; flex-direction: column; padding: 10px 10px 10px 5px; overflow-y: scroll; overflow-x: hidden">
+        <div id="layoutDivRight" style="display: flex; flex-direction: column; padding: 10px 10px 10px 0px; overflow-y: scroll; overflow-x: hidden">
 
-            <div id="modificationDiv" style="width: 290px; display: flex; flex-direction: column; padding: 5px 0px" class="panel-container">
+            <div style="padding: 0px 0px 0px 10px">
+                <div id="modificationDiv" style="width: 290px; display: flex; flex-direction: column; padding: 5px 0px" class="panel-container">
 
-                <div class="slidertitle1" style="padding: 0px 10px 0px 10px;">
-                    <div style="display: flex; flex-direction: row; width: 100%; height: 50px">
+                    <div class="slidertitle1" style="padding: 0px 10px 0px 10px;">
+                        <div style="display: flex; flex-direction: row; width: 100%; height: 50px">
 
-                        <div style="width: 28px; height: 28px">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 28x; height: 28px; fill: #555555" viewbox="-15 -15 30 30">
-                                <path id="modificationBgPath" style="transition: transform 250ms ease-in-out" d="M 0 -12.4 C -6.85 -12.4 -12.4 -6.85 -12.4 0 S -6.85 12.4 0 12.4 S 12.4 6.85 12.4 0 S 6.85 -12.4 0 -12.4 Z" />
-                                <path id="modificationFgPath" style="transition: transform 250ms ease-in-out; fill: black" d="" />
-                            </svg>
-                        </div>
-                        <div style="flex-grow: 100; display: flex; flex-direction: column; width: 100%">
-                            <div id="modificationTitleDiv" style="padding-top: 5px;">
-                                <input id="modificationTitleInput" type="text" style="padding-top: 3px; padding-left: 3px; font-size: 16px; width: 100%; display: none; height: 18px">
-                                <span id="modificationTitleSpan" class="modifiable-text" contenteditable="true" style="padding-left: 4px">modifier</span>
+                            <div style="width: 28px; height: 28px">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 28x; height: 28px; fill: #555555" viewbox="-15 -15 30 30">
+                                    <path id="modificationBgPath" style="transition: transform 250ms ease-in-out" d="M 0 -12.4 C -6.85 -12.4 -12.4 -6.85 -12.4 0 S -6.85 12.4 0 12.4 S 12.4 6.85 12.4 0 S 6.85 -12.4 0 -12.4 Z" />
+                                    <path id="modificationFgPath" style="transition: transform 250ms ease-in-out; fill: black" d="" />
+                                </svg>
                             </div>
-                            <div id="modificationInstantDiv" style="padding: 0px 10px 0px 4px; font-size: 12px">
+                            <div style="flex-grow: 100; display: flex; flex-direction: column; width: 100%">
+                                <div id="modificationTitleDiv" style="padding-top: 5px;">
+                                    <input id="modificationTitleInput" type="text" style="padding-top: 3px; padding-left: 3px; font-size: 16px; width: 100%; display: none; height: 18px">
+                                    <span id="modificationTitleSpan" class="modifiable-text" contenteditable="true" style="padding-left: 4px">modifier</span>
+                                </div>
+                                <div id="modificationInstantDiv" style="padding: 0px 10px 0px 4px; font-size: 12px">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="modificationTimeDiv" style="display: flex; flex-direction: column; display: block">
+                        <div id="chartTimeDiv" style="width: inherit; height: 350px; ">
+
+                        </div>
+                    </div>
+
+                    <div id="modificationStrainDiv" style="display: block; flex-direction: column; height: 190px; padding: 10px 0px 0px 0px">
+
+                        <div style="display: flex; flex-direction: column; z-index: 100;">
+                            <div id="sliderReproductionDiv" class="sliderdiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
+
+                            </div>
+                        </div>
+                        <div style="min-height: 60px; z-index: 10;">
+                            <!-- TODO clarify dimensions, lots of magic numbers currently -->
+                            <div id="weibullDiv" class="sliderdiv" style="position: absolute; left: 10px; width: calc(100% - 30px); bottom: 86px; min-height: 120px">
+                                <canvas id="weibullCanvas" style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
+                            </div>
+                            <div id="serialIntervalDiv" style="background-color: unset; position: absolute; left: 10px; width: calc(100% - 30px); bottom: 74px; height: 60px; min-height: 60px">
+
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <div id="sliderIncidenceDiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
 
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="modificationTimeDiv" style="display: flex; flex-direction: column; display: block">
-                    <div id="chartTimeDiv" style="width: inherit; height: 350px; ">
+                    <div id="modificationContactDiv" style="width: inherit; display: block; flex-direction: column">
+                        <div id="chartContactDiv" style="width: inherit; height: 345px; ">
 
-                    </div>
-                </div>
-
-                <div id="modificationStrainDiv" style="display: block; flex-direction: column; height: 190px; padding: 10px 0px 0px 0px">
-
-                    <div style="display: flex; flex-direction: column; z-index: 100;">
-                        <div id="sliderReproductionDiv" class="sliderdiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
+                        </div>
+                        <div id="slidersCategoryDiv">
 
                         </div>
                     </div>
-                    <div style="min-height: 60px; z-index: 10;">
-                        <!-- TODO clarify dimensions, lots of magic numbers currently -->
-                        <div id="weibullDiv" class="sliderdiv" style="position: absolute; left: 10px; width: calc(100% - 30px); bottom: 86px; min-height: 120px">
-                            <canvas id="weibullCanvas" style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
-                        </div>
-                        <div id="serialIntervalDiv" style="background-color: unset; position: absolute; left: 10px; width: calc(100% - 30px); bottom: 74px; height: 60px; min-height: 60px">
+
+                    <div id="modificationTestingDiv" style="display: block; flex-direction: column">
+                        <div id="chartTestingDiv" style="width: 100%px; height: 200px; ">
 
                         </div>
-                    </div>
-                    <div style="display: flex; flex-direction: column;">
-                        <div id="sliderIncidenceDiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
+                        <div id="slidersTestingDiv">
 
                         </div>
                     </div>
+
+                    <div id="modificationVaccinationDiv" style="display: block; flex-direction: column">
+                        <div id="slidersVaccinationDiv">
+
+                        </div>
+                    </div>
+
+                    <div id="modificationSeasonalityDiv" style="display: block; flex-direction: column">
+                        <div id="slidersSeasonalityDiv">
+
+                        </div>
+                    </div>
+
+                    <div id="modificationSettingsDiv" style="display: block; flex-direction: column">
+                        <div id="slidersSettingsDiv">
+
+                        </div>
+                        <!-- <input type="date"/> -->
+                    </div>
+
                 </div>
-
-                <div id="modificationContactDiv" style="width: inherit; display: block; flex-direction: column">
-                    <div id="chartContactDiv" style="width: inherit; height: 345px; ">
-
-                    </div>
-                    <div id="slidersCategoryDiv">
-
-                    </div>
-                </div>
-
-                <div id="modificationTestingDiv" style="display: block; flex-direction: column">
-                    <div id="chartTestingDiv" style="width: 100%px; height: 200px; ">
-
-                    </div>
-                    <div id="slidersTestingDiv">
-
-                    </div>
-                </div>
-
-                <div id="modificationVaccinationDiv" style="display: block; flex-direction: column">
-                    <div id="slidersVaccinationDiv">
-
-                    </div>
-                </div>
-
-                <div id="modificationSeasonalityDiv" style="display: block; flex-direction: column">
-                    <div id="slidersSeasonalityDiv">
-
-                    </div>
-                </div>
-
-                <div id="modificationSettingsDiv" style="display: block; flex-direction: column">
-                    <div id="slidersSettingsDiv">
-
-                    </div>
-                    <!-- <input type="date"/> -->
-                </div>
-
             </div>
-            <div class="sliderspace"></div>
-            <div id="legendDiv">
-                <div id="chartModeIncidenceDiv" class="chart-mode">
-                    INCIDENCE<br>
-                    <!-- <img src="assets/chartmode_i.png"> -->
+            <div style="min-height: 10px"></div>
+            <div id="legendDiv" class="panel-container" style="z-index: 200">
+                <!-- <div id="chartModeIncidenceDiv" class="chart-mode">
+                    INCIDENCE
                 </div>
                 <div id="chartModeSeirDiv" class="chart-mode">
-                    SUSCEPTIBLE<br>
-                    <!-- <img src="assets/chartmode_s.png"> -->
+                    SUSCEPTIBLE
                 </div>
                 <div id="chartModeEiDiv" class="chart-mode">
-                    EXPOSED<br>
-                    <!-- <img src="assets/chartmode_e.png"> -->
+                    EXPOSED
                 </div>
                 <div id="chartModeVaccDiv" class="chart-mode">
-                    VACCINATED<br>
-                    <!-- <img src="assets/chartmode_v.png"> -->
-                </div>
+                    VACCINATED
+                </div> -->
             </div>
-            <div style="visibility: hidden">
-                <input type="file" id="jsonImportInput" accept="application/json"/>
-            </div>
+
         </div>
 
     </div>

@@ -55,7 +55,7 @@ export class ModelImplVaccination implements IModelSeir {
             this.groupPriority = 10000; // TODO magic number, don't know if another settings would be fine with that number too
         }
 
-        console.log('vaccR',  this.ageGroupIndex, this.groupPriority);
+        // console.log('vaccR',  this.ageGroupIndex, this.groupPriority);
 
         this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, vacc1 - vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
         this.compartmentImmunizedV = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
