@@ -1,3 +1,5 @@
+import { TimeUtil } from './../../util/TimeUtil';
+import { ModelInstants } from './../../model/ModelInstants';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
@@ -92,7 +94,7 @@ export class Modifications {
                     typedModifications[i].setInstants(typedModifications[i].getInstantA(), typedModifications[i+1].getInstantA());
                 }
                 const lastModification = typedModifications[typedModifications.length - 1];
-                lastModification.setInstants(lastModification.getInstantA(), Number.MAX_SAFE_INTEGER);
+                lastModification.setInstants(lastModification.getInstantA(), ModelInstants.getInstance().getMaxInstant());
             }
         });
     }

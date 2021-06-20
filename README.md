@@ -41,6 +41,7 @@ next:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 done:
+* ~~some modification-min-charts don't have values for last item~~
 * ~~in the current vaccination model there is no share in 5-14~~
 * ~~when the vaccination rate hits threshold there may be an edge~~
 * ~~change chart range when a file is imported~~

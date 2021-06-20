@@ -1,3 +1,4 @@
+import { ModelInstants } from './../../model/ModelInstants';
 import { ModelConstants, MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
@@ -21,7 +22,7 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     appliesToInstant(instant: number): boolean {
-        return instant >= this.modificationValues.instant && (this.instantB === ModelConstants.MODEL_MAX_______INSTANT || instant < this.instantB);
+        return instant >= this.modificationValues.instant && (this.instantB === ModelInstants.getInstance().getMaxInstant() || instant < this.instantB);
     }
 
     getId(): string {
