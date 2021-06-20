@@ -1,6 +1,16 @@
 # COVID19-SEIR
-## COVID-19 SEIR Model, Age-Group granularity. Contact-Matrix based. Vaccinations, Testing, Seasonality.
+# Age-Group granularity model. Contact-Matrix based, Vaccinations, Testing, Seasonality.
+* ## Modifications
+  * ## <a href="#anchor_test">TEST</a>
+
+
+
+
+
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/screenshot01.png?raw=true)
+
+
+
 This app currently is in a alpha state where i review some features for plausibility and validity against historic data
 
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
@@ -39,6 +49,8 @@ next:
   * find and eliminate most prominent performance bottlenecks
   * will caching compartments on compartmentFilter improve performance?
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
+
+<a name="anchor_test" href="">TIME </a>
 
 done:
 * ~~some modification-min-charts don't have values for last item~~
