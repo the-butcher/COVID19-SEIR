@@ -6,94 +6,114 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@FleischerHannes">
     <meta name="twitter:creator" content="@FleischerHannes">
-    <meta name="twitter:title" content="COVID-19 Timeline Model">
-    <meta name="twitter:image" content="https://the-butchers.at/covid-19-timeline/assets/model_128.png">
-    <meta name="twitter:description"
-        content="A simple SEIR model simulating multi strain spread meant to create a broader understanding of disease dynamics.">
+    <meta name="twitter:title" content="COVID19-SEIR">
+    <meta name="twitter:image" content="https://the-butchers.at/COVID19-SEIR/assets/icon_192.png">
+    <meta name="twitter:description" content="Age group specific SEIR model. Contact-Matrix based, Vaccinations, Testing, Seasonality.">
 
     <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
 
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="Description"
-        content="A simple SEIR model simulating multi strain spread meant to create a broader understanding of disease dynamics. Made privately by Hannes Fleischer of VertiGIS GmbH located in Austria.">
+    <meta name="Description"  content="Age group specific SEIR model. Contact-Matrix based, Vaccinations, Testing, Seasonality. Made privately by Hannes Fleischer of VertiGIS GmbH located in Austria.">
     <meta name="theme-color" content="#2d3232" />
 
-    <title>COVID-19 Timeline Model</title>
+    <title>COVID19-SEIR</title>
 
-    <link rel="apple-touch-icon" href="assets/model_192.png?cb=COVID_19_TIMELINE_VERSION">
-    <!-- <link rel="manifest" href="manifest.webmanifest?cb=COVID_19_TIMELINE_VERSION"> -->
-    <link rel="shortcut icon" href="assets/favicon.png?cb=COVID_19_TIMELINE_VERSION">
+    <!-- <link rel="apple-touch-icon" href="assets/icon_192.png?cb=COVID_19_TIMELINE_VERSION">
+    <link rel="manifest" href="manifest.webmanifest?cb=COVID_19_TIMELINE_VERSION">
+    <link rel="shortcut icon" href="assets/favicon.png?cb=COVID_19_TIMELINE_VERSION"> -->
 
 </head>
 
 <body>
 
-    <div id="layoutDivRoot" class="size-full-xy" style="position: absolute; top:0px; bottom: 0px; display: flex; flex-direction: row; overflow: hidden; align-items: stretch">
-        <div id="layoutDivLeft" style="display: flex; flex-direction: column; padding: 15px 0px 12px 12px; max-width: 40px; min-width: 40px">
+    <div id="layoutDivRoot" class="size-full-xy"
+        style="position: absolute; top:0px; bottom: 0px; display: flex; flex-direction: row; overflow: hidden; align-items: stretch">
+        <div id="layoutDivLeft"
+            style="display: flex; flex-direction: column; padding: 15px 0px 12px 12px; max-width: 40px; min-width: 40px">
             <div id="modelModeDiv" style="flex-grow: 100">
 
             </div>
             <div id="modelActionDiv" style="display: flex; flex-direction: column">
                 <div id="actionDivExportPng" class="content-action-container" title="export png">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor" viewbox="-15 -15 40 30">
-                        <path style="transition: transform 250ms ease-in-out" d="M 9.6 -6.7 V -6.4 H 3.2 V -12.8 H 3.5 A 1.2 1.2 90 0 1 4.35 -12.45 L 9.25 -7.55 A 1.2 1.2 90 0 1 9.6 -6.7 Z M 2.8 -4.8 C 2.14 -4.8 1.6 -5.34 1.6 -6 V -12.8 H -8.4 C -9.06 -12.8 -9.6 -12.26 -9.6 -11.6 V 11.6 C -9.6 12.26 -9.06 12.8 -8.4 12.8 H 8.4 C 9.06 12.8 9.6 12.26 9.6 11.6 V -4.8 H 2.8 Z M -3.97 -4 C -2.65 -4 -1.57 -2.93 -1.57 -1.6 S -2.65 0.8 -3.97 0.8 S -6.37 -0.27 -6.37 -1.6 S -5.3 -4 -3.97 -4 Z M 6.43 8 H -6.37 L -6.35 5.58 L -4.37 3.6 C -4.14 3.37 -3.78 3.39 -3.55 3.62 L -1.57 5.6 L 3.6 0.42 C 3.84 0.19 4.22 0.19 4.45 0.42 L 6.43 2.4 V 8 Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor"
+                        viewbox="-15 -15 40 30">
+                        <path style="transition: transform 250ms ease-in-out"
+                            d="M 9.6 -6.7 V -6.4 H 3.2 V -12.8 H 3.5 A 1.2 1.2 90 0 1 4.35 -12.45 L 9.25 -7.55 A 1.2 1.2 90 0 1 9.6 -6.7 Z M 2.8 -4.8 C 2.14 -4.8 1.6 -5.34 1.6 -6 V -12.8 H -8.4 C -9.06 -12.8 -9.6 -12.26 -9.6 -11.6 V 11.6 C -9.6 12.26 -9.06 12.8 -8.4 12.8 H 8.4 C 9.06 12.8 9.6 12.26 9.6 11.6 V -4.8 H 2.8 Z M -3.97 -4 C -2.65 -4 -1.57 -2.93 -1.57 -1.6 S -2.65 0.8 -3.97 0.8 S -6.37 -0.27 -6.37 -1.6 S -5.3 -4 -3.97 -4 Z M 6.43 8 H -6.37 L -6.35 5.58 L -4.37 3.6 C -4.14 3.37 -3.78 3.39 -3.55 3.62 L -1.57 5.6 L 3.6 0.42 C 3.84 0.19 4.22 0.19 4.45 0.42 L 6.43 2.4 V 8 Z" />
                     </svg>
                 </div>
                 <div id="actionDivExportCsv" class="content-action-container" title="export csv">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor" viewbox="-15 -15 40 30">
-                        <path style="transition: transform 250ms ease-in-out" d="M 1.6 -6 V -12.8 H -8.4 C -9.07 -12.8 -9.6 -12.27 -9.6 -11.6 V 11.6 C -9.6 12.27 -9.07 12.8 -8.4 12.8 H 8.4 C 9.06 12.8 9.6 12.27 9.6 11.6 V -4.8 H 2.8 C 2.14 -4.8 1.6 -5.34 1.6 -6 Z M 4.8 5.8 C 4.8 6.13 4.53 6.4 4.2 6.4 H -4.2 C -4.53 6.4 -4.8 6.13 -4.8 5.8 V 5.4 C -4.8 5.07 -4.53 4.8 -4.2 4.8 H 4.2 C 4.53 4.8 4.8 5.07 4.8 5.4 V 5.8 Z M 4.8 2.6 C 4.8 2.93 4.53 3.2 4.2 3.2 H -4.2 C -4.53 3.2 -4.8 2.93 -4.8 2.6 V 2.2 C -4.8 1.87 -4.53 1.6 -4.2 1.6 H 4.2 C 4.53 1.6 4.8 1.87 4.8 2.2 V 2.6 Z M 4.8 -1 V -0.6 C 4.8 -0.27 4.53 0 4.2 0 H -4.2 C -4.53 0 -4.8 -0.27 -4.8 -0.6 V -1 C -4.8 -1.33 -4.53 -1.6 -4.2 -1.6 H 4.2 C 4.53 -1.6 4.8 -1.33 4.8 -1 Z M 9.6 -6.71 V -6.4 H 3.2 V -12.8 H 3.51 C 3.83 -12.8 4.13 -12.68 4.36 -12.45 L 9.25 -7.55 C 9.47 -7.33 9.6 -7.02 9.6 -6.71 Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor"
+                        viewbox="-15 -15 40 30">
+                        <path style="transition: transform 250ms ease-in-out"
+                            d="M 1.6 -6 V -12.8 H -8.4 C -9.07 -12.8 -9.6 -12.27 -9.6 -11.6 V 11.6 C -9.6 12.27 -9.07 12.8 -8.4 12.8 H 8.4 C 9.06 12.8 9.6 12.27 9.6 11.6 V -4.8 H 2.8 C 2.14 -4.8 1.6 -5.34 1.6 -6 Z M 4.8 5.8 C 4.8 6.13 4.53 6.4 4.2 6.4 H -4.2 C -4.53 6.4 -4.8 6.13 -4.8 5.8 V 5.4 C -4.8 5.07 -4.53 4.8 -4.2 4.8 H 4.2 C 4.53 4.8 4.8 5.07 4.8 5.4 V 5.8 Z M 4.8 2.6 C 4.8 2.93 4.53 3.2 4.2 3.2 H -4.2 C -4.53 3.2 -4.8 2.93 -4.8 2.6 V 2.2 C -4.8 1.87 -4.53 1.6 -4.2 1.6 H 4.2 C 4.53 1.6 4.8 1.87 4.8 2.2 V 2.6 Z M 4.8 -1 V -0.6 C 4.8 -0.27 4.53 0 4.2 0 H -4.2 C -4.53 0 -4.8 -0.27 -4.8 -0.6 V -1 C -4.8 -1.33 -4.53 -1.6 -4.2 -1.6 H 4.2 C 4.53 -1.6 4.8 -1.33 4.8 -1 Z M 9.6 -6.71 V -6.4 H 3.2 V -12.8 H 3.51 C 3.83 -12.8 4.13 -12.68 4.36 -12.45 L 9.25 -7.55 C 9.47 -7.33 9.6 -7.02 9.6 -6.71 Z" />
                     </svg>
                 </div>
                 <div style="height: 20px"></div>
                 <div id="actionDivImportDiv" class="content-action-container" title="import configuration">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor" viewbox="-15 -15 40 30">
-                        <path style="transition: transform 250ms ease-in-out" d="M -15.2 1.6 c -0.44 0 -0.8 0.36 -0.8 0.8 v 1.6 c 0 0.44 0.36 0.8 0.8 0.8 h 5.6 v -3.2 z m 24.45 -9.15 L 4.355 -12.45 c -0.225 -0.225 -0.53 -0.35 -0.85 -0.35 H 3.2 v 6.4 h 6.4 v -0.305 c 0 -0.315 -0.125 -0.62 -0.35 -0.845 z m -7.65 1.55 V -12.8 H -8.4 c -0.665 0 -1.2 0.535 -1.2 1.2 v 13.2 h 6.4 v -3.26 c 0 -0.715 0.865 -1.07 1.37 -0.565 L 2.95 2.6 c 0.33 0.335 0.33 0.87 0 1.2 l -4.785 4.82 c -0.505 0.505 -1.37 0.15 -1.37 -0.565 V 4.8 H -9.6 v 6.8 c 0 0.665 0.535 1.2 1.2 1.2 h 16.8 c 0.665 0 1.2 -0.535 1.2 -1.2 V -4.8 H 2.8 c -0.66 0 -1.2 -0.54 -1.2 -1.2 z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor"
+                        viewbox="-15 -15 40 30">
+                        <path style="transition: transform 250ms ease-in-out"
+                            d="M -15.2 1.6 c -0.44 0 -0.8 0.36 -0.8 0.8 v 1.6 c 0 0.44 0.36 0.8 0.8 0.8 h 5.6 v -3.2 z m 24.45 -9.15 L 4.355 -12.45 c -0.225 -0.225 -0.53 -0.35 -0.85 -0.35 H 3.2 v 6.4 h 6.4 v -0.305 c 0 -0.315 -0.125 -0.62 -0.35 -0.845 z m -7.65 1.55 V -12.8 H -8.4 c -0.665 0 -1.2 0.535 -1.2 1.2 v 13.2 h 6.4 v -3.26 c 0 -0.715 0.865 -1.07 1.37 -0.565 L 2.95 2.6 c 0.33 0.335 0.33 0.87 0 1.2 l -4.785 4.82 c -0.505 0.505 -1.37 0.15 -1.37 -0.565 V 4.8 H -9.6 v 6.8 c 0 0.665 0.535 1.2 1.2 1.2 h 16.8 c 0.665 0 1.2 -0.535 1.2 -1.2 V -4.8 H 2.8 c -0.66 0 -1.2 -0.54 -1.2 -1.2 z" />
                     </svg>
                 </div>
                 <div id="actionDivSaveDiv" class="content-action-container" title="save to local storage">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 25x; height: 25px; fill: currentColor" viewbox="-15 -15 30 30">
-                        <path style="transition: transform 250ms ease-in-out" d="M 10.8833 -6.5785 l -4.3483 -4.3774 A 2.5049 2.4883 90 0 0 4.7755 -11.6897 H -9.1238 C -10.4982 -11.6897 -11.6122 -10.5682 -11.6122 -9.1846 v 18.3694 c 0 1.3834 1.114 2.5049 2.4883 2.5049 h 18.2477 c 1.3744 0 2.4883 -1.1215 2.4883 -2.5049 V -4.8073 a 2.5049 2.4883 90 0 0 -0.7289 -1.7712 z M 0 8.3497 c -1.8323 0 -3.3178 -1.4954 -3.3178 -3.34 c 0 -1.8445 1.4855 -3.34 3.3178 -3.34 s 3.3178 1.4954 3.3178 3.34 c 0 1.8445 -1.4855 3.34 -3.3178 3.34 z m 4.9766 -15.8916 V -2.2962 c 0 0.3457 -0.2788 0.6263 -0.6221 0.6263 H -7.6723 c -0.3436 0 -0.6221 -0.2806 -0.6221 -0.6263 V -7.7234 c 0 -0.3457 0.2788 -0.6263 0.6221 -0.6263 h 11.8464 c 0.1651 0 0.3232 0.066 0.4398 0.1835 l 0.1805 0.1816 A 0.6258 0.622 90 0 1 4.9766 -7.5419 z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 25x; height: 25px; fill: currentColor"
+                        viewbox="-15 -15 30 30">
+                        <path style="transition: transform 250ms ease-in-out"
+                            d="M 10.8833 -6.5785 l -4.3483 -4.3774 A 2.5049 2.4883 90 0 0 4.7755 -11.6897 H -9.1238 C -10.4982 -11.6897 -11.6122 -10.5682 -11.6122 -9.1846 v 18.3694 c 0 1.3834 1.114 2.5049 2.4883 2.5049 h 18.2477 c 1.3744 0 2.4883 -1.1215 2.4883 -2.5049 V -4.8073 a 2.5049 2.4883 90 0 0 -0.7289 -1.7712 z M 0 8.3497 c -1.8323 0 -3.3178 -1.4954 -3.3178 -3.34 c 0 -1.8445 1.4855 -3.34 3.3178 -3.34 s 3.3178 1.4954 3.3178 3.34 c 0 1.8445 -1.4855 3.34 -3.3178 3.34 z m 4.9766 -15.8916 V -2.2962 c 0 0.3457 -0.2788 0.6263 -0.6221 0.6263 H -7.6723 c -0.3436 0 -0.6221 -0.2806 -0.6221 -0.6263 V -7.7234 c 0 -0.3457 0.2788 -0.6263 0.6221 -0.6263 h 11.8464 c 0.1651 0 0.3232 0.066 0.4398 0.1835 l 0.1805 0.1816 A 0.6258 0.622 90 0 1 4.9766 -7.5419 z" />
                     </svg>
                 </div>
                 <div id="actionDivExportDiv" class="content-action-container" title="export configuration">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor" viewbox="-15 -15 40 30">
-                        <path style="transition: transform 250ms ease-in-out" d="M 9.6 -6.705 c 0 -0.315 -0.125 -0.62 -0.35 -0.845 L 4.355 -12.45 c -0.225 -0.225 -0.53 -0.35 -0.85 -0.35 H 3.2 v 6.4 h 6.4 z M 18.95 2.6 l -4.785 -4.82 c -0.505 -0.505 -1.37 -0.15 -1.37 0.565 V 1.6 h -3.2 v 3.2 h 3.2 v 3.26 c 0 0.715 0.865 1.07 1.37 0.565 L 18.95 3.8 c 0.33 -0.33 0.33 -0.87 0 -1.2 z m -18.95 1.4 v -1.6 c 0 -0.44 0.36 -0.8 0.8 -0.8 h 8.8 V -4.8 H 2.8 c -0.66 0 -1.2 -0.54 -1.2 -1.2 V -12.8 H -8.4 C -9.065 -12.8 -9.6 -12.265 -9.6 -11.6 v 23.2 c 0 0.665 0.535 1.2 1.2 1.2 h 16.8 c 0.665 0 1.2 -0.535 1.2 -1.2 V 4.8 H 0.8 c -0.44 0 -0.8 -0.36 -0.8 -0.8 z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 30x; height: 25px; fill: currentColor"
+                        viewbox="-15 -15 40 30">
+                        <path style="transition: transform 250ms ease-in-out"
+                            d="M 9.6 -6.705 c 0 -0.315 -0.125 -0.62 -0.35 -0.845 L 4.355 -12.45 c -0.225 -0.225 -0.53 -0.35 -0.85 -0.35 H 3.2 v 6.4 h 6.4 z M 18.95 2.6 l -4.785 -4.82 c -0.505 -0.505 -1.37 -0.15 -1.37 0.565 V 1.6 h -3.2 v 3.2 h 3.2 v 3.26 c 0 0.715 0.865 1.07 1.37 0.565 L 18.95 3.8 c 0.33 -0.33 0.33 -0.87 0 -1.2 z m -18.95 1.4 v -1.6 c 0 -0.44 0.36 -0.8 0.8 -0.8 h 8.8 V -4.8 H 2.8 c -0.66 0 -1.2 -0.54 -1.2 -1.2 V -12.8 H -8.4 C -9.065 -12.8 -9.6 -12.265 -9.6 -11.6 v 23.2 c 0 0.665 0.535 1.2 1.2 1.2 h 16.8 c 0.665 0 1.2 -0.535 1.2 -1.2 V 4.8 H 0.8 c -0.44 0 -0.8 -0.36 -0.8 -0.8 z" />
                     </svg>
                 </div>
             </div>
         </div>
-        <div id="layoutDivCenter" style="flex-grow: 100; display: flex; flex-direction: column; padding: 10px 0px 10px 0px; z-index: 100;">
+        <div id="layoutDivCenter"
+            style="flex-grow: 100; display: flex; flex-direction: column; padding: 10px 0px 10px 0px; z-index: 100;">
             <div id="sliderDivTime" class="slider-container panel-container" style="padding: 0px 26px 0px 81.3px;">
 
             </div>
             <div class="sliderspace"></div>
-            <div style="flex-grow: 100; background-color: var(--color-panel-bg); filter: drop-shadow(2px 2px 3px var(--color-dropshadow))">
+            <div
+                style="flex-grow: 100; background-color: var(--color-panel-bg); filter: drop-shadow(2px 2px 3px var(--color-dropshadow))">
                 <!-- not sure if true, but unset of drop-shadow in inner container appears to improve performance -->
-                <div id="chartDivAgeGroupPlot" style="width: 100%; height: 100%; background-color: unset; filter: unset">
+                <div id="chartDivAgeGroupPlot"
+                    style="width: 100%; height: 100%; background-color: unset; filter: unset">
                     <!-- seir chart -->
                 </div>
             </div>
         </div>
-        <div id="layoutDivRight" style="display: flex; flex-direction: column; padding: 10px 10px 10px 0px; overflow-y: scroll; overflow-x: hidden">
+        <div id="layoutDivRight"
+            style="display: flex; flex-direction: column; padding: 10px 10px 10px 0px; overflow-y: scroll; overflow-x: hidden">
 
             <div style="padding: 0px 0px 0px 10px">
-                <div id="modificationDiv" style="width: 290px; display: flex; flex-direction: column; padding: 5px 0px" class="panel-container">
+                <div id="modificationDiv" style="width: 290px; display: flex; flex-direction: column; padding: 5px 0px"
+                    class="panel-container">
 
                     <div class="slidertitle1" style="padding: 0px 10px 0px 10px;">
                         <div style="display: flex; flex-direction: row; width: 100%; height: 50px">
 
                             <div style="width: 28px; height: 28px">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 28x; height: 28px; fill: #555555" viewbox="-15 -15 30 30">
-                                    <path id="modificationBgPath" style="transition: transform 250ms ease-in-out" d="M 0 -12.4 C -6.85 -12.4 -12.4 -6.85 -12.4 0 S -6.85 12.4 0 12.4 S 12.4 6.85 12.4 0 S 6.85 -12.4 0 -12.4 Z" />
-                                    <path id="modificationFgPath" style="transition: transform 250ms ease-in-out; fill: black" d="" />
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 28x; height: 28px; fill: #555555"
+                                    viewbox="-15 -15 30 30">
+                                    <path id="modificationBgPath" style="transition: transform 250ms ease-in-out"
+                                        d="M 0 -12.4 C -6.85 -12.4 -12.4 -6.85 -12.4 0 S -6.85 12.4 0 12.4 S 12.4 6.85 12.4 0 S 6.85 -12.4 0 -12.4 Z" />
+                                    <path id="modificationFgPath"
+                                        style="transition: transform 250ms ease-in-out; fill: black" d="" />
                                 </svg>
                             </div>
                             <div style="flex-grow: 100; display: flex; flex-direction: column; width: 100%">
                                 <div id="modificationTitleDiv" style="padding-top: 5px;">
-                                    <input id="modificationTitleInput" type="text" style="padding-top: 3px; padding-left: 3px; font-size: 16px; width: 100%; display: none; height: 18px">
-                                    <span id="modificationTitleSpan" class="modifiable-text" contenteditable="true" style="padding-left: 4px">modifier</span>
+                                    <input id="modificationTitleInput" type="text"
+                                        style="padding-top: 3px; padding-left: 3px; font-size: 16px; width: 100%; display: none; height: 18px">
+                                    <span id="modificationTitleSpan" class="modifiable-text" contenteditable="true"
+                                        style="padding-left: 4px">modifier</span>
                                 </div>
                                 <div id="modificationInstantDiv" style="padding: 0px 10px 0px 4px; font-size: 12px">
 
@@ -108,24 +128,30 @@
                         </div>
                     </div>
 
-                    <div id="modificationStrainDiv" style="display: block; flex-direction: column; height: 190px; padding: 10px 0px 0px 0px">
+                    <div id="modificationStrainDiv"
+                        style="display: block; flex-direction: column; height: 190px; padding: 10px 0px 0px 0px">
 
                         <div style="display: flex; flex-direction: column; z-index: 100;">
-                            <div id="sliderReproductionDiv" class="sliderdiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
+                            <div id="sliderReproductionDiv" class="sliderdiv"
+                                style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
 
                             </div>
                         </div>
                         <div style="min-height: 60px; z-index: 10;">
                             <!-- TODO clarify dimensions, lots of magic numbers currently -->
-                            <div id="weibullDiv" class="sliderdiv" style="position: absolute; left: 10px; width: calc(100% - 30px); bottom: 86px; min-height: 120px">
-                                <canvas id="weibullCanvas" style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
+                            <div id="weibullDiv" class="sliderdiv"
+                                style="position: absolute; left: 10px; width: calc(100% - 30px); bottom: 86px; min-height: 120px">
+                                <canvas id="weibullCanvas"
+                                    style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
                             </div>
-                            <div id="serialIntervalDiv" style="background-color: unset; position: absolute; left: 10px; width: calc(100% - 30px); bottom: 74px; height: 60px; min-height: 60px">
+                            <div id="serialIntervalDiv"
+                                style="background-color: unset; position: absolute; left: 10px; width: calc(100% - 30px); bottom: 74px; height: 60px; min-height: 60px">
 
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column;">
-                            <div id="sliderIncidenceDiv" style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
+                            <div id="sliderIncidenceDiv"
+                                style="background-color: unset; padding: 0px 20px 0px 10px; height: 60px; min-height: 60px">
 
                             </div>
                         </div>
@@ -172,36 +198,31 @@
             </div>
             <div class="sliderspace"></div>
             <div id="legendDiv" class="panel-container" style="z-index: 200">
-                <!-- <div id="chartModeIncidenceDiv" class="chart-mode">
-                    INCIDENCE
-                </div>
-                <div id="chartModeSeirDiv" class="chart-mode">
-                    SUSCEPTIBLE
-                </div>
-                <div id="chartModeEiDiv" class="chart-mode">
-                    EXPOSED
-                </div>
-                <div id="chartModeVaccDiv" class="chart-mode">
-                    VACCINATED
-                </div> -->
+                <!-- chart mode controls here -->
             </div>
             <div class="sliderspace"></div>
             <div style="padding-left: 16px">
-                <a href="https://github.com/the-butcher/COVID19-SEIR" target="_blank" style="color: var(--color-text); font-size: 12px;">
+                <a href="https://github.com/the-butcher/COVID19-SEIR" target="_blank" rel="noreferrer"
+                    style="color: var(--color-text); font-size: 12px;">
                     <div style="display: flex; flex-direction: row">
                         <div>
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 20x; height: 20px; fill: var(--color-text)" viewbox="-15 -15 30 30">
-                                <path style="transition: transform 250ms ease-in-out" d="M -4.105 7.07 C -4.105 7.17 -4.22 7.25 -4.365 7.25 C -4.53 7.265 -4.645 7.185 -4.645 7.07 C -4.645 6.97 -4.53 6.89 -4.385 6.89 C -4.235 6.875 -4.105 6.955 -4.105 7.07 Z M -5.66 6.845 C -5.695 6.945 -5.595 7.06 -5.445 7.09 C -5.315 7.14 -5.165 7.09 -5.135 6.99 S -5.2 6.775 -5.35 6.73 C -5.48 6.695 -5.625 6.745 -5.66 6.845 Z M -3.45 6.76 C -3.595 6.795 -3.695 6.89 -3.68 7.005 C -3.665 7.105 -3.535 7.17 -3.385 7.135 C -3.24 7.1 -3.14 7.005 -3.155 6.905 C -3.17 6.81 -3.305 6.745 -3.45 6.76 Z M -0.16 -12.4 C -7.095 -12.4 -12.4 -7.135 -12.4 -0.2 C -12.4 5.345 -8.91 10.09 -3.925 11.76 C -3.285 11.875 -3.06 11.48 -3.06 11.155 C -3.06 10.845 -3.075 9.135 -3.075 8.085 C -3.075 8.085 -6.575 8.835 -7.31 6.595 C -7.31 6.595 -7.88 5.14 -8.7 4.765 C -8.7 4.765 -9.845 3.98 -8.62 3.995 C -8.62 3.995 -7.375 4.095 -6.69 5.285 C -5.595 7.215 -3.76 6.66 -3.045 6.33 C -2.93 5.53 -2.605 4.975 -2.245 4.645 C -5.04 4.335 -7.86 3.93 -7.86 -0.88 C -7.86 -2.255 -7.48 -2.945 -6.68 -3.825 C -6.81 -4.15 -7.235 -5.49 -6.55 -7.22 C -5.505 -7.545 -3.1 -5.87 -3.1 -5.87 C -2.1 -6.15 -1.025 -6.295 0.04 -6.295 S 2.18 -6.15 3.18 -5.87 C 3.18 -5.87 5.585 -7.55 6.63 -7.22 C 7.315 -5.485 6.89 -4.15 6.76 -3.825 C 7.56 -2.94 8.05 -2.25 8.05 -0.88 C 8.05 3.945 5.105 4.33 2.31 4.645 C 2.77 5.04 3.16 5.79 3.16 6.965 C 3.16 8.65 3.145 10.735 3.145 11.145 C 3.145 11.47 3.375 11.865 4.01 11.75 C 9.01 10.09 12.4 5.345 12.4 -0.2 C 12.4 -7.135 6.775 -12.4 -0.16 -12.4 Z M -7.54 4.845 C -7.605 4.895 -7.59 5.01 -7.505 5.105 C -7.425 5.185 -7.31 5.22 -7.245 5.155 C -7.18 5.105 -7.195 4.99 -7.28 4.895 C -7.36 4.815 -7.475 4.78 -7.54 4.845 Z M -8.08 4.44 C -8.115 4.505 -8.065 4.585 -7.965 4.635 C -7.885 4.685 -7.785 4.67 -7.75 4.6 C -7.715 4.535 -7.765 4.455 -7.865 4.405 C -7.965 4.375 -8.045 4.39 -8.08 4.44 Z M -6.46 6.22 C -6.54 6.285 -6.51 6.435 -6.395 6.53 C -6.28 6.645 -6.135 6.66 -6.07 6.58 C -6.005 6.515 -6.035 6.365 -6.135 6.27 C -6.245 6.155 -6.395 6.14 -6.46 6.22 Z M -7.03 5.485 C -7.11 5.535 -7.11 5.665 -7.03 5.78 C -6.95 5.895 -6.815 5.945 -6.75 5.895 C -6.67 5.83 -6.67 5.7 -6.75 5.585 C -6.82 5.47 -6.95 5.42 -7.03 5.485 Z" />
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                style="width: 20x; height: 20px; fill: var(--color-text)" viewbox="-15 -15 30 30">
+                                <path style="transition: transform 250ms ease-in-out"
+                                    d="M -4.105 7.07 C -4.105 7.17 -4.22 7.25 -4.365 7.25 C -4.53 7.265 -4.645 7.185 -4.645 7.07 C -4.645 6.97 -4.53 6.89 -4.385 6.89 C -4.235 6.875 -4.105 6.955 -4.105 7.07 Z M -5.66 6.845 C -5.695 6.945 -5.595 7.06 -5.445 7.09 C -5.315 7.14 -5.165 7.09 -5.135 6.99 S -5.2 6.775 -5.35 6.73 C -5.48 6.695 -5.625 6.745 -5.66 6.845 Z M -3.45 6.76 C -3.595 6.795 -3.695 6.89 -3.68 7.005 C -3.665 7.105 -3.535 7.17 -3.385 7.135 C -3.24 7.1 -3.14 7.005 -3.155 6.905 C -3.17 6.81 -3.305 6.745 -3.45 6.76 Z M -0.16 -12.4 C -7.095 -12.4 -12.4 -7.135 -12.4 -0.2 C -12.4 5.345 -8.91 10.09 -3.925 11.76 C -3.285 11.875 -3.06 11.48 -3.06 11.155 C -3.06 10.845 -3.075 9.135 -3.075 8.085 C -3.075 8.085 -6.575 8.835 -7.31 6.595 C -7.31 6.595 -7.88 5.14 -8.7 4.765 C -8.7 4.765 -9.845 3.98 -8.62 3.995 C -8.62 3.995 -7.375 4.095 -6.69 5.285 C -5.595 7.215 -3.76 6.66 -3.045 6.33 C -2.93 5.53 -2.605 4.975 -2.245 4.645 C -5.04 4.335 -7.86 3.93 -7.86 -0.88 C -7.86 -2.255 -7.48 -2.945 -6.68 -3.825 C -6.81 -4.15 -7.235 -5.49 -6.55 -7.22 C -5.505 -7.545 -3.1 -5.87 -3.1 -5.87 C -2.1 -6.15 -1.025 -6.295 0.04 -6.295 S 2.18 -6.15 3.18 -5.87 C 3.18 -5.87 5.585 -7.55 6.63 -7.22 C 7.315 -5.485 6.89 -4.15 6.76 -3.825 C 7.56 -2.94 8.05 -2.25 8.05 -0.88 C 8.05 3.945 5.105 4.33 2.31 4.645 C 2.77 5.04 3.16 5.79 3.16 6.965 C 3.16 8.65 3.145 10.735 3.145 11.145 C 3.145 11.47 3.375 11.865 4.01 11.75 C 9.01 10.09 12.4 5.345 12.4 -0.2 C 12.4 -7.135 6.775 -12.4 -0.16 -12.4 Z M -7.54 4.845 C -7.605 4.895 -7.59 5.01 -7.505 5.105 C -7.425 5.185 -7.31 5.22 -7.245 5.155 C -7.18 5.105 -7.195 4.99 -7.28 4.895 C -7.36 4.815 -7.475 4.78 -7.54 4.845 Z M -8.08 4.44 C -8.115 4.505 -8.065 4.585 -7.965 4.635 C -7.885 4.685 -7.785 4.67 -7.75 4.6 C -7.715 4.535 -7.765 4.455 -7.865 4.405 C -7.965 4.375 -8.045 4.39 -8.08 4.44 Z M -6.46 6.22 C -6.54 6.285 -6.51 6.435 -6.395 6.53 C -6.28 6.645 -6.135 6.66 -6.07 6.58 C -6.005 6.515 -6.035 6.365 -6.135 6.27 C -6.245 6.155 -6.395 6.14 -6.46 6.22 Z M -7.03 5.485 C -7.11 5.535 -7.11 5.665 -7.03 5.78 C -6.95 5.895 -6.815 5.945 -6.75 5.895 C -6.67 5.83 -6.67 5.7 -6.75 5.585 C -6.82 5.47 -6.95 5.42 -7.03 5.485 Z" />
                             </svg>
                         </div>
                         <div style="padding: 3px">COVID19-SEIR</div>
                     </div>
                 </a>
-                <a href="https://twitter.com/FleischerHannes" target="_blank" style="color: var(--color-text); font-size: 12px;">
+                <a href="https://twitter.com/FleischerHannes" target="_blank" rel="noreferrer"
+                    style="color: var(--color-text); font-size: 12px;">
                     <div style="display: flex; flex-direction: row">
                         <div>
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 20x; height: 20px; fill: var(--color-text)" viewbox="-15 -15 30 30">
-                                <path style="transition: transform 250ms ease-in-out" d="M 10.169 -5.214 c 0.016 0.227 0.016 0.455 0.016 0.682 c 0 6.936 -5.279 14.928 -14.928 14.928 c -2.973 0 -5.734 -0.861 -8.057 -2.355 c 0.422 0.049 0.828 0.065 1.267 0.065 c 2.453 0 4.711 -0.828 6.514 -2.242 c -2.307 -0.049 -4.24 -1.559 -4.906 -3.639 c 0.325 0.049 0.65 0.081 0.991 0.081 c 0.471 0 0.942 -0.065 1.381 -0.179 c -2.404 -0.487 -4.207 -2.599 -4.207 -5.149 v -0.065 c 0.698 0.39 1.511 0.634 2.372 0.666 c -1.413 -0.942 -2.339 -2.55 -2.339 -4.37 c 0 -0.975 0.26 -1.868 0.715 -2.648 c 2.583 3.184 6.465 5.263 10.818 5.49 c -0.081 -0.39 -0.13 -0.796 -0.13 -1.202 c 0 -2.891 2.339 -5.247 5.247 -5.247 c 1.511 0 2.875 0.634 3.834 1.657 c 1.186 -0.227 2.323 -0.666 3.33 -1.267 c -0.39 1.218 -1.218 2.242 -2.307 2.891 c 1.056 -0.114 2.079 -0.406 3.021 -0.812 c -0.715 1.04 -1.608 1.965 -2.631 2.713 z" />
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                style="width: 20x; height: 20px; fill: var(--color-text)" viewbox="-15 -15 30 30">
+                                <path style="transition: transform 250ms ease-in-out"
+                                    d="M 10.169 -5.214 c 0.016 0.227 0.016 0.455 0.016 0.682 c 0 6.936 -5.279 14.928 -14.928 14.928 c -2.973 0 -5.734 -0.861 -8.057 -2.355 c 0.422 0.049 0.828 0.065 1.267 0.065 c 2.453 0 4.711 -0.828 6.514 -2.242 c -2.307 -0.049 -4.24 -1.559 -4.906 -3.639 c 0.325 0.049 0.65 0.081 0.991 0.081 c 0.471 0 0.942 -0.065 1.381 -0.179 c -2.404 -0.487 -4.207 -2.599 -4.207 -5.149 v -0.065 c 0.698 0.39 1.511 0.634 2.372 0.666 c -1.413 -0.942 -2.339 -2.55 -2.339 -4.37 c 0 -0.975 0.26 -1.868 0.715 -2.648 c 2.583 3.184 6.465 5.263 10.818 5.49 c -0.081 -0.39 -0.13 -0.796 -0.13 -1.202 c 0 -2.891 2.339 -5.247 5.247 -5.247 c 1.511 0 2.875 0.634 3.834 1.657 c 1.186 -0.227 2.323 -0.666 3.33 -1.267 c -0.39 1.218 -1.218 2.242 -2.307 2.891 c 1.056 -0.114 2.079 -0.406 3.021 -0.812 c -0.715 1.04 -1.608 1.965 -2.631 2.713 z" />
                             </svg>
                         </div>
                         <div style="padding: 3px">@FleischerHannes</div>
@@ -216,19 +237,5 @@
     </div>
 
 </body>
-
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            /* remove_s
-            navigator.serviceWorker.register('sw.js?cb=COVID_19_TIMELINE_VERSION').then((registration) => {
-                //do nothing
-            }, (err) => {
-                console.log('failed to register service worker due to', err);
-            });
-            remove_e */
-        });
-    }
-</script>
 
 </html>

@@ -1,10 +1,15 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+
 
 var $path = require("path");
 
+// $env:COVID_19_TIMELINE_VERSION=[guid]::NewGuid().ToString().Replace("-","").Substring(12); npm run build
+
+
 module.exports = {
-    mode: "development",
+    mode: "production",
     devtool: "source-map",
     devServer: {
         contentBase: $path.join(__dirname, 'dist'),
@@ -18,8 +23,8 @@ module.exports = {
     },
     output: {
         path: $path.join(__dirname, "dist"),
-        filename: "[name].js",
-        chunkFilename: "[name].js"
+        filename: "[name].js?cb=" + process.env.COVID_19_TIMELINE_VERSION,
+        chunkFilename: "[name].js?cb=" + process.env.COVID_19_TIMELINE_VERSION,
     },
     module: {
         rules: [
@@ -33,6 +38,19 @@ module.exports = {
             //             plugins: ["@babel/plugin-syntax-dynamic-import"]
             //         }
             //     }
+            // },
+
+            // {
+            //   test: /\.(png|jpe?g|gif)$/i,
+            //   use: [
+            //     {
+            //       loader: 'file-loader',
+            //       options: {
+            //         esModule: false,
+            //         name: "assets/[name].[ext]?cb=" + process.env.COVID_19_TIMELINE_VERSION
+            //       }
+            //     },
+            //   ],
             // },
             {
                 test: /\.worker\.js$/,
@@ -71,6 +89,18 @@ module.exports = {
                 ],
             },
             {
+              test: /\.html$/,
+              use: [
+                {
+                  loader: "html-loader",
+                  options: {
+                    minimize: false,
+                  }
+                }
+              ],
+              exclude: /node_modules/
+            },
+            {
                 test: /.json$/,
                 use: [
                   {
@@ -82,13 +112,22 @@ module.exports = {
                   },
                 ],
             },
+            {
+              test: /.html$/,
+              loader: 'string-replace-loader',
+              options: {
+                multiple: [
+                  { search: /COVID_19_TIMELINE_VERSION/g, replace: process.env.COVID_19_TIMELINE_VERSION }
+                ]
+              }
+            }
 
         ]
     },
     plugins: [
 
         new HtmlWebPackPlugin({
-            title: "COVID-19 Timeline",
+            title: "COVID19-SEIR",
             template: "./src/main/webapp/index.html",
             filename: "./index.html",
             chunksSortMode: "none",
@@ -102,6 +141,23 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: "[name].css",
             chunkFilename: "[name].css"
+        }),
+        new CopyPlugin({
+          patterns: [
+            {
+              from: './src/main/webapp/manifest.webmanifest',
+              to: 'manifest.webmanifest',
+              transform(content) {
+                return content.toString().replace(/COVID_19_TIMELINE_VERSION/g, process.env.COVID_19_TIMELINE_VERSION);
+              }
+            },
+            { from: './src/main/webapp/data/default-config.json', to: 'data/default-config.json' },
+            { from: './src/main/webapp/data/heatmap-data-at.json', to: 'data/heatmap-data-at.json' },
+            { from: './src/main/webapp/data/model-data-at.json', to: 'data/model-data-at.json' },
+            { from: './src/main/webapp/assets/icon_192.png', to: 'assets/icon_192.png' },
+            { from: './src/main/webapp/assets/icon_512.png', to: 'assets/icon_512.png' },
+            { from: './src/main/webapp/assets/favicon.png', to: 'assets/favicon.png' },
+          ]
         }),
 
     ],
@@ -117,4 +173,11 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js", ".scss", ".css"]
 
     },
+    node: {
+
+      // process: false,
+      global: false,
+      // fs: "empty"
+
+    }
 };
