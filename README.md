@@ -57,6 +57,7 @@ Modifications are the configuration of the model. Except "Time", each type of mo
 #### <a name="anchor_settings">Settings</a>
 <br><br><br>
 #### Issues
+* favicon, ... in published version
 * wiki on github
 * be sure that strain calibration is still functional
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
@@ -92,6 +93,7 @@ Modifications are the configuration of the model. Except "Time", each type of mo
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* ~~sidebar in firefox does not work well~~
 * ~~proper default configuration~~
 * ~~have a link to this readme~~
 * ~~some modification-min-charts don't have values for last item~~

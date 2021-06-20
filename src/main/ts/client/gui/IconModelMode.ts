@@ -10,10 +10,12 @@ export class IconModelMode {
     private readonly svgContainer: HTMLDivElement;
     private readonly containerDiv1: HTMLDivElement;
     private readonly containerDiv2: HTMLDivElement;
+    private readonly firefox: boolean;
 
     constructor(key: MODIFICATION____KEY) {
 
         this.key = key;
+        this.firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
         this.svgContainer = document.createElement('div');
         this.svgContainer.classList.add('model-mode');
@@ -77,7 +79,13 @@ export class IconModelMode {
     }
 
     toggle(visible: boolean): void {
-        this.containerDiv2.style.padding = visible ? '50% 0' : '0 0';
+        if (this.firefox) {
+            this.containerDiv1.style.display = visible ? 'table': 'none';
+            this.containerDiv2.style.padding = '50% 0';
+        } else {
+            this.containerDiv2.style.padding = visible ? '50% 0' : '0 0';
+        }
+
     }
 
 }

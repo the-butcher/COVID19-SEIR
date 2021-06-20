@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -43,7 +44,7 @@ export class SliderModification extends Slider {
                 return new IconModification('x', 'CONTACT', 'create'); // TODO could this be optional
             },
             labelFormatFunction: (index, value) => {
-                return `${new Date(value).toLocaleDateString()}`;
+                return `${TimeUtil.formatCategoryDate(value)}`;
             },
             handleValueChange: (index, value, type) => {
                 const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
@@ -149,7 +150,7 @@ export class SliderModification extends Slider {
             creatorIcon.setHandleOpacity(creatorIcon.getLastHandleOpacity());
             const creatorThumb = this.createThumb(-1, -1, creatorIcon.getId(), true, {
                 thumbCreateFunction: (index: number) => creatorIcon,
-                labelFormatFunction: (index, value) => `${new Date(value).toLocaleDateString()}`
+                labelFormatFunction: (index, value) => `${TimeUtil.formatCategoryDate(value)}`
             });
             creatorThumb.getContainer().style.opacity = '0';
             this.setCreatorThumb(creatorThumb);
@@ -203,7 +204,7 @@ export class SliderModification extends Slider {
             const modificationThumb = this.createThumb(typedModifications[index].getInstantA(), index, modificationIcon.getId(), typedModifications[index].isDraggable(), {
                 thumbCreateFunction: (index: number) => modificationIcon,
                 labelFormatFunction: (index, value, type) => {
-                    return `${new Date(value).toLocaleDateString()}`;
+                    return `${TimeUtil.formatCategoryDate(value)}`;
                 }
             });
             this.addThumb(modificationThumb);

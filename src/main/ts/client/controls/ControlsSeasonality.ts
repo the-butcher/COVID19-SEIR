@@ -35,9 +35,15 @@ export class ControlsSeasonality {
     }
 
     acceptModification(modification: ModificationSeasonality): void {
+
         Controls.acceptModification(modification);
         this.modification = modification;
         this.sliderAmount.setValue(this.modification.getSeasonality());
+
+        requestAnimationFrame(() => {
+            this.sliderAmount.handleResize();
+        });
+
     }
 
 }

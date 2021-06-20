@@ -35,9 +35,14 @@ export class ControlsTime {
     }
 
     acceptModification(modification: ModificationTime): void {
+
         Controls.acceptModification(modification);
         const contactMatrix = ModificationResolverTime.getInstance().findContactMatrix(modification.getInstantA());
-        this.chartContactMatrix.redraw(contactMatrix);
+
+        requestAnimationFrame(() => {
+            this.chartContactMatrix.redraw(contactMatrix);
+        });
+
     }
 
 }

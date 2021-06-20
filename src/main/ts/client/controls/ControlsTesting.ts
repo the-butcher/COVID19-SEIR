@@ -61,7 +61,12 @@ export class ControlsTesting {
             sliderTesting.setValue(modification.getMultiplier(sliderTesting.getName()));
         });
 
-        this.chartTesting.redraw(modification);
+        requestAnimationFrame(() => {
+            this.chartTesting.redraw(modification);
+            this.slidersTesting.forEach(sliderTesting => {
+                sliderTesting.handleResize();
+            });
+        });
 
     }
 

@@ -39,9 +39,16 @@ export class ControlsVaccination {
     }
 
     acceptModification(modification: ModificationVaccination): void {
+
         Controls.acceptModification(modification);
         this.modification = modification;
+
         this.sliderDosesPerDay.setValue(this.modification.getDosesPerDay());
+
+        requestAnimationFrame(() => {
+            this.sliderDosesPerDay.handleResize();
+        });
+
     }
 
 }

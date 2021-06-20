@@ -51,12 +51,20 @@ export class ControlsSettings {
     }
 
     acceptModification(modification: ModificationSettings): void {
+
         Controls.acceptModification(modification);
         this.modification = modification;
+
         this.sliderUndetected.setValue(this.modification.getUndetected());
         this.sliderQuarantine.setValue(this.modification.getQuarantine());
         // this.sliderDead.setValue(this.modification.getDead());
+        requestAnimationFrame(() => {
+            this.sliderUndetected.handleResize();
+            this.sliderQuarantine.handleResize();
+        });
+
         this.modification = modification;
+
     }
 
 }

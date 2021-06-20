@@ -62,7 +62,12 @@ export class ControlsContact {
             sliderCategory.setValue(modification.getMultiplier(sliderCategory.getName()));
         });
 
-        this.chartContact.redraw(modification);
+        requestAnimationFrame(() => {
+            this.chartContact.redraw(modification);
+            this.slidersCategory.forEach(sliderCategory => {
+                sliderCategory.handleResize();
+            });
+        });
 
     }
 

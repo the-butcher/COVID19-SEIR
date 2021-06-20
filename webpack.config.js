@@ -9,7 +9,7 @@ var $path = require("path");
 
 
 module.exports = {
-    mode: "production",
+    mode: "development",
     devtool: "source-map",
     devServer: {
         contentBase: $path.join(__dirname, 'dist'),
@@ -155,7 +155,6 @@ module.exports = {
             { from: './src/main/webapp/data/heatmap-data-at.json', to: 'data/heatmap-data-at.json' },
             { from: './src/main/webapp/data/model-data-at.json', to: 'data/model-data-at.json' },
             { from: './src/main/webapp/assets/icon_192.png', to: 'assets/icon_192.png' },
-            { from: './src/main/webapp/assets/icon_512.png', to: 'assets/icon_512.png' },
             { from: './src/main/webapp/assets/favicon.png', to: 'assets/favicon.png' },
           ]
         }),
