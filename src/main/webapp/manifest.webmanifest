@@ -6,13 +6,7 @@
       {
         "src": "assets/icon_192.png?cb=COVID_19_TIMELINE_VERSION",
         "type": "image/png",
-        "sizes": "192x192",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "assets/icon_512.png?cb=COVID_19_TIMELINE_VERSION",
-        "type": "image/png",
-        "sizes": "512x512"
+        "sizes": "192x192"
       }
     ],
     "start_url": "index.html",
