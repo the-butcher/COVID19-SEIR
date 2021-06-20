@@ -27,7 +27,16 @@
 
 ### <a name="anchor_timeline">TIMELINE</a>
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider.png?raw=true)
-An area where you can place "modifications" of different types. These modifications are used to alter the model by i.e. changing contact levels, adding new strains, definition seasonality, ....
+
+An area where you can place "modifications" of different types. These modifications are used to alter the model by i.e. changing contact levels, adding new strains, definition seasonality.
+To create a modification move your mouse over the timeline area. Modification types that are creatable will show a "create" thumb underneath the mouse.
+
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_create.png?raw=true)
+
+To delete a modification move your mouse over the modification that you want to delete. Modifications that are deletable will display a delete button. Click the unfolded delete button to delete the modification.
+
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_create.png?raw=true)
+
 
 ### <a name="anchor_time">TIME</a>
    asdadasd
