@@ -1,17 +1,50 @@
 # COVID19-SEIR
-# Age-Group granularity model. Contact-Matrix based, Vaccinations, Testing, Seasonality.
-* ## Modifications
-  * ## <a href="#anchor_test">TEST</a>
+## Age-Group granularity model. Contact-Matrix based, Vaccinations, Testing, Seasonality.
 
+* ### Timeline
 
+* ### Modifications
+  * #### <a href="#anchor_time">TIME</a>
+  * #### <a href="#anchor_strain">STRAIN</a>
+  * #### <a href="#anchor_contact">CONTACT</a>
+  * #### <a href="#anchor_testing">TESTING</a>
+  * #### <a href="#anchor_vaccination">VACCINATION</a>
+  * #### <a href="#anchor_seasonality">SEASONALITY</a>
+  * #### <a href="#anchor_settings">SETTINGS</a>
+* ### Actions
+  * #### <a href="#anchor_action_export_png">Export to PNG</a>
+  * #### <a href="#anchor_action_export_data">Export data to JSON</a>
+  * #### <a href="#anchor_action_import_config">Import config from JSON</a>
+  * #### <a href="#anchor_action_save_config">Save config to browser storage</a>
+  * #### <a href="#anchor_action_export_config">Export config to JSON</a>
 
+* ### Chart Mode
+  * #### <a href="#anchor_action_export_png">Export to PNG</a>
+  * #### <a href="#anchor_action_export_data">Export data to JSON</a>
+  * #### <a href="#anchor_action_import_config">Import config from JSON</a>
+  * #### <a href="#anchor_action_save_config">Save config to browser storage</a>
+  * #### <a href="#anchor_action_export_config">Export config to JSON</a>
+
+### <a name="anchor_timeline">TIMELINE</a>
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider.png?raw=true)
+An area where you can place "modifications" of different types. These modifications are used to alter the model by i.e. changing contact levels, adding new strains, definition seasonality, ....
+
+### <a name="anchor_time">TIME</a>
+   asdadasd
+   asdasdasd
+### <a name="anchor_strain">STRAIN</a>
+### <a name="anchor_contact">CONTACT</a>
+### <a name="anchor_testing">TESTING</a>
+### <a name="anchor_vaccination">VACCINATION</a>
+### <a name="anchor_seasonality">SEASONALITY</a>
+### <a name="anchor_settings">SETTINGS</a>
 
 
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/screenshot01.png?raw=true)
 
 
 
-This app currently is in a alpha state where i review some features for plausibility and validity against historic data
+```This app currently is in a alpha state where i review some features for plausibility and validity against historic data
 
 The code has been moved from local storage to github for backup- and documentation purposes. I plan to work on this repository to get it finished over the upcoming weeks (as of 22.05.2021).
 
@@ -50,7 +83,7 @@ next:
   * will caching compartments on compartmentFilter improve performance?
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
-<a name="anchor_test">TIME </a>
+
 
 done:
 * ~~some modification-min-charts don't have values for last item~~
