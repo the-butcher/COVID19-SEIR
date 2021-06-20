@@ -50,7 +50,7 @@ next:
   * will caching compartments on compartmentFilter improve performance?
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
-<a name="anchor_test" href="">TIME </a>
+<a name="anchor_test">TIME </a>
 
 done:
 * ~~some modification-min-charts don't have values for last item~~
