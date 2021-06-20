@@ -1,6 +1,13 @@
 # COVID19-SEIR
 ## Age-Group granularity model. Contact-Matrix based, Vaccinations, Testing, Seasonality.
 
+This is a private project, created in an attempt to understand the dynamics inherit to the COVID pandemic.
+At the time of writing (20.06.2021) the model contains data for Austria. It should be possible to add data for other countries given the availability of age specific case and vaccination data.
+
+Documentation will be added continuously over the next weeks.
+
+Please feel free to contact me on Twitter <a href="https://twitter.com/FleischerHannes">@FleischerHannes</a>.
+
 * ### Timeline
 
 * ### Modifications
@@ -48,11 +55,10 @@ Modifications are the configuration of the model. Except "Time", each type of mo
 #### <a name="anchor_vaccination">Vaccination</a>
 #### <a name="anchor_seasonality">Seasonality</a>
 #### <a name="anchor_settings">Settings</a>
-
-
-#### <a name="anchor_strain">Current issues:</a>
-* be sure that strain calibration is still functional
+<br><br><br>
+#### Issues
 * wiki on github
+* be sure that strain calibration is still functional
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
 * border cases
   * all testing sliders on zero renders an all zero chart,
@@ -63,7 +69,7 @@ Modifications are the configuration of the model. Except "Time", each type of mo
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
 
 
-#### <a name="anchor_strain">Backlog:</a>
+#### Backlog
 * y-axis modes in relative chart (max, age-group-max, manual)
 * demographics for germany (check the default priority value 10000 in ModelImplVaccination)
 * explore the difference between "cases" and "total exposure" (maybe think about a solution like in model1, but may be difficult due to incidence being the central strain parameter)
@@ -85,7 +91,7 @@ Modifications are the configuration of the model. Except "Time", each type of mo
   * will caching compartments on compartmentFilter improve performance?
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
-#### <a name="anchor_strain">Solved issues:</a>
+#### Solved issues
 * ~~proper default configuration~~
 * ~~have a link to this readme~~
 * ~~some modification-min-charts don't have values for last item~~
