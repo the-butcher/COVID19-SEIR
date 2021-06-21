@@ -32,24 +32,40 @@ Please feel free to contact me on Twitter <a href="https://twitter.com/Fleischer
   * #### <a href="#anchor_action_save_config">Save config to browser storage</a>
   * #### <a href="#anchor_action_export_config">Export config to JSON</a>
 
-### <a name="anchor_timeline">TIMELINE</a>
-![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider.png?raw=true)
+# <a name="anchor_timeline">TIMELINE</a>
 
 An area where you can place "modifications" of different types. These modifications are used to alter the model by i.e. changing contact levels, adding new strains, definition seasonality.
-To change configuration of a modification click the modification. A configuration area of the modification will appear in the upper right area of your browser.
-To create a modification move your mouse over the timeline area. Modification types that are creatable will show a "create" thumb underneath the mouse.
+
+* To change configuration of a modification click the modification. A configuration area of the modification will appear in the upper right area of your browser.
+* To change the date of a modification drag it along the slider. Some modification are fixes to the beginning of the timeline an can not be dragged.
+* To create a modification move your mouse over the timeline area. Modification types that are creatable will show a "create" thumb underneath the mouse.
 
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_create2.png?raw=true)
 
-To delete a modification move your mouse over the modification that you want to delete. Modifications that are deletable will display a delete button. Click the unfolded delete button to delete the modification without further notification.
+* To delete a modification move your mouse over the modification that you want to delete. Modifications that are deletable will display a delete button. Click the unfolded delete button to delete the modification without further notification.
 
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/timeslider_delete.png?raw=true)
 
-### Modifications
+# Modifications
 
 Modifications are the configuration of the model. Except "Time", each type of modification allows to alter the behaviour of the model by changing specific settings of modification.
-#### <a name="anchor_time">Time</a>
+## <a name="anchor_time">Time</a>
+
+The "Time" modification serves to show effective settings for a given day along the time slider. Drag the time icon to a specific day to see actual contact rates given the model state at that time.
+
+For example contact rates for a population at vaccination rate 50% contact rates may be higher for older age-groups, while a few months later in a population at 70% vaccination rate contact raters may be more focused on younger age groups.
+
+![alt text](https://the-butchers.at/COVID19-SEIR/assets/effective_contact.gif)
+
 #### <a name="anchor_strain">Strain</a>
+
+The strain modification defines properties of given strains. Adjustable properties for a strain are:
+* R<sub>0</sub>, the base reduction number of this strain.
+* Serial Interval, the mean between "generations" of infection.
+* Initial incidence, the incidence a cases associated with the strain at the time where the strain modification is placed on the timeslider.
+
+![alt text](https://the-butchers.at/COVID19-SEIR/assets/modification_strain.png)
+
 #### <a name="anchor_contact">Contact</a>
 #### <a name="anchor_testing">Testing</a>
 #### <a name="anchor_vaccination">Vaccination</a>
@@ -57,7 +73,6 @@ Modifications are the configuration of the model. Except "Time", each type of mo
 #### <a name="anchor_settings">Settings</a>
 <br><br><br>
 #### Issues
-* favicon, ... in published version
 * wiki on github
 * be sure that strain calibration is still functional
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
@@ -93,6 +108,7 @@ Modifications are the configuration of the model. Except "Time", each type of mo
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* ~~favicon, ... in published version~~
 * ~~sidebar in firefox does not work well~~
 * ~~proper default configuration~~
 * ~~have a link to this readme~~
