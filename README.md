@@ -67,6 +67,11 @@ The strain modification defines properties of given strains. Adjustable properti
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/modification_strain.png?raw=true)
 
 #### <a name="anchor_contact">Contact</a>
+
+The contact modification allows to define a composite contact matrix from different settings matrices. Drag the sliders to a specific value or click the percentage of a slider, then type the desired value.
+
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/modification_contact.gif?raw=true)
+
 #### <a name="anchor_testing">Testing</a>
 #### <a name="anchor_vaccination">Vaccination</a>
 #### <a name="anchor_seasonality">Seasonality</a>
