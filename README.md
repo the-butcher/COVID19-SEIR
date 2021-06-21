@@ -57,7 +57,7 @@ For example contact rates for a population at vaccination rate 50% contact rates
 
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/effective_contact.gif?raw=true)
 
-#### <a name="anchor_strain">Strain</a>
+## <a name="anchor_strain">Strain</a>
 
 The strain modification defines properties of given strains. Adjustable properties for a strain are:
 * R<sub>0</sub>, the base reduction number of this strain.
@@ -66,16 +66,24 @@ The strain modification defines properties of given strains. Adjustable properti
 
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/modification_strain.png?raw=true)
 
-#### <a name="anchor_contact">Contact</a>
+## <a name="anchor_contact">Contact</a>
 
 The contact modification allows to define a composite contact matrix from different settings matrices. Drag the sliders to a specific value or click the percentage of a slider, then type the desired value.
 
 ![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/modification_contact.gif?raw=true)
 
-#### <a name="anchor_testing">Testing</a>
-#### <a name="anchor_vaccination">Vaccination</a>
-#### <a name="anchor_seasonality">Seasonality</a>
-#### <a name="anchor_settings">Settings</a>
+## <a name="anchor_testing">Testing</a>
+
+The testing modification gives the possibility to define discovery rates for different settings. It is assumed that cases are discovered at the time of incubation.
+A higher discovery rate means:
+* More individuals will quarantine, reducing contact rates after incubation time.
+* More individuals will know about infection, an then by design of this model consume a single vaccination dose from the available doses.
+
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/modification_testing.png?raw=true)
+
+## <a name="anchor_vaccination">Vaccination</a>
+## <a name="anchor_seasonality">Seasonality</a>
+## <a name="anchor_settings">Settings</a>
 <br><br><br>
 #### Issues
 * wiki on github
