@@ -55,7 +55,7 @@ The "Time" modification serves to show effective settings for a given day along 
 
 For example contact rates for a population at vaccination rate 50% contact rates may be higher for older age-groups, while a few months later in a population at 70% vaccination rate contact raters may be more focused on younger age groups.
 
-![alt text](https://the-butchers.at/COVID19-SEIR/assets/effective_contact.gif)
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/effective_contact.gif?raw=true)
 
 #### <a name="anchor_strain">Strain</a>
 
@@ -64,7 +64,7 @@ The strain modification defines properties of given strains. Adjustable properti
 * Serial Interval, the mean between "generations" of infection.
 * Initial incidence, the incidence a cases associated with the strain at the time where the strain modification is placed on the timeslider.
 
-![alt text](https://the-butchers.at/COVID19-SEIR/assets/modification_strain.png)
+![alt text](https://github.com/the-butcher/COVID19-SEIR/blob/master/src/main/webapp/assets/modification_strain.png?raw=true)
 
 #### <a name="anchor_contact">Contact</a>
 #### <a name="anchor_testing">Testing</a>
