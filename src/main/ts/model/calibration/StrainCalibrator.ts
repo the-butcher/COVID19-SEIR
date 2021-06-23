@@ -1,15 +1,16 @@
-import { ModelInstants } from './ModelInstants';
-import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
-import { IAnyModificationValue, Modifications } from '../common/modification/Modifications';
-import { ModificationTime } from '../common/modification/ModificationTime';
-import { Demographics } from './../common/demographics/Demographics';
-import { IModificationValuesTesting } from './../common/modification/IModificationValuesTesting';
-import { BaseData } from './basedata/BaseData';
-import { CompartmentFilter } from './compartment/CompartmentFilter';
-import { ECompartmentType } from './compartment/ECompartmentType';
-import { ModelConstants } from './ModelConstants';
-import { ModelImplRoot } from './ModelImplRoot';
-import { ModelStateIntegrator } from './state/ModelStateIntegrator';
+import { Demographics } from '../../common/demographics/Demographics';
+import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { IModificationValuesTesting } from '../../common/modification/IModificationValuesTesting';
+import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
+import { ModificationTime } from '../../common/modification/ModificationTime';
+import { TimeUtil } from '../../util/TimeUtil';
+import { CompartmentFilter } from '../compartment/CompartmentFilter';
+import { ECompartmentType } from '../compartment/ECompartmentType';
+import { ModelConstants } from '../ModelConstants';
+import { ModelImplRoot } from '../ModelImplRoot';
+import { ModelInstants } from '../ModelInstants';
+import { ModelStateIntegrator } from '../state/ModelStateIntegrator';
+import { BaseData } from './BaseData';
 
 /**
  * utility type that takes care of calibrating a strain with respect to current age groups and testing (discovery) rates
@@ -32,7 +33,7 @@ export class StrainCalibrator {
         /**
          * start at minus preload days
          */
-        const curInstant = ModelInstants.getInstance().getMinInstant(); // - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
+        const curInstant = ModelInstants.getInstance().getMinInstant() - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
 
         /**
          * start with some default
@@ -140,7 +141,7 @@ export class StrainCalibrator {
                 modificationValuesStrain.preIncidences[i] *= incidenceCorrection;
             }
 
-            // console.log('strainModel', strainModel, strainModel.getAbsDeltas(), modifiers, incidenceCorrection, incidence, transmissionRisk);
+            // console.log('strainModel', modificationValuesStrain);
 
         }
 

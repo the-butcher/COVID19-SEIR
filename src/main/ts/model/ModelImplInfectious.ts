@@ -5,7 +5,7 @@ import { ModificationTesting } from '../common/modification/ModificationTesting'
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { StrainUtil } from '../util/StrainUtil';
 import { TimeUtil } from './../util/TimeUtil';
-import { BaseData } from './basedata/BaseData';
+import { BaseData } from './calibration/BaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { CompartmentInfectious } from './compartment/CompartmentInfectious';

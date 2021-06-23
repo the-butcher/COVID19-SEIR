@@ -48,7 +48,7 @@ export class ChartAgeGroupSeries {
         this.baseLabel = params.baseLabel;
         this.valueField = params.valueField;
         this.locationOnPath = params.locationOnPath;
-        this.labellingDefinition = params.percent ? ControlsConstants.LABEL_PERCENT__FLOAT_2 : ControlsConstants.LABEL_ABSOLUTE_FIXED;
+        this.labellingDefinition = params.percent ? ControlsConstants.LABEL_PERCENT__FLOAT_2 : ControlsConstants.LABEL_ABSOLUTE_FLOAT_2;
 
         this.series = params.chart.series.push(new LineSeries());
         this.series.showOnInit = false;

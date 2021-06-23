@@ -38,7 +38,7 @@
       "r0": 4.4,
       "serialInterval": 4.8,
       "intervalScale": 1,
-      "dstIncidence": 148.00977526413635,
+      "dstIncidence": 147.52816920647004,
       "deletable": false,
       "draggable": false,
       "primary": true
@@ -50,10 +50,10 @@
       "instant": 1619827200000,
       "multipliers": {
         "family": 0.7000000000000001,
-        "school": 0.3,
-        "nursing": 0.05,
-        "work": 0.41000000000000003,
-        "other": 0.14
+        "school": 0.24,
+        "nursing": 0.5,
+        "work": 0.42,
+        "other": 0.13
       },
       "deletable": false,
       "draggable": false
@@ -66,7 +66,7 @@
       "multipliers": {
         "family": 0.6,
         "school": 0.65,
-        "nursing": 0.8,
+        "nursing": 0.75,
         "work": 0.4,
         "other": 0.4
       },
@@ -78,30 +78,14 @@
       "key": "VACCINATION",
       "name": "daily vaccinations",
       "instant": 1619827200000,
-      "doses": 90000,
+      "doses": 35000,
       "deletable": false,
       "draggable": false
     },
     {
-      "id": "be71c",
-      "key": "CONTACT",
-      "name": "copy of initial NPIs",
-      "instant": 1621382400000,
-      "multipliers": {
-        "family": 0.7000000000000001,
-        "school": 0.35000000000000003,
-        "nursing": 0.05,
-        "work": 0.5,
-        "other": 0.3
-      },
-      "deletable": true,
-      "draggable": true,
-      "primary": false
-    },
-    {
       "id": "6fedb",
       "key": "STRAIN",
-      "instant": 1622505600000,
+      "instant": 1620172800000,
       "name": "b.1.617.2",
       "r0": 6.6000000000000005,
       "serialInterval": 4.8,
@@ -111,15 +95,41 @@
       "draggable": true
     },
     {
+      "id": "d3f4f",
+      "key": "VACCINATION",
+      "name": "daily vaccinations 2",
+      "instant": 1621036800000,
+      "doses": 100000,
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "be71c",
+      "key": "CONTACT",
+      "name": "schools full",
+      "instant": 1621382400000,
+      "multipliers": {
+        "family": 0.7000000000000001,
+        "school": 0.24,
+        "nursing": 0.5,
+        "work": 0.44,
+        "other": 0.3
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
       "id": "80032",
       "key": "CONTACT",
-      "name": "copy of initial NPIs",
+      "name": "school mask mandate",
       "instant": 1623715200000,
       "multipliers": {
         "family": 0.7000000000000001,
-        "school": 0.55,
-        "nursing": 0.05,
-        "work": 0.5,
+        "school": 0.29,
+        "nursing": 0.5,
+        "work": 0.44,
         "other": 0.3
       },
       "deletable": true,
@@ -129,12 +139,12 @@
     {
       "id": "6e78f",
       "key": "CONTACT",
-      "name": "copy of initial NPIs",
+      "name": "summer break",
       "instant": 1625097600000,
       "multipliers": {
         "family": 0.8,
         "school": 0.05,
-        "nursing": 0.05,
+        "nursing": 0.5,
         "work": 0.75,
         "other": 0.75
       },
@@ -154,7 +164,7 @@
     {
       "id": "2d860",
       "key": "CONTACT",
-      "name": "copy of copy of initial NPIs",
+      "name": "back to school",
       "instant": 1630972800000,
       "multipliers": {
         "family": 0.8,

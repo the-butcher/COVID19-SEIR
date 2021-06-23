@@ -4,7 +4,7 @@ import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
 import { Modifications } from './common/modification/Modifications';
-import { BaseData } from './model/basedata/BaseData';
+import { BaseData } from './model/calibration/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 

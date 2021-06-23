@@ -86,8 +86,11 @@ A higher discovery rate means:
 ## <a name="anchor_settings">Settings</a>
 <br><br><br>
 #### Issues
+* create a new default-config
+* further refine vaccination model (deflate the groupPriorities and move away from vacc step - sanitize and improve performance)
+* take care of corrections on matrices (bake them into matrices)
+* have a second look at contact matrix normalization because age-groups could not be properly fit so far.
 * wiki on github
-* be sure that strain calibration is still functional
 * with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce
 * border cases
   * all testing sliders on zero renders an all zero chart,
@@ -96,7 +99,6 @@ A higher discovery rate means:
   * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
   * keep history in local storage (or internal, reset modification after validation problems)
 * find a way to reliably reproduce scenarios from 11.2020 and 03.2021
-
 
 #### Backlog
 * y-axis modes in relative chart (max, age-group-max, manual)
@@ -121,6 +123,7 @@ A higher discovery rate means:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* be sure that strain calibration is still functional
 * ~~favicon, ... in published version~~
 * ~~sidebar in firefox does not work well~~
 * ~~proper default configuration~~

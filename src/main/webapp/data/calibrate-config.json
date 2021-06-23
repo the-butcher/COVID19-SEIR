@@ -1,0 +1,95 @@
+{
+  "model______basedata": "data/calibrate-data-at.json",
+  "model__demographics": "data/model-data-at.json",
+  "model_____daterange": [
+    "2021-05-01",
+    "2021-06-01",
+    "2021-07-01",
+    "2021-08-01",
+    "2021-09-01",
+    "2021-10-01"
+  ],
+  "model_modifications": [
+    {
+      "id": "b5e7",
+      "key": "SETTINGS",
+      "name": "initial state",
+      "instant": 1619827200000,
+      "undetected": 0,
+      "vaccinated": 0,
+      "quarantine": 0,
+      "dead": 0,
+      "deletable": false,
+      "draggable": false
+    },
+    {
+      "id": "71e2e",
+      "key": "STRAIN",
+      "instant": 1619827200000,
+      "name": "b.1.1.7",
+      "r0": 1,
+      "serialInterval": 4.8,
+      "intervalScale": 1,
+      "dstIncidence": 148.39621327705038,
+      "deletable": false,
+      "draggable": false,
+      "primary": true
+    },
+    {
+      "id": "6c3d0",
+      "key": "CONTACT",
+      "name": "initial NPIs",
+      "instant": 1619827200000,
+      "multipliers": {
+        "family": 1,
+        "school": 1,
+        "nursing": 1,
+        "work": 1,
+        "other": 1
+      },
+      "deletable": false,
+      "draggable": false
+    },
+    {
+      "id": "5971a",
+      "key": "TESTING",
+      "name": "initial discovery",
+      "instant": 1619827200000,
+      "multipliers": {
+        "family": 1,
+        "school": 1,
+        "nursing": 1,
+        "work": 1,
+        "other": 1
+      },
+      "deletable": false,
+      "draggable": false
+    },
+    {
+      "id": "f072",
+      "key": "VACCINATION",
+      "name": "daily vaccinations",
+      "instant": 1619827200000,
+      "doses": 0,
+      "deletable": false,
+      "draggable": false
+    },
+    {
+      "id": "b3f4d",
+      "key": "TIME",
+      "name": "effective settings",
+      "instant": 1619827200000,
+      "deletable": false,
+      "draggable": true
+    },
+    {
+      "id": "ea37",
+      "key": "SEASONALITY",
+      "name": "seasonality",
+      "instant": 1625875200000,
+      "seasonality": 1,
+      "deletable": false,
+      "draggable": true
+    }
+  ]
+}

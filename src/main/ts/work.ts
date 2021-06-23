@@ -2,11 +2,11 @@ import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
 import { Modifications } from './common/modification/Modifications';
-import { BaseData } from './model/basedata/BaseData';
+import { BaseData } from './model/calibration/BaseData';
 import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
-import { StrainCalibrator } from './model/StrainCalibrator';
+import { StrainCalibrator } from './model/calibration/StrainCalibrator';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
 

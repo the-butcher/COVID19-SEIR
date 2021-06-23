@@ -2,7 +2,7 @@ import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
-import { BaseData } from './basedata/BaseData';
+import { BaseData } from './calibration/BaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
@@ -23,7 +23,7 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly ageGroupTotal: number;
     private readonly ageGroupName: string;
 
-    private groupPriority: number;
+    // private groupPriority: number;
     private readonly grpAccept: number;
 
     private readonly compartmentImmunizing: CompartmentBase;
@@ -47,16 +47,6 @@ export class ModelImplVaccination implements IModelSeir {
         const vacc1 = BaseData.getInstance().findBaseData(category1)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
         const vacc2 = BaseData.getInstance().findBaseData(category2)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
 
-        if (vacc1 > 0 && vacc2 > 0) {
-            const vaccM = this.ageGroupTotal * this.grpAccept; // vaccination maximum
-            const vaccR = vacc2 / vaccM; // vaccination ratio
-            this.groupPriority = vaccR < 1 ? (vacc1 - vacc2) / (1 - vaccR) : 1; // rough estimation of priority
-        } else {
-            this.groupPriority = 10000; // TODO magic number, don't know if another settings would be fine with that number too
-        }
-
-        // console.log('vaccR',  this.ageGroupIndex, this.groupPriority);
-
         this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, vacc1 - vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
         this.compartmentImmunizedV = new CompartmentBase(ECompartmentType.R___REMOVED_V, this.absTotal, vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
         this.integrationStep = {
@@ -74,10 +64,6 @@ export class ModelImplVaccination implements IModelSeir {
 
     getRootModel(): ModelImplRoot {
         return this.parentModel.getRootModel();
-    }
-
-    getGroupPriority(): number {
-        return this.groupPriority;
     }
 
     /**
@@ -116,6 +102,9 @@ export class ModelImplVaccination implements IModelSeir {
     }
     getAgeGroupTotal(): number {
         return this.ageGroupTotal;
+    }
+    getAgeGroupName(): string {
+        return this.ageGroupName;
     }
 
     getInitialState(): IModelState {

@@ -62,6 +62,8 @@ export class Demographics {
         }
         this.absTotal = pN1;
 
+
+
         const contactCategoryParams: IContactMatrixConfig[] = [];
         demographicsConfig.matrices.forEach(contactCategoryParamsBase => {
 
@@ -71,21 +73,25 @@ export class Demographics {
                 ageGroups: demographicsConfig.groups
             }
 
+            const corrections: number[] = [
+                0.8,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1.35,
+                1,
+                1,
+                1
+            ];
+
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
                 contactCategoryParamsTarget.data[indexContact] = [];
                 for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
-                    contactCategoryParamsTarget.data[indexContact][indexParticipant] = contactCategoryParamsBase.data[indexContact][indexParticipant];
+                    contactCategoryParamsTarget.data[indexContact][indexParticipant] = contactCategoryParamsBase.data[indexContact][indexParticipant] * corrections[indexContact] * corrections[indexParticipant];
                 }
             }
-
-            // for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            //     for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
-            //         const sumC = contactCategoryParamsTarget.data[indexContact][indexParticipant] * this.ageGroups[indexContact].getAbsValue();
-            //         const sumP = contactCategoryParamsTarget.data[indexParticipant][indexContact] * this.ageGroups[indexParticipant].getAbsValue();
-            //         console.log(sumC, indexContact, contactCategoryParamsTarget.data[indexContact][indexParticipant], this.ageGroups[indexContact].getAbsValue());
-            //         console.log(sumP, indexParticipant, contactCategoryParamsTarget.data[indexParticipant][indexContact], this.ageGroups[indexParticipant].getAbsValue());
-            //     }
-            // }
 
             contactCategoryParams.push(contactCategoryParamsTarget);
 

@@ -1,5 +1,3 @@
-import { SliderModification } from './SliderModification';
-import { IWorkerInput } from './../../model/IWorkerInput';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModification } from '../../common/modification/IModification';
 import { IModificationValues } from '../../common/modification/IModificationValues';
@@ -13,7 +11,7 @@ import { ModificationStrain } from '../../common/modification/ModificationStrain
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
-import { BaseData } from '../../model/basedata/BaseData';
+import { BaseData } from '../../model/calibration/BaseData';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { Color } from '../../util/Color';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
@@ -31,8 +29,10 @@ import { ModificationResolverStrain } from './../../common/modification/Modifica
 import { ModificationResolverTesting } from './../../common/modification/ModificationResolverTesting';
 import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
 import { Modifications } from './../../common/modification/Modifications';
+import { IWorkerInput } from './../../model/IWorkerInput';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
+import { SliderModification } from './SliderModification';
 
 export interface IControlsDefinitions {
     icon: string;

@@ -1,4 +1,4 @@
-import { BaseData } from './basedata/BaseData';
+import { BaseData } from './calibration/BaseData';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTesting } from '../common/modification/ModificationTesting';
@@ -200,6 +200,7 @@ export class ModelImplStrain implements IModelSeir {
 
             const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(ageGroupIndex);
             const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(ageGroupIndex);
+            // ~~~CALIBRATION
             // const compartmentSusceptible = this.parentModel.getCompartmentsSusceptible(ageGroupIndex)[0];
 
             const outgoingCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
@@ -214,6 +215,7 @@ export class ModelImplStrain implements IModelSeir {
             // removal from last infectious happens in infectious model (TODO find a more readable version)
             result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
             result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
+            // ~~~CALIBRATION
             // result.addNrmValue(continuationValue, compartmentSusceptible);
 
         }

@@ -5,15 +5,17 @@ import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
-import { BaseData } from '../../model/basedata/BaseData';
+import { BaseData } from '../../model/calibration/BaseData';
+import { Color } from '../../util/Color';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
+import { StorageUtil } from '../storage/StorageUtil';
 import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
+import { ColorUtil } from './../../util/ColorUtil';
 import { ObjectUtil } from './../../util/ObjectUtil';
-import { StorageUtil } from '../storage/StorageUtil';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
 
@@ -108,7 +110,6 @@ export class ChartAgeGroup {
     private ageGroupMarker: Rectangle;
     private intervalHandle: number;
 
-
     // private xMin = -1;
     // private yMin = -1;
     // private xMax = -1;
@@ -138,7 +139,6 @@ export class ChartAgeGroup {
             }
             return x;
         });
-
 
         let plotContainerOutTimeout = -1;
         this.chart.plotContainer.events.on('out', () => {
@@ -383,6 +383,7 @@ export class ChartAgeGroup {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
             this.setSeriesAgeGroup(index);
         });
+        // this.columnTemplate.propertyFields.fill = 'color';
 
         this.seriesHeat.heatRules.push({
             target: this.columnTemplate,
@@ -855,11 +856,28 @@ export class ChartAgeGroup {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
+                let color: string;
                 if (dataItemA && dataItemB) {
+
                     // const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
                     // value -= baseIncidence;
                     // const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND] / ageGroupHeat.getAbsValue();
                     // value -= baseVaccination;
+
+                    let r = 0;
+                    let g = 0;
+                    let b = 0;
+                    if (value >= 0) {
+                        g = value / 50; //.1;
+                    }
+                    else {
+                        r = value / -50; // -.1;
+                    }
+                    const rgb = [r, g, b];
+                    const hsv = [0, 0, 0];
+                    ColorUtil.rgbToHsv(rgb, hsv);
+                    color = new Color(hsv[0], hsv[1], hsv[2]).getHex();
+
                 }
 
                 const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
@@ -868,7 +886,8 @@ export class ChartAgeGroup {
                     categoryY: ageGroupHeat.getName(),
                     index: ageGroupHeat.getIndex(),
                     value: value + randomVd,
-                    label
+                    label,
+                    color
                 });
                 maxValue = Math.max(maxValue, value);
 
