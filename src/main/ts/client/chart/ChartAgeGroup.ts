@@ -91,9 +91,14 @@ export class ChartAgeGroup {
      */
     protected readonly seriesAgeGroupInfectiousByStrain: Map<string, ChartAgeGroupSeries>;
 
-    protected readonly seriesAgeGroupRemoved: ChartAgeGroupSeries;
-    protected readonly seriesAgeGroupRemovedI: ChartAgeGroupSeries;
-    protected readonly seriesAgeGroupRemovedV: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupRemovedID: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupRemovedIU: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupRemovedVS: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupRemovedVD: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupRemovedVU: ChartAgeGroupSeries;
+
+    protected readonly seriesAgeGroupRemovedVR: ChartAgeGroupSeries;
+
 
     protected readonly seriesModification: ChartAgeGroupSeries;
 
@@ -281,38 +286,74 @@ export class ChartAgeGroup {
         });
         this.seriesAgeGroupInfectiousByStrain = new Map();
 
-        this.seriesAgeGroupRemoved = new ChartAgeGroupSeries({
+        this.seriesAgeGroupRemovedID = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'removed',
-            valueField: 'ageGroupRemoved',
-            colorKey: 'REMOVED',
+            baseLabel: 'recv_d',
+            valueField: 'ageGroupRemovedID',
+            colorKey: 'EXPOSED',
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.45,
             labelled: true,
             percent: true
         });
-        this.seriesAgeGroupRemovedI = new ChartAgeGroupSeries({
+        this.seriesAgeGroupRemovedIU = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'recovered or dead',
-            valueField: 'ageGroupRemovedI',
-            colorKey: 'REMOVED',
+            baseLabel: 'recv_u',
+            valueField: 'ageGroupRemovedIU',
+            colorKey: 'INFECTIOUS',
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.65,
             labelled: true,
             percent: true
         });
-        this.seriesAgeGroupRemovedV = new ChartAgeGroupSeries({
+        this.seriesAgeGroupRemovedVS = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'vaccinated',
-            valueField: 'ageGroupRemovedV',
+            baseLabel: 'vacc_s',
+            valueField: 'ageGroupRemovedVS',
             colorKey: 'REMOVED',
             strokeWidth: 1,
-            dashed: true,
+            dashed: false,
+            locationOnPath: 0.85,
+            labelled: true,
+            percent: true
+        });
+        this.seriesAgeGroupRemovedVD = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotRelative,
+            baseLabel: 'vacc_d',
+            valueField: 'ageGroupRemovedVD',
+            colorKey: 'EXPOSED',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.85,
+            labelled: true,
+            percent: true
+        });
+        this.seriesAgeGroupRemovedVU = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotRelative,
+            baseLabel: 'vacc_u',
+            valueField: 'ageGroupRemovedVU',
+            colorKey: 'INFECTIOUS',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.85,
+            labelled: true,
+            percent: true
+        });
+        this.seriesAgeGroupRemovedVR = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotRelative,
+            baseLabel: 'vacc_r',
+            valueField: 'ageGroupRemovedVR',
+            colorKey: 'EXPOSED',
+            strokeWidth: 1,
+            dashed: false,
             locationOnPath: 0.85,
             labelled: true,
             percent: true
@@ -383,7 +424,7 @@ export class ChartAgeGroup {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
             this.setSeriesAgeGroup(index);
         });
-        // this.columnTemplate.propertyFields.fill = 'color';
+        this.columnTemplate.propertyFields.fill = 'color';
 
         this.seriesHeat.heatRules.push({
             target: this.columnTemplate,
@@ -533,9 +574,12 @@ export class ChartAgeGroup {
         this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupInfectious.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemoved.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedI.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedV.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedID.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedIU.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedVS.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedVD.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedVU.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedVR.setSeriesNote(ageGroup.getName());
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
         modificationValuesStrain.forEach(strainValues => {
@@ -641,9 +685,12 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.tooltip.disabled = !visible;
 
         this.seriesAgeGroupSusceptible.getSeries().visible = visible;
-        this.seriesAgeGroupRemoved.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedI.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedV.getSeries().visible = visible;
+        this.seriesAgeGroupRemovedID.getSeries().visible = visible;
+        this.seriesAgeGroupRemovedIU.getSeries().visible = visible;
+        this.seriesAgeGroupRemovedVS.getSeries().visible = visible;
+        this.seriesAgeGroupRemovedVD.getSeries().visible = visible;
+        this.seriesAgeGroupRemovedVU.getSeries().visible = visible;
+        this.seriesAgeGroupRemovedVR.getSeries().visible = visible;
 
     }
 
@@ -817,19 +864,31 @@ export class ChartAgeGroup {
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
             const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID___________ALL];;
             const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL];
-            const ageGroupRemovedI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_D + dataItem.valueset[ageGroupPlot.getName()].REMOVED_U;
-            const ageGroupRemovedV = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V;
+            const ageGroupRemovedID = dataItem.valueset[ageGroupPlot.getName()].REMOVED_ID;
+            const ageGroupRemovedIU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_IU;
+            const ageGroupRemovedVS = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VS;
+            const ageGroupRemovedVD = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VD;
+            const ageGroupRemovedVU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VU;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
+
+            const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
+            let ageGroupRemovedVR = null;
+            if (dataItemB) {
+                ageGroupRemovedVR = dataItemB[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND] / ageGroupPlot.getAbsValue();
+            }
 
             const item = {
                 categoryX: dataItem.categoryX,
                 ageGroupSusceptible,
                 ageGroupExposed,
                 ageGroupInfectious,
-                ageGroupRemoved: ageGroupRemovedI + ageGroupRemovedV,
-                ageGroupRemovedI,
-                ageGroupRemovedV,
+                ageGroupRemovedID, //: ageGroupRemovedID + ageGroupRemovedIU,
+                ageGroupRemovedIU,
+                ageGroupRemovedVS: ageGroupRemovedVS + ageGroupRemovedVD + ageGroupRemovedVU,
+                ageGroupRemovedVR,
+                ageGroupRemovedVD,
+                ageGroupRemovedVU,
                 ageGroupIncidence,
                 ageGroupCases
             }
@@ -861,17 +920,17 @@ export class ChartAgeGroup {
 
                     // const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
                     // value -= baseIncidence;
-                    // const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND] / ageGroupHeat.getAbsValue();
-                    // value -= baseVaccination;
+                    const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND] / ageGroupHeat.getAbsValue();
+                    value -= baseVaccination;
 
                     let r = 0;
                     let g = 0;
                     let b = 0;
                     if (value >= 0) {
-                        g = value / 50; //.1;
+                        g = value / .05;
                     }
                     else {
-                        r = value / -50; // -.1;
+                        r = value / -.05;
                     }
                     const rgb = [r, g, b];
                     const hsv = [0, 0, 0];
@@ -905,7 +964,7 @@ export class ChartAgeGroup {
 
         // console.log('chartData', chartData);
 
-        if (this.chart.data.length === chartData.length) {
+        if (false && this.chart.data.length === chartData.length) {
             for (let i = 0; i < chartData.length; i++) {
                 for (const key of Object.keys(chartData[i])) { // const key in chartData[i]
                     this.chart.data[i][key] = chartData[i][key];

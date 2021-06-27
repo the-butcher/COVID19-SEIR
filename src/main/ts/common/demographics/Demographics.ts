@@ -73,6 +73,9 @@ export class Demographics {
                 ageGroups: demographicsConfig.groups
             }
 
+            /**
+             * TODO test scenarios from spring (i.e. after school opening when alpha came)
+             */
             const corrections: number[] = [
                 0.8,
                 1,

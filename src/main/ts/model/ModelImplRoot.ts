@@ -1,4 +1,3 @@
-
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
@@ -21,11 +20,9 @@ import { ModelState } from './state/ModelState';
 import { IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
 
 interface IVaccinationGroupData {
-    nrmVaccS: number; // susceptible - vaccination of susceptible population -> 2 shots
-    nrmVaccD: number; // discovered - vaccination of cases previously discovered -> 1 shot
-    nrmVaccU: number; // undiscovered - vaccination of cases previously undiscovered -> 2 shots
-    nrmVaccT: number; // total number of shots that would be consumed
-    priority: number;
+    nrmReqS: number; // susceptible - vaccination of susceptible population -> 2 shots
+    nrmReqD: number; // discovered - vaccination of cases previously discovered -> 1 shot
+    nrmReqU: number; // undiscovered - vaccination of cases previously undiscovered -> 2 shots
 }
 
 interface IBaseIncidences {
@@ -55,7 +52,6 @@ export class ModelImplRoot implements IModelSeir {
         //const approximator = new StrainApproximatorCalibrate(demographics, modifications);
         const approximator = new StrainApproximatorBaseData(demographics, modifications, baseData);
         await approximator.approximate(progressCallback);
-
 
         const instantDst = ModelInstants.getInstance().getMinInstant();
         const instantPre = ModelInstants.getInstance().getMinInstant() - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
@@ -110,10 +106,10 @@ export class ModelImplRoot implements IModelSeir {
             const absValueRemovedD = referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_REMOVED];
             const absValueRemovedU = absValueRemovedD * modificationSettings.getUndetected();
 
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_D, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R__REMOVED_ID, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedD.push(compartmentRemovedD);
 
-            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_U, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedU.push(compartmentRemovedU);
 
             // configurable
@@ -214,145 +210,206 @@ export class ModelImplRoot implements IModelSeir {
 
         const result = ModelState.empty();
 
+        // const eT = tT - new Date('2021-02-01').getTime();
+        const oTX = new Date('2021-02-08').getTime(); // ref vaccination start
+        const oTD = 310 * TimeUtil.MILLISECONDS_PER____DAY; // priority buildup time
+
+        const groupDelayWeeks: number[] = [
+            19, // >= 04
+            19, // 05-14
+            12.0, // 15-24
+            12.0, // 25-34
+            13.0, // 35-44
+            13.0, // 45-54
+            14.9, // 55-64
+            14.0, // 65-74
+            12.2, // 75-84
+            12.9  // >= 85
+        ].map(v => v * 7 * TimeUtil.MILLISECONDS_PER____DAY);
+
+        const fullPriorities: number[] = [
+            1, // >= 04
+            1, // 05-14
+            1, // 15-24
+            2, // 25-34
+            4, // 35-44
+            4, // 45-54
+            150, // 55-64
+            750, // 65-74
+            80, // 75-84
+            80 // >= 85
+        ];
+
+        const groupPriorities: number[] = [];
+
+        for (let i = 0; i < this.vaccinationModels.length; i++) {
+
+            // risk prio to that point
+            const oTA = oTX + groupDelayWeeks[i];
+            const oTB = oTA + oTD;
+
+
+            let grpPrio = 0;
+             if (tT > oTA && tT < oTB) {
+                grpPrio += fullPriorities[i] * (tT - oTA) / (oTB - oTA);
+
+            } else if (tT > oTB) {
+                grpPrio = fullPriorities[i];
+            }
+            groupPriorities.push(grpPrio);
+
+            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+            //     console.log('vacS', TimeUtil.formatCategoryDate(tT), i, new Date(oTB), groupPriorities[i]);
+            // }
+
+        }
+
+
+
+
+
+
         // collect a total vaccination priority
         const vaccinationGroupDataset: IVaccinationGroupData[] = [];
 
-        let totalPriority = 0;
         for (let i = 0; i < this.vaccinationModels.length; i++) {
 
             /**
              * maximum percentage that this age-groups accepts (by configuration)
              */
-            const grpVaccMax = this.vaccinationModels[i].getGrpAccept();
+            // const grpVacMax = this.vaccinationModels[i].getGrpAccept();
+            const grpVacMax = this.vaccinationModels[i].getGrpAccept();
 
-            /**
-             * already in a vaccination state (susceptible in the beginning, protected after a while)
-             */
-            const grpVaccAct = (state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizing()) + state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizedV())) * this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal();
+            if (grpVacMax > 0) {
 
-            // const
+                let grpVacD = state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizedD());
+                let grpMaxD = grpVacMax * (grpVacD + state.getNrmValue(this.compartmentsRemovedD[i]));
+                grpVacD *= this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal(); // currently vaccinated after symptomatic recovery (percentage of group)
+                grpMaxD *= this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal(); // all after symptomatic recovery vaccinated or not (percentage of group)
 
-            /**
-             * share that still want to get vaccinated
-             */
-            const grpVaccDif = (grpVaccMax - grpVaccAct);
-            const grpVaccMlt = grpVaccDif / grpVaccMax;
+                let grpDifD = grpMaxD - grpVacD;
+                let grpFacD = grpDifD / grpMaxD; // percentage of people that are currently vaccinated among symptomatic recovery (with respect to max possible vaccinated)
+                let nrmDifD = 0;
+                if (grpDifD > 0) {
+                    nrmDifD = grpDifD / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+                }
 
-            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
-            //     console.log('grpVaccDif', i, TimeUtil.formatCategoryDate(tT), grpVaccDif, grpVaccMlt);
-            // }
+                let grpVacU = state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizedU());
+                let grpMaxU = grpVacMax * (grpVacU + state.getNrmValue(this.compartmentsRemovedU[i]));
+                grpVacU *= this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal(); // currently vaccinated after asymptomatic recovery (percentage of group)
+                grpMaxU *= this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal(); // all after asymptomatic recovery vaccinated or not (percentage of group)
 
-            /**
-             * how much missing?
-             */
-            const nrmVaccDif = grpVaccDif / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+                let grpDifU = grpMaxU - grpVacU;
+                let grpFacU = grpDifU / grpMaxU; // percentage of people that are currently vaccinated among asymptomatic recovery (with respect to max possible vaccinated)
+                let nrmDifU = 0;
+                if (grpDifU > 0) {
+                    nrmDifU = grpDifU / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+                }
 
-            const groupPriorities: number[] = [
-                2000,
-                2000,
-                50000,
-                53000,
-                56085,
-                60000,
-                65000,
-                80000,
-                90000,
-                70000
-            ].map(i => Math.pow(i, 7));
+                let grpVacS = 0; // currently vaccinated in this group (percentage of group)
+                grpVacS += state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizing());
+                grpVacS += state.getNrmValue(this.vaccinationModels[i].getCompartmentImmunizedS());
+                let grpMaxS = grpVacMax * (grpVacS + state.getNrmValue(this.compartmentsSusceptible[i]));
+                grpVacS *= this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal(); // currently vaccinated after asymptomatic recovery (percentage of group)
+                grpMaxS *= this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal(); // all after asymptomatic recovery vaccinated or not (percentage of group)
 
-            if (nrmVaccDif > 0) {
+                let grpDifS = grpMaxS - grpVacS
+                let grpFacS = grpDifS / grpMaxS; // percentage of people that are currently vaccinated amon recovered (with respect to max possible vaccinated)
+                let nrmDifS = 0;
+                if (grpDifS > 0) {
+                    nrmDifS = grpDifS / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+                }
+
+                // const shareOfSusceptible =
+
+                let nrmReqS = groupPriorities[i] * Math.max(0, nrmDifS * grpFacS); // * 2
+
+                const nrmShrS = nrmReqS / grpMaxS; // the share just requested from susceptible
+                let nrmReqD = nrmShrS * state.getNrmValue(this.compartmentsRemovedU[i]);
+                let nrmReqU = nrmShrS * state.getNrmValue(this.compartmentsRemovedD[i]);
 
 
-                let nrmVaccS = state.getNrmValue(this.compartmentsSusceptible[i]) * 2;
-                let nrmVaccD = state.getNrmValue(this.compartmentsRemovedD[i]);
-                let nrmVaccU = state.getNrmValue(this.compartmentsRemovedU[i]) * 2;
-                let nrmVaccT = nrmVaccS + nrmVaccD + nrmVaccU;
+                // let nrmReqD = groupPriorities[i] * Math.max(0, nrmDifD * grpFacD);
+                // let nrmReqU = groupPriorities[i] * Math.max(0, nrmDifU * grpFacU * 2); // * 2 // grpFacU
 
-                // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
-                //     console.warn('nrmVaccSDU', i, TimeUtil.formatCategoryDate(tT), nrmVaccT, nrmVaccS * this.getAbsTotal(), this.compartmentsSusceptible[i]);
-                // }
-
-                nrmVaccS *= nrmVaccDif / nrmVaccT;
-                nrmVaccD *= nrmVaccDif / nrmVaccT;
-                nrmVaccU *= nrmVaccDif / nrmVaccT;
-                nrmVaccT = nrmVaccS + nrmVaccD + nrmVaccU;
-
-                //  * this.getAbsTotal() / this.vaccinationModels[i].getAgeGroupTotal()
-                // nrmVaccT
-                const priority = nrmVaccT * groupPriorities[i] * grpVaccMlt; // grpVaccMlt here smoothens the transition from some still vaccinateable
                 vaccinationGroupDataset.push({
-                    nrmVaccS,
-                    nrmVaccD,
-                    nrmVaccU,
-                    nrmVaccT,
-                    priority
+                    nrmReqS,
+                    nrmReqD,
+                    nrmReqU
                 });
-                totalPriority += priority;
 
+                // if (tT % TimeUtil.MILLISECONDS_PER____DAY / 2 === 0 && i === 6) {
+                //     console.log('vacS', TimeUtil.formatCategoryDate(tT), grpVacD, grpMaxD, grpDifD, grpFacD, ' -> ', nrmReqD);
+                // }
 
             } else {
 
                 vaccinationGroupDataset.push({
-                    nrmVaccS: 0,
-                    nrmVaccD: 0,
-                    nrmVaccU: 0,
-                    nrmVaccT: 0,
-                    priority: 0
+                    nrmReqS: 0,
+                    nrmReqD: 0,
+                    nrmReqU: 0
                 });
 
             }
 
-            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
-            //     console.log('nrmVaccDif', i, TimeUtil.formatCategoryDate(tT),  nrmVaccGrp, vaccinationGroupDataset[vaccinationGroupDataset.length - 1]);
-            // }
-
-
         }
 
+        // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        //     console.log('vaccinationGroupDataset', TimeUtil.formatCategoryDate(tT), vaccinationGroupDataset);
+        // }
 
-        let nrmDosesTotal = modificationTime.getDosesPerDay() * dT / TimeUtil.MILLISECONDS_PER____DAY / this.getAbsTotal();
-        // let nrmDosesCheck = 0;
-        for (let i = this.vaccinationModels.length - 1; i >= 0; i--) {
+        let nrmReqT = 0;
+        vaccinationGroupDataset.forEach(vaccinationGroupData => {
+            nrmReqT += vaccinationGroupData.nrmReqS;
+            nrmReqT += vaccinationGroupData.nrmReqD;
+            nrmReqT += vaccinationGroupData.nrmReqU;
+        });
 
-            const ageGroupShare = vaccinationGroupDataset[i].priority / totalPriority;
-            const nrmGroupDoses = nrmDosesTotal * ageGroupShare;
-            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-            //     console.log('nrmTotal', i, state.getNrmValue(this.compartmentsSusceptible[i]), ageGroupShare);
-            // }
+        if (nrmReqT > 0) {
 
-            if (nrmGroupDoses > 0) {
+            // available doses that day
+            let nrmJabTotal = modificationTime.getDosesPerDay() * dT / TimeUtil.MILLISECONDS_PER____DAY / this.getAbsTotal();
 
-                // actual shares being shifted between compartments
-                const nrmIncrS = nrmGroupDoses * vaccinationGroupDataset[i].nrmVaccS / vaccinationGroupDataset[i].nrmVaccT / 2;
-                const nrmIncrD = nrmGroupDoses * vaccinationGroupDataset[i].nrmVaccD / vaccinationGroupDataset[i].nrmVaccT;
-                const nrmIncrU = nrmGroupDoses * vaccinationGroupDataset[i].nrmVaccU / vaccinationGroupDataset[i].nrmVaccT / 2;
+            // less requested than available
+            let requestMultiplier = 1;
+            if (nrmReqT < nrmJabTotal) {
+                nrmJabTotal = nrmReqT;
+            } else {
+                requestMultiplier = nrmReqT / nrmJabTotal;
+            }
 
-                // nrmDosesCheck += nrmIncrS;
-                // nrmDosesCheck += nrmIncrD;
-                // nrmDosesCheck += nrmIncrU;
+            if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+                console.log('mult', TimeUtil.formatCategoryDate(tT), requestMultiplier, nrmJabTotal * this.getAbsTotal() * 24);
+            }
+
+
+            for (let i = 0; i < this.vaccinationModels.length; i++) {
+
+                const vaccinationGroupData = vaccinationGroupDataset[i];
+
+                let nrmJabS = vaccinationGroupData.nrmReqS * 0.5 / requestMultiplier;
+                let nrmJabD = vaccinationGroupData.nrmReqD / requestMultiplier;
+                let nrmJabU = vaccinationGroupData.nrmReqU * 0.5 / requestMultiplier;
 
                 // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 9) {
-                //     console.log('nrmVaccT', i, vaccinationGroupDataset[i]);
+                //     console.log('giving', i, TimeUtil.formatCategoryDate(tT), (nrmJabS + nrmJabD + nrmJabU) * this.getAbsTotal() * 24);
                 // }
 
                 // remove from susceptible and add to immunizing compartment
-                result.addNrmValue(-nrmIncrS, this.compartmentsSusceptible[i]);
-                result.addNrmValue(+nrmIncrS, this.vaccinationModels[i].getCompartmentImmunizing());
+                result.addNrmValue(-nrmJabS, this.compartmentsSusceptible[i]);
+                result.addNrmValue(+nrmJabS, this.vaccinationModels[i].getCompartmentImmunizing());
 
                 // remove from discovered and add to vaccinated compartment
-                result.addNrmValue(-nrmIncrD, this.compartmentsRemovedD[i]);
-                result.addNrmValue(+nrmIncrD, this.vaccinationModels[i].getCompartmentImmunizedV());
+                result.addNrmValue(-nrmJabD, this.compartmentsRemovedD[i]);
+                result.addNrmValue(+nrmJabD, this.vaccinationModels[i].getCompartmentImmunizedD());
 
-                // remove from undiscovered and add to vaccinated compartment
-                result.addNrmValue(-nrmIncrU, this.compartmentsRemovedU[i]);
-                result.addNrmValue(+nrmIncrU, this.vaccinationModels[i].getCompartmentImmunizedV());
+                // // remove from undiscovered and add to vaccinated compartment
+                result.addNrmValue(-nrmJabU, this.compartmentsRemovedU[i]);
+                result.addNrmValue(+nrmJabU, this.vaccinationModels[i].getCompartmentImmunizedU());
 
             }
 
         }
-        // if (tT % (TimeUtil.MILLISECONDS_PER____DAY) === 0) {
-        //     console.log('nrmGroupCheck', nrmDosesTotal, nrmDosesCheck);
-        // }
 
         this.vaccinationModels.forEach(vaccinationModel => {
             result.add(vaccinationModel.apply(state, dT, tT, modificationTime));

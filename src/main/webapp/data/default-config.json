@@ -38,7 +38,7 @@
       "r0": 4.4,
       "serialInterval": 4.8,
       "intervalScale": 1,
-      "dstIncidence": 147.52816920647004,
+      "dstIncidence": 147.52803703471227,
       "deletable": false,
       "draggable": false,
       "primary": true
@@ -78,7 +78,7 @@
       "key": "VACCINATION",
       "name": "daily vaccinations",
       "instant": 1619827200000,
-      "doses": 35000,
+      "doses": 25000,
       "deletable": false,
       "draggable": false
     },
@@ -95,16 +95,6 @@
       "draggable": true
     },
     {
-      "id": "d3f4f",
-      "key": "VACCINATION",
-      "name": "daily vaccinations 2",
-      "instant": 1621036800000,
-      "doses": 100000,
-      "deletable": true,
-      "draggable": true,
-      "primary": false
-    },
-    {
       "id": "be71c",
       "key": "CONTACT",
       "name": "schools full",
@@ -116,6 +106,16 @@
         "work": 0.44,
         "other": 0.3
       },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "16a18",
+      "key": "VACCINATION",
+      "name": "copy of daily vaccinations",
+      "instant": 1621382400000,
+      "doses": 159000,
       "deletable": true,
       "draggable": true,
       "primary": false
