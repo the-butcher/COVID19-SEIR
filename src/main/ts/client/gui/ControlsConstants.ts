@@ -177,7 +177,7 @@ export class ControlsConstants {
         },
         'VACC': {
             id: ObjectUtil.createId(),
-            getHeatValue: (dataItem, ageGroupName) => ( dataItem.valueset[ageGroupName].REMOVED_VS + dataItem.valueset[ageGroupName].REMOVED_VD + dataItem.valueset[ageGroupName].REMOVED_VU),
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].REMOVED_VC,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.23, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: () => 1,

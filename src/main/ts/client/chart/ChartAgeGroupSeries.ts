@@ -87,7 +87,7 @@ export class ChartAgeGroupSeries {
             if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
                 const itemCurr = target.dataItems.values[indexCurr];
                 const valueCurr = itemCurr.dataContext[this.valueField];
-                return `${this.seriesLabel.text}: ${this.labellingDefinition.format(valueCurr)}`;
+                return valueCurr ? `${this.seriesLabel.text}: ${this.labellingDefinition.format(valueCurr)}` : undefined;
             } else {
                 return value;
             }

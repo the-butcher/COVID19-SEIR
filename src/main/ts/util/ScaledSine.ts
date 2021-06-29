@@ -24,7 +24,13 @@ export class ScaledSine {
     }
 
     getY(x: number): number {
-        return (Math.sin(x * this.scaleX + this.offsetX) + this.offsetY) * this.scaleY;
+        if (x < 0) {
+            return 0;
+        } else if (x > 1) {
+            return 1;
+        } else {
+            return (Math.sin(Math.pow(x, 0.5) * this.scaleX + this.offsetX) + this.offsetY) * this.scaleY;
+        }
     }
 
     getX(y: number): number {

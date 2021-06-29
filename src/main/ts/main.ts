@@ -1,3 +1,4 @@
+import { IconBezierHandle } from './client/gui/IconBezierHandle';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
@@ -21,12 +22,13 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             ModelActions.getInstance();
 
             setTimeout(() => {
-                ModelActions.getInstance().toggleModelMode('STRAIN');
+                ModelActions.getInstance().toggleModelMode('VACCINATION');
                 ModelActions.getInstance().toggleChartMode('VACC');
                 requestAnimationFrame(() => {
                     ChartAgeGroup.getInstance();
                     ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
                 });
+
             }, 250);
 
         }).catch(e => {

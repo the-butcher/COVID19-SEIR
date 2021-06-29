@@ -38,7 +38,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
         this.baseData = baseData;
 
         this.instantDst = ModelInstants.getInstance().getMinInstant();
-        this.instantPre = this.instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
+        this.instantPre = ModelInstants.getInstance().getPreInstant();
         this.referenceDataRemoved = this.baseData.findBaseData(TimeUtil.formatCategoryDate(this.instantPre));
 
     }

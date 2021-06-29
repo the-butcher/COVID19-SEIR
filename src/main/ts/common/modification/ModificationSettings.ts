@@ -22,10 +22,6 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         return this.modificationValues.undetected;
     }
 
-    // getVaccinated(): number {
-    //     return this.modificationValues.vaccinated;
-    // }
-
     getQuarantine(): number {
         return this.modificationValues.quarantine;
     }

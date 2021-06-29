@@ -1,7 +1,7 @@
 import { Axis, Chart, Series, XYChart } from '@amcharts/amcharts4/charts';
 import { color } from '@amcharts/amcharts4/core';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { CHART_MODE______KEY, ControlsConstants, IHeatmapColorDefinition, ILabellingDefinition } from './../gui/ControlsConstants';
+import { ControlsConstants, IHeatmapColorDefinition, ILabellingDefinition } from './../gui/ControlsConstants';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 
 /**

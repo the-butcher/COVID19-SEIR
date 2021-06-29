@@ -22,7 +22,7 @@ export class ContactMatrixExposure implements IContactMatrix {
 
         this.instant = instant;
 
-        const dataItem = ChartAgeGroup.getInstance().findDataItem(instant);
+        const dataItem = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
         if (dataItem) {
             this.contacts = [];
             this.maxCellTotal = 0;
@@ -31,7 +31,7 @@ export class ContactMatrixExposure implements IContactMatrix {
                 let colTotal = 0;
                 this.contacts[indexContact] = [];
                 for (let indexParticipant = 0; indexParticipant < ageGroups.length; indexParticipant++) {
-                    this.contacts[indexContact][indexParticipant] = ChartAgeGroup.getInstance().findDataItem(instant).exposure[indexContact][indexParticipant] * demographics.getAbsTotal() / demographics.getAgeGroups()[indexContact].getAbsValue();
+                    this.contacts[indexContact][indexParticipant] = ChartAgeGroup.getInstance().findDataItemByInstant(instant).exposure[indexContact][indexParticipant] * demographics.getAbsTotal() / demographics.getAgeGroups()[indexContact].getAbsValue();
                     this.maxCellTotal = Math.max(this.maxCellTotal, this.contacts[indexContact][indexParticipant]);
                     colTotal += this.contacts[indexContact][indexParticipant];
                 }

@@ -37,6 +37,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         // nothing to be updated
     }
 
+    getLutByName(ageGroup: string): { [K in number]: number} {
+        return this.modificationVaccination.getLutByName(ageGroup);
+    }
+
     /**
      * TODO there should be a test for this
      * must be instant A (the underlying contact modification may have a different time, while still applying to this instance)
@@ -55,7 +59,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         super.setInstants(instantA, instantB);
         this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA());
         this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
-        this.modificationVaccination = new ModificationResolverVaccination().getModification(this.getInstantA());
+        this.modificationVaccination = Modifications.getInstance().findModificationsByType('VACCINATION')[0] as ModificationVaccination; // not mutable, thus reusable
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
         this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
     }
@@ -66,10 +70,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     getMaxCellTotal(): number {
         return this.modificationContact.getMaxCellTotal();
-    }
-
-    getDosesPerDay(): number {
-        return this.modificationVaccination.getDosesPerDay();
     }
 
     getSeasonality(): number {

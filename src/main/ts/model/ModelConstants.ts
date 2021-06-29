@@ -85,7 +85,7 @@ export class ModelConstants {
                 key: 'VACCINATION',
                 name: 'vaccinations',
                 instant,
-                doses: 0,
+                vaccinationCurves: {},
                 deletable: true,
                 draggable: true
             }),
@@ -100,7 +100,10 @@ export class ModelConstants {
 
     static readonly PRELOAD_________________DAYS = 7;
     static readonly APPROXIMATION_________CYCLES = 3;
-    static readonly VACCINATION_TO_IMMUNITY_DAYS = 35;
+
+    static readonly V1_TO_V2________________DAYS = 35;
+    static readonly V2_TO_VI________________DAYS = 21;
+
     static readonly AGE_GROUP_ALL = -1;
 
     static readonly AGEGROUP_NAME_______ALL = 'TOTAL';
@@ -108,7 +111,8 @@ export class ModelConstants {
 
     static readonly BASE_DATA_INDEX_EXPOSED = 0;
     static readonly BASE_DATA_INDEX_REMOVED = 1;
-    static readonly BASE_DATA_INDEX_VACC2ND = 2;
+    static readonly BASE_DATA_INDEX_VACC1ST = 2;
+    static readonly BASE_DATA_INDEX_VACC2ND = 3;
 
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];

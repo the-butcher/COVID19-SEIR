@@ -37,8 +37,8 @@ export class ModificationResolverStrain extends AModificationResolver<IModificat
         // const interval = TimeUtil.MILLISECONDS_PER____DAY;
 
         const instantB = instantA + TimeUtil.MILLISECONDS_PER____DAY * 5;
-        const dataItemA = ChartAgeGroup.getInstance().findDataItem(instantA);
-        const dataItemB = ChartAgeGroup.getInstance().findDataItem(instantB);
+        const dataItemA = ChartAgeGroup.getInstance().findDataItemByInstant(instantA);
+        const dataItemB = ChartAgeGroup.getInstance().findDataItemByInstant(instantB);
         if (dataItemA && dataItemB) {
 
             // https://en.wikipedia.org/wiki/Basic_reproduction_number;

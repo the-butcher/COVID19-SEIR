@@ -35,15 +35,15 @@ export class ObjectUtil {
         return values.map(v => v / valueSum);
     }
 
-    /**
-     * calculate a values for vaccinations suitable to a given population size
-     * @param absTotal
-     * @returns
-     */
-    static getMaxVaccinations(absTotal: number): number {
-        const log = Math.round(Math.log10(absTotal));
-        const div = Math.pow(10, log) * 0.25;
-        return Math.round(absTotal / div) * div * 0.02;
-    }
+    // /**
+    //  * calculate a values for vaccinations suitable to a given population size
+    //  * @param absTotal
+    //  * @returns
+    //  */
+    // static getMaxVaccinations(absTotal: number): number {
+    //     const log = Math.round(Math.log10(absTotal));
+    //     const div = Math.pow(10, log) * 0.25;
+    //     return Math.round(absTotal / div) * div * 0.02;
+    // }
 
 }

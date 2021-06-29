@@ -185,6 +185,10 @@ export class Demographics {
         return this.ageGroups;
     }
 
+    findAgeGroupByName(ageGroup: string): AgeGroup {
+        return this.ageGroups.find(g => g.getName() === ageGroup);
+    }
+
     getContactCategories(): ContactCategory[] {
         return this.contactCategories;
     }

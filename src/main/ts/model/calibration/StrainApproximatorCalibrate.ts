@@ -3,8 +3,6 @@ import { Modifications } from '../../common/modification/Modifications';
 import { ModificationContact } from './../../common/modification/ModificationContact';
 import { ModificationStrain } from './../../common/modification/ModificationStrain';
 import { ModificationTesting } from './../../common/modification/ModificationTesting';
-import { TimeUtil } from './../../util/TimeUtil';
-import { ModelConstants } from './../ModelConstants';
 import { ModelInstants } from './../ModelInstants';
 import { IModelProgress } from './../state/ModelStateIntegrator';
 import { IBaseDataItem } from './BaseData';
@@ -48,7 +46,7 @@ export class StrainApproximatorCalibrate implements IStrainApproximator {
     async approximate(progressCallback: (progress: IModelProgress) => void): Promise<void> {
 
         const instantDst = ModelInstants.getInstance().getMinInstant();
-        const instantPre = instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
+        const instantPre = ModelInstants.getInstance().getPreInstant();
 
         const modificationsStrain = this.modifications.findModificationsByType('STRAIN').map(m => m as ModificationStrain);
         const modificationContact = this.modifications.findModificationsByType('CONTACT')[0] as ModificationContact;

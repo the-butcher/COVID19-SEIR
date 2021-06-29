@@ -1,4 +1,5 @@
 import { IModificationValues as IModificationValues } from './IModificationValues';
+import { IVaccinationCurve } from './IVaccinationCurve';
 
 /**
  *
@@ -8,8 +9,8 @@ import { IModificationValues as IModificationValues } from './IModificationValue
 export interface IModificationValuesVaccination extends IModificationValues {
 
     /**
-     * get the number of doses configured in this instance
+     * vaccination curves by age-groups
      */
-    doses: number;
+    vaccinationCurves: { [K in string] : IVaccinationCurve };
 
 }

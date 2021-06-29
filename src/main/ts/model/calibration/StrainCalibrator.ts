@@ -3,7 +3,6 @@ import { IModificationValuesStrain } from '../../common/modification/IModificati
 import { IModificationValuesTesting } from '../../common/modification/IModificationValuesTesting';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModificationTime } from '../../common/modification/ModificationTime';
-import { TimeUtil } from '../../util/TimeUtil';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
 import { ECompartmentType } from '../compartment/ECompartmentType';
 import { ModelConstants } from '../ModelConstants';
@@ -33,7 +32,7 @@ export class StrainCalibrator {
         /**
          * start at minus preload days
          */
-        const curInstant = ModelInstants.getInstance().getMinInstant() - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
+        const preInstant = ModelInstants.getInstance().getPreInstant();
 
         /**
          * start with some default
@@ -59,7 +58,7 @@ export class StrainCalibrator {
                 id: 'calibrate (contact)',
                 key: 'CONTACT',
                 name: 'calibrate (contact)',
-                instant: curInstant,
+                instant: preInstant,
                 multipliers: {},
                 deletable: false,
                 draggable: false
@@ -69,7 +68,7 @@ export class StrainCalibrator {
                 id: 'calibrate (settings)',
                 key: 'SETTINGS',
                 name: 'calibrate (settings)',
-                instant: curInstant,
+                instant: preInstant,
                 undetected: 0.0,
                 quarantine: 0.0,
                 dead: 0.0,
@@ -80,7 +79,7 @@ export class StrainCalibrator {
                 id: 'calibrate (time)',
                 key: 'TIME',
                 name: 'calibrate (time)',
-                instant: curInstant,
+                instant: preInstant,
                 deletable: false,
                 draggable: false
             }
@@ -91,11 +90,11 @@ export class StrainCalibrator {
             id: 'calibrate (time)',
             key: 'TIME',
             name: 'calibrate (time)',
-            instant: curInstant,
+            instant: preInstant,
             deletable: false,
             draggable: false
         }) as ModificationTime;
-        modificationTimeCalibrate.setInstants(curInstant, curInstant);
+        modificationTimeCalibrate.setInstants(preInstant, preInstant);
 
         let model: ModelImplRoot = null;
         let modelStateIntegrator: ModelStateIntegrator;
@@ -115,13 +114,13 @@ export class StrainCalibrator {
                 ">= 85": [0, 0, 0],
                 "TOTAL": [0, 0, 0]
             }, baseData);
-            modelStateIntegrator = new ModelStateIntegrator(model, curInstant);
+            modelStateIntegrator = new ModelStateIntegrator(model, preInstant);
 
             const modelState = modelStateIntegrator.getModelState();
             const strainModel = model.findStrainModel(modificationValuesStrain.id);
 
             // single step on the strain model
-            strainModel.apply(modelState, ModelStateIntegrator.DT, curInstant, modificationTimeCalibrate);
+            strainModel.apply(modelState, ModelStateIntegrator.DT, preInstant, modificationTimeCalibrate);
 
             const absDeltas = strainModel.getAbsDeltas();
             let absDeltaAvg = 0;

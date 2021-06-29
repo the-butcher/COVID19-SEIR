@@ -8,6 +8,8 @@ import { IconChartMode } from './IconChartMode';
 import { IconModelMode } from './IconModelMode';
 import { SliderModification } from './SliderModification';
 
+
+
 export interface IIconActionParams {
     container: string;
     actionFunction: () => void;

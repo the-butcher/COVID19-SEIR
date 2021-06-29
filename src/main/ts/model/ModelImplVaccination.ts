@@ -1,12 +1,10 @@
+import { CompartmentChain } from './compartment/CompartmentChain';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
-import { Modifications } from '../common/modification/Modifications';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
-import { ModificationSettings } from './../common/modification/ModificationSettings';
 import { BaseData } from './calibration/BaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
-import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
@@ -28,22 +26,19 @@ export class ModelImplVaccination implements IModelSeir {
     // private groupPriority: number;
     private readonly grpAccept: number;
 
-    private readonly compartmentImmunizing: CompartmentBase;
+    /**
+     * pure model based --> does not match the VR1 curve, since it is a pass through compartment, continuing to VM2
+     */
+    private readonly compartmentV1: CompartmentBase;
 
     /**
-     * coming from susceptible
+     * pure model based --> should match the VR2 curve, which yet has to proof true
      */
-    private readonly compartmentImmunizedS: CompartmentBase;
+    private readonly compartmentV2: CompartmentBase;
 
-    /**
-     * coming from discovered
-     */
-    private readonly compartmentImmunizedD: CompartmentBase;
+    private readonly compartmentVC: CompartmentBase;
 
-    /**
-     * coming from undiscovered
-     */
-    private readonly compartmentImmunizedU: CompartmentBase;
+
     private integrationStep: IModelIntegrationStep;
 
     constructor(parentModel: ModelImplRoot, modelSettings: Demographics, ageGroup: AgeGroup) {
@@ -55,49 +50,34 @@ export class ModelImplVaccination implements IModelSeir {
         this.ageGroupName = ageGroup.getName();
         this.grpAccept = ageGroup.getAcpt();
 
-        const instantDst = ModelInstants.getInstance().getMinInstant();
-        const instantPre = instantDst - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.PRELOAD_________________DAYS;
-        const category1 = TimeUtil.formatCategoryDate(instantPre + TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
-        const category2 = TimeUtil.formatCategoryDate(instantPre);
+        const instantDA = ModelInstants.getInstance().getMinInstant();
+        const instantDB = ModelInstants.getInstance().getMinInstant() - TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.V1_TO_V2________________DAYS;
+        const instantPre = ModelInstants.getInstance().getPreInstant();
 
-        const vacc1 = BaseData.getInstance().findBaseData(category1)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
-        const vacc2 = BaseData.getInstance().findBaseData(category2)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+        const categoryDA = TimeUtil.formatCategoryDate(instantDA);
+        const categoryDB = TimeUtil.formatCategoryDate(instantDB);
+        const categoryP = TimeUtil.formatCategoryDate(instantPre);
 
-        const modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
+        const vaccC = BaseData.getInstance().findBaseData(categoryP)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        // console.log('vaccC', vaccC, this.ageGroupName);
 
-        // share of people immunized in this group
-        const vaccShare = vacc2 / this.ageGroupTotal;
+        const vacc1A = BaseData.getInstance().findBaseData(categoryDA)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        const vacc1B = BaseData.getInstance().findBaseData(categoryDB)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        const vacc2 = BaseData.getInstance().findBaseData(categoryDA)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
 
-        // total removed in this group
-        const removed = BaseData.getInstance().findBaseData(category1)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_REMOVED];
+        this.compartmentVC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, vaccC, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
 
-        // assume equal vaccination share for removed -> total people vaccinated after infection
-        const vaccD = removed * vaccShare;
+        this.compartmentV1 = new CompartmentBase(ECompartmentType.R__REMOVED_V1, this.absTotal, vacc1A - vacc1B, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, ModelConstants.V1_TO_V2________________DAYS * TimeUtil.MILLISECONDS_PER____DAY);
+        this.compartmentV2 = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
 
-        // total people vaccinated after undiscovered infection
-        const vaccU = vaccD * modificationSettings.getUndetected();
-
-        // total vaccinated minus vaccinated from removed --> vaccinated directly from susceptible
-        const vaccS = vacc2 - vaccD - vaccU;
-
-        // console.log('initial vacc', this.ageGroupName, vaccShare);
-        // share of people in this age group vaccinated
-
-        this.compartmentImmunizing = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.absTotal, vacc1 - vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, TimeUtil.MILLISECONDS_PER____DAY * ModelConstants.VACCINATION_TO_IMMUNITY_DAYS);
-        this.compartmentImmunizedS = new CompartmentBase(ECompartmentType.R__REMOVED_VS, this.absTotal, vaccS, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedD = new CompartmentBase(ECompartmentType.R__REMOVED_VD, this.absTotal, vaccD, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
-        this.compartmentImmunizedU = new CompartmentBase(ECompartmentType.R__REMOVED_VU, this.absTotal, vaccU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
         this.integrationStep = {
             apply: (modelState: IModelState, dT: number, tT: number) => {
-                const continuationRate = this.compartmentImmunizing.getContinuationRatio().getRate(dT, tT);
-                const continuationValue = continuationRate * modelState.getNrmValue(this.compartmentImmunizing);
-                const increments = ModelState.empty();
-                increments.addNrmValue(-continuationValue, this.compartmentImmunizing);
-                increments.addNrmValue(+continuationValue, this.compartmentImmunizedS);
 
-                // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && this.ageGroupIndex === 7) {
-                //     console.log('continuationValue', TimeUtil.formatCategoryDate(tT), continuationValue, continuationValue * this.getAbsTotal());
-                // }
+                const continuationRate = this.compartmentV1.getContinuationRatio().getRate(dT, tT);
+                const continuationValue = continuationRate * modelState.getNrmValue(this.compartmentV1);
+                const increments = ModelState.empty();
+                increments.addNrmValue(-continuationValue, this.compartmentV1);
+                increments.addNrmValue(+continuationValue, this.compartmentV2);
 
                 return increments;
             }
@@ -114,20 +94,16 @@ export class ModelImplVaccination implements IModelSeir {
      * get this model's compartment holding population vaccinated, but not immune yet, therefore still susceptible
      * @returns
      */
-    getCompartmentImmunizing(): CompartmentBase {
-        return this.compartmentImmunizing;
+    getCompartmentV1(): CompartmentBase {
+        return this.compartmentV1;
     }
 
-    getCompartmentImmunizedS(): CompartmentBase {
-        return this.compartmentImmunizedS;
+    getCompartmentV2(): CompartmentBase {
+        return this.compartmentV2;
     }
 
-    getCompartmentImmunizedD(): CompartmentBase {
-        return this.compartmentImmunizedD;
-    }
-
-    getCompartmentImmunizedU(): CompartmentBase {
-        return this.compartmentImmunizedU;
+    getCompartmentVC(): CompartmentBase {
+        return this.compartmentVC;
     }
 
     getGrpAccept(): number {
@@ -142,7 +118,7 @@ export class ModelImplVaccination implements IModelSeir {
         return this.absTotal;
     }
     getNrmValue(): number {
-        return this.compartmentImmunizing.getNrmValue() + this.compartmentImmunizedS.getNrmValue() + this.compartmentImmunizedD.getNrmValue() + this.compartmentImmunizedU.getNrmValue();
+        return this.compartmentV1.getNrmValue() + this.compartmentV2.getNrmValue(); // do not include compartmentVC
     }
     getAbsValue(): number {
         return this.getNrmValue() * this.absTotal;
@@ -160,10 +136,9 @@ export class ModelImplVaccination implements IModelSeir {
 
     getInitialState(): IModelState {
         const initialState = ModelState.empty();
-        initialState.addNrmValue(this.compartmentImmunizing.getNrmValue(), this.compartmentImmunizing);
-        initialState.addNrmValue(this.compartmentImmunizedS.getNrmValue(), this.compartmentImmunizedS);
-        initialState.addNrmValue(this.compartmentImmunizedD.getNrmValue(), this.compartmentImmunizedD);
-        initialState.addNrmValue(this.compartmentImmunizedU.getNrmValue(), this.compartmentImmunizedU);
+        initialState.addNrmValue(this.compartmentV1.getNrmValue(), this.compartmentV1);
+        initialState.addNrmValue(this.compartmentV2.getNrmValue(), this.compartmentV2);
+        initialState.addNrmValue(this.compartmentVC.getNrmValue(), this.compartmentVC);
         return initialState;
     }
 
