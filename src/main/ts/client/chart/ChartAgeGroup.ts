@@ -447,7 +447,7 @@ export class ChartAgeGroup {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
             this.setSeriesAgeGroup(index);
         });
-        this.columnTemplate.propertyFields.fill = 'color';
+        // this.columnTemplate.propertyFields.fill = 'color';
 
         this.seriesHeat.heatRules.push({
             target: this.columnTemplate,
@@ -1000,17 +1000,17 @@ export class ChartAgeGroup {
 
                     // const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
                     // value -= baseIncidence;
-                    const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC1ST] / ageGroupHeat.getAbsValue();
-                    value -= baseVaccination;
+                    // const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC1ST] / ageGroupHeat.getAbsValue();
+                    // value -= baseVaccination;
 
                     let r = 0;
                     let g = 0;
                     let b = 0;
                     if (value >= 0) {
-                        g = value / .05;
+                        g = value / 50; //.05;
                     }
                     else {
-                        r = value / -.05;
+                        r = value / -50; //-.05;
                     }
                     const rgb = [r, g, b];
                     const hsv = [0, 0, 0];

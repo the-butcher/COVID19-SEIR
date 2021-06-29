@@ -101,7 +101,7 @@ export class ModelConstants {
     static readonly PRELOAD_________________DAYS = 7;
     static readonly APPROXIMATION_________CYCLES = 3;
 
-    static readonly V1_TO_V2________________DAYS = 35;
+    static readonly V1_TO_V2_______________WEEKS = 5;
     static readonly V2_TO_VI________________DAYS = 21;
 
     static readonly AGE_GROUP_ALL = -1;

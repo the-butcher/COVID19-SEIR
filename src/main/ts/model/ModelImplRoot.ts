@@ -62,7 +62,7 @@ export class ModelImplRoot implements IModelSeir {
          */
         const model = new ModelImplRoot(demographics, Modifications.getInstance(), approximator.getReferenceDataRemoved(), baseData);
         const modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
-        // await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
         modelStateIntegrator.resetExposure();
 
         return modelStateIntegrator;
@@ -136,7 +136,7 @@ export class ModelImplRoot implements IModelSeir {
     }
 
     getCompartmentsSusceptible(ageGroupIndex: number): CompartmentBase[] {
-        return [this.compartmentsSusceptible[ageGroupIndex], this.vaccinationModels[ageGroupIndex].getCompartmentV1()];
+        return [this.compartmentsSusceptible[ageGroupIndex], ...this.vaccinationModels[ageGroupIndex].getCompartmentsV1()];
     }
 
     getCompartmentRemovedD(ageGroupIndex: number): CompartmentBase {
@@ -231,7 +231,7 @@ export class ModelImplRoot implements IModelSeir {
 
                 // remove from susceptible and add to immunizing compartment
                 result.addNrmValue(-nrmJabS, this.compartmentsSusceptible[i]);
-                result.addNrmValue(+nrmJabS, this.vaccinationModels[i].getCompartmentV1());
+                result.addNrmValue(+nrmJabS, this.vaccinationModels[i].getCompartmentsV1()[0]);
                 result.addNrmValue(+nrmJabS, this.vaccinationModels[i].getCompartmentVC());
 
                 // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 8) {

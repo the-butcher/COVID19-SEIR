@@ -86,6 +86,9 @@ A higher discovery rate means:
 ## <a name="anchor_settings">Settings</a>
 <br><br><br>
 #### Issues
+* hide vacc control points
+* find out why a full set of vacc1 values pushes v2 far up (susceptible go into minus, model breaks)
+* a window resize is likely to break vacc curves
 * create a new default-config
 * further refine vaccination model (deflate the groupPriorities and move away from vacc step - sanitize and improve performance)
 * take care of corrections on matrices (bake them into matrices)
