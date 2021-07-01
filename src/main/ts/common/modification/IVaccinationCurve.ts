@@ -11,5 +11,6 @@ export interface IVaccinationCurve {
     cA: ICoordinate;
     cB: ICoordinate;
     pB: ICoordinate;
+    vacc1ToVacc2Weeks: number;
 
 }

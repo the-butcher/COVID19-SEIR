@@ -102,17 +102,17 @@ export class StrainCalibrator {
         for (let interpolationIndex = 0; interpolationIndex < 20; interpolationIndex++) {
 
             model = new ModelImplRoot(demographics, Modifications.getInstance(), {
-                "<= 04": [0, 0, 0],
-                "05-14": [0, 0, 0],
-                "15-24": [0, 0, 0],
-                "25-34": [0, 0, 0],
-                "35-44": [0, 0, 0],
-                "45-54": [0, 0, 0],
-                "55-64": [0, 0, 0],
-                "65-74": [0, 0, 0],
-                "75-84": [0, 0, 0],
-                ">= 85": [0, 0, 0],
-                "TOTAL": [0, 0, 0]
+                "<= 04": [0, 0, 0, 0],
+                "05-14": [0, 0, 0, 0],
+                "15-24": [0, 0, 0, 0],
+                "25-34": [0, 0, 0, 0],
+                "35-44": [0, 0, 0, 0],
+                "45-54": [0, 0, 0, 0],
+                "55-64": [0, 0, 0, 0],
+                "65-74": [0, 0, 0, 0],
+                "75-84": [0, 0, 0, 0],
+                ">= 85": [0, 0, 0, 0],
+                "TOTAL": [0, 0, 0, 0]
             }, baseData);
             modelStateIntegrator = new ModelStateIntegrator(model, preInstant);
 

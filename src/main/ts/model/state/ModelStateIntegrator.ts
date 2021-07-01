@@ -253,11 +253,11 @@ export class ModelStateIntegrator {
 
             }
 
-            if (this.curInstant % TimeUtil.MILLISECONDS_PER____DAY * 7 === 0) {
+            // if (this.curInstant % TimeUtil.MILLISECONDS_PER___WEEK === 0) {
                 progressCallback({
                     ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant)
                 });
-            }
+            // }
 
         }
 

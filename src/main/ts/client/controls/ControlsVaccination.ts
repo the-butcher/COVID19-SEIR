@@ -1,11 +1,6 @@
 import { IVaccinationCurve } from '../../common/modification/IVaccinationCurve';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
-import { ModelConstants } from '../../model/ModelConstants';
-import { ModelInstants } from '../../model/ModelInstants';
-import { ModelStateIntegrator } from '../../model/state/ModelStateIntegrator';
-import { ICoordinate } from '../../util/ICoordinate';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { TimeUtil } from '../../util/TimeUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { IconBezierHandle } from '../gui/IconBezierHandle';
 import { Controls } from './Controls';
@@ -86,10 +81,10 @@ export class ControlsVaccination {
 
         this.ageGroup = ageGroup;
         const vaccinationCurve: IVaccinationCurve = this.modification.getVaccinationCurve(ageGroup);
-        this.iconBezierAP.redraw(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.pA));
-        this.iconBezierAC.redraw(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.cA));
-        this.iconBezierBC.redraw(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.cB));
-        this.iconBezierBP.redraw(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.pB));
+        this.iconBezierAP.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.pA));
+        this.iconBezierAC.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.cA));
+        this.iconBezierBC.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.cB));
+        this.iconBezierBP.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.pB));
 
         this.bezierCanvas.style.left = '0px';
         this.bezierCanvas.style.top = '0px';
@@ -107,7 +102,10 @@ export class ControlsVaccination {
     }
 
     hideVaccinationCurve(): void {
-        // TODO implement
+        this.iconBezierAP.hide();
+        this.iconBezierAC.hide();
+        this.iconBezierBC.hide();
+        this.iconBezierBP.hide();
     }
 
     acceptModification(modification: ModificationVaccination): void {
@@ -128,7 +126,7 @@ export class ControlsVaccination {
                 x: e.clientX,
                 y: e.clientY
             }
-            this.activeControlPointIcon.redraw(documentCoordinate);
+            this.activeControlPointIcon.showAt(documentCoordinate);
 
             if (this.activeControlPointIcon === this.iconBezierBC) {
 
@@ -136,7 +134,7 @@ export class ControlsVaccination {
                     x: this.iconBezierBP.getCoordinate().x,
                     y: e.clientY
                 }
-                this.iconBezierBP.redraw(documentCoordinate);
+                this.iconBezierBP.showAt(documentCoordinate);
 
             }
 

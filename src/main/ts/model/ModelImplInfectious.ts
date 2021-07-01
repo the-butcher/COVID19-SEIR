@@ -81,7 +81,6 @@ export class ModelImplInfectious implements IModelSeir {
         let absCompartmentInfectiousSum = 0;
         const incubationOffset = (compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantA + compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantB) / 2;
 
-        let weeklyPlusB = 0;
         for (let compartmentIndex = 0; compartmentIndex < compartmentParams.length; compartmentIndex++) {
 
             const compartmentParam = compartmentParams[compartmentIndex];

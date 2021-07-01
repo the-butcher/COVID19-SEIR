@@ -77,9 +77,9 @@ export class Demographics {
              * TODO test scenarios from spring (i.e. after school opening when alpha came)
              */
             const corrections: number[] = [
-                0.8,
+                0.9, // <= 04
                 1,
-                1,
+                1.02,
                 1,
                 1,
                 1,

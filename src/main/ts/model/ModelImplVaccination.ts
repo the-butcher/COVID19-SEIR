@@ -23,9 +23,6 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly ageGroupTotal: number;
     private readonly ageGroupName: string;
 
-    // private groupPriority: number;
-    private readonly grpAccept: number;
-
     /**
      * pure model based --> does not match the VR1 curve, since it is a pass through compartment, continuing to VM2
      */
@@ -36,10 +33,14 @@ export class ModelImplVaccination implements IModelSeir {
      */
     private readonly compartmentV2: CompartmentBase;
 
+
+    // private readonly compartmentVD: CompartmentBase;
+    // private readonly compartmentVU: CompartmentBase;
+
     private readonly compartmentVC: CompartmentBase;
 
 
-    private integrationStep: IModelIntegrationStep;
+    private integrationSteps: IModelIntegrationStep[];
 
     constructor(parentModel: ModelImplRoot, modelSettings: Demographics, ageGroup: AgeGroup) {
 
@@ -48,48 +49,79 @@ export class ModelImplVaccination implements IModelSeir {
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupTotal = ageGroup.getAbsValue();
         this.ageGroupName = ageGroup.getName();
-        this.grpAccept = ageGroup.getAcpt();
 
         const instantPre = ModelInstants.getInstance().getPreInstant();
 
         const categoryP = TimeUtil.formatCategoryDate(instantPre);
 
-        const vaccC = BaseData.getInstance().findBaseData(categoryP)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
-        this.compartmentVC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, vaccC, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+        // the "control" compartment shows absolute number of first vaccinations
+        const absVaccC = BaseData.getInstance().findBaseData(categoryP)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        this.compartmentVC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVaccC, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+
+        // this.compartmentVD = new CompartmentBase(ECompartmentType.R__REMOVED_ID, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, vacc1ToVacc2Weeks * TimeUtil.MILLISECONDS_PER___WEEK);
+        // this.compartmentVU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, vacc1ToVacc2Weeks * TimeUtil.MILLISECONDS_PER___WEEK);
 
         this.compartmentsV1 = [];
+        this.integrationSteps = [];
 
-        let instantDA = ModelInstants.getInstance().getMinInstant();
-        let categoryDA = TimeUtil.formatCategoryDate(instantDA);
-        const vacc2 = BaseData.getInstance().findBaseData(categoryDA)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+        const categoryPre = TimeUtil.formatCategoryDate(instantPre);
+        const absVacc2 = BaseData.getInstance().findBaseData(categoryPre)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
 
-        for (let weekIndex = 0; weekIndex < ModelConstants.V1_TO_V2_______________WEEKS; weekIndex++) {
 
-            // instantDA = ModelInstants.getInstance().getMinInstant();
-            // categoryDA = TimeUtil.formatCategoryDate(instantDA);
+        let vacc1ToVacc2Weeks = ModelConstants.V1_TO_V2_______________WEEKS; // Math.round((instantPre - instantV12Cur) / TimeUtil.MILLISECONDS_PER___WEEK);
+        if (this.ageGroupIndex === 9) {
+            vacc1ToVacc2Weeks = 5;
+        }
 
-            const instantDB = instantDA - TimeUtil.MILLISECONDS_PER____DAY * 7;
-            const categoryDB = TimeUtil.formatCategoryDate(instantDB);
-            const vacc1A = BaseData.getInstance().findBaseData(categoryDA)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
-            const vacc1B = BaseData.getInstance().findBaseData(categoryDB)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        const absVacc1Total = absVaccC - absVacc2;
 
-            this.compartmentsV1.push(new CompartmentBase(ECompartmentType.R__REMOVED_V1, this.absTotal, (vacc1A - vacc1B) / 2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, 7 * TimeUtil.MILLISECONDS_PER____DAY));
+        const vacc2ABs: number[] = [];
+        for (let weekIndex = 0; weekIndex < vacc1ToVacc2Weeks; weekIndex++) {
 
-            instantDA = instantDB;
-            categoryDA = TimeUtil.formatCategoryDate(instantDA);
+            const instantV2A = ModelInstants.getInstance().getPreInstant() + (weekIndex + 0) * TimeUtil.MILLISECONDS_PER___WEEK;
+            const instantV2B = ModelInstants.getInstance().getPreInstant() + (weekIndex + 1) * TimeUtil.MILLISECONDS_PER___WEEK;
+
+            const categoryV2A = TimeUtil.formatCategoryDate(instantV2A);
+            const categoryV2B = TimeUtil.formatCategoryDate(instantV2B);
+
+            const baseDataV2A = BaseData.getInstance().findBaseData(categoryV2A);
+            const baseDataV2B = BaseData.getInstance().findBaseData(categoryV2B);
+
+            if (baseDataV2A && baseDataV2B) {
+                const absVacc2A = baseDataV2A[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+                const absVacc2B = baseDataV2B[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+                vacc2ABs.push(absVacc2B  - absVacc2A);
+            } else {
+                vacc2ABs.push(0);
+                console.warn('failed to find base data', this.ageGroupName, TimeUtil.formatCategoryDate(instantV2A), ' >> ',  TimeUtil.formatCategoryDate(instantV2B));
+            }
+
 
         }
 
-        this.compartmentV2 = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, vacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+        // console.log(this.ageGroupName, 'vacc2ABs', vacc2ABs);
+        let vacc2ABSum = 0;
+        vacc2ABs.forEach(vacc2AB => {
+            vacc2ABSum += vacc2AB;
+        });
 
-        this.integrationStep = {
+        const vaccMult = vacc2ABSum > 0 ? absVacc1Total / vacc2ABSum : 0;
+        // console.log(vacc2ABSum, absVacc1Total, vaccMult)
+
+        for (let weekIndex = vacc1ToVacc2Weeks - 1; weekIndex >= 0; weekIndex--) {
+            // console.log(vacc2ABs[weekIndex] * vaccMult, absVacc1Total / vacc1ToVacc2Weeks)
+            this.compartmentsV1.push(new CompartmentBase(ECompartmentType.R__REMOVED_V1, this.absTotal, vacc2ABs[weekIndex] * vaccMult, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, TimeUtil.MILLISECONDS_PER___WEEK));
+        }
+        this.compartmentV2 = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, absVacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+
+        this.integrationSteps.push({
             apply: (modelState: IModelState, dT: number, tT: number) => {
 
                 const increments = ModelState.empty();
-                for (let weekIndex = 0; weekIndex < ModelConstants.V1_TO_V2_______________WEEKS; weekIndex++) {
+                for (let weekIndex = 0; weekIndex < vacc1ToVacc2Weeks; weekIndex++) {
 
                     const compartmentSrc = this.compartmentsV1[weekIndex];
-                    const compartmentDst = weekIndex === ModelConstants.V1_TO_V2_______________WEEKS - 1 ? this.compartmentV2 : this.compartmentsV1[weekIndex + 1];
+                    const compartmentDst = weekIndex === vacc1ToVacc2Weeks - 1 ? this.compartmentV2 : this.compartmentsV1[weekIndex + 1];
 
                     const continuationRate = compartmentSrc.getContinuationRatio().getRate(dT, tT);
                     const continuationValue = continuationRate * modelState.getNrmValue(compartmentSrc);
@@ -100,7 +132,41 @@ export class ModelImplVaccination implements IModelSeir {
                 return increments;
 
             }
-        }
+        });
+        // this.integrationSteps.push({
+        //     apply: (modelState: IModelState, dT: number, tT: number) => {
+
+        //         const increments = ModelState.empty();
+
+        //         const compartmentSrc = this.compartmentVD;
+        //         const compartmentDst = this.compartmentV2;
+
+        //         const continuationRate = compartmentSrc.getContinuationRatio().getRate(dT, tT);
+        //         const continuationValue = continuationRate * modelState.getNrmValue(compartmentSrc);
+        //         increments.addNrmValue(-continuationValue, compartmentSrc);
+        //         increments.addNrmValue(+continuationValue, compartmentDst);
+
+        //         return increments;
+
+        //     }
+        // });
+        // this.integrationSteps.push({
+        //     apply: (modelState: IModelState, dT: number, tT: number) => {
+
+        //         const increments = ModelState.empty();
+
+        //         const compartmentSrc = this.compartmentVU;
+        //         const compartmentDst = this.compartmentV2;
+
+        //         const continuationRate = compartmentSrc.getContinuationRatio().getRate(dT, tT);
+        //         const continuationValue = continuationRate * modelState.getNrmValue(compartmentSrc);
+        //         increments.addNrmValue(-continuationValue, compartmentSrc);
+        //         increments.addNrmValue(+continuationValue, compartmentDst);
+
+        //         return increments;
+
+        //     }
+        // });
 
     }
 
@@ -108,30 +174,25 @@ export class ModelImplVaccination implements IModelSeir {
         return this.parentModel.getRootModel();
     }
 
-    /**
-     *
-     * get this model's compartment holding population vaccinated, but not immune yet, therefore still susceptible
-     * @returns
-     */
-    // getCompartmentV1(): CompartmentBase {
-    //     return this.compartmentsV1[0];
-    // }
-
     getCompartmentsV1(): CompartmentBase[] {
         return this.compartmentsV1;
     }
 
-    // getCompartmentV2(): CompartmentBase {
-    //     return this.compartmentV2;
-    // }
+    getCompartmentV2(): CompartmentBase {
+        return this.compartmentV2;
+    }
 
     getCompartmentVC(): CompartmentBase {
         return this.compartmentVC;
     }
 
-    getGrpAccept(): number {
-        return this.grpAccept;
-    }
+    // getCompartmentVD(): CompartmentBase {
+    //     return this.compartmentVD;
+    // }
+
+    // getCompartmentVU(): CompartmentBase {
+    //     return this.compartmentVU;
+    // }
 
     getNrmValueGroup(ageGroupIndex: number): number {
         return ageGroupIndex === this.ageGroupIndex ? this.getNrmValue() : 0;
@@ -186,7 +247,10 @@ export class ModelImplVaccination implements IModelSeir {
      */
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
         const result = ModelState.empty();
-        result.add(this.integrationStep.apply(state, dT, tT, modificationTime));
+        this.integrationSteps.forEach(integrationStep => {
+            result.add(integrationStep.apply(state, dT, tT, modificationTime));
+        });
+        // result.add(this.integrationStep.apply(state, dT, tT, modificationTime));
         return result;
     }
 

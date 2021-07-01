@@ -103,18 +103,40 @@ export class ModelImplRoot implements IModelSeir {
 
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            const absValueRemovedD = referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_REMOVED];
-            const absValueRemovedU = absValueRemovedD * modificationSettings.getUndetected();
+            // initial values in the removed compartment
+            // a pre-calculation of susceptible
+            let absValueD = referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_REMOVED];
+            let absValueU = absValueD * modificationSettings.getUndetected();
+            const absValueV = referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND]
+            let absValueS = ageGroup.getAbsValue();
+            absValueS -= absValueD;
+            absValueS -= absValueU;
+            absValueS -= absValueV;
+            this.strainModels.forEach(strainModel => {
+                absValueS -= strainModel.getNrmValueGroup(ageGroup.getIndex());
+            });
 
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R__REMOVED_ID, this.demographics.getAbsTotal(), absValueRemovedD, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
-            this.compartmentsRemovedD.push(compartmentRemovedD);
+            // total values subject to vaccination
+            const absWeightT = absValueS + absValueD + absValueU;
+            const shrValueS = absValueS / absWeightT;
+            const shrValueD = absValueD / absWeightT;
+            const shrValueU = absValueU / absWeightT;
 
-            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.demographics.getAbsTotal(), absValueRemovedU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
-            this.compartmentsRemovedU.push(compartmentRemovedU);
+            // console.log(ageGroup.getName(), absValueD, absValueU, absValueV);
 
-            // configurable
+            // have removed contacts initially reduced to model already vaccinated individuals that were previously infected
+            absValueD -= absValueV * shrValueD ;
+            absValueU -= absValueV * shrValueU ;
+
             const vaccinationModel = new ModelImplVaccination(this, demographics, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
+
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R__REMOVED_ID, this.demographics.getAbsTotal(), absValueD, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+            this.compartmentsRemovedD.push(compartmentRemovedD);
+
+            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.demographics.getAbsTotal(), absValueU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+            this.compartmentsRemovedU.push(compartmentRemovedU);
+
 
         });
 
@@ -226,13 +248,29 @@ export class ModelImplRoot implements IModelSeir {
             if (valueA && valueB) {
 
                 // const grpJabS = valueB - valueA;
-                const grpJabS = valueB - valueA;
-                const nrmJabS = grpJabS / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+                const grpJabT = valueB - valueA;
+                const nrmJabT = grpJabT / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
+
+                const nrmWeightS = state.getNrmValue(this.compartmentsSusceptible[i]);
+                const nrmWeightD = state.getNrmValue(this.compartmentsRemovedD[i]);
+                const nrmWeightU = state.getNrmValue(this.compartmentsRemovedU[i]);
+                const nrmWeightT = nrmWeightS + nrmWeightD + nrmWeightU;
+
+                const nrmJabS = nrmJabT * nrmWeightS / nrmWeightT;
+                const nrmJabD = nrmJabT * nrmWeightD / nrmWeightT;
+                const nrmJabU = nrmJabT * nrmWeightU / nrmWeightT;
 
                 // remove from susceptible and add to immunizing compartment
                 result.addNrmValue(-nrmJabS, this.compartmentsSusceptible[i]);
                 result.addNrmValue(+nrmJabS, this.vaccinationModels[i].getCompartmentsV1()[0]);
-                result.addNrmValue(+nrmJabS, this.vaccinationModels[i].getCompartmentVC());
+
+                result.addNrmValue(-nrmJabD, this.compartmentsRemovedD[i]);
+                result.addNrmValue(+nrmJabD, this.vaccinationModels[i].getCompartmentV2());
+
+                result.addNrmValue(-nrmJabU, this.compartmentsRemovedU[i]);
+                result.addNrmValue(+nrmJabU, this.vaccinationModels[i].getCompartmentV2());
+
+                result.addNrmValue(+nrmJabT, this.vaccinationModels[i].getCompartmentVC());
 
                 // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i === 8) {
                 //     console.log('mult', TimeUtil.formatCategoryDate(tT), i, grpJabS, state.getNrmValue(this.vaccinationModels[i].getCompartmentVC()) * this.getAbsTotal());

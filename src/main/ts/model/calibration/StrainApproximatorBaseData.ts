@@ -200,7 +200,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
         for (let approximationIndex = 0; approximationIndex < ModelConstants.APPROXIMATION_________CYCLES; approximationIndex++) {
 
             const instantB = this.instantPre;
-            const instantC = this.instantPre + 7 * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantC = this.instantPre + TimeUtil.MILLISECONDS_PER___WEEK;
             for (let strainIndexA = 0; strainIndexA < modificationsStrain.length; strainIndexA++) {
 
                 /**

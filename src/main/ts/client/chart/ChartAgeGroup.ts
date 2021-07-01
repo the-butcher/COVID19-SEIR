@@ -12,9 +12,7 @@ import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
 import { AgeGroup } from './../../common/demographics/AgeGroup';
-import { IModificationValuesVaccination } from './../../common/modification/IModificationValuesVaccination';
 import { ModelConstants } from './../../model/ModelConstants';
-import { ModelInstants } from './../../model/ModelInstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ColorUtil } from './../../util/ColorUtil';
 import { ICoordinate } from './../../util/ICoordinate';
@@ -302,8 +300,8 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'recv_d',
             valueField: 'ageGroupRemovedID',
-            colorKey: 'EXPOSED',
-            strokeWidth: 2,
+            colorKey: 'REMOVED',
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.45,
             labelled: true,
@@ -314,9 +312,9 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'recv_u',
             valueField: 'ageGroupRemovedIU',
-            colorKey: 'INFECTIOUS',
+            colorKey: 'REMOVED',
             strokeWidth: 1,
-            dashed: true,
+            dashed: false,
             locationOnPath: 0.65,
             labelled: true,
             percent: true
@@ -326,7 +324,7 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'vacc_v1',
             valueField: 'ageGroupRemovedVM1',
-            colorKey: 'EXPOSED',
+            colorKey: 'VACCINATION',
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.85,
@@ -338,7 +336,7 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'vacc_v2',
             valueField: 'ageGroupRemovedVM2',
-            colorKey: 'INFECTIOUS',
+            colorKey: 'VACCINATION',
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.85,
@@ -350,10 +348,10 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'vacc_r1',
             valueField: 'ageGroupRemovedVR1',
-            colorKey: 'INFECTIOUS',
+            colorKey: 'VACCINATION',
             strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.85,
+            dashed: true,
+            locationOnPath: 0.25,
             labelled: true,
             percent: true
         });
@@ -362,10 +360,10 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'vacc_r2',
             valueField: 'ageGroupRemovedVR2',
-            colorKey: 'INFECTIOUS',
+            colorKey: 'VACCINATION',
             strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.85,
+            dashed: true,
+            locationOnPath: 0.35,
             labelled: true,
             percent: true
         });
@@ -374,10 +372,10 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'vacc_rc',
             valueField: 'ageGroupRemovedVRC',
-            colorKey: 'INFECTIOUS',
+            colorKey: 'VACCINATION',
             strokeWidth: 1,
             dashed: false,
-            locationOnPath: 0.85,
+            locationOnPath: 0.45,
             labelled: true,
             percent: true
         });
@@ -905,8 +903,7 @@ export class ChartAgeGroup {
         this.modelData = modelData;
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
             name: ModelConstants.AGEGROUP_NAME_______ALL,
-            pG: Demographics.getInstance().getAbsTotal(),
-            acpt: 0
+            pG: Demographics.getInstance().getAbsTotal()
         })];
 
         let maxIncidence = 0;
@@ -1010,7 +1007,7 @@ export class ChartAgeGroup {
                         g = value / 50; //.05;
                     }
                     else {
-                        r = value / -50; //-.05;
+                        r = value / -50; // -.05;
                     }
                     const rgb = [r, g, b];
                     const hsv = [0, 0, 0];

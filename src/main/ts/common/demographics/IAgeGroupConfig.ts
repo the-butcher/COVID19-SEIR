@@ -7,11 +7,6 @@
 export interface IAgeGroupConfig {
 
     /**
-     * acceptance for vaccination
-     */
-    acpt: number;
-
-    /**
      * human readable name of the group
      */
     name: string;

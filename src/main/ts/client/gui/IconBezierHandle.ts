@@ -37,14 +37,18 @@ export class IconBezierHandle {
         }
     }
 
-    redraw(point: ICoordinate): void {
+    showAt(point: ICoordinate): void {
+        this.svgContainer.style.display = 'block';
         this.svgContainer.style.left = `${point.x - 14}px`;
         this.svgContainer.style.top = `${point.y - 14}px`;
+    }
+
+    hide(): void {
+        this.svgContainer.style.display = 'none';
     }
 
     getSvgContainer(): HTMLDivElement {
         return this.svgContainer;
     }
-
 
 }

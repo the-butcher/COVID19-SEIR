@@ -24,10 +24,6 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
     constructor(modificationParams: IModificationValuesVaccination) {
         super('INSTANT', modificationParams);
         this.luts = {};
-        // Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-        //     this.updateLut(ageGroup.getName());
-        // });
-        // console.warn('vacc create');
     }
 
     getLutByName(ageGroup: string): { [K in number]: number } {
@@ -43,19 +39,19 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
     getVaccinationCurve(ageGroup: string): IVaccinationCurve {
 
-        console.warn(ageGroup);
+        const categoryPre = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getPreInstant());
+        const absVacc1 = BaseData.getInstance().findBaseData(categoryPre)[ageGroup][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        const grpVacc1 = absVacc1 / Demographics.getInstance().findAgeGroupByName(ageGroup).getAbsValue();
+        const pA: ICoordinate = {
+            x: ModelInstants.getInstance().getPreInstant(),
+            y: grpVacc1
+        };
 
         let vaccinationCurve: IVaccinationCurve = this.modificationValues.vaccinationCurves[ageGroup];
         if (!vaccinationCurve) {
 
-            const categoryPre = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getPreInstant());
-            const absVacc1 = BaseData.getInstance().findBaseData(categoryPre)[ageGroup][ModelConstants.BASE_DATA_INDEX_VACC1ST];
-            const grpVacc1 = absVacc1 / Demographics.getInstance().findAgeGroupByName(ageGroup).getAbsValue();
 
-            const pA: ICoordinate = {
-                x: ModelInstants.getInstance().getPreInstant(),
-                y: grpVacc1
-            };
+
             const cA: ICoordinate = {
                 x: ModelInstants.getInstance().getPreInstant() + TimeUtil.MILLISECONDS_PER____DAY * 60,
                 y: grpVacc1
@@ -77,6 +73,9 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
             }
 
         }
+        vaccinationCurve.pA.x = pA.x;
+        vaccinationCurve.pA.y = pA.y;
+
         return vaccinationCurve;
 
     }
