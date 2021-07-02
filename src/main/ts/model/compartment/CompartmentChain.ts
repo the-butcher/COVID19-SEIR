@@ -3,6 +3,7 @@ import { TimeUtil } from '../../util/TimeUtil';
 import { Weibull } from '../../util/Weibull';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { ECompartmentType } from './ECompartmentType';
+import { RationalDurationFixed } from '../rational/RationalDurationFixed';
 
 export interface ICompartmentParams {
     type: ECompartmentType;
@@ -26,7 +27,7 @@ export class CompartmentChain {
     static readonly COMPARTMENT_COUNT_POST_INCUBATION = 6; // 11;
 
     static readonly NO_REPRODUCTION = 0;
-    static readonly NO_CONTINUATION = 0;
+    static readonly NO_CONTINUATION = new RationalDurationFixed(0);
 
     static getInstance(): CompartmentChain {
         if (ObjectUtil.isEmpty(this.instance)) {

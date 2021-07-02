@@ -1,4 +1,4 @@
-import { IVaccinationCurve } from '../../common/modification/IVaccinationCurve';
+import { IVaccinationConfig } from '../../common/demographics/IVaccinationConfig';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
@@ -80,7 +80,7 @@ export class ControlsVaccination {
     showVaccinationCurve(ageGroup: string): void {
 
         this.ageGroup = ageGroup;
-        const vaccinationCurve: IVaccinationCurve = this.modification.getVaccinationCurve(ageGroup);
+        const vaccinationCurve: IVaccinationConfig = this.modification.getVaccinationConfig(ageGroup);
         this.iconBezierAP.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.pA));
         this.iconBezierAC.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.cA));
         this.iconBezierBC.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.cB));
@@ -97,7 +97,7 @@ export class ControlsVaccination {
             this.bezierCanvas.height = window.innerHeight;
         // });
 
-        console.log(this.bezierCanvas);
+        // console.log(this.bezierCanvas);
 
     }
 
@@ -138,7 +138,7 @@ export class ControlsVaccination {
 
             }
 
-            console.log(ChartAgeGroup.getInstance().toVaccinationCoordinate(documentCoordinate));
+            // console.log(ChartAgeGroup.getInstance().toVaccinationCoordinate(documentCoordinate));
 
             this.redrawCanvas();
 
@@ -189,11 +189,16 @@ export class ControlsVaccination {
             const cA = ChartAgeGroup.getInstance().toVaccinationCoordinate(this.iconBezierAC.getCoordinate());
             const cB = ChartAgeGroup.getInstance().toVaccinationCoordinate(this.iconBezierBC.getCoordinate());
             const pB = ChartAgeGroup.getInstance().toVaccinationCoordinate(this.iconBezierBP.getCoordinate());
+            const sD = this.modification.getVaccinationConfig(this.ageGroup).sD;
+            const sC = this.modification.getVaccinationConfig(this.ageGroup).sC;
+
             this.modification.setVaccinationCurve(this.ageGroup, {
                 pA,
                 cA,
                 cB,
-                pB
+                pB,
+                sD,
+                sC
             });
 
         }

@@ -62,7 +62,7 @@ export class ModelImplRoot implements IModelSeir {
          */
         const model = new ModelImplRoot(demographics, Modifications.getInstance(), approximator.getReferenceDataRemoved(), baseData);
         const modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
-        await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        // await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
         modelStateIntegrator.resetExposure();
 
         return modelStateIntegrator;
@@ -91,10 +91,7 @@ export class ModelImplRoot implements IModelSeir {
         this.vaccinationModels = [];
 
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
-        // const settingsValues = modificationSettings.getModificationValues();
-
         const modificationTesting = modifications.findModificationsByType('TESTING')[0] as ModificationTesting;
-        // const testingValues = modificationSettings.getModificationValues();
 
         this.demographics = demographics;
         modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {
@@ -118,17 +115,14 @@ export class ModelImplRoot implements IModelSeir {
 
             // total values subject to vaccination
             const absWeightT = absValueS + absValueD + absValueU;
-            const shrValueS = absValueS / absWeightT;
             const shrValueD = absValueD / absWeightT;
             const shrValueU = absValueU / absWeightT;
-
-            // console.log(ageGroup.getName(), absValueD, absValueU, absValueV);
 
             // have removed contacts initially reduced to model already vaccinated individuals that were previously infected
             absValueD -= absValueV * shrValueD ;
             absValueU -= absValueV * shrValueU ;
 
-            const vaccinationModel = new ModelImplVaccination(this, demographics, ageGroup);
+            const vaccinationModel = new ModelImplVaccination(this, demographics, modifications, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
             const compartmentRemovedD = new CompartmentBase(ECompartmentType.R__REMOVED_ID, this.demographics.getAbsTotal(), absValueD, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
@@ -136,7 +130,6 @@ export class ModelImplRoot implements IModelSeir {
 
             const compartmentRemovedU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.demographics.getAbsTotal(), absValueU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
             this.compartmentsRemovedU.push(compartmentRemovedU);
-
 
         });
 
@@ -232,11 +225,9 @@ export class ModelImplRoot implements IModelSeir {
 
         const result = ModelState.empty();
 
-
         // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
         //     console.log('mult', TimeUtil.formatCategoryDate(tT), requestMultiplier, nrmJabTotal * this.getAbsTotal() * 24);
         // }
-
 
         for (let i = 0; i < this.vaccinationModels.length; i++) {
 
@@ -295,6 +286,5 @@ export class ModelImplRoot implements IModelSeir {
         });
         return result;
     }
-
 
 }

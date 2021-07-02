@@ -41,6 +41,7 @@ export class StorageUtil {
     }
 
     createStorableConfig(): IStoredConfig {
+        // console.log('mv', Modifications.getInstance().buildModificationValues());
         return {
             model______basedata: BaseData.getInstance().getPath(),
             model__demographics: Demographics.getInstance().getPath(),

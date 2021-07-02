@@ -6,7 +6,7 @@ import { IRational } from './IRational';
  * @author h.fleischer
  * @since 16.05.2021
  */
-export class RationalDuration implements IRational {
+export class RationalDurationFixed implements IRational {
 
     private readonly duration: number;
 

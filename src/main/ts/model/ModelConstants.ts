@@ -1,3 +1,4 @@
+import { TimeUtil } from './../util/TimeUtil';
 import { IModification } from '../common/modification/IModification';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IModificationValuesContact } from '../common/modification/IModificationValuesContact';
@@ -101,11 +102,8 @@ export class ModelConstants {
     static readonly PRELOAD_________________DAYS = 7;
     static readonly APPROXIMATION_________CYCLES = 3;
 
-    /**
-     * @deprecated
-     * TODO have age-group specific range
-     */
-    static readonly V1_TO_V2_______________WEEKS = 8;
+    static readonly V1_TO_V2_______DEFAULT_WEEKS = 8;
+    // static readonly V1_TO_V2______DEFAULT_MILLIS = 8 * TimeUtil.MILLISECONDS_PER___WEEK;
 
     static readonly AGE_GROUP_ALL = -1;
 

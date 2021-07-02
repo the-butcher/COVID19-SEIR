@@ -13,9 +13,9 @@ export interface IRational {
      */
     getRate(dT: number, tT: number): number;
 
-    /**
-     * get the base-duration of this compartment
-     */
-    getDuration(): number;
+    // /**
+    //  * get the base-duration of this compartment
+    //  */
+    // getDuration(): number;
 
 }

@@ -1,3 +1,4 @@
+import { IVaccinationConfig } from './../../common/demographics/IVaccinationConfig';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { IModificationValuesTesting } from '../../common/modification/IModificationValuesTesting';
@@ -43,6 +44,19 @@ export class StrainCalibrator {
         modificationValuesStrain.transmissionRisk = 0.065;
         modificationValuesStrain.preIncidences = ageGroups.map(g => modificationValuesStrain.dstIncidence);
 
+        const vv = {};
+        vv[preInstant] = 0;
+        const vaccinationCurves = {};
+        demographics.getAgeGroups().forEach(ageGroup => {
+            vaccinationCurves[ageGroup.getName()] = {
+                pA: { x: preInstant, y: 0},
+                cA: { x: preInstant, y: 0},
+                cB: { x: preInstant, y: 0},
+                pB: { x: preInstant, y: 0},
+                vv: vv
+            };
+        })
+
         const modificationValuesCalibrate: IAnyModificationValue[] = [
             {
                 id: 'calibrate (seasonality)',
@@ -82,6 +96,15 @@ export class StrainCalibrator {
                 instant: preInstant,
                 deletable: false,
                 draggable: false
+            },
+            {
+                id: "calibrate (vaccination)",
+                key: "VACCINATION",
+                name: "calibrate (vaccination)",
+                instant: preInstant,
+                vaccinationCurves,
+                deletable: false,
+                draggable: false
             }
         ];
         Modifications.setInstanceFromValues(modificationValuesCalibrate);
@@ -101,6 +124,7 @@ export class StrainCalibrator {
 
         for (let interpolationIndex = 0; interpolationIndex < 20; interpolationIndex++) {
 
+            // TODO build from demographic since actual age groups are configuration, not fixed
             model = new ModelImplRoot(demographics, Modifications.getInstance(), {
                 "<= 04": [0, 0, 0, 0],
                 "05-14": [0, 0, 0, 0],

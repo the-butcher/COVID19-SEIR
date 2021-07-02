@@ -1,6 +1,5 @@
-import { TimeUtil } from './../../util/TimeUtil';
-import { ModelInstants } from './../../model/ModelInstants';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { ModelInstants } from './../../model/ModelInstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
 import { IModificationValuesContact } from './IModificationValuesContact';
@@ -75,7 +74,7 @@ export class Modifications {
     }
 
     deleteModification(id: string): void {
-        const modification = this.findModificationById(id);
+        // const modification = this.findModificationById(id);
         this.modifications = this.modifications.filter(m => m.getId() !== id);
     }
 

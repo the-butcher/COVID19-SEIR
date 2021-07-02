@@ -5,12 +5,21 @@ import { ICoordinate } from '../../util/ICoordinate';
  * x: instant
  * y: percentage
  */
-export interface IVaccinationCurve {
+export interface IVaccinationConfig {
 
     pA: ICoordinate;
     cA: ICoordinate;
     cB: ICoordinate;
     pB: ICoordinate;
-    vacc1ToVacc2Weeks: number;
+
+    /**
+     * stretch of duration
+     */
+    sD: number;
+
+    /**
+     * slope at point C (vacc2 at at instantPre)
+     */
+    sC: number;
 
 }

@@ -1,6 +1,5 @@
-import { ObjectUtil } from './../../util/ObjectUtil';
 import { IRational } from '../rational/IRational';
-import { RationalDuration } from '../rational/RationalDuration';
+import { ObjectUtil } from './../../util/ObjectUtil';
 import { ECompartmentType } from './ECompartmentType';
 import { ICompartment } from './ICompartment';
 
@@ -23,14 +22,14 @@ export class CompartmentBase implements ICompartment {
 
     private readonly continuationRatio: IRational;
 
-    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, continuationDuration: number) {
+    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, continuationRatio: IRational) {
         this.id = ObjectUtil.createId();
         this.compartmentType = compartmentType;
         this.absTotal = absTotal;
         this.nrmValue = absValue * 1.0 / this.absTotal;
         this.ageGroupIndex = ageGroupIndex;
         this.strainId = strainId;
-        this.continuationRatio = new RationalDuration(continuationDuration);
+        this.continuationRatio = continuationRatio; // new RationalDuration(continuationDuration);
     }
 
     getId(): string {

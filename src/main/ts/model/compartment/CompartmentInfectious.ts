@@ -1,3 +1,4 @@
+import { RationalDurationFixed } from '../rational/RationalDurationFixed';
 import { RationalReproduction } from '../rational/RationalReproduction';
 import { CompartmentBase } from './CompartmentBase';
 import { ECompartmentType } from './ECompartmentType';
@@ -15,7 +16,7 @@ export class CompartmentInfectious extends CompartmentBase {
     private readonly preSymptomatic: boolean
 
     constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, r0: number, duration: number, preSymptomatic: boolean) {
-        super(compartmentType, absTotal, absValue, ageGroupIndex, strainId, duration);
+        super(compartmentType, absTotal, absValue, ageGroupIndex, strainId, new RationalDurationFixed(duration));
         this.reproductionRatio = new RationalReproduction(r0, duration);
         this.preSymptomatic = preSymptomatic;
     }

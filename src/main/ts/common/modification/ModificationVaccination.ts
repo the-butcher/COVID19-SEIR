@@ -1,15 +1,15 @@
-import { Demographics } from './../demographics/Demographics';
-import { TimeUtil } from './../../util/TimeUtil';
 // @ts-ignore
 import { Bezier } from 'bezier-js';
-import { IModificationValuesVaccination } from './IModificationValuesVaccination';
-import { AModification } from './AModification';
-import { IVaccinationCurve } from './IVaccinationCurve';
+import { BaseData } from '../../model/calibration/BaseData';
+import { ModelConstants } from '../../model/ModelConstants';
 import { ModelInstants } from '../../model/ModelInstants';
 import { ModelStateIntegrator } from '../../model/state/ModelStateIntegrator';
 import { ICoordinate } from '../../util/ICoordinate';
-import { BaseData } from '../../model/calibration/BaseData';
-import { ModelConstants } from '../../model/ModelConstants';
+import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
+import { TimeUtil } from './../../util/TimeUtil';
+import { Demographics } from './../demographics/Demographics';
+import { AModification } from './AModification';
+import { IModificationValuesVaccination } from './IModificationValuesVaccination';
 
 /**
  * implementation of IModification to hold configurable value for the vaccination model
@@ -24,6 +24,10 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
     constructor(modificationParams: IModificationValuesVaccination) {
         super('INSTANT', modificationParams);
         this.luts = {};
+        // when called in the constructor, it will later be passed to the worker in a complete state, otherwise the worker will create default objects that are never known in main
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            this.getVaccinationConfig(ageGroup.getName());
+        });
     }
 
     getLutByName(ageGroup: string): { [K in number]: number } {
@@ -37,7 +41,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
         this.modificationValues = {...this.modificationValues, ...update};
     }
 
-    getVaccinationCurve(ageGroup: string): IVaccinationCurve {
+    getVaccinationConfig(ageGroup: string): IVaccinationConfig {
 
         const categoryPre = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getPreInstant());
         const absVacc1 = BaseData.getInstance().findBaseData(categoryPre)[ageGroup][ModelConstants.BASE_DATA_INDEX_VACC1ST];
@@ -47,10 +51,11 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
             y: grpVacc1
         };
 
-        let vaccinationCurve: IVaccinationCurve = this.modificationValues.vaccinationCurves[ageGroup];
+        const sDDefault = 1.25;
+        const sCDefault = 0.002;
+
+        let vaccinationCurve: IVaccinationConfig = this.modificationValues.vaccinationCurves[ageGroup];
         if (!vaccinationCurve) {
-
-
 
             const cA: ICoordinate = {
                 x: ModelInstants.getInstance().getPreInstant() + TimeUtil.MILLISECONDS_PER____DAY * 60,
@@ -64,30 +69,41 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
                 x: ModelInstants.getInstance().getMaxInstant(),
                 y: 0.5
             };
-
             vaccinationCurve = {
                 pA,
                 cA,
                 cB,
-                pB
+                pB,
+                sD: sDDefault,
+                sC: sCDefault
             }
 
         }
+
+        // temporary, so existing configs have something
+        if (!vaccinationCurve.sD) {
+            vaccinationCurve.sD = sDDefault;
+            vaccinationCurve.sC = sCDefault;
+        }
+
         vaccinationCurve.pA.x = pA.x;
         vaccinationCurve.pA.y = pA.y;
+
+        // this.acceptUpdate(this.modificationValues);
+        // console.log('this.modificationValues', this.modificationValues);
 
         return vaccinationCurve;
 
     }
 
-    setVaccinationCurve(ageGroup: string, vaccinationCurve: IVaccinationCurve): void {
+    setVaccinationCurve(ageGroup: string, vaccinationCurve: IVaccinationConfig): void {
         this.modificationValues.vaccinationCurves[ageGroup] = vaccinationCurve;
         this.updateLut(ageGroup);
     }
 
     updateLut(ageGroup: string): void {
 
-        const vaccinationCurve = this.getVaccinationCurve(ageGroup);
+        const vaccinationCurve = this.getVaccinationConfig(ageGroup);
 
         const bezier = new Bezier(vaccinationCurve.pA, vaccinationCurve.cA, vaccinationCurve.cB, vaccinationCurve.pB);
         const lut = bezier.getLUT(100);
