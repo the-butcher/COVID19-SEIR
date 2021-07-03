@@ -80,9 +80,11 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
         }
 
-        // temporary, so existing configs have something
+        // temporary, so existing configs get values
         if (!vaccinationCurve.sD) {
             vaccinationCurve.sD = sDDefault;
+        }
+        if (!vaccinationCurve.sC) {
             vaccinationCurve.sC = sCDefault;
         }
 

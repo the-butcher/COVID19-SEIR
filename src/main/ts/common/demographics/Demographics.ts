@@ -76,18 +76,33 @@ export class Demographics {
             /**
              * TODO test scenarios from spring (i.e. after school opening when alpha came)
              */
-            const corrections: number[] = [
-                0.9, // <= 04
+            let corrections: number[] = [
+                1, // <= 04
                 1,
-                1.02,
+                1, // 1.02,
                 1,
                 1,
                 1,
-                1.35,
+                1, // 1.35,
                 1,
                 1,
                 1
             ];
+
+            // if (contactCategoryParamsBase.name === 'work') {
+            //     corrections = [
+            //         1, // <= 04
+            //         1,
+            //         1, // 1.02,
+            //         1,
+            //         1,
+            //         1,
+            //         1, // 1.35,
+            //         1,
+            //         1,
+            //         1
+            //     ]
+            // }
 
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
                 contactCategoryParamsTarget.data[indexContact] = [];

@@ -77,6 +77,10 @@ export class ModelImplVaccination implements IModelSeir {
             instantRev -= TimeUtil.MILLISECONDS_PER____DAY;
         }
 
+        if (this.ageGroupIndex === 9) {
+
+        }
+
         const modificationVaccination = modifications.findModificationsByType('VACCINATION')[0] as ModificationVaccination;
         const modificationValues = modificationVaccination.getVaccinationConfig(this.ageGroupName);
 
@@ -91,7 +95,7 @@ export class ModelImplVaccination implements IModelSeir {
         let absTimeDiff12 = instantPre - instantRev;
         let compartmentCountV1 = Math.max(5, Math.round(absTimeDiff12 / TimeUtil.MILLISECONDS_PER___WEEK));
         let compartmentDuration = absTimeDiff12 / compartmentCountV1;
-        let continuationRatioV1 = new RationalDurationFixed(compartmentDuration); //  * modificationValues.sD
+        let continuationRatioV1 = new RationalDurationFixed(compartmentDuration * modificationValues.sD); //  * modificationValues.sD
 
         // console.log('elapse', instantPre - instantRev, 'cnt', compartmentCountV1, 'dur', compartmentDuration);
 
@@ -107,7 +111,7 @@ export class ModelImplVaccination implements IModelSeir {
             valueA = valueB;
 
         }
-        console.log('vacc2ABs', vacc2ABs.reduce((prev, curr) => prev + curr, 0));
+        // console.log('vacc2ABs', vacc2ABs.reduce((prev, curr) => prev + curr, 0), vacc2ABs);
 
 
         const vaccMult = 1;
