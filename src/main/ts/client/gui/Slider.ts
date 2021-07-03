@@ -277,11 +277,12 @@ export class Slider {
 
     }
 
-    getTickValues(): number[] {
-        return this.sliderTicks.map(t => t.getValue());
-    }
+    // getTickValues(): number[] {
+    //     return this.sliderTicks.map(t => t.getValue());
+    // }
 
     setRange(range: number[]): void {
+
         this.minValue = Math.min(...range);
         this.maxValue = Math.max(...range);
         this.clearTicks();
@@ -289,6 +290,8 @@ export class Slider {
             const sliderTick = this.createTick(range[index], index);
             this.addTick(sliderTick);
         };
+        this.handleResize();
+
     }
 
     setProgress(progress: number): void {
@@ -466,6 +469,11 @@ export class Slider {
         const elementContainer = sliderElement.getContainer();
         elementContainer.style.transition = animated ? 'transform 250ms ease-in-out' : '';
         elementContainer.style.transform = `translate(${trackBounds.width * ratio - elementContainer.offsetWidth / 2}px, ${topOffset}px)`;
+        if (ratio >= 0 && ratio <= 1) {
+            elementContainer.style.visibility = 'visible';
+        } else {
+            elementContainer.style.visibility = 'hidden';
+        }
     }
 
     /**

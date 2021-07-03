@@ -44,6 +44,7 @@ export class ModelTask {
             if (modelProgress.ratio >= 1 && modelProgress.data) {
 
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
+                await ChartAgeGroup.getInstance().renderModelData();
 
                 /**
                  * primary strain has a "floating value", update the value on the gui instance of that modification

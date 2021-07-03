@@ -1,8 +1,8 @@
-import { ModificationVaccination } from './../common/modification/ModificationVaccination';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { Modifications } from '../common/modification/Modifications';
 import { ModificationTime } from '../common/modification/ModificationTime';
+import { ModificationVaccination } from './../common/modification/ModificationVaccination';
 import { StrainUtil } from './../util/StrainUtil';
 import { TimeUtil } from './../util/TimeUtil';
 import { BaseData } from './calibration/BaseData';
@@ -90,7 +90,7 @@ export class ModelImplVaccination implements IModelSeir {
         // const v0 = StrainUtil.calculateR0(absVacc1Rev, absVacc1, instantRev, instantPre, 1);
 
         // console.log('expect', absVacc1 - absVacc2, 'got', absVacc1 - absVacc2, (instantPre - instantRev) / TimeUtil.MILLISECONDS_PER___WEEK, v0);
-        console.log(this.ageGroupName, 'v0', v0, modificationValues.sC);
+        // console.log(this.ageGroupName, 'v0', v0, modificationValues.sC);
 
         // let absVaccDiff12 = absVacc1 - absVacc1Rev;
         let absTimeDiff12 = instantPre - instantRev;

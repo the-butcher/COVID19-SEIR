@@ -127,7 +127,7 @@ export class ModelActions {
             iconMode: ModelConstants.AGEGROUP_NAME_______ALL,
             handleClick: () => this.toggleAgeGroup(ModelConstants.AGEGROUP_NAME_______ALL, ageGroups.length)
         }));
-        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+        ageGroups.forEach(ageGroup => {
             this.ageGroupIcons.push(new IconChartMode({
                 container: 'agetoggleDiv',
                 label: ageGroup.getName(),

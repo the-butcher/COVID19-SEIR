@@ -143,16 +143,19 @@ export class ChartAgeGroup {
         ChartUtil.getInstance().configureChartPadding(this.chart);
         ChartUtil.getInstance().configureSeparators(this.chart);
 
-        this.chart.plotContainer.adapter.add('x', (x, target) => {
-            if (this.xAxis.dataItems.length > 0) {
-                const categoryMin = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue());
-                const positionMin = this.xAxis.categoryToPoint(categoryMin);
-                const categoryMax = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMaxValue());
-                const positionMax = this.xAxis.categoryToPoint(categoryMax);
-                SliderModification.getInstance().setSliderPadding((x as number) + positionMin.x + 4, this.chart.plotContainer.pixelWidth - positionMax.x + 20);
-            }
-            return x;
-        });
+        // this.chart.plotContainer.adapter.add('x', (x, target) => {
+        //     // if (this.xAxis.dataItems.length > 0) {
+        //     //     // const categoryMin = this.xAxis.positionToCategory(this.xAxis.start);
+        //     //     // const categoryMax = this.xAxis.positionToCategory(this.xAxis.end);
+        //     //     // // const categoryMin = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue());
+        //     //     // const positionMin = this.xAxis.categoryToPoint(categoryMin);
+        //     //     // // const categoryMax = TimeUtil.formatCategoryDate(SliderModification.getInstance().getMaxValue());
+        //     //     // const positionMax = this.xAxis.categoryToPoint(categoryMax);
+        //     //     // console.log('slider padding');
+        //     //     // SliderModification.getInstance().setSliderPadding((x as number) + positionMin.x + 4, this.chart.plotContainer.pixelWidth - positionMax.x + 20);
+        //     // }
+        //     return x;
+        // });
 
         let plotContainerOutTimeout = -1;
         this.chart.plotContainer.events.on('out', () => {
@@ -175,6 +178,7 @@ export class ChartAgeGroup {
         this.xAxis.renderer.labels.template.rotation = -90;
         this.xAxis.renderer.labels.template.horizontalCenter = 'right';
         this.xAxis.renderer.labels.template.verticalCenter = 'middle';
+        this.xAxis.rangeChangeDuration = 0;
 
         this.xAxis.tooltip.label.rotation = -90;
         this.xAxis.tooltip.label.horizontalCenter = 'right';
@@ -210,7 +214,6 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence = this.chart.yAxes.push(new ValueAxis());
         this.yAxisPlotIncidence.rangeChangeDuration = 0;
         this.yAxisPlotIncidence.strictMinMax = true;
-        this.yAxisPlotIncidence.rangeChangeDuration = 0;
         ChartUtil.getInstance().configureAxis(this.yAxisPlotIncidence, '7-day incidence / ' + (100000).toLocaleString());
         this.yAxisPlotIncidence.tooltip.exportable = false;
 
@@ -218,8 +221,9 @@ export class ChartAgeGroup {
         this.yAxisModification = this.chart.yAxes.push(new ValueAxis());
         this.yAxisModification.strictMinMax = true;
         this.yAxisModification.rangeChangeDuration = 0;
+        this.yAxisModification.zoomable = false;
         ChartUtil.getInstance().configureAxis(this.yAxisModification, 'Mods');
-        this.yAxisModification.tooltip.exportable = false;
+        // this.yAxisModification.tooltip.exportable = false;
         this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.getLabellingDefinition());
         });
@@ -402,15 +406,16 @@ export class ChartAgeGroup {
         this.chart.cursor.lineX.disabled = false;
         this.chart.cursor.lineY.disabled = true;
 
-        this.chart.cursor.behavior = 'none';
-        this.chart.zoomOutButton.disabled = true;
-        this.chart.mouseWheelBehavior = 'none';
+        this.chart.zoomOutButton.disabled = false;
+        this.chart.cursor.behavior = 'zoomX';
+        this.chart.mouseWheelBehavior = 'zoomX';
 
         /**
          * heat axis
          */
         this.yAxisHeat = this.chart.yAxes.push(new CategoryAxis());
         this.yAxisHeat.dataFields.category = ChartAgeGroup.FIELD_CATEGORY_Y;
+        this.yAxisHeat.zoomable = false;
         ChartUtil.getInstance().configureAxis(this.yAxisHeat, 'Age');
 
         /**
@@ -454,6 +459,22 @@ export class ChartAgeGroup {
             max: color(ChartUtil.getInstance().toColor(1, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode])),
             minValue: 0,
             maxValue: 1,
+        });
+
+        this.xAxis.events.on('startendchanged', e => {
+
+            // console.log('startendchanged')
+
+            const minCategory = this.xAxis.positionToCategory(this.xAxis.start);
+            const maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
+            const minInstant = this.findDataItemByCategory(minCategory).instant;
+            const maxInstant = this.findDataItemByCategory(maxCategory).instant;
+
+            const ticks = SliderModification.getInstance().getTickValues().filter(t => t > minInstant && t < maxInstant);
+
+            SliderModification.getInstance().setRange([minInstant, ...ticks, maxInstant]);
+            this.applyMaxIncidence();
+
         });
 
         // zoom in y-direction
@@ -564,62 +585,66 @@ export class ChartAgeGroup {
 
     async setSeriesAgeGroup(ageGroupIndex: number): Promise<void> {
 
-        this.ageGroupIndex = ageGroupIndex;
-        const ageGroup = this.ageGroupsWithTotal[this.ageGroupIndex];
-        this.absValue = ageGroup.getAbsValue();
+        if (ObjectUtil.isNotEmpty(this.modelData)) {
 
-        await this.renderModelData();
+            this.ageGroupIndex = ageGroupIndex;
+            const ageGroup = this.ageGroupsWithTotal[this.ageGroupIndex];
+            this.absValue = ageGroup.getAbsValue();
 
-        // wait for the series heat to be ready, then place marker
-        clearInterval(this.intervalHandle);
-        this.intervalHandle = window.setInterval(() => {
-            if (this.seriesHeat.columns.length > 0) {
+            this.requestRenderModelData();
 
-                const templateColumn = this.seriesHeat.columns.getIndex(0);
+            // wait for the series heat to be ready, then place marker
+            clearInterval(this.intervalHandle);
+            this.intervalHandle = window.setInterval(() => {
+                if (this.seriesHeat.columns.length > 0) {
 
-                const minX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x - templateColumn.realWidth / 2;
-                const maxX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x + templateColumn.realWidth / 2;
+                    const templateColumn = this.seriesHeat.columns.getIndex(0);
 
-                const minY = this.yAxisHeat.categoryToPoint(this.ageGroupsWithTotal[ageGroupIndex].getName()).y - templateColumn.realHeight / 2;
-                const maxY = minY + templateColumn.realHeight;
+                    const minX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x - templateColumn.realWidth / 2;
+                    const maxX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x + templateColumn.realWidth / 2;
 
-                // place the marker rectangle
-                this.ageGroupMarker.x = minX - 4;
-                this.ageGroupMarker.y = this.yAxisHeat.pixelY + maxY;
-                this.ageGroupMarker.width = 2;
-                this.ageGroupMarker.height = minY - maxY;
+                    const minY = this.yAxisHeat.categoryToPoint(this.ageGroupsWithTotal[ageGroupIndex].getName()).y - templateColumn.realHeight / 2;
+                    const maxY = minY + templateColumn.realHeight;
 
-                clearInterval(this.intervalHandle);
+                    // place the marker rectangle
+                    this.ageGroupMarker.x = minX - 4;
+                    this.ageGroupMarker.y = this.yAxisHeat.pixelY + maxY;
+                    this.ageGroupMarker.width = 2;
+                    this.ageGroupMarker.height = minY - maxY;
 
+                    clearInterval(this.intervalHandle);
+
+                }
+            }, 100);
+
+            this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupCases.setSeriesNote(ageGroup.getName());
+
+            this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupInfectious.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupRemovedID.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupRemovedIU.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupRemovedVM1.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupRemovedVM2.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupRemovedVR1.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupRemovedVRC.setSeriesNote(ageGroup.getName());
+
+            const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+            modificationValuesStrain.forEach(strainValues => {
+                // this call implicitly updates the base label, explicity updates series label
+                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setSeriesNote(ageGroup.getName());
+                this.getOrCreateSeriesAgeGroupExposedStrain(strainValues).setSeriesNote(ageGroup.getName());
+                this.getOrCreateSeriesAgeGroupInfectiousStrain(strainValues).setSeriesNote(ageGroup.getName());
+            });
+
+            if (ModelActions.getInstance().getKey() === 'VACCINATION' && ageGroup.getName() !== ModelConstants.AGEGROUP_NAME_______ALL) {
+                ControlsVaccination.getInstance().showVaccinationCurve(ageGroup.getName());
+            } else {
+                ControlsVaccination.getInstance().hideVaccinationCurve();
             }
-        }, 100);
 
-        this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupCases.setSeriesNote(ageGroup.getName());
-
-        this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupInfectious.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedID.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedIU.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedVM1.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedVM2.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedVR1.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedVRC.setSeriesNote(ageGroup.getName());
-
-        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
-        modificationValuesStrain.forEach(strainValues => {
-            // this call implicitly updates the base label, explicity updates series label
-            this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setSeriesNote(ageGroup.getName());
-            this.getOrCreateSeriesAgeGroupExposedStrain(strainValues).setSeriesNote(ageGroup.getName());
-            this.getOrCreateSeriesAgeGroupInfectiousStrain(strainValues).setSeriesNote(ageGroup.getName());
-        });
-
-        if (ModelActions.getInstance().getKey() === 'VACCINATION' && ageGroup.getName() !== ModelConstants.AGEGROUP_NAME_______ALL) {
-            ControlsVaccination.getInstance().showVaccinationCurve(ageGroup.getName());
-        } else {
-            ControlsVaccination.getInstance().hideVaccinationCurve();
         }
 
     }
@@ -820,13 +845,7 @@ export class ChartAgeGroup {
 
         this.chartMode = chartMode;
         ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
-
-        // no data during initial call
-        if (ObjectUtil.isNotEmpty(this.modelData)) {
-            requestAnimationFrame(() => {
-                this.renderModelData();
-            });
-        }
+        this.requestRenderModelData();
 
     }
 
@@ -844,7 +863,6 @@ export class ChartAgeGroup {
      */
     async showModifications(modificationDefinition: IControlsChartDefinition, modificationData: IModificationData[]): Promise<void> {
 
-        // TODO probably needs to move to separate method
         if (modificationDefinition) {
 
             this.seriesModification.setLabellingDefinition(modificationDefinition.labellingDefinition);
@@ -860,8 +878,6 @@ export class ChartAgeGroup {
 
             this.seriesModification.getSeries().stroke = color(modificationDefinition.color);
             this.seriesModification.getSeries().data = modificationData;
-
-            // console.log('modificationData', modificationData);
 
         } else {
             // TODO reset display
@@ -895,10 +911,7 @@ export class ChartAgeGroup {
             this.getOrCreateSeriesAgeGroupInfectiousStrain(strainValues);
         });
 
-        // detach from thread, be sure series visibilities are correct
-        requestAnimationFrame(() => {
-            this.setChartMode(this.chartMode);
-        });
+        this.setChartMode(this.chartMode);
 
         this.modelData = modelData;
         this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
@@ -906,25 +919,75 @@ export class ChartAgeGroup {
             pG: Demographics.getInstance().getAbsTotal()
         })];
 
-        let maxIncidence = 0;
-        this.maxInfectious = 0;
-        for (const dataItem of this.modelData) {
-            this.ageGroupsWithTotal.forEach(ageGroupHeat => {
-                maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
-                this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
-            });
-        }
+        this.setSeriesAgeGroup(this.ageGroupIndex);
 
-        this.yAxisPlotIncidence.min = 0;
-        this.yAxisPlotIncidence.max = maxIncidence * 1.05;
-        this.yAxisPlotIncidence.start = 0;
-        this.yAxisPlotIncidence.end = 1;
-
-        await this.setSeriesAgeGroup(this.ageGroupIndex);
+        this.requestRenderModelData();
 
     }
 
+    applyMaxIncidence(): void {
+
+        if (ObjectUtil.isNotEmpty(this.modelData)) {
+
+            // console.log(this.xAxis.start, this.xAxis.end);
+
+            const minCategory = this.xAxis.positionToCategory(this.xAxis.start);
+            const maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
+            const minInstant = this.findDataItemByCategory(minCategory).instant;
+            const maxInstant = this.findDataItemByCategory(maxCategory).instant;
+            // console.log(minCategory, minInstant, ' >> ', maxCategory, maxInstant);
+
+            let maxIncidence = 0;
+            this.maxInfectious = 0;
+            for (const dataItem of this.modelData) {
+                if (dataItem.instant >= minInstant && dataItem.instant <= maxInstant) {
+                    this.ageGroupsWithTotal.forEach(ageGroupHeat => {
+                        maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+                        this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
+                    });
+                }
+            }
+
+            this.yAxisPlotIncidence.min = 0;
+            this.yAxisPlotIncidence.max = maxIncidence * 1.05;
+            // this.yAxisPlotIncidence.start = 0;
+            // this.yAxisPlotIncidence.end = 1;
+
+            // console.log('maxIncidence', maxIncidence);
+            this.applyMaxHeat(maxIncidence);
+
+        }
+
+    }
+
+    applyMaxHeat(maxValue: number): void {
+
+        const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
+        heatRule.minValue = 0;
+        heatRule.maxValue = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatMax(maxValue);
+        heatRule.min = color(ChartUtil.getInstance().toColor(0, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode]));
+        heatRule.max = color(ChartUtil.getInstance().toColor(1, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode]));
+
+        this.chart.invalidateRawData();
+
+    }
+
+    private renderTimeout = -1;
+    requestRenderModelData(): void {
+        clearTimeout(this.renderTimeout);
+        if (ObjectUtil.isNotEmpty(this.modelData)) {
+            this.renderTimeout = window.setTimeout(() => {
+                requestAnimationFrame(() => {
+                    this.renderModelData();
+                });
+            }, 250);
+        }
+    }
+
     async renderModelData(): Promise<void> {
+
+        console.warn('rendering');
+        clearTimeout(this.renderTimeout);
 
         const plotData: any[] = [];
         const heatData: any[] = [];
@@ -1033,11 +1096,7 @@ export class ChartAgeGroup {
 
         const chartData = [...plotData, ...heatData];
 
-        const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
-        heatRule.minValue = 0;
-        heatRule.maxValue = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatMax(maxValue);
-        heatRule.min = color(ChartUtil.getInstance().toColor(0, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode]));
-        heatRule.max = color(ChartUtil.getInstance().toColor(1, ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode]));
+        this.applyMaxHeat(maxValue);
 
         // console.log('chartData', chartData);
 

@@ -1,10 +1,9 @@
-import { TimeUtil } from './../../util/TimeUtil';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { TimeUtil } from '../../util/TimeUtil';
 import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ModelInstants } from './../../model/ModelInstants';
+import { TimeUtil } from './../../util/TimeUtil';
 import { ControlsConstants } from './ControlsConstants';
 import { IconModification } from './IconModification';
 import { IconModificationMini } from './IconModificationMini';
@@ -28,6 +27,8 @@ export class SliderModification extends Slider {
 
     private readonly modificationIcons: IconModification[];
     private selectableModificationId: string;
+
+    private readonly ticks: number[];
 
     constructor() {
 
@@ -64,11 +65,14 @@ export class SliderModification extends Slider {
                 ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
             }
         });
-
+        this.ticks = ticks;
         this.modificationIcons = [];
 
     }
 
+    getTickValues(): number[] {
+        return this.ticks;
+    }
 
     setSliderPadding(paddingLeft: number, paddingRight: number): void {
         this.getContainer().style.paddingLeft = `${paddingLeft}px`;
