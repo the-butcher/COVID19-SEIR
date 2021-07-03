@@ -15,9 +15,9 @@
       "key": "SETTINGS",
       "name": "initial state",
       "instant": 1619827200000,
-      "undetected": 0,
-      "vaccinated": 0,
-      "quarantine": 0,
+      "undetected": 1,
+      "vaccinated": 0.09,
+      "quarantine": 0.5,
       "dead": 0,
       "deletable": false,
       "draggable": false
@@ -26,11 +26,11 @@
       "id": "71e2e",
       "key": "STRAIN",
       "instant": 1619827200000,
-      "name": "b.1.1.7",
-      "r0": 1,
+      "name": "alpha",
+      "r0": 4.4,
       "serialInterval": 4.8,
       "intervalScale": 1,
-      "dstIncidence": 148.39621327705038,
+      "dstIncidence": 189.1291888296051,
       "deletable": false,
       "draggable": false,
       "primary": true
@@ -41,11 +41,11 @@
       "name": "initial NPIs",
       "instant": 1619827200000,
       "multipliers": {
-        "family": 1,
-        "school": 1,
-        "nursing": 1,
-        "work": 1,
-        "other": 1
+        "family": 0.75,
+        "school": 0.15,
+        "nursing": 0.22,
+        "work": 0.34,
+        "other": 0.17
       },
       "deletable": false,
       "draggable": false
@@ -56,11 +56,11 @@
       "name": "initial discovery",
       "instant": 1619827200000,
       "multipliers": {
-        "family": 1,
-        "school": 1,
-        "nursing": 1,
-        "work": 1,
-        "other": 1
+        "family": 0.6,
+        "school": 0.65,
+        "nursing": 0.5,
+        "work": 0.35000000000000003,
+        "other": 0.35000000000000003
       },
       "deletable": false,
       "draggable": false
@@ -70,26 +70,351 @@
       "key": "VACCINATION",
       "name": "daily vaccinations",
       "instant": 1619827200000,
-      "doses": 0,
+      "vaccinationCurves": {
+        "75-84": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.7568750629730979
+          },
+          "cA": {
+            "x": 1621555200000,
+            "y": 0.8473698000000001
+          },
+          "cB": {
+            "x": 1625788800000,
+            "y": 0.8930218
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.8930218
+          },
+          "sD": 1.75,
+          "sC": 1
+        },
+        ">= 85": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.8143112780293825
+          },
+          "cA": {
+            "x": 1622073600000,
+            "y": 0.872842
+          },
+          "cB": {
+            "x": 1630540800000,
+            "y": 0.9102423
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.9102423
+          },
+          "sD": 1.15,
+          "sC": 0.95
+        },
+        "65-74": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.5506469446044404
+          },
+          "cA": {
+            "x": 1620259200000,
+            "y": 0.9038389
+          },
+          "cB": {
+            "x": 1629504000000,
+            "y": 0.8694080000000001
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.8694080000000001
+          },
+          "sD": 1.35,
+          "sC": 0.03
+        },
+        "55-64": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.2600701771212993
+          },
+          "cA": {
+            "x": 1622073600000,
+            "y": 0.5664585000000001
+          },
+          "cB": {
+            "x": 1620086400000,
+            "y": 0.81406
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.81406
+          },
+          "sD": 1.03,
+          "sC": 1e-9
+        },
+        "45-54": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.18231489582466487
+          },
+          "cA": {
+            "x": 1622937600000,
+            "y": 0.3473592
+          },
+          "cB": {
+            "x": 1620518400000,
+            "y": 0.7018389
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.7018389
+          },
+          "sD": 0.98,
+          "sC": 1e-9
+        },
+        "35-44": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.149995956569298
+          },
+          "cA": {
+            "x": 1623715200000,
+            "y": 0.27258889999999997
+          },
+          "cB": {
+            "x": 1622246400000,
+            "y": 0.7001118000000001
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.7001118000000001
+          },
+          "sD": 0.97,
+          "sC": 0.002
+        },
+        "25-34": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.11788954781932624
+          },
+          "cA": {
+            "x": 1624838400000,
+            "y": 0.2778813
+          },
+          "cB": {
+            "x": 1622419200000,
+            "y": 0.5824872
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.5824872
+          },
+          "sD": 0.95,
+          "sC": 0.002
+        },
+        "15-24": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0.0630278613472858
+          },
+          "cA": {
+            "x": 1626048000000,
+            "y": 0.16743780000000005
+          },
+          "cB": {
+            "x": 1622332800000,
+            "y": 0.5130194
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.5130194
+          },
+          "sD": 1.1,
+          "sC": 0.002
+        },
+        "05-14": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0
+          },
+          "cA": {
+            "x": 1631232000000,
+            "y": 0
+          },
+          "cB": {
+            "x": 1627948800000,
+            "y": 0.043036100000000035
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0.043036100000000035
+          },
+          "sD": 1.1,
+          "sC": 0.002
+        },
+        "<= 04": {
+          "pA": {
+            "x": 1619222400000,
+            "y": 0
+          },
+          "cA": {
+            "x": 1624406400000,
+            "y": 0
+          },
+          "cB": {
+            "x": 1628380800000,
+            "y": 0
+          },
+          "pB": {
+            "x": 1633046400000,
+            "y": 0
+          },
+          "sD": 1,
+          "sC": 1
+        }
+      },
       "deletable": false,
       "draggable": false
+    },
+    {
+      "id": "6fedb",
+      "key": "STRAIN",
+      "instant": 1620518400000,
+      "name": "delta",
+      "r0": 6.6000000000000005,
+      "serialInterval": 4.8,
+      "intervalScale": 1,
+      "dstIncidence": 2,
+      "deletable": true,
+      "draggable": true
     },
     {
       "id": "b3f4d",
       "key": "TIME",
       "name": "effective settings",
-      "instant": 1619827200000,
+      "instant": 1621382400000,
       "deletable": false,
       "draggable": true
+    },
+    {
+      "id": "be71c",
+      "key": "CONTACT",
+      "name": "full classes with NPI",
+      "instant": 1621382400000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.18,
+        "nursing": 0.22,
+        "work": 0.34,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "3e423",
+      "key": "CONTACT",
+      "name": "lift school mask mandate",
+      "instant": 1623715200000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.21,
+        "nursing": 0.22,
+        "work": 0.34,
+        "other": 0.3
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "6e78f",
+      "key": "CONTACT",
+      "name": "summer break",
+      "instant": 1625097600000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.1,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.5
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
     },
     {
       "id": "ea37",
       "key": "SEASONALITY",
       "name": "seasonality",
       "instant": 1625875200000,
-      "seasonality": 1,
+      "seasonality": 0.7000000000000001,
       "deletable": false,
       "draggable": true
+    },
+    {
+      "id": "2d860",
+      "key": "CONTACT",
+      "name": "back to school",
+      "instant": 1630972800000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.75,
+        "nursing": 0.5,
+        "work": 0.75,
+        "other": 0.75
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "50b4a",
+      "key": "TESTING",
+      "name": "copy of initial discovery",
+      "instant": 1622505600000,
+      "multipliers": {
+        "family": 0.55,
+        "school": 0.6,
+        "nursing": 0.45,
+        "work": 0.35000000000000003,
+        "other": 0.35000000000000003
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "c9938",
+      "key": "TESTING",
+      "name": "copy of copy of initial discovery",
+      "instant": 1625097600000,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.45,
+        "work": 0.25,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "84fc",
+      "key": "CONTACT",
+      "name": "copy of summer break",
+      "instant": 1627776000000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.1,
+        "nursing": 0.5,
+        "work": 0.75,
+        "other": 0.75
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
     }
   ]
 }

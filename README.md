@@ -86,14 +86,6 @@ A higher discovery rate means:
 ## <a name="anchor_settings">Settings</a>
 <br><br><br>
 #### Issues
-* auto update model after bezier control drag
-* alter style of bezier controls
-* add bezier curve when age is picked (currently only points draw at that time)
-* hide vacc control points
-* find out why a full set of vacc1 values pushes v2 far up (susceptible go into minus, model behaviour worsens)
-  * likely altered times between v1 and v2 which needs to be accounted for
-* a window resize is likely to break vacc curves
-* create a new default-config
 * take care of corrections on matrices (bake them into matrices)
 * have a second look at contact matrix normalization because age-groups could not be properly fit so far.
 * wiki on github
@@ -128,6 +120,14 @@ A higher discovery rate means:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* ~~auto update model after bezier control drag~~
+* ~~alter style of bezier controls~~
+* ~~add bezier curve when age is picked (currently only points draw at that time)~~
+* ~~hide vacc control points~~
+* ~~find out why a full set of vacc1 values pushes v2 far up (susceptible go into minus, model behaviour worsens)~~
+  * ~~likely altered times between v1 and v2 which needs to be accounted for~~
+* ~~a window resize is likely to break vacc curves~~
+* ~~create a new default-config~~
 * ~~further refine vaccination model (deflate the groupPriorities and move away from vacc step - sanitize and improve performance)~~
 * ~~NO :: allow pA to not be at vacc1-min (should give better overlay) at model start in some age-groups --> also consider in vacc model prefill~~
 * ~~with vaccination slider on zero and pre-filled vaccinations, vaccination percentage still increases after Model.MIN_TIME, try to reproduce~~

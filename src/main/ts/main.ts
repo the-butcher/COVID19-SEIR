@@ -24,6 +24,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             setTimeout(() => {
                 ModelActions.getInstance().toggleModelMode('STRAIN');
                 ModelActions.getInstance().toggleChartMode('INCIDENCE');
+                ModelActions.getInstance().toggleAgeGroup('TOTAL', Demographics.getInstance().getAgeGroups().length);
                 requestAnimationFrame(() => {
                     ChartAgeGroup.getInstance();
                     ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();

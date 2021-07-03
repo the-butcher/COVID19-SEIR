@@ -2,7 +2,6 @@ import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants'
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { StorageUtil } from '../storage/StorageUtil';
-import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { Demographics } from './../../common/demographics/Demographics';
 import { CHART_MODE______KEY } from './ControlsConstants';
 import { IconAction } from './IconAction';
@@ -120,23 +119,31 @@ export class ModelActions {
             handleClick: () => ModelActions.getInstance().toggleChartMode('VACC')
         }));
 
+
+        const ageGroups = [...Demographics.getInstance().getAgeGroups()].reverse();
+        this.ageGroupIcons.push(new IconChartMode({
+            container: 'agetoggleDiv',
+            label: ModelConstants.AGEGROUP_NAME_______ALL,
+            iconMode: ModelConstants.AGEGROUP_NAME_______ALL,
+            handleClick: () => this.toggleAgeGroup(ModelConstants.AGEGROUP_NAME_______ALL, ageGroups.length)
+        }));
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             this.ageGroupIcons.push(new IconChartMode({
                 container: 'agetoggleDiv',
                 label: ageGroup.getName(),
                 iconMode: ageGroup.getName(),
-                handleClick: () => this.toggleAgeGroup(ageGroup)
+                handleClick: () => this.toggleAgeGroup(ageGroup.getName(), ageGroup.getIndex())
             }));
         });
 
 
     }
 
-    toggleAgeGroup(ageGroup: AgeGroup): void {
+    toggleAgeGroup(name: string, index: number): void {
         this.ageGroupIcons.forEach(ageGroupIcon => {
-            ageGroupIcon.setActive(ageGroupIcon.getIconMode() === ageGroup.getName());
+            ageGroupIcon.setActive(ageGroupIcon.getIconMode() === name);
         });
-        ChartAgeGroup.getInstance().setSeriesAgeGroup(ageGroup.getIndex());
+        ChartAgeGroup.getInstance().setSeriesAgeGroup(index);
     }
 
     toggleChartMode(chartMode: CHART_MODE______KEY): void {
