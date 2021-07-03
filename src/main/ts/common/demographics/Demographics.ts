@@ -89,6 +89,51 @@ export class Demographics {
                 1
             ];
 
+            if (contactCategoryParamsBase.name === 'school') {
+                corrections = [
+                    1.5, // <= 04
+                    1, // 05-14
+                    1, // 15-24
+                    1, // 25-34
+                    1, // 35-44
+                    1, // 45-54
+                    1, // 55-64
+                    1, // 65-74
+                    1, // 75-84
+                    1  // >= 85
+                ]
+            }
+
+            if (contactCategoryParamsBase.name === 'nursing') {
+                corrections = [
+                    1, // <= 04
+                    1, // 05-14
+                    1, // 15-24
+                    1, // 25-34
+                    1, // 35-44
+                    1, // 45-54
+                    1, // 55-64
+                    1.2, // 65-74
+                    1.2, // 75-84
+                    1  // >= 85
+                ]
+            }
+
+            if (contactCategoryParamsBase.name === 'family') {
+                corrections = [
+                    0.85, // <= 04
+                    1, // 05-14
+                    1, // 15-24
+                    1, // 25-34
+                    1, // 35-44
+                    1, // 45-54
+                    1, // 55-64
+                    1.1, // 65-74
+                    1, // 75-84
+                    1  // >= 85
+                ]
+            }
+
             if (contactCategoryParamsBase.name === 'work') {
                 corrections = [
                     1, // <= 04
@@ -97,8 +142,8 @@ export class Demographics {
                     1, // 25-34
                     1, // 35-44
                     1.05, // 45-54
-                    2.2, // 55-64
-                    1.2, // 65-74
+                    2.8, // 55-64
+                    2.5, // 65-74
                     1, // 75-84
                     1  // >= 85
                 ]
@@ -106,14 +151,14 @@ export class Demographics {
 
             if (contactCategoryParamsBase.name === 'other') {
                 corrections = [
-                    1, // <= 04
+                    0.70, // <= 04
                     1, // 05-14
-                    1, // 15-24
+                    1.3, // 15-24
                     1.2, // 25-34
                     1, // 35-44
                     1, // 45-54
                     1, // 55-64
-                    0.70, // 65-74
+                    0.90, // 65-74
                     1.3, // 75-84
                     1  // >= 85
                 ]

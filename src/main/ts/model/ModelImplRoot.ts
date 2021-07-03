@@ -62,7 +62,7 @@ export class ModelImplRoot implements IModelSeir {
          */
         const model = new ModelImplRoot(demographics, Modifications.getInstance(), approximator.getReferenceDataRemoved(), baseData);
         const modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
-        // await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
         modelStateIntegrator.resetExposure();
 
         return modelStateIntegrator;

@@ -22,8 +22,8 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             ModelActions.getInstance();
 
             setTimeout(() => {
-                ModelActions.getInstance().toggleModelMode('VACCINATION');
-                ModelActions.getInstance().toggleChartMode('VACC');
+                ModelActions.getInstance().toggleModelMode('STRAIN');
+                ModelActions.getInstance().toggleChartMode('INCIDENCE');
                 requestAnimationFrame(() => {
                     ChartAgeGroup.getInstance();
                     ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();

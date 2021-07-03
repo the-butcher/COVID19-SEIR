@@ -79,6 +79,8 @@ export class ControlsVaccination {
 
     showVaccinationCurve(ageGroup: string): void {
 
+        return;
+
         this.ageGroup = ageGroup;
         const vaccinationCurve: IVaccinationConfig = this.modification.getVaccinationConfig(ageGroup);
         this.iconBezierAP.showAt(ChartAgeGroup.getInstance().toDocumentCoordinate(vaccinationCurve.pA));
@@ -92,12 +94,8 @@ export class ControlsVaccination {
         this.bezierCanvas.style.height = `${window.innerHeight}px`;
         this.bezierCanvas.style.top = '0px';
         this.bezierCanvas.style.bottom = '0px';
-        // requestAnimationFrame(() => {
-            this.bezierCanvas.width = window.innerWidth;
-            this.bezierCanvas.height = window.innerHeight;
-        // });
-
-        // console.log(this.bezierCanvas);
+        this.bezierCanvas.width = window.innerWidth;
+        this.bezierCanvas.height = window.innerHeight;
 
     }
 
