@@ -2,6 +2,8 @@ import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants'
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { StorageUtil } from '../storage/StorageUtil';
+import { AgeGroup } from './../../common/demographics/AgeGroup';
+import { Demographics } from './../../common/demographics/Demographics';
 import { CHART_MODE______KEY } from './ControlsConstants';
 import { IconAction } from './IconAction';
 import { IconChartMode } from './IconChartMode';
@@ -16,8 +18,10 @@ export interface IIconActionParams {
 }
 
 export interface IChartModeParams {
+    container: string;
     label: string;
-    chartMode: CHART_MODE______KEY;
+    iconMode: string;
+    handleClick: (e: MouseEvent) => void;
 }
 
 /**
@@ -39,6 +43,7 @@ export class ModelActions {
     private key: MODIFICATION____KEY;
     private readonly modelModeIcons: IconModelMode[];
     private readonly chartModeIcons: IconChartMode[];
+    private readonly ageGroupIcons: IconChartMode[];
 
     private readonly actionIcons: IconAction[];
 
@@ -46,6 +51,7 @@ export class ModelActions {
 
         this.modelModeIcons = [];
         this.chartModeIcons = [];
+        this.ageGroupIcons = [];
         this.actionIcons = [];
 
         Object.keys(ModelConstants.MODIFICATION_PARAMS).forEach((key: MODIFICATION____KEY) => {
@@ -90,27 +96,52 @@ export class ModelActions {
         }));
 
         this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
             label: 'INCIDENCE',
-            chartMode: 'INCIDENCE'
+            iconMode: 'INCIDENCE',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('INCIDENCE')
         }));
         this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
             label: 'SUSCEPTIBLE',
-            chartMode: 'SEIR'
+            iconMode: 'SEIR',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('SEIR')
         }));
         this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
             label: 'EXPOSED',
-            chartMode: 'EI'
+            iconMode: 'EI',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('EI')
         }));
         this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
             label: 'VACCINATED',
-            chartMode: 'VACC'
+            iconMode: 'VACC',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('VACC')
         }));
 
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            this.ageGroupIcons.push(new IconChartMode({
+                container: 'agetoggleDiv',
+                label: ageGroup.getName(),
+                iconMode: ageGroup.getName(),
+                handleClick: () => this.toggleAgeGroup(ageGroup)
+            }));
+        });
+
+
+    }
+
+    toggleAgeGroup(ageGroup: AgeGroup): void {
+        this.ageGroupIcons.forEach(ageGroupIcon => {
+            ageGroupIcon.setActive(ageGroupIcon.getIconMode() === ageGroup.getName());
+        });
+        ChartAgeGroup.getInstance().setSeriesAgeGroup(ageGroup.getIndex());
     }
 
     toggleChartMode(chartMode: CHART_MODE______KEY): void {
         this.chartModeIcons.forEach(chartModeIcon => {
-            chartModeIcon.setActive(chartModeIcon.getChartMode() === chartMode);
+            chartModeIcon.setActive(chartModeIcon.getIconMode() === chartMode);
         });
         ChartAgeGroup.getInstance().setChartMode(chartMode);
     }

@@ -1,32 +1,30 @@
-import { ContactCategory } from './../../common/demographics/ContactCategory';
-import { CHART_MODE______KEY } from './ControlsConstants';
-import { IChartModeParams, ModelActions } from './ModelActions';
+import { IChartModeParams } from './ModelActions';
 
 export class IconChartMode {
 
-    private readonly chartMode: CHART_MODE______KEY;
+    private readonly iconMode: string;
     private readonly label: string;
     private readonly container: HTMLDivElement;
 
     constructor(params: IChartModeParams) {
 
-        this.chartMode = params.chartMode;
+        this.iconMode = params.iconMode;
         this.label = params.label;
 
         this.container = document.createElement('div');
         this.container.classList.add('chart-mode');
         this.container.innerHTML = this.label;
 
-        document.getElementById('legendDiv').appendChild(this.container);
+        document.getElementById(params.container).appendChild(this.container);
 
         this.container.addEventListener('click', e => {
-            ModelActions.getInstance().toggleChartMode(this.chartMode);
+            params.handleClick(e);
         });
 
     }
 
-    getChartMode(): CHART_MODE______KEY {
-        return this.chartMode;
+    getIconMode(): string {
+        return this.iconMode;
     }
 
     setActive(active: boolean): void {
