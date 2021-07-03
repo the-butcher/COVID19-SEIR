@@ -1,3 +1,4 @@
+import { ModelConstants } from './../ModelConstants';
 import { JsonLoader } from '../../util/JsonLoader';
 
 export interface IBaseDataConfig {
@@ -33,6 +34,22 @@ export class BaseData {
         return this.instance;
     }
 
+    static getVacc1(sourceItem: IBaseDataItem, ageGroupName: string): number {
+        return sourceItem[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+    }
+
+    static getVacc2(sourceItem: IBaseDataItem, ageGroupName: string): number {
+        return sourceItem[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+    }
+
+    static getExposed(sourceItem: IBaseDataItem, ageGroupName: string): number {
+        return sourceItem[ageGroupName][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+    }
+
+    static getRemoved(sourceItem: IBaseDataItem, ageGroupName: string): number {
+        return sourceItem[ageGroupName][ModelConstants.BASE_DATA_INDEX_REMOVED];
+    }
+
     private static instance: BaseData;
 
     private readonly path: string;
@@ -54,5 +71,7 @@ export class BaseData {
     findBaseData(categoryX: string): IBaseDataItem {
         return this.baseDataset[categoryX];
     }
+
+
 
 }

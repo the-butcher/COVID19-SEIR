@@ -59,9 +59,10 @@ export class ModelImplVaccination implements IModelSeir {
         const instantPre = ModelInstants.getInstance().getPreInstant();
         const categoryPre = TimeUtil.formatCategoryDate(instantPre);
 
+        const baseDatePre = BaseData.getInstance().findBaseData(categoryPre);
         // the "control" compartment shows absolute number of first vaccinations
-        const absVacc1 = BaseData.getInstance().findBaseData(categoryPre)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
-        const absVacc2 = BaseData.getInstance().findBaseData(categoryPre)[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+        const absVacc1 = BaseData.getVacc1(baseDatePre, this.ageGroupName);
+        const absVacc2 = BaseData.getVacc2(baseDatePre, this.ageGroupName);
 
         this.compartmentVC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
 
@@ -73,7 +74,7 @@ export class ModelImplVaccination implements IModelSeir {
         while (absVacc1Rev > absVacc2) {
             const categoryRev = TimeUtil.formatCategoryDate(instantRev);
             const baseDataRev = BaseData.getInstance().findBaseData(categoryRev);
-            absVacc1Rev = baseDataRev[this.ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+            absVacc1Rev = BaseData.getVacc1(baseDataRev, this.ageGroupName);
             instantRev -= TimeUtil.MILLISECONDS_PER____DAY;
         }
 

@@ -1,6 +1,6 @@
 {
-  "model______basedata": "data/calibrate-data-at.json",
-  "model__demographics": "data/model-data-at.json",
+  "model______basedata": "data/heatmap-data-at.json",
+  "model__demographics": "data/demographics-at.json",
   "model_____daterange": [
     "2021-05-01",
     "2021-06-01",

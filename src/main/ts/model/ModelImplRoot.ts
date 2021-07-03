@@ -102,9 +102,9 @@ export class ModelImplRoot implements IModelSeir {
 
             // initial values in the removed compartment
             // a pre-calculation of susceptible
-            let absValueD = referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_REMOVED];
+            let absValueD = BaseData.getRemoved(referenceDataRemoved, ageGroup.getName()); // referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_REMOVED];
             let absValueU = absValueD * modificationSettings.getUndetected();
-            const absValueV = referenceDataRemoved[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_VACC2ND]
+            const absValueV = BaseData.getVacc2(referenceDataRemoved, ageGroup.getName());
             let absValueS = ageGroup.getAbsValue();
             absValueS -= absValueD;
             absValueS -= absValueU;

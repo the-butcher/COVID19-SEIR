@@ -44,7 +44,8 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
     getVaccinationConfig(ageGroup: string): IVaccinationConfig {
 
         const categoryPre = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getPreInstant());
-        const absVacc1 = BaseData.getInstance().findBaseData(categoryPre)[ageGroup][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        const baseDataPre = BaseData.getInstance().findBaseData(categoryPre);
+        const absVacc1 = BaseData.getVacc1(baseDataPre, ageGroup);
         const grpVacc1 = absVacc1 / Demographics.getInstance().findAgeGroupByName(ageGroup).getAbsValue();
         const pA: ICoordinate = {
             x: ModelInstants.getInstance().getPreInstant(),
@@ -54,7 +55,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
         const sDDefault = 1.25;
         const sCDefault = 0.002;
 
-        let vaccinationCurve: IVaccinationConfig = this.modificationValues.vaccinationCurves[ageGroup];
+        let vaccinationCurve: IVaccinationConfig = this.modificationValues.vaccinationCurves?.[ageGroup];
         if (!vaccinationCurve) {
 
             const cA: ICoordinate = {
@@ -93,6 +94,28 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
         // this.acceptUpdate(this.modificationValues);
         // console.log('this.modificationValues', this.modificationValues);
+
+        // return vaccinationCurve;
+        // return {
+        //     pA: {
+        //         x: ModelInstants.getInstance().getPreInstant(),
+        //         y: 0
+        //     },
+        //     cA: {
+        //         x: ModelInstants.getInstance().getPreInstant() + TimeUtil.MILLISECONDS_PER____DAY * 10,
+        //         y: 0
+        //     },
+        //     cB: {
+        //         x: ModelInstants.getInstance().getMaxInstant() - TimeUtil.MILLISECONDS_PER____DAY * 10,
+        //         y: 0
+        //     },
+        //     pB: {
+        //         x: ModelInstants.getInstance().getMaxInstant(),
+        //         y: 0
+        //     },
+        //     sD: sDDefault,
+        //     sC: sCDefault
+        // }
 
         return vaccinationCurve;
 

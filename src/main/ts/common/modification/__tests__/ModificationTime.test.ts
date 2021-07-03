@@ -1,10 +1,9 @@
-import { ModelInstants } from './../../../model/ModelInstants';
 import { describe, expect, it } from '@jest/globals';
-import model2config from '../../../../webapp/data/model-data-at.json';
+import model2config from '../../../../webapp/data/demographics-at.json';
 import model2testmodifications from '../../../../webapp/data/model-test-modifications.json';
-import { ModelConstants } from '../../../model/ModelConstants';
 import { ObjectUtil } from '../../../util/ObjectUtil';
 import { IModificationValues } from '../IModificationValues';
+import { ModelInstants } from './../../../model/ModelInstants';
 import { Demographics } from './../../demographics/Demographics';
 import { IDemographicsConfig } from './../../demographics/IDemographicsConfig';
 import { Modifications } from './../Modifications';

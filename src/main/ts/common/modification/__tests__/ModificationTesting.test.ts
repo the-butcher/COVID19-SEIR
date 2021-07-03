@@ -1,6 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import model2config from '../../../../webapp/data/model-data-at.json';
-import { ModelConstants } from '../../../model/ModelConstants';
+import model2config from '../../../../webapp/data/demographics-at.json';
 import { ObjectUtil } from '../../../util/ObjectUtil';
 import { ModificationTesting } from '../ModificationTesting';
 import { Demographics } from './../../demographics/Demographics';

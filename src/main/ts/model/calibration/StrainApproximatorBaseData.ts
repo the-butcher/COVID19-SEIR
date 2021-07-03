@@ -1,3 +1,4 @@
+import { DataItem } from '@amcharts/amcharts4/core';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { Modifications } from '../../common/modification/Modifications';
@@ -104,16 +105,23 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             const instantDstA = this.instantDst + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
             const instantDstB = this.instantDst + offsetIndex * TimeUtil.MILLISECONDS_PER____DAY;
 
+            const dataItemPreA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA));
+            const dataItemPreB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB));
+            const dataItemPreC = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreC));
+
+            const dataItemDstA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA));
+            const dataItemDstB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB));
+
             ageGroups.forEach(ageGroup => {
 
                 // cases at preload
-                const casesPreA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-                const casesPreB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-                const casesPreC = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreC))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesPreA = BaseData.getExposed(dataItemPreA, ageGroup.getName());
+                const casesPreB = BaseData.getExposed(dataItemPreB, ageGroup.getName());
+                const casesPreC = BaseData.getExposed(dataItemPreC, ageGroup.getName());
 
                 // cases at model-min
-                const casesDstA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-                const casesDstB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ageGroup.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+                const casesDstA = BaseData.getExposed(dataItemDstA, ageGroup.getName());
+                const casesDstB = BaseData.getExposed(dataItemDstB, ageGroup.getName());
 
                 // case diffs (additional cases) at preload
                 const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
@@ -132,13 +140,17 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             });
 
             // total incidence at preload
-            const casesPreA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-            const casesPreB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const baseDataPreA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA));
+            const baseDataPreB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB));
+            const casesPreA = BaseData.getExposed(baseDataPreA, ModelConstants.AGEGROUP_NAME_______ALL);
+            const casesPreB = BaseData.getExposed(baseDataPreB, ModelConstants.AGEGROUP_NAME_______ALL);
             const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
 
             // total case diff at model-min
-            const casesDstA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
-            const casesDstB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB))[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED];
+            const baseDataDstA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA));
+            const baseDataDstB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB));
+            const casesDstA = BaseData.getExposed(baseDataDstA, ModelConstants.AGEGROUP_NAME_______ALL);
+            const casesDstB = BaseData.getExposed(baseDataDstB, ModelConstants.AGEGROUP_NAME_______ALL);
             const heatmapCasesDeltaDstAB = casesDstB - casesDstA;
 
             heatmapPreIncidenceTotal += casesToIncidence(heatmapCasesDeltaPreAB, this.demographics.getAbsTotal());

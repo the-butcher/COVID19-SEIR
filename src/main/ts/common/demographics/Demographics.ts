@@ -89,20 +89,35 @@ export class Demographics {
                 1
             ];
 
-            // if (contactCategoryParamsBase.name === 'work') {
-            //     corrections = [
-            //         1, // <= 04
-            //         1,
-            //         1, // 1.02,
-            //         1,
-            //         1,
-            //         1,
-            //         1, // 1.35,
-            //         1,
-            //         1,
-            //         1
-            //     ]
-            // }
+            if (contactCategoryParamsBase.name === 'work') {
+                corrections = [
+                    1, // <= 04
+                    1, // 05-14
+                    1, // 15-24
+                    1, // 25-34
+                    1, // 35-44
+                    1.05, // 45-54
+                    2.2, // 55-64
+                    1.2, // 65-74
+                    1, // 75-84
+                    1  // >= 85
+                ]
+            }
+
+            if (contactCategoryParamsBase.name === 'other') {
+                corrections = [
+                    1, // <= 04
+                    1, // 05-14
+                    1, // 15-24
+                    1.2, // 25-34
+                    1, // 35-44
+                    1, // 45-54
+                    1, // 55-64
+                    0.70, // 65-74
+                    1.3, // 75-84
+                    1  // >= 85
+                ]
+            }
 
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
                 contactCategoryParamsTarget.data[indexContact] = [];

@@ -153,7 +153,7 @@ module.exports = {
             },
             { from: './src/main/webapp/data/default-config.json', to: 'data/default-config.json' },
             { from: './src/main/webapp/data/heatmap-data-at.json', to: 'data/heatmap-data-at.json' },
-            { from: './src/main/webapp/data/model-data-at.json', to: 'data/model-data-at.json' },
+            { from: './src/main/webapp/data/demographics-at.json', to: 'data/demographics-at.json' },
             { from: './src/main/webapp/assets/icon_192.png', to: 'assets/icon_192.png' },
             { from: './src/main/webapp/assets/favicon.png', to: 'assets/favicon.png' },
           ]
