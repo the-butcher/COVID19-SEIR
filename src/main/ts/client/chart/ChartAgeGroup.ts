@@ -325,7 +325,7 @@ export class ChartAgeGroup {
             baseLabel: 'vacc_v1',
             valueField: 'ageGroupRemovedVM1',
             colorKey: 'VACCINATION',
-            strokeWidth: 1,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.85,
             labelled: true,
@@ -337,7 +337,7 @@ export class ChartAgeGroup {
             baseLabel: 'vacc_v2',
             valueField: 'ageGroupRemovedVM2',
             colorKey: 'VACCINATION',
-            strokeWidth: 1,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.85,
             labelled: true,
@@ -348,11 +348,11 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'vacc_r1',
             valueField: 'ageGroupRemovedVR1',
-            colorKey: 'VACCINATION',
+            colorKey: 'SEASONALITY',
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.25,
-            labelled: true,
+            labelled: false,
             percent: true
         });
         this.seriesAgeGroupRemovedVR2 = new ChartAgeGroupSeries({
@@ -360,11 +360,11 @@ export class ChartAgeGroup {
             yAxis: this.yAxisPlotRelative,
             baseLabel: 'vacc_r2',
             valueField: 'ageGroupRemovedVR2',
-            colorKey: 'VACCINATION',
+            colorKey: 'SEASONALITY',
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.35,
-            labelled: true,
+            labelled: false,
             percent: true
         });
         this.seriesAgeGroupRemovedVRC = new ChartAgeGroupSeries({
@@ -373,7 +373,7 @@ export class ChartAgeGroup {
             baseLabel: 'vacc_rc',
             valueField: 'ageGroupRemovedVRC',
             colorKey: 'VACCINATION',
-            strokeWidth: 1,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.45,
             labelled: true,

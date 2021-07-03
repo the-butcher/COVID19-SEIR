@@ -262,7 +262,7 @@ export class ControlsConstants {
                 return new ModificationResolverVaccination();
             },
             showInEditor: modification => ControlsVaccination.getInstance().acceptModification(modification as ModificationVaccination),
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
         'SEASONALITY': {
             icon: 'M 3.73 5.81 c -2.35 0 -3.44 -2.8 -4.5 -5.5 C -1.59 -1.78 -2.52 -4.15 -3.73 -4.15 c -1.03 0 -2.37 2.12 -2.96 3.86 a 0.41 0.41 90 0 1 -0.51 0.27 l -0.8 -0.24 A 0.41 0.41 90 0 1 -8.27 -0.79 C -7.79 -2.23 -6.16 -5.81 -3.73 -5.81 c 2.35 0 3.44 2.8 4.5 5.5 C 1.59 1.78 2.52 4.15 3.73 4.15 c 1.03 0 2.37 -2.12 2.96 -3.86 a 0.41 0.41 90 0 1 0.51 -0.27 l 0.8 0.24 a 0.41 0.41 90 0 1 0.27 0.53 C 7.79 2.23 6.16 5.81 3.73 5.81 z',
