@@ -53,6 +53,7 @@ export class ChartAgeGroupSeries {
         this.series = params.chart.series.push(new LineSeries());
         this.series.showOnInit = false;
 
+
         this.seriesLabel = this.series.createChild(Label);
         this.seriesLabel.fontFamily = ControlsConstants.FONT_FAMILY;
         this.seriesLabel.fontSize = ControlsConstants.FONT_SIZE - 2;
@@ -92,6 +93,8 @@ export class ChartAgeGroupSeries {
                 return value;
             }
         });
+
+        this.series.tooltip.disabled = !params.labelled;
 
         this.series.events.on('ready', () => {
 

@@ -19,7 +19,7 @@ export interface IIconActionParams {
 export interface IChartModeParams {
     container: string;
     label: string;
-    iconMode: string;
+    iconKey: any;
     handleClick: (e: MouseEvent) => void;
 }
 
@@ -97,25 +97,25 @@ export class ModelActions {
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
             label: 'INCIDENCE',
-            iconMode: 'INCIDENCE',
+            iconKey: 'INCIDENCE',
             handleClick: () => ModelActions.getInstance().toggleChartMode('INCIDENCE')
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
             label: 'SUSCEPTIBLE',
-            iconMode: 'SEIR',
+            iconKey: 'SEIR',
             handleClick: () => ModelActions.getInstance().toggleChartMode('SEIR')
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
             label: 'EXPOSED',
-            iconMode: 'EI',
+            iconKey: 'EI',
             handleClick: () => ModelActions.getInstance().toggleChartMode('EI')
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
             label: 'VACCINATED',
-            iconMode: 'VACC',
+            iconKey: 'VACC',
             handleClick: () => ModelActions.getInstance().toggleChartMode('VACC')
         }));
 
@@ -124,31 +124,31 @@ export class ModelActions {
         this.ageGroupIcons.push(new IconChartMode({
             container: 'agetoggleDiv',
             label: ModelConstants.AGEGROUP_NAME_______ALL,
-            iconMode: ModelConstants.AGEGROUP_NAME_______ALL,
-            handleClick: () => this.toggleAgeGroup(ModelConstants.AGEGROUP_NAME_______ALL, ageGroups.length)
+            iconKey: ageGroups.length,
+            handleClick: () => this.toggleAgeGroup(ageGroups.length)
         }));
         ageGroups.forEach(ageGroup => {
             this.ageGroupIcons.push(new IconChartMode({
                 container: 'agetoggleDiv',
                 label: ageGroup.getName(),
-                iconMode: ageGroup.getName(),
-                handleClick: () => this.toggleAgeGroup(ageGroup.getName(), ageGroup.getIndex())
+                iconKey: ageGroup.getIndex(),
+                handleClick: () => this.toggleAgeGroup(ageGroup.getIndex())
             }));
         });
 
 
     }
 
-    toggleAgeGroup(name: string, index: number): void {
+    toggleAgeGroup(index: number): void {
         this.ageGroupIcons.forEach(ageGroupIcon => {
-            ageGroupIcon.setActive(ageGroupIcon.getIconMode() === name);
+            ageGroupIcon.setActive(ageGroupIcon.getIconKey() === index);
         });
         ChartAgeGroup.getInstance().setSeriesAgeGroup(index);
     }
 
     toggleChartMode(chartMode: CHART_MODE______KEY): void {
         this.chartModeIcons.forEach(chartModeIcon => {
-            chartModeIcon.setActive(chartModeIcon.getIconMode() === chartMode);
+            chartModeIcon.setActive(chartModeIcon.getIconKey() === chartMode);
         });
         ChartAgeGroup.getInstance().setChartMode(chartMode);
     }

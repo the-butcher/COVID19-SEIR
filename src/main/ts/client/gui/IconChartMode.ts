@@ -2,13 +2,13 @@ import { IChartModeParams } from './ModelActions';
 
 export class IconChartMode {
 
-    private readonly iconMode: string;
+    private readonly iconKey: any;
     private readonly label: string;
     private readonly container: HTMLDivElement;
 
     constructor(params: IChartModeParams) {
 
-        this.iconMode = params.iconMode;
+        this.iconKey = params.iconKey;
         this.label = params.label;
 
         this.container = document.createElement('div');
@@ -23,8 +23,8 @@ export class IconChartMode {
 
     }
 
-    getIconMode(): string {
-        return this.iconMode;
+    getIconKey(): any {
+        return this.iconKey;
     }
 
     setActive(active: boolean): void {

@@ -35,6 +35,8 @@ export interface IModificationData {
  */
 export class ChartAgeGroup {
 
+    static readonly showDiffDisplay = true;
+
     static readonly FIELD______INDEX = 'index';
     static readonly FIELD_CATEGORY_X = 'categoryX';
     static readonly FIELD_CATEGORY_Y = 'categoryY';
@@ -104,11 +106,12 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedVM2: ChartAgeGroupSeries;
 
     /**
-     * real vaccination data
+     * real data
      */
     protected readonly seriesAgeGroupRemovedVR1: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupRemovedVR2: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupRemovedVRC: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupIncidenceR: ChartAgeGroupSeries;
 
     protected readonly seriesModification: ChartAgeGroupSeries;
 
@@ -255,6 +258,18 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.10,
             labelled: true,
+            percent: false
+        });
+        this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotIncidence,
+            baseLabel: 'incidence_r',
+            valueField: 'ageGroupIncidenceR',
+            colorKey: 'SEASONALITY',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.35,
+            labelled: false,
             percent: false
         });
         this.seriesAgeGroupIncidenceByStrain = new Map();
@@ -448,9 +463,12 @@ export class ChartAgeGroup {
         this.columnTemplate.height = percent(95);
         this.columnTemplate.events.on('hit', e => {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
-            this.setSeriesAgeGroup(index);
+            // this.setSeriesAgeGroup(index);
+            ModelActions.getInstance().toggleAgeGroup(index);
         });
-        // this.columnTemplate.propertyFields.fill = 'color';
+        if (ChartAgeGroup.showDiffDisplay) {
+            this.columnTemplate.propertyFields.fill = 'color';
+        }
 
         this.seriesHeat.heatRules.push({
             target: this.columnTemplate,
@@ -618,6 +636,7 @@ export class ChartAgeGroup {
             }, 100);
 
             this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
+            this.seriesAgeGroupIncidenceR.setSeriesNote(ageGroup.getName());
             this.seriesAgeGroupCases.setSeriesNote(ageGroup.getName());
 
             this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
@@ -823,6 +842,7 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
         this.seriesAgeGroupIncidence.getSeries().visible = visible;
+        this.seriesAgeGroupIncidenceR.getSeries().visible = visible;
         this.seriesAgeGroupCases.getSeries().visible = visible;
 
         // set everything to invisible
@@ -919,6 +939,7 @@ export class ChartAgeGroup {
             pG: Demographics.getInstance().getAbsTotal()
         })];
 
+        // does not need to go through age ModelActions, because it just reapplies
         this.setSeriesAgeGroup(this.ageGroupIndex);
 
         this.requestRenderModelData();
@@ -986,7 +1007,7 @@ export class ChartAgeGroup {
 
     async renderModelData(): Promise<void> {
 
-        console.warn('rendering');
+        // console.warn('rendering');
         clearTimeout(this.renderTimeout);
 
         const plotData: any[] = [];
@@ -1009,12 +1030,15 @@ export class ChartAgeGroup {
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
+            const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
             const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
             let ageGroupRemovedVR1 = null;
             let ageGroupRemovedVR2 = null;
-            if (dataItemB) {
+            let ageGroupIncidenceR = null;
+            if (dataItemA && dataItemB) {
                 ageGroupRemovedVR1 = BaseData.getVacc1(dataItemB, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupRemovedVR2 = BaseData.getVacc2(dataItemB, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
+                ageGroupIncidenceR = (dataItemB[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
             }
 
             const item = {
@@ -1030,6 +1054,7 @@ export class ChartAgeGroup {
                 ageGroupRemovedVR2,
                 ageGroupRemovedVRC,
                 ageGroupIncidence,
+                ageGroupIncidenceR,
                 ageGroupCases
             }
 
@@ -1056,10 +1081,10 @@ export class ChartAgeGroup {
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
                 let color: string;
-                if (dataItemA && dataItemB) {
+                if (ChartAgeGroup.showDiffDisplay && dataItemA && dataItemB) {
 
-                    // const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
-                    // value -= baseIncidence;
+                    const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
+                    value -= baseIncidence;
                     // const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC1ST] / ageGroupHeat.getAbsValue();
                     // value -= baseVaccination;
 
@@ -1100,7 +1125,7 @@ export class ChartAgeGroup {
 
         // console.log('chartData', chartData);
 
-        if (this.chart.data.length === chartData.length) {
+        if (this.chart.data.length === chartData.length && !ChartAgeGroup.showDiffDisplay) {
             for (let i = 0; i < chartData.length; i++) {
                 for (const key of Object.keys(chartData[i])) { // const key in chartData[i]
                     this.chart.data[i][key] = chartData[i][key];
