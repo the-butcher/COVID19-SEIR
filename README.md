@@ -86,7 +86,6 @@ A higher discovery rate means:
 ## <a name="anchor_settings">Settings</a>
 <br><br><br>
 #### Issues
-* >= 85 behaves strange in initial week of model
 * age-group toggle from chart does not reflect in side-list
 * take care of corrections on matrices (bake them into matrices)
 * have a second look at contact matrix normalization because age-groups could not be properly fit so far.
@@ -122,6 +121,7 @@ A higher discovery rate means:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* ~~>= 85 behaves strange in initial week of model << awkward data at model start~~
 * ~~auto update model after bezier control drag~~
 * ~~alter style of bezier controls~~
 * ~~add bezier curve when age is picked (currently only points draw at that time)~~

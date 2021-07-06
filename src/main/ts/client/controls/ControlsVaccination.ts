@@ -79,7 +79,7 @@ export class ControlsVaccination {
 
     showVaccinationCurve(ageGroup: string): void {
 
-        return;
+        // return;
 
         this.ageGroup = ageGroup;
         const vaccinationCurve: IVaccinationConfig = this.modification.getVaccinationConfig(ageGroup);

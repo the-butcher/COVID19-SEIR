@@ -95,6 +95,7 @@ export class ChartAgeGroupSeries {
         });
 
         this.series.tooltip.disabled = !params.labelled;
+        this.seriesLabel.disabled =  !params.labelled;
 
         this.series.events.on('ready', () => {
 

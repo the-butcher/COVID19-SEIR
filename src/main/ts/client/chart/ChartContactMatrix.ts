@@ -191,6 +191,10 @@ export class ChartContactMatrix {
                 }
             }
         });
+        columnTemplate.events.on('hit', e => {
+            const chartData = e.target.dataItem.dataContext as IChartData;
+            console.log(this.contactMatrix.getSummary(chartData.indexX, chartData.indexY));
+        });
 
         this.seriesHeat.heatRules.push({
             target: columnTemplate,

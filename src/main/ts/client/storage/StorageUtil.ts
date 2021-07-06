@@ -1,4 +1,5 @@
 import { Demographics } from '../../common/demographics/Demographics';
+import { IModificationValuesContact } from '../../common/modification/IModificationValuesContact';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/calibration/BaseData';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -114,16 +115,23 @@ export class StorageUtil {
 
         if (this.isStorageEnabled()) {
 
-            const loadedConfig = localStorage.getItem(StorageUtil.STORAGE_KEY_MODIFICATIONS);
-            if (ObjectUtil.isNotEmpty(loadedConfig)) {
-                return JSON.parse(loadedConfig);
-            } else {
-                return this.loadDefaultConfig();
+            const loadedConfigRaw = localStorage.getItem(StorageUtil.STORAGE_KEY_MODIFICATIONS);
+            if (ObjectUtil.isNotEmpty(loadedConfigRaw)) {
+                const loadedConfig: IStoredConfig = JSON.parse(loadedConfigRaw);
+                let loadedConfigHasRisk = false;
+                loadedConfig.model_modifications.filter(m => m.key === 'CONTACT').forEach((modification: IModificationValuesContact) => {
+                    if (modification.multipliers['risk']) {
+                        loadedConfigHasRisk = true;
+                    }
+                });
+                if (loadedConfigHasRisk) {
+                    // console.log('OK risk in config');
+                    return loadedConfig;
+                }
             }
-
-        } else {
-            return this.loadDefaultConfig();
         }
+        // old config, no stored config, no local storage
+        return this.loadDefaultConfig();
 
     }
 

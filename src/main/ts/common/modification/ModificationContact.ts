@@ -63,6 +63,14 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return value;
     }
 
+    getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {
+        let summary: {[K: string]: string} = {};
+        this.contactCategories.forEach(contactCategory => {
+            summary[contactCategory.getName()] = (contactCategory.getData(indexContact, indexParticipant) * this.getMultiplier(contactCategory.getName())).toFixed(4);
+        });
+        return summary;
+    }
+
     private getContactCategoryMultiplier(contactCategoryName: string): number {
         if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
             this.modificationValues.multipliers[contactCategoryName] = 1.0;
