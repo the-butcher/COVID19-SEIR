@@ -151,8 +151,7 @@ export class StorageUtil {
             storage.setItem(testItem, testItem);
             storage.removeItem(testItem);
             return true;
-        }
-        catch(e) {
+        } catch(e) {
             return e instanceof DOMException && (
                 // everything except Firefox
                 e.code === 22 ||

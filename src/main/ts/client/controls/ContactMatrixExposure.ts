@@ -60,4 +60,10 @@ export class ContactMatrixExposure implements IContactMatrix {
         return 0;
     }
 
+    getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {
+        return {
+            'exposure': this.contacts[indexContact][indexParticipant].toFixed(4)
+        };
+    }
+
 }

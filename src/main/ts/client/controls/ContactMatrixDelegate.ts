@@ -36,4 +36,8 @@ export class ContactMatrixDelegate implements IContactMatrix {
         return this.contactMatrix.getContacts(indexContact, indexParticipant);
     }
 
+    getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {
+        return this.contactMatrix.getSummary(indexContact, indexParticipant);
+    }
+
 }

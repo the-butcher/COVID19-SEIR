@@ -52,10 +52,13 @@ export interface IModification<P extends IModificationValues> {
      */
     setInstants(instantA: number, instantB: number): void;
 
+
     /**
      * check if this instance can be deleted through the modification slider
      */
     isDeletable(): boolean;
+
+    isBlendable(): boolean;
 
     /**
      * check if this instance can be dragged along the modification slider

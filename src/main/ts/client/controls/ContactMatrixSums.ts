@@ -32,6 +32,10 @@ export class ContactMatrixSums {
 
     }
 
+    getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {
+        return this.contactMatrix.getSummary(indexContact, indexParticipant);
+    }
+
     getColumnSum(ageGroupIndex: number): number {
         return this.columnSums[ageGroupIndex];
     }

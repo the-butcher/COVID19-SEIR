@@ -17,7 +17,7 @@ import { Modifications } from './Modifications';
 export abstract class AModificationResolver<V extends IModificationValues, M extends IModification<V>> implements IModificationResolver<V, M> {
 
     private readonly key: MODIFICATION____KEY;
-    private typedModifications: M[];
+    protected typedModifications: M[];
 
     constructor(key: MODIFICATION____KEY) {
         this.key = key;

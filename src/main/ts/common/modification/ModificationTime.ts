@@ -96,6 +96,12 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     }
 
+    getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {
+        return {
+            'time': this.getContacts(indexContact, indexParticipant).toFixed(4)
+        };
+    }
+
     /**
      * get the underlying contact matrix setting
      * @param indexContact
