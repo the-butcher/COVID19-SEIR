@@ -81,15 +81,15 @@ export class ModelConstants {
         },
         'VACCINATION': {
             createValuesModification: (modificationValues) => new ModificationVaccination(modificationValues as IModificationValuesVaccination),
-            createDefaultModification: (instant: number) => new ModificationVaccination({
-                id: ObjectUtil.createId(),
-                key: 'VACCINATION',
-                name: 'vaccinations',
-                instant,
-                vaccinationCurves: {},
-                deletable: false,
-                draggable: false
-            }),
+            // createDefaultModification: (instant: number) => new ModificationVaccination({
+            //     id: ObjectUtil.createId(),
+            //     key: 'VACCINATION',
+            //     name: 'vaccinations',
+            //     instant,
+            //     vaccinationCurves: {},
+            //     deletable: false,
+            //     draggable: false
+            // }),
         },
         'SEASONALITY': {
             createValuesModification: (modificationValues) => new ModificationSeasonality(modificationValues as IModificationValuesSeasonality),

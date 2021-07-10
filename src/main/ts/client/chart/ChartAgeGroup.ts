@@ -35,7 +35,7 @@ export interface IModificationData {
  */
 export class ChartAgeGroup {
 
-    static readonly showDiffDisplay = false;
+    static readonly showDiffDisplay = true;
 
     static readonly FIELD______INDEX = 'index';
     static readonly FIELD_CATEGORY_X = 'categoryX';

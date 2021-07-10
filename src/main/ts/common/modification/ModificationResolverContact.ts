@@ -73,10 +73,9 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
             });
             return interpolatedModification;
 
-        }
-        // } else {
+        } else {
             return modificationA;
-        // }
+        }
 
     }
 

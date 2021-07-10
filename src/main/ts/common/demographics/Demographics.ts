@@ -94,9 +94,9 @@ export class Demographics {
                     1.1, // <= 04
                     1, // 05-14
                     1, // 15-24
-                    1.05, // 25-34
+                    1.1, // 25-34
                     1, // 35-44
-                    1, // 45-54
+                    0.6, // 45-54
                     1.2, // 55-64
                     1.05, // 65-74
                     1, // 75-84
@@ -113,8 +113,8 @@ export class Demographics {
                     1, // 35-44
                     1, // 45-54
                     1.20, // 55-64
-                    1.20, // 65-74
-                    1.20, // 75-84
+                    1.6, // 65-74
+                    1.7, // 75-84
                     1  // >= 85
                 ]
             }
@@ -124,7 +124,7 @@ export class Demographics {
                     0.75, // <= 04
                     1, // 05-14
                     0.95, // 15-24
-                    1, // 25-34
+                    1.1, // 25-34
                     1, // 35-44
                     1, // 45-54
                     1.15, // 55-64
@@ -139,9 +139,9 @@ export class Demographics {
                     1, // <= 04
                     1, // 05-14
                     1, // 15-24
-                    1, // 25-34
-                    0.85, // 35-44
-                    0.95, // 45-54
+                    1.1, // 25-34
+                    0.80, // 35-44
+                    0.80, // 45-54
                     4.0, // 55-64
                     70, // 65-74
                     1, // 75-84
@@ -154,7 +154,7 @@ export class Demographics {
                     0.50, // <= 04
                     1, // 05-14
                     0.9, // 15-24
-                    1.5, // 25-34
+                    1.3, // 25-34
                     0.85, // 35-44
                     0.80, // 45-54
                     1.00, // 55-64
@@ -167,16 +167,16 @@ export class Demographics {
             if (contactCategoryParamsBase.name === 'risk') {
                 corrections = [
                     0.00, // <= 04
-                    0.5, // 05-14
+                    0.2, // 05-14
                     2, // 15-24
-                    1.7, // 25-34
+                    1.75, // 25-34
                     0.5, // 35-44
-                    0.1, // 45-54
-                    0.05, // 55-64
+                    0.05, // 45-54
+                    0.02, // 55-64
                     0.0, // 65-74
                     0.0, // 75-84
                     0.0  // >= 85
-                ].map(v => v * 1.4 / Math.sqrt(2))
+                ].map(v => v * 2 / Math.sqrt(2))
             }
 
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
@@ -203,6 +203,11 @@ export class Demographics {
         this.contactCategories = [];
 
         contactCategoryParams.forEach(contactCategoryParam => {
+
+            const contactCategory = new ContactCategory(contactCategoryParam);
+            this.contactCategories.push(contactCategory);
+
+
             // let populationContactCategory = 0;
             let matrixSumCategory = 0;
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
@@ -212,12 +217,10 @@ export class Demographics {
                     matrixSumCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
                 }
             }
-            const contactCategory = new ContactCategory(contactCategoryParam);
-            this.contactCategories.push(contactCategory);
             // populationContactTotal += populationContactCategory;
             this.matrixSum += matrixSumCategory;
-        });
 
+        });
 
         this.exposuresPerContact = this.absTotal / this.matrixSum;
 

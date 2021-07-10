@@ -138,7 +138,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                 heatmapDstIncidencesB[ageGroup.getIndex()] += casesToIncidence(heatmapCasesDeltaDstAB, ageGroup.getAbsValue());
 
                 if (ageGroup.getName() === '05-14') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 7;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 4;
                 }
 
             });

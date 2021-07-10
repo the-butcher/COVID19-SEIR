@@ -84,8 +84,13 @@ A higher discovery rate means:
 ## <a name="anchor_vaccination">Vaccination</a>
 ## <a name="anchor_seasonality">Seasonality</a>
 ## <a name="anchor_settings">Settings</a>
-<br><br><br>
+
+#### Hardcoded and to be changed to an i.e. configurable implementation<br><br><br>
+* StrainApproximatorBaseData - manual increase of incidence to correct for awkward data
+* Demographics corrections on the matrices
+* AModification - isBlendable
 #### Issues
+* vaccination must not be creatable
 * take care of corrections on matrices (bake them into matrices)
 * have a second look at contact matrix normalization because age-groups could not be properly fit so far.
 * wiki on github
