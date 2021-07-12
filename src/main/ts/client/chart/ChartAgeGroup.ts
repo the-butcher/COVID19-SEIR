@@ -203,7 +203,7 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.renderer.grid.template.disabled = true;
         this.yAxisPlotRelative.rangeChangeDuration = 0;
         this.yAxisPlotRelative.strictMinMax = true;
-        this.yAxisPlotRelative.min = 0.00;
+        this.yAxisPlotRelative.min = -0.1; // 0.00;
         this.yAxisPlotRelative.max = 1.01; // some extra required, or 100% label will not show
 
         this.yAxisPlotRelative.renderer.labels.template.adapter.add('text', (value, target) => {
@@ -371,7 +371,7 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.25,
-            labelled: false,
+            labelled: true,
             percent: true
         });
         this.seriesAgeGroupRemovedVR2 = new ChartAgeGroupSeries({
@@ -383,7 +383,7 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.35,
-            labelled: false,
+            labelled: true,
             percent: true
         });
         this.seriesAgeGroupRemovedVRC = new ChartAgeGroupSeries({

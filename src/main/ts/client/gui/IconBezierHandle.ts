@@ -7,7 +7,7 @@ export class IconBezierHandle {
 
     private readonly svgContainer: HTMLDivElement;
 
-    constructor() {
+    constructor(color: string) {
 
         this.svgContainer = document.createElement('div');
         this.svgContainer.style.position = 'absolute';
@@ -20,7 +20,7 @@ export class IconBezierHandle {
         this.svgContainer.appendChild(svgElement);
 
         const bulletPathElement = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        bulletPathElement.setAttributeNS(null, 'stroke', '#FF0000');
+        bulletPathElement.setAttributeNS(null, 'stroke', color);
         bulletPathElement.setAttributeNS(null, 'stroke-width', '2');
         bulletPathElement.setAttributeNS(null, 'r', '4');
         svgElement.appendChild(bulletPathElement);

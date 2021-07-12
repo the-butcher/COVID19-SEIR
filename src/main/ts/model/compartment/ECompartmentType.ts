@@ -11,7 +11,7 @@ export enum ECompartmentType {
     I__INFECTIOUS,
     R__REMOVED_ID,
     R__REMOVED_IU,
-    R__REMOVED_V1,
+    R__REMOVED_VI,
     R__REMOVED_V2,
     X__REMOVED_VC,
     R________DEAD,

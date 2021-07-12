@@ -341,7 +341,6 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
 
         }
 
-
     }
 
 }

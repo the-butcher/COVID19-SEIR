@@ -30,7 +30,9 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
 
         const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
         if (dataItemCur) {
-            return dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].TOTAL;
+            const value = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].TOTAL;
+            // console.log('set', new Date(instant), value);
+            return value;
         }
         return Number.NaN;
     }

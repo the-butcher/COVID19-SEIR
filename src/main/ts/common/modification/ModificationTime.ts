@@ -37,8 +37,12 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         // nothing to be updated
     }
 
-    getLutByName(ageGroup: string): { [K in number]: number} {
-        return this.modificationVaccination.getLutByName(ageGroup);
+    getLut1ByName(ageGroup: string): { [K in number]: number} {
+        return this.modificationVaccination.getLut1ByName(ageGroup);
+    }
+
+    getLut2ByName(ageGroup: string): { [K in number]: number} {
+        return this.modificationVaccination.getLut2ByName(ageGroup);
     }
 
     /**

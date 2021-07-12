@@ -7,10 +7,15 @@ import { ICoordinate } from '../../util/ICoordinate';
  */
 export interface IVaccinationConfig {
 
-    pA: ICoordinate;
-    cA: ICoordinate;
-    cB: ICoordinate;
-    pB: ICoordinate;
+    pA1: ICoordinate;
+    cA1: ICoordinate;
+    cB1: ICoordinate;
+
+    pA2: ICoordinate;
+    cA2: ICoordinate;
+    cB2: ICoordinate;
+
+    pBN: ICoordinate;
 
     /**
      * stretch of duration

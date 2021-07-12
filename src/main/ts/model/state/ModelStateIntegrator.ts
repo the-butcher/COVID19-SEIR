@@ -121,7 +121,7 @@ export class ModelStateIntegrator {
         const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I__INFECTIOUS));
         const compartmentFilterRemovedIDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID));
         const compartmentFilterRemovedIUTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU));
-        const compartmentFilterRemovedV1Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V1));
+        const compartmentFilterRemovedV1Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI));
         const compartmentFilterRemovedV2Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2));
         const compartmentFilterRemovedVCTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__REMOVED_VC));
         const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0);
@@ -199,7 +199,7 @@ export class ModelStateIntegrator {
                     const compartmentFilterInfectious = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.I__INFECTIOUS && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedID = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedIU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU) && c.getAgeGroupIndex() === ageGroup.getIndex());
-                    const compartmentFilterRemovedV1 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V1 && c.getAgeGroupIndex() === ageGroup.getIndex()));
+                    const compartmentFilterRemovedV1 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterRemovedV2 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2 && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterRemovedVC = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__REMOVED_VC && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterCases = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 && c.getAgeGroupIndex() === ageGroup.getIndex());

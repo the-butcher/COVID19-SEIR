@@ -19,22 +19,31 @@ import { IModificationValuesVaccination } from './IModificationValuesVaccination
  */
 export class ModificationVaccination extends AModification<IModificationValuesVaccination> {
 
-    private readonly luts: { [K in string]: { [K in number]: number}};
+    private readonly luts1: { [K in string]: { [K in number]: number}};
+    private readonly luts2: { [K in string]: { [K in number]: number}};
 
     constructor(modificationParams: IModificationValuesVaccination) {
         super('INSTANT', modificationParams);
-        this.luts = {};
+        this.luts1 = {};
+        this.luts2 = {};
         // when called in the constructor, it will later be passed to the worker in a complete state, otherwise the worker will create default objects that are never known in main
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             this.getVaccinationConfig(ageGroup.getName());
         });
     }
 
-    getLutByName(ageGroup: string): { [K in number]: number } {
-        if (!this.luts[ageGroup]) {
-            this.updateLut(ageGroup);
+    getLut1ByName(ageGroup: string): { [K in number]: number } {
+        if (!this.luts1[ageGroup]) {
+            this.updateLut1(ageGroup);
         }
-        return this.luts[ageGroup];
+        return this.luts1[ageGroup];
+    }
+
+    getLut2ByName(ageGroup: string): { [K in number]: number } {
+        if (!this.luts2[ageGroup]) {
+            this.updateLut2(ageGroup);
+        }
+        return this.luts2[ageGroup];
     }
 
     acceptUpdate(update: Partial<IModificationValuesVaccination>): void {
@@ -45,11 +54,20 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
         const categoryPre = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getPreInstant());
         const baseDataPre = BaseData.getInstance().findBaseData(categoryPre);
+
         const absVacc1 = BaseData.getVacc1(baseDataPre, ageGroup);
         const grpVacc1 = absVacc1 / Demographics.getInstance().findAgeGroupByName(ageGroup).getAbsValue();
-        const pA: ICoordinate = {
+
+        const absVacc2 = BaseData.getVacc2(baseDataPre, ageGroup);
+        const grpVacc2 = absVacc2 / Demographics.getInstance().findAgeGroupByName(ageGroup).getAbsValue();
+
+        const pA1: ICoordinate = {
             x: ModelInstants.getInstance().getPreInstant(),
             y: grpVacc1
+        };
+        const pA2: ICoordinate = {
+            x: ModelInstants.getInstance().getPreInstant(),
+            y: grpVacc2
         };
 
         const sDDefault = 1.25;
@@ -58,23 +76,34 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
         let vaccinationCurve: IVaccinationConfig = this.modificationValues.vaccinationCurves?.[ageGroup];
         if (!vaccinationCurve) {
 
-            const cA: ICoordinate = {
+            const cA1: ICoordinate = {
                 x: ModelInstants.getInstance().getPreInstant() + TimeUtil.MILLISECONDS_PER____DAY * 60,
                 y: grpVacc1
             };
-            const cB: ICoordinate = {
+            const cB1: ICoordinate = {
                 x: ModelInstants.getInstance().getMaxInstant() - TimeUtil.MILLISECONDS_PER____DAY * 60,
                 y: 0.5
             };
-            const pB: ICoordinate = {
+            const cA2: ICoordinate = {
+                x: ModelInstants.getInstance().getPreInstant() + TimeUtil.MILLISECONDS_PER____DAY * 60,
+                y: grpVacc2
+            };
+            const cB2: ICoordinate = {
+                x: ModelInstants.getInstance().getMaxInstant() - TimeUtil.MILLISECONDS_PER____DAY * 60,
+                y: 0.5
+            };
+            const pBN: ICoordinate = {
                 x: ModelInstants.getInstance().getMaxInstant(),
                 y: 0.5
             };
             vaccinationCurve = {
-                pA,
-                cA,
-                cB,
-                pB,
+                pA1,
+                cA1,
+                cB1,
+                pA2,
+                cA2,
+                cB2,
+                pBN,
                 sD: sDDefault,
                 sC: sCDefault
             }
@@ -88,10 +117,25 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
         if (!vaccinationCurve.sC) {
             vaccinationCurve.sC = sCDefault;
         }
+        if (!vaccinationCurve.cA2) {
+            vaccinationCurve.cA2 = {
+                x: ModelInstants.getInstance().getPreInstant() + TimeUtil.MILLISECONDS_PER____DAY * 60,
+                y: grpVacc2
+            };
+        }
+        if (!vaccinationCurve.cB2) {
+            vaccinationCurve.cB2 = {
+                x: ModelInstants.getInstance().getMaxInstant() - TimeUtil.MILLISECONDS_PER____DAY * 60,
+                y: 0.5
+            };
+        }
 
-        vaccinationCurve.pA.x = pA.x;
-        vaccinationCurve.pA.y = pA.y;
 
+
+        vaccinationCurve.pA1 = {...pA1}
+        vaccinationCurve.pA2 = {...pA2}
+
+        // code for a non-vaccination scenario - needs to be completed with the vacc2 coordinates to work
         // this.acceptUpdate(this.modificationValues);
         // console.log('this.modificationValues', this.modificationValues);
 
@@ -123,42 +167,83 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
     setVaccinationCurve(ageGroup: string, vaccinationCurve: IVaccinationConfig): void {
         this.modificationValues.vaccinationCurves[ageGroup] = vaccinationCurve;
-        this.updateLut(ageGroup);
+        this.updateLut1(ageGroup);
     }
 
-    updateLut(ageGroup: string): void {
+    updateLut1(ageGroup: string): void {
 
         const vaccinationCurve = this.getVaccinationConfig(ageGroup);
+        console.log('vaccinationCurve', vaccinationCurve);
 
-        const bezier = new Bezier(vaccinationCurve.pA, vaccinationCurve.cA, vaccinationCurve.cB, vaccinationCurve.pB);
-        const lut = bezier.getLUT(100);
+        const lutCount = 100;
+
+        const bezier1 = new Bezier(vaccinationCurve.pA1, vaccinationCurve.cA1, vaccinationCurve.cB1, vaccinationCurve.pBN);
+        const lut1 = bezier1.getLUT(lutCount);
 
         const minChartInstant = ModelInstants.getInstance().getPreInstant();
         const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
 
         let lutIndex = 0;
-        const lutVacc: { [K in number]: number} = {};
+        const lutVacc1: { [K in number]: number} = {};
         for (let curInstant = minChartInstant; curInstant <= maxChartInstant; curInstant += ModelStateIntegrator.DT) {
 
             // iterate lut until lut value is equal or greater than cur instant
-            while (curInstant > lut[lutIndex].x) {
+            while (curInstant > lut1[lutIndex].x) {
                 lutIndex++;
-                if (lutIndex >= lut.length) {
+                if (lutIndex >= lut1.length) {
                     break;
                 }
             }
 
             if (lutIndex > 0) {
-                const diffCurX = curInstant - lut[lutIndex - 1].x;
-                const diffLutX = lut[lutIndex].x - lut[lutIndex - 1].x;
-                const diffLutY = lut[lutIndex].y - lut[lutIndex - 1].y;
-                lutVacc[curInstant] = lut[lutIndex - 1].y + diffLutY * diffCurX / diffLutX;
+                const diffCurX = curInstant - lut1[lutIndex - 1].x;
+                const diffLutX = lut1[lutIndex].x - lut1[lutIndex - 1].x;
+                const diffLutY = lut1[lutIndex].y - lut1[lutIndex - 1].y;
+                lutVacc1[curInstant] = lut1[lutIndex - 1].y + diffLutY * diffCurX / diffLutX;
             } else {
-                lutVacc[curInstant] = lut[0].y;
+                lutVacc1[curInstant] = lut1[0].y;
             }
 
         }
-        this.luts[ageGroup] = lutVacc;
+        this.luts1[ageGroup] = lutVacc1;
+
+    }
+
+    updateLut2(ageGroup: string): void {
+
+        const vaccinationCurve = this.getVaccinationConfig(ageGroup);
+
+        const lutCount = 100;
+
+        const bezier2 = new Bezier(vaccinationCurve.pA2, vaccinationCurve.cA2, vaccinationCurve.cB2, vaccinationCurve.pBN);
+        const lut2 = bezier2.getLUT(lutCount);
+
+        const minChartInstant = ModelInstants.getInstance().getPreInstant();
+        const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
+
+        let lutIndex = 0;
+        const lutVacc2: { [K in number]: number} = {};
+        for (let curInstant = minChartInstant; curInstant <= maxChartInstant; curInstant += ModelStateIntegrator.DT) {
+
+            // iterate lut until lut value is equal or greater than cur instant
+            while (curInstant > lut2[lutIndex].x) {
+                lutIndex++;
+                if (lutIndex >= lut2.length) {
+                    break;
+                }
+            }
+
+            if (lutIndex > 0) {
+                const diffCurX = curInstant - lut2[lutIndex - 1].x;
+                const diffLutX = lut2[lutIndex].x - lut2[lutIndex - 1].x;
+                const diffLutY = lut2[lutIndex].y - lut2[lutIndex - 1].y;
+                lutVacc2[curInstant] = lut2[lutIndex - 1].y + diffLutY * diffCurX / diffLutX;
+            } else {
+                lutVacc2[curInstant] = lut2[0].y;
+            }
+
+        }
+        this.luts2[ageGroup] = lutVacc2;
 
     }
 
