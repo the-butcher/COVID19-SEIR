@@ -18,7 +18,8 @@ export interface IChartAgeGroupSeriesParams {
     dashed: boolean;
     labelled: boolean;
     locationOnPath: number;
-    percent: boolean
+    percent: boolean;
+    stacked: boolean;
 }
 
 /**
@@ -53,7 +54,6 @@ export class ChartAgeGroupSeries {
         this.series = params.chart.series.push(new LineSeries());
         this.series.showOnInit = false;
 
-
         this.seriesLabel = this.series.createChild(Label);
         this.seriesLabel.fontFamily = ControlsConstants.FONT_FAMILY;
         this.seriesLabel.fontSize = ControlsConstants.FONT_SIZE - 2;
@@ -72,13 +72,14 @@ export class ChartAgeGroupSeries {
 
         this.series.sequencedInterpolation = false;
 
-        this.series.stacked = false;
-        this.series.fillOpacity = 0.0;
+        this.series.stacked = params.stacked;
+        this.series.fillOpacity = params.stacked ? 0.5 : 0.0;
+        this.series.strokeOpacity = params.stacked ? 0.2 : 1.0;
         this.series.strokeWidth = params.strokeWidth;
         if (params.dashed) {
             this.series.strokeDasharray = params.strokeWidth * 2 + ',' + params.strokeWidth * 2;
         }
-        this.series.strokeOpacity = 1.0;
+        // this.series.strokeOpacity = 1.0;
         this.series.fontFamily = ControlsConstants.FONT_FAMILY;
         this.series.fontSize = ControlsConstants.FONT_SIZE;
         ChartUtil.getInstance().configureAgeGroupSeries(this, ControlsConstants.COLORS[params.colorKey], true);

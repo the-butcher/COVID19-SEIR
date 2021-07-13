@@ -31,6 +31,7 @@ export interface IDataValues {
     REMOVED_IU: number;
     REMOVED_V1: number;
     REMOVED_V2: number;
+    REMOVED_VR: number;
     REMOVED_VC: number;
     CASES: number;
     INCIDENCES: { [K: string]: number };
@@ -122,6 +123,7 @@ export class ModelStateIntegrator {
         const compartmentFilterRemovedIDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID));
         const compartmentFilterRemovedIUTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU));
         const compartmentFilterRemovedV1Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI));
+        const compartmentFilterRemovedVRTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VU));
         const compartmentFilterRemovedV2Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2));
         const compartmentFilterRemovedVCTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__REMOVED_VC));
         const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0);
@@ -147,6 +149,7 @@ export class ModelStateIntegrator {
                 const removedIDTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedIDTotal);
                 const removedIUTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedIUTotal);
                 const removedV1Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV1Total);
+                const removedVRTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVRTotal);
                 const removedV2Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV2Total);
                 const removedVCTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVCTotal);
 
@@ -181,6 +184,7 @@ export class ModelStateIntegrator {
                     REMOVED_ID: removedIDTotal,
                     REMOVED_IU: removedIUTotal,
                     REMOVED_V1: removedV1Total,
+                    REMOVED_VR: removedVRTotal,
                     REMOVED_V2: removedV2Total,
                     REMOVED_VC: removedVCTotal,
                     CASES: this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal,
@@ -200,6 +204,7 @@ export class ModelStateIntegrator {
                     const compartmentFilterRemovedID = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedIU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedV1 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI && c.getAgeGroupIndex() === ageGroup.getIndex()));
+                    const compartmentFilterRemovedVR = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VU && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterRemovedV2 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2 && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterRemovedVC = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__REMOVED_VC && c.getAgeGroupIndex() === ageGroup.getIndex()));
                     const compartmentFilterCases = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 && c.getAgeGroupIndex() === ageGroup.getIndex());
@@ -209,6 +214,7 @@ export class ModelStateIntegrator {
                     const removedID = this.modelState.getNrmValueSum(compartmentFilterRemovedID) * groupNormalizer;
                     const removedIU = this.modelState.getNrmValueSum(compartmentFilterRemovedIU) * groupNormalizer;
                     const removedV1 = this.modelState.getNrmValueSum(compartmentFilterRemovedV1) * groupNormalizer;
+                    const removedVR = this.modelState.getNrmValueSum(compartmentFilterRemovedVR) * groupNormalizer;
                     const removedV2 = this.modelState.getNrmValueSum(compartmentFilterRemovedV2) * groupNormalizer;
                     const removedVC = this.modelState.getNrmValueSum(compartmentFilterRemovedVC) * groupNormalizer;
 
@@ -236,6 +242,7 @@ export class ModelStateIntegrator {
                         REMOVED_ID: removedID,
                         REMOVED_IU: removedIU,
                         REMOVED_V1: removedV1,
+                        REMOVED_VR: removedVR,
                         REMOVED_V2: removedV2,
                         REMOVED_VC: removedVC,
                         CASES: this.modelState.getNrmValueSum(compartmentFilterCases) * absTotal,

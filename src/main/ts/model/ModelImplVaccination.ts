@@ -23,18 +23,26 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly ageGroupName: string;
 
     /**
-     * pure model based --> does not match the VR1 curve, since it is a pass through compartment, continuing to VM2
+     * pure model based --> amount of immunizing at given time
      */
     private readonly compartmentI: CompartmentBase;
 
     /**
-     * pure model based --> should match the VR2 curve, which yet has to proof true
+     * pure model based --> should match the vacc_2 curve
      */
     private readonly compartmentV: CompartmentBase;
 
+    /**
+     * people immunized after previously infected
+     */
+    private readonly compartmentU: CompartmentBase;
+
+    /**
+     * control compartment (not contributing to model sum, but useful to validate actual vacc1 progress)
+     */
     private readonly compartmentC: CompartmentBase;
 
-    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, absValueI: number, ageGroup: AgeGroup) {
+    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, absValueI: number, absValueU: number, ageGroup: AgeGroup) {
 
         this.parentModel = parentModel;
         this.absTotal = modelSettings.getAbsTotal();
@@ -52,8 +60,8 @@ export class ModelImplVaccination implements IModelSeir {
         const absVacc2 = BaseData.getVacc2(baseDatePre, this.ageGroupName);
 
         this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
-
         this.compartmentI = new CompartmentBase(ECompartmentType.R__REMOVED_VI, this.absTotal, absValueI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+        this.compartmentU = new CompartmentBase(ECompartmentType.R__REMOVED_VU, this.absTotal, absValueU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
         this.compartmentV = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, absVacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
 
     }
@@ -64,6 +72,10 @@ export class ModelImplVaccination implements IModelSeir {
 
     getCompartmentI(): CompartmentBase {
         return this.compartmentI;
+    }
+
+    getCompartmentU(): CompartmentBase {
+        return this.compartmentU;
     }
 
     getCompartmentV(): CompartmentBase {
@@ -85,6 +97,7 @@ export class ModelImplVaccination implements IModelSeir {
     getNrmValue(): number {
         let nrmValue = 0;
         nrmValue += this.compartmentI.getNrmValue();
+        nrmValue += this.compartmentU.getNrmValue();
         nrmValue += this.compartmentV.getNrmValue();
         return nrmValue;
     }
@@ -106,6 +119,7 @@ export class ModelImplVaccination implements IModelSeir {
     getInitialState(): IModelState {
         const initialState = ModelState.empty();
         initialState.addNrmValue(this.compartmentI.getNrmValue(), this.compartmentI);
+        initialState.addNrmValue(this.compartmentU.getNrmValue(), this.compartmentU);
         initialState.addNrmValue(this.compartmentV.getNrmValue(), this.compartmentV);
         initialState.addNrmValue(this.compartmentC.getNrmValue(), this.compartmentC);
         return initialState;
