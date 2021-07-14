@@ -1125,10 +1125,10 @@ export class ChartAgeGroup {
                     let g = 0;
                     let b = 0;
                     if (value >= 0) {
-                        g = value / 50; // .05;
+                        g = value / 25; // .05;
                     }
                     else {
-                        r = value / -50; // -.05;
+                        r = value / -25; // -.05;
                     }
                     const rgb = [r, g, b];
                     const hsv = [0, 0, 0];

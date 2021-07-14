@@ -46,11 +46,6 @@ export interface IModificationValuesStrain extends IModificationValues {
      */
     preGrowthRate?: number[];
 
-    /**
-     * target incidences at model-min-time
-     */
-    // dstIncidences?: number[];
-
     transmissionRisk?: number
 
 }

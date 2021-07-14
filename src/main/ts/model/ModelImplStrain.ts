@@ -24,12 +24,6 @@ export class ModelImplStrain implements IModelSeir {
 
     private readonly infectiousModels: ModelImplInfectious[];
 
-    /**
-     * 1) a one-day compartment of cases that incubated that day
-     * 2) 6 more single day compartments to get a total of 7 -> 7-day incidence
-     */
-    // private incidenceModels: ModelImplIncidence[];
-
     private readonly strainId: string;
     private readonly absTotal: number;
     private readonly nrmValue: number;
@@ -42,7 +36,6 @@ export class ModelImplStrain implements IModelSeir {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
-        // this.incidenceModels = [];
         this.transmissionRisk = strainValues.transmissionRisk;
 
         this.nrmDeltas = [];
@@ -102,10 +95,6 @@ export class ModelImplStrain implements IModelSeir {
             initialState.add(groupModel.getInitialState());
         });
         return initialState;
-    }
-
-    isValid(): boolean {
-        throw new Error('Method not implemented.');
     }
 
     getAbsDeltas(): number[] {

@@ -125,10 +125,6 @@ export class ModelImplVaccination implements IModelSeir {
         return initialState;
     }
 
-    isValid(): boolean {
-        throw new Error('Method not implemented.');
-    }
-
     /**
      * @param state handle internal transfer (vaccination1 to vaccination2)
      * @param dT

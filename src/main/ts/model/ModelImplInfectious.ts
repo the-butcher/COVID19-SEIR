@@ -252,10 +252,6 @@ export class ModelImplInfectious implements IModelSeir {
         return initialState;
     }
 
-    isValid(): boolean {
-        throw new Error('NI');
-    }
-
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
         const result = ModelState.empty();
         this.integrationSteps.forEach(integrationStep => {

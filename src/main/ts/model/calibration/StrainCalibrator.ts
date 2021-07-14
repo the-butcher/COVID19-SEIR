@@ -41,7 +41,7 @@ export class StrainCalibrator {
         const originalR0 = modificationValuesStrain.r0;
 
         modificationValuesStrain.r0 = 1;
-        modificationValuesStrain.transmissionRisk = 0.065;
+        modificationValuesStrain.transmissionRisk = 0.065; // default start value
         modificationValuesStrain.preIncidences = ageGroups.map(g => modificationValuesStrain.dstIncidence);
 
         const vv = {};
@@ -73,7 +73,10 @@ export class StrainCalibrator {
                 key: 'CONTACT',
                 name: 'calibrate (contact)',
                 instant: preInstant,
-                multipliers: {},
+                multipliers: {
+                    'other': 1 / Math.sqrt(2),
+                    'risk': 1 / Math.sqrt(2),
+                },
                 deletable: false,
                 draggable: false
             },
@@ -170,7 +173,7 @@ export class StrainCalibrator {
 
         modificationValuesStrain.r0 = originalR0;
 
-        // console.log('strain incidences', modificationValuesStrain.name, modificationValuesStrain.incidences);
+        console.log('transmissionRisk', modificationValuesStrain.transmissionRisk);
 
     }
 

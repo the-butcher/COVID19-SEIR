@@ -21,8 +21,6 @@ export interface IModelSeir extends IModelIntegrationStep, IValueHolder {
      */
     getInitialState(): IModelState;
 
-    isValid(): boolean;
-
     /**
      * get the normalized values sum of all compartments associated with the given age-group
      * @param ageGroupIndex

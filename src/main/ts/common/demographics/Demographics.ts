@@ -43,7 +43,7 @@ export class Demographics {
     private contactCategories: ContactCategory[];
     private maxCellTotal: number;
     private maxColTotal: number;
-    private exposuresPerContact: number;
+    // private exposuresPerContact: number;
     private matrixSum: number;
 
     constructor(path: string, demographicsConfig: IDemographicsConfig) {
@@ -62,13 +62,11 @@ export class Demographics {
         }
         this.absTotal = pN1;
 
-
-
         const contactCategoryParams: IContactMatrixConfig[] = [];
-        demographicsConfig.matrices.forEach(contactCategoryParamsBase => {
+        demographicsConfig.matrices.forEach(matrixConfig => {
 
             const contactCategoryParamsTarget: IContactMatrixConfig = {
-                name: contactCategoryParamsBase.name,
+                name: matrixConfig.name,
                 data: [],
                 ageGroups: demographicsConfig.groups
             }
@@ -77,19 +75,19 @@ export class Demographics {
              * TODO test scenarios from spring (i.e. after school opening when alpha came)
              */
             let corrections: number[] = [
-                1, // <= 04
-                1,
-                1, // 1.02,
-                1,
-                1,
-                1,
-                1, // 1.35,
-                1,
-                1,
-                1
+                1.00, // <= 04
+                1.00,
+                1.00,
+                1.00,
+                1.00,
+                1.00,
+                1.00,
+                1.00,
+                1.00,
+                1.00
             ];
 
-            if (contactCategoryParamsBase.name === 'school') {
+            if (matrixConfig.name === 'school') {
                 corrections = [
                     1.1, // <= 04
                     1, // 05-14
@@ -97,14 +95,14 @@ export class Demographics {
                     1.1, // 25-34
                     1, // 35-44
                     0.6, // 45-54
-                    1.2, // 55-64
+                    1.1, // 55-64
                     1.05, // 65-74
                     1, // 75-84
                     1  // >= 85
                 ]
             }
 
-            if (contactCategoryParamsBase.name === 'nursing') {
+            if (matrixConfig.name === 'nursing') {
                 corrections = [
                     1, // <= 04
                     1, // 05-14
@@ -112,29 +110,29 @@ export class Demographics {
                     1, // 25-34
                     1, // 35-44
                     1, // 45-54
-                    1.20, // 55-64
-                    1.6, // 65-74
-                    1.7, // 75-84
+                    1, // 55-64
+                    1, // 65-74
+                    1, // 75-84
                     1  // >= 85
                 ]
             }
 
-            if (contactCategoryParamsBase.name === 'family') {
+            if (matrixConfig.name === 'family') {
                 corrections = [
                     0.75, // <= 04
-                    1, // 05-14
+                    1.00, // 05-14
                     0.95, // 15-24
-                    1.1, // 25-34
-                    1, // 35-44
-                    1, // 45-54
-                    1.15, // 55-64
-                    1.1, // 65-74
-                    1.1, // 75-84
-                    1  // >= 85
+                    1.10, // 25-34
+                    1.00, // 35-44
+                    1.00, // 45-54
+                    1.10, // 55-64
+                    1.10, // 65-74
+                    0.95, // 75-84
+                    1.00  // >= 85
                 ]
             }
 
-            if (contactCategoryParamsBase.name === 'work') {
+            if (matrixConfig.name === 'work') {
                 corrections = [
                     1, // <= 04
                     1, // 05-14
@@ -149,34 +147,36 @@ export class Demographics {
                 ]
             }
 
-            if (contactCategoryParamsBase.name === 'other') {
+            if (matrixConfig.name === 'other') {
                 corrections = [
                     0.50, // <= 04
-                    1, // 05-14
-                    0.9, // 15-24
-                    1.3, // 25-34
+                    1.00, // 05-14
+                    0.90, // 15-24
+                    1.30, // 25-34
                     0.85, // 35-44
                     0.80, // 45-54
                     1.00, // 55-64
-                    1, // 65-74
-                    1.3, // 75-84
-                    1  // >= 85
+                    1.00, // 65-74
+                    1.00, // 75-84
+                    1.00  // >= 85
                 ].map(v => v / Math.sqrt(2))
             }
 
-            if (contactCategoryParamsBase.name === 'risk') {
+            if (matrixConfig.name === 'risk') {
                 corrections = [
                     0.00, // <= 04
-                    0.2, // 05-14
-                    2, // 15-24
-                    1.75, // 25-34
-                    0.5, // 35-44
-                    0.05, // 45-54
+                    0.15, // 05-14
+                    2.00, // 15-24
+                    1.20, // 25-34
+                    0.45, // 35-44
+                    0.04, // 45-54
                     0.02, // 55-64
-                    0.0, // 65-74
-                    0.0, // 75-84
-                    0.0  // >= 85
+                    0.00, // 65-74
+                    0.00, // 75-84
+                    0.00  // >= 85
                 ].map(v => v * 2 / Math.sqrt(2))
+
+
             }
 
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
@@ -186,7 +186,7 @@ export class Demographics {
                     if (indexContact !== indexParticipant) {
                         correction *= corrections[indexParticipant]
                     }
-                    contactCategoryParamsTarget.data[indexContact][indexParticipant] = contactCategoryParamsBase.data[indexContact][indexParticipant] * correction;
+                    contactCategoryParamsTarget.data[indexContact][indexParticipant] = matrixConfig.data[indexContact][indexParticipant] * correction;
                 }
             }
 
@@ -207,25 +207,20 @@ export class Demographics {
             const contactCategory = new ContactCategory(contactCategoryParam);
             this.contactCategories.push(contactCategory);
 
-
-            // let populationContactCategory = 0;
             let matrixSumCategory = 0;
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
                 populationG = this.ageGroups[indexContact].getAbsValue(); // population of the "contact" age group
                 for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
-                    // populationContactCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
                     matrixSumCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
                 }
             }
-            // populationContactTotal += populationContactCategory;
             this.matrixSum += matrixSumCategory;
 
         });
 
-        this.exposuresPerContact = this.absTotal / this.matrixSum;
-
+        // this.exposuresPerContact = 0.07315426234883828; // this.absTotal / this.matrixSum;
         // console.log('this.contactCategories', this.contactCategories);
-        // console.log('this.exposuresPerContact', this.exposuresPerContact);
+        // console.log('exposuresPerContact', this.exposuresPerContact);
 
         /**
          * evaluate max combined cell value
@@ -241,9 +236,6 @@ export class Demographics {
                 });
                 colTotal += curCombinedCellValue;
                 this.maxCellTotal = Math.max(this.maxCellTotal, curCombinedCellValue);
-                // if (curCombinedCellValue > this.maxCellTotal) {
-                //     this.maxCellTotal = curCombinedCellValue;
-                // }
             }
             this.maxColTotal = Math.max(this.maxColTotal, colTotal);
         };
@@ -256,10 +248,6 @@ export class Demographics {
 
     getDemographicsConfig(): IDemographicsConfig {
         return this.demographicsConfig;
-    }
-
-    getExposuresPerContact(): number {
-        return this.exposuresPerContact;
     }
 
     getMatrixSum(): number {

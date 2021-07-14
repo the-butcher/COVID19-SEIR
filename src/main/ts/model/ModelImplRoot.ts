@@ -19,17 +19,6 @@ import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
 
-interface IVaccinationGroupData {
-    nrmReqS: number; // susceptible - vaccination of susceptible population -> 2 shots
-    nrmReqD: number; // discovered - vaccination of cases previously discovered -> 1 shot
-    nrmReqU: number; // undiscovered - vaccination of cases previously undiscovered -> 2 shots
-}
-
-interface IBaseIncidences {
-    overall: number,
-    agewise: number[]
-}
-
 /**
  * root model holding a set of age-specific submodels
  *
@@ -70,7 +59,6 @@ export class ModelImplRoot implements IModelSeir {
     }
 
     private readonly demographics: Demographics;
-    private readonly valid: boolean;
 
     private readonly strainModels: ModelImplStrain[];
     private readonly compartmentsSusceptible: CompartmentBase[];
@@ -196,10 +184,6 @@ export class ModelImplRoot implements IModelSeir {
         return this.demographics.getAbsTotal();
     }
 
-    isValid(): boolean {
-        return this.valid;
-    }
-
     /**
      * get the initial state of this model (this state includes the preloaded portion of the model which must be "released")
      */
@@ -252,23 +236,6 @@ export class ModelImplRoot implements IModelSeir {
                 // find vacc2 step
                 const grpJab2T = grpVal2B - grpVal2A;
                 const nrmJab2T = grpJab2T / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
-
-                // // desired state of compartment
-
-                // // value required to achieve desired state of vacc1
-                // // susceptible -> immunizing
-                // // current state of compartmentI
-                // const nrmDiffA = state.getNrmValue(this.vaccinationModels[i].getCompartmentI());
-                // const nrmDiffB = (grpVal1B - grpVal2B) / this.getAbsTotal() * this.vaccinationModels[i].getAgeGroupTotal();
-                // const nrmJabSI = nrmDiffB - nrmDiffA;
-
-                // result.addNrmValue(-nrmJabSI, this.compartmentsSusceptible[i]);
-                // result.addNrmValue(+nrmJabSI, this.vaccinationModels[i].getCompartmentI());
-
-                // const nrmJabIV = nrmJab2T;
-
-                // result.addNrmValue(-nrmJabIV, this.vaccinationModels[i].getCompartmentI());
-                // result.addNrmValue(+nrmJabIV, this.vaccinationModels[i].getCompartmentV());
 
                 /**
                  * with the knowledge of 1st shots make an assumption about effects on the underlying model
@@ -332,9 +299,9 @@ export class ModelImplRoot implements IModelSeir {
                 result.addNrmValue(-nrmJabUU, this.compartmentsRemovedU[i]);
                 result.addNrmValue(+nrmJabUU, this.vaccinationModels[i].getCompartmentU());
 
-                if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i == 1) {
-                    console.log('mult', TimeUtil.formatCategoryDate(tT), this.vaccinationModels[i].getAgeGroupName(), nrmJabUU, nrmJabUV);
-                }
+                // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && i == 1) {
+                //     console.log('mult', TimeUtil.formatCategoryDate(tT), this.vaccinationModels[i].getAgeGroupName(), nrmJabUU, nrmJabUV);
+                // }
 
                 result.addNrmValue(-nrmJabUV, this.vaccinationModels[i].getCompartmentU());
                 result.addNrmValue(+nrmJabUV, this.vaccinationModels[i].getCompartmentV());

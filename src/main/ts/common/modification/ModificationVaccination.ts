@@ -173,7 +173,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
     updateLut1(ageGroup: string): void {
 
         const vaccinationCurve = this.getVaccinationConfig(ageGroup);
-        console.log('vaccinationCurve', vaccinationCurve);
+        // console.log('vaccinationCurve', vaccinationCurve);
 
         const lutCount = 100;
 
