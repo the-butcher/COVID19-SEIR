@@ -102,21 +102,15 @@ export class ModelActions {
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
-            label: 'SUSCEPTIBLE',
-            iconKey: 'SEIR',
-            handleClick: () => ModelActions.getInstance().toggleChartMode('SEIR')
-        }));
-        this.chartModeIcons.push(new IconChartMode({
-            container: 'charttoggleDiv',
             label: 'EXPOSED',
-            iconKey: 'EI',
-            handleClick: () => ModelActions.getInstance().toggleChartMode('EI')
+            iconKey: 'EXPOSED',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('EXPOSED')
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
             label: 'VACCINATED',
-            iconKey: 'VACC',
-            handleClick: () => ModelActions.getInstance().toggleChartMode('VACC')
+            iconKey: 'VACCINATION',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('VACCINATED')
         }));
 
 

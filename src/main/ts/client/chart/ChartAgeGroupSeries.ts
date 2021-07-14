@@ -73,8 +73,8 @@ export class ChartAgeGroupSeries {
         this.series.sequencedInterpolation = false;
 
         this.series.stacked = params.stacked;
-        this.series.fillOpacity = params.stacked ? 0.5 : 0.0;
-        this.series.strokeOpacity = params.stacked ? 0.2 : 1.0;
+        this.series.fillOpacity = params.stacked ? 0.1 : 0.0;
+        this.series.strokeOpacity = params.stacked ? 0.7 : 1.0;
         this.series.strokeWidth = params.strokeWidth;
         if (params.dashed) {
             this.series.strokeDasharray = params.strokeWidth * 2 + ',' + params.strokeWidth * 2;

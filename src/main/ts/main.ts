@@ -41,8 +41,8 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             ModelActions.getInstance();
 
             setTimeout(() => {
-                ModelActions.getInstance().toggleModelMode('VACCINATION');
-                ModelActions.getInstance().toggleChartMode('VACC');
+                ModelActions.getInstance().toggleModelMode('CONTACT');
+                ModelActions.getInstance().toggleChartMode('INCIDENCE');
                 ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
                 requestAnimationFrame(() => {
                     ChartAgeGroup.getInstance();

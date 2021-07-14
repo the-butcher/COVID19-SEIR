@@ -75,7 +75,7 @@ export class StrainCalibrator {
                 instant: preInstant,
                 multipliers: {
                     'other': 1 / Math.sqrt(2),
-                    'risk': 1 / Math.sqrt(2),
+                    'risk': 0.0 / Math.sqrt(2),
                 },
                 deletable: false,
                 draggable: false

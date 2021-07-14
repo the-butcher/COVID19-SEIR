@@ -90,9 +90,11 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 * AModification - isBlendable
 #### Issues
-* vaccination must not be creatable
+* add control for interpolate true|false and implements in modifications
+  * contact
+  * testing
+* allow floating point config on initial strain incidence
 * take care of corrections on matrices (bake them into matrices)
-* have a second look at contact matrix normalization because age-groups could not be properly fit so far.
 * wiki on github
 * border cases
   * all testing sliders on zero renders an all zero chart,
@@ -125,6 +127,8 @@ A higher discovery rate means:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* ~~have a second look at contact matrix normalization because age-groups could not be properly fit so far.~~
+* ~~vaccination must not be creatable~~
 * ~~age-group toggle from chart does not reflect in side-list~~
 * ~~>= 85 behaves strange in initial week of model << awkward data at model start~~
 * ~~auto update model after bezier control drag~~

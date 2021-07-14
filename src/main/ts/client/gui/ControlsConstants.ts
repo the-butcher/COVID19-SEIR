@@ -67,7 +67,7 @@ export interface ILabellingDefinition {
     format(value: number): string;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'SEIR' | 'EI' | 'VACC';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'EXPOSED' | 'VACCINATED';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
@@ -137,20 +137,7 @@ export class ControlsConstants {
     }
 
     static readonly HEATMAP_DATA_PARAMS: {[K in CHART_MODE______KEY]: IHeatmapChartDefinition} = {
-        'SEIR': {
-            id: ObjectUtil.createId(),
-            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].SUSCEPTIBLE,
-            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.58, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
-            getHeatMax: () => 1,
-            visitChart: (chart) => {
-                chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesEIVisible(false);
-                chart.setSeriesSRVisible(true);
-                chart.setAxisRelativeMax(1.01);
-            }
-        },
-        'EI': {
+        'EXPOSED': {
             id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL],
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
@@ -175,11 +162,11 @@ export class ControlsConstants {
                 chart.setSeriesSRVisible(false);
             }
         },
-        'VACC': {
+        'VACCINATED': {
             id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].REMOVED_VC,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.23, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.54, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: () => 1,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);

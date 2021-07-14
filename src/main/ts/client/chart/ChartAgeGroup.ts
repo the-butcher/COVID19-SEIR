@@ -35,7 +35,7 @@ export interface IModificationData {
  */
 export class ChartAgeGroup {
 
-    static readonly showDiffDisplay = true;
+    static readonly showDiffDisplay = false;
 
     static readonly FIELD______INDEX = 'index';
     static readonly FIELD_CATEGORY_X = 'categoryX';
@@ -279,7 +279,7 @@ export class ChartAgeGroup {
             baseLabel: 'vacc_v2',
             valueField: 'ageGroupRemovedVM2',
             colorKey: 'VACCINATION',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.15,
             labelled: true,
@@ -292,7 +292,7 @@ export class ChartAgeGroup {
             baseLabel: 'vacc_vi',
             valueField: 'ageGroupRemovedVM1',
             colorKey: 'SUSCEPTIBLE',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.05,
             labelled: true,
@@ -305,7 +305,7 @@ export class ChartAgeGroup {
             baseLabel: 'vacc_vu',
             valueField: 'ageGroupRemovedVMU',
             colorKey: 'REMOVED',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.25,
             labelled: true,
@@ -319,7 +319,7 @@ export class ChartAgeGroup {
             baseLabel: 'recv_d',
             valueField: 'ageGroupRemovedID',
             colorKey: 'REMOVED',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.15,
             labelled: true,
@@ -332,7 +332,7 @@ export class ChartAgeGroup {
             baseLabel: 'recv_u',
             valueField: 'ageGroupRemovedIU',
             colorKey: 'REMOVED',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.25,
             labelled: true,
@@ -346,7 +346,7 @@ export class ChartAgeGroup {
             baseLabel: 'susceptible',
             valueField: 'ageGroupSusceptible',
             colorKey: 'SUSCEPTIBLE',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.05,
             labelled: true,
@@ -429,7 +429,7 @@ export class ChartAgeGroup {
             baseLabel: '',
             valueField: 'modValueY',
             colorKey: 'TIME',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.70,
             labelled: true,
@@ -785,7 +785,7 @@ export class ChartAgeGroup {
 
         const seriesAgeGroup = this.seriesAgeGroupExposedByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
-        seriesAgeGroup.getSeries().visible = this.chartMode === 'EI';
+        seriesAgeGroup.getSeries().visible = this.chartMode === 'EXPOSED';
         return seriesAgeGroup;
 
     }
@@ -814,7 +814,7 @@ export class ChartAgeGroup {
 
         const seriesAgeGroup = this.seriesAgeGroupInfectiousByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
-        seriesAgeGroup.getSeries().visible = this.chartMode === 'EI';
+        seriesAgeGroup.getSeries().visible = this.chartMode === 'EXPOSED';
         return seriesAgeGroup;
 
     }
@@ -1002,6 +1002,7 @@ export class ChartAgeGroup {
 
             this.yAxisPlotIncidence.min = 0;
             this.yAxisPlotIncidence.max = maxIncidence * 1.05;
+            // this.yAxisPlotIncidence.strictMinMax = true;
             // this.yAxisPlotIncidence.start = 0;
             // this.yAxisPlotIncidence.end = 1;
 
