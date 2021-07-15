@@ -102,12 +102,6 @@ export class ModelActions {
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
-            label: 'EXPOSED',
-            iconKey: 'EXPOSED',
-            handleClick: () => ModelActions.getInstance().toggleChartMode('EXPOSED')
-        }));
-        this.chartModeIcons.push(new IconChartMode({
-            container: 'charttoggleDiv',
             label: 'VACCINATED',
             iconKey: 'VACCINATION',
             handleClick: () => ModelActions.getInstance().toggleChartMode('VACCINATED')

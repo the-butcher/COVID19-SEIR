@@ -30,7 +30,7 @@
       "r0": 4.4,
       "serialInterval": 4.8,
       "intervalScale": 1,
-      "dstIncidence": 188.90110284442306,
+      "dstIncidence": 148.78042439991776,
       "deletable": false,
       "draggable": false,
       "primary": true
@@ -41,12 +41,12 @@
       "name": "initial NPIs",
       "instant": 1619827200000,
       "multipliers": {
-        "family": 0.54,
-        "school": 0.24,
-        "nursing": 0.37,
+        "family": 0.66,
+        "school": 0.22,
+        "nursing": 0.4,
         "work": 0.36,
-        "other": 0.16,
-        "risk": 0.02
+        "other": 0.13,
+        "risk": 0.01
       },
       "deletable": false,
       "draggable": false
@@ -62,7 +62,7 @@
         "nursing": 0.75,
         "work": 0.5,
         "other": 0.25,
-        "risk": 0.1
+        "risk": 0.25
       },
       "deletable": false,
       "draggable": false
@@ -415,12 +415,12 @@
       "name": "loss of compliance",
       "instant": 1621209600000,
       "multipliers": {
-        "family": 0.54,
+        "family": 0.66,
         "school": 0.22,
-        "nursing": 0.37,
+        "nursing": 0.4,
         "work": 0.31,
         "other": 0.16,
-        "risk": 0.15
+        "risk": 0.14
       },
       "deletable": true,
       "draggable": true,
@@ -437,7 +437,7 @@
         "nursing": 0.75,
         "work": 0.5,
         "other": 0.25,
-        "risk": 0.1
+        "risk": 0.25
       },
       "deletable": true,
       "draggable": true,
@@ -446,14 +446,14 @@
     {
       "id": "4ca64",
       "key": "CONTACT",
-      "name": "copy of loss of compliance",
+      "name": "gain of compliance",
       "instant": 1623196800000,
       "multipliers": {
-        "family": 0.54,
-        "school": 0.24,
-        "nursing": 0.37,
+        "family": 0.66,
+        "school": 0.22,
+        "nursing": 0.4,
         "work": 0.2,
-        "other": 0.21,
+        "other": 0.2,
         "risk": 0.05
       },
       "deletable": true,
@@ -463,15 +463,15 @@
     {
       "id": "6e78f",
       "key": "CONTACT",
-      "name": "summer break",
-      "instant": 1624492800000,
+      "name": "loss of compliance",
+      "instant": 1624579200000,
       "multipliers": {
-        "family": 0.54,
-        "school": 0.24,
-        "nursing": 0.37,
+        "family": 0.66,
+        "school": 0.22,
+        "nursing": 0.4,
         "work": 0.2,
-        "other": 0.22,
-        "risk": 0.32
+        "other": 0.2,
+        "risk": 0.25
       },
       "deletable": true,
       "draggable": true,
@@ -489,35 +489,18 @@
     {
       "id": "7005a",
       "key": "CONTACT",
-      "name": "copy of interpolation",
-      "instant": 1625875200000,
+      "name": "summer break",
+      "instant": 1625788800000,
       "deletable": true,
       "draggable": true,
       "multipliers": {
-        "family": 0.54,
+        "family": 0.66,
         "school": 0.05,
-        "nursing": 0.37,
+        "nursing": 0.4,
         "work": 0.2,
-        "other": 0.26,
-        "risk": 0.65
+        "other": 0.21,
+        "risk": 0.8
       },
-      "primary": false
-    },
-    {
-      "id": "89391",
-      "key": "TESTING",
-      "name": "copy of copy of initial discovery",
-      "instant": 1625875200000,
-      "multipliers": {
-        "family": 0.6,
-        "school": 0.7000000000000001,
-        "nursing": 0.75,
-        "work": 0.5,
-        "other": 0.25,
-        "risk": 0.2
-      },
-      "deletable": true,
-      "draggable": true,
       "primary": false
     },
     {
@@ -548,14 +531,14 @@
     {
       "id": "d6e66",
       "key": "CONTACT",
-      "name": "return to school",
+      "name": "back to school 1",
       "instant": 1630972800000,
       "multipliers": {
-        "family": 0.54,
+        "family": 0.66,
         "school": 0.05,
-        "nursing": 0.37,
+        "nursing": 0.4,
         "work": 0.2,
-        "other": 0.26,
+        "other": 0.25,
         "risk": 0.65
       },
       "deletable": true,
@@ -565,12 +548,12 @@
     {
       "id": "a8b39",
       "key": "CONTACT",
-      "name": "copy of return to school",
+      "name": "back to school 2",
       "instant": 1631577600000,
       "multipliers": {
-        "family": 0.54,
+        "family": 0.66,
         "school": 0.5,
-        "nursing": 0.37,
+        "nursing": 0.5,
         "work": 0.5,
         "other": 0.5,
         "risk": 0.65

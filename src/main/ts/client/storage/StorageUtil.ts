@@ -1,3 +1,4 @@
+import { ModelConstants } from './../../model/ModelConstants';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesContact } from '../../common/modification/IModificationValuesContact';
 import { Modifications } from '../../common/modification/Modifications';
@@ -44,6 +45,7 @@ export class StorageUtil {
     createStorableConfig(): IStoredConfig {
         // console.log('mv', Modifications.getInstance().buildModificationValues());
         return {
+            model_______version: ModelConstants.CONFIG_VERSION,
             model______basedata: BaseData.getInstance().getPath(),
             model__demographics: Demographics.getInstance().getPath(),
             model_____daterange: SliderModification.getInstance().getTickValues().map(t => TimeUtil.formatConfigDate(t)),
@@ -118,17 +120,23 @@ export class StorageUtil {
             const loadedConfigRaw = localStorage.getItem(StorageUtil.STORAGE_KEY_MODIFICATIONS);
             if (ObjectUtil.isNotEmpty(loadedConfigRaw)) {
                 const loadedConfig: IStoredConfig = JSON.parse(loadedConfigRaw);
+
                 let loadedConfigHasRisk = false;
                 loadedConfig.model_modifications.filter(m => m.key === 'CONTACT').forEach((modification: IModificationValuesContact) => {
                     if (modification.multipliers['risk']) {
                         loadedConfigHasRisk = true;
                     }
                 });
-                if (loadedConfigHasRisk) {
-                    // console.log('OK risk in config');
+
+                let loadedConfigVersion = loadedConfig.model_______version || 'NO_VERSION';
+
+                if (loadedConfigHasRisk && loadedConfigVersion === ModelConstants.CONFIG_VERSION) {
                     return loadedConfig;
+                } else {
+                    console.warn('found invalid config-version', loadedConfigVersion, 'falling back to default config');
                 }
             }
+
         }
         // old config, no stored config, no local storage
         return this.loadDefaultConfig();

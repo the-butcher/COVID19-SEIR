@@ -11,6 +11,7 @@ import { ChartUtil } from './ChartUtil';
 export interface IChartAgeGroupSeriesParams {
     chart: XYChart;
     yAxis: ValueAxis;
+    title: string;
     baseLabel: string;
     valueField: string;
     colorKey: COMPARTMENT__COLORS;
@@ -42,6 +43,9 @@ export class ChartAgeGroupSeries {
 
     private labellingDefinition: ILabellingDefinition;
 
+    private hasLegend: boolean;
+    private boundSeries: ChartAgeGroupSeries[];
+
     constructor(params: IChartAgeGroupSeriesParams) {
 
         useTheme(am4themes_dark);
@@ -54,6 +58,8 @@ export class ChartAgeGroupSeries {
 
         this.series = params.chart.series.push(new LineSeries());
         this.series.showOnInit = false;
+        this.boundSeries = [];
+        this.hasLegend = params.legend;
 
         this.seriesLabel = this.series.createChild(Label);
         this.seriesLabel.fontFamily = ControlsConstants.FONT_FAMILY;
@@ -73,7 +79,7 @@ export class ChartAgeGroupSeries {
 
         this.series.sequencedInterpolation = false;
 
-        this.series.hiddenInLegend = !params.legend;
+        this.series.hiddenInLegend = true; // !params.legend;
         this.series.stacked = params.stacked;
         this.series.fillOpacity = params.stacked ? 0.7 : 0.0;
         this.series.strokeOpacity = params.stacked ? 0.7 : 1.0;
@@ -100,10 +106,43 @@ export class ChartAgeGroupSeries {
         this.series.tooltip.disabled = !params.labelled;
         this.seriesLabel.disabled =  !params.labelled;
 
+        this.getSeries().events.on('hidden', () => {
+            this.boundSeries.forEach(series => {
+                series.getSeries().hide();
+            });
+        });
+        this.getSeries().events.on('shown', () => {
+            this.boundSeries.forEach(series => {
+                series.getSeries().show();
+            });
+        });
+
         this.series.events.on('ready', () => {
 
         });
 
+        if (params.stacked) {
+            this.series.segments.template.interactionsEnabled = true;
+            this.series.segments.template.events.on('over', () => {
+                this.series.tooltip.disabled = false;
+            });
+            this.series.segments.template.events.on('out', () => {
+                this.series.tooltip.disabled = true;
+            });
+        }
+
+        this.series.name = params.title;
+
+
+    }
+
+    setVisible(visible: boolean): void {
+        this.series.hiddenInLegend = !visible || !this.hasLegend;
+        this.series.visible = visible;
+    }
+
+    bindToLegend(bindableSeries: ChartAgeGroupSeries): void {
+        this.boundSeries.push(bindableSeries);
     }
 
     getValueField(): string {
@@ -128,7 +167,6 @@ export class ChartAgeGroupSeries {
         if (ObjectUtil.isNotEmpty(seriesNote)) {
             this.seriesLabel.text = this.seriesLabel.text + ' (' + seriesNote + ')';
         }
-        this.series.name = this.seriesLabel.text; // seriesNote;
 
         clearInterval(this.intervalHandle);
         this.intervalHandle = window.setInterval(() => {

@@ -82,19 +82,9 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupExposed: ChartAgeGroupSeries;
 
     /**
-     * exposed series by strain, TODO remove
-     */
-    protected readonly seriesAgeGroupExposedByStrain: Map<string, ChartAgeGroupSeries>;
-
-    /**
      * primary infectious series (all strains)
      */
     protected readonly seriesAgeGroupInfectious: ChartAgeGroupSeries;
-
-    /**
-     * exposed series by strain, TODO remove
-     */
-    protected readonly seriesAgeGroupInfectiousByStrain: Map<string, ChartAgeGroupSeries>;
 
     protected readonly seriesAgeGroupRemovedID: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupRemovedIU: ChartAgeGroupSeries;
@@ -234,6 +224,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCases = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
+            title: 'cases',
             baseLabel: 'cases',
             valueField: 'ageGroupCases',
             colorKey: 'CASES',
@@ -243,13 +234,14 @@ export class ChartAgeGroup {
             labelled: true,
             percent: false,
             stacked: false,
-            legend: false
+            legend: true
         });
 
         this.seriesAgeGroupLabelLocation = 0.5;
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
+            title: 'incidence',
             baseLabel: 'incidence',
             valueField: 'ageGroupIncidence',
             colorKey: 'INCIDENCE',
@@ -259,16 +251,17 @@ export class ChartAgeGroup {
             labelled: true,
             percent: false,
             stacked: false,
-            legend: false
+            legend: true
         });
         this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
+            title: 'incidence',
             baseLabel: 'incidence',
             valueField: 'ageGroupIncidenceR',
-            colorKey: 'STRAIN',
+            colorKey: 'SEASONALITY',
             strokeWidth: 1,
-            dashed: false,
+            dashed: true,
             locationOnPath: 0.35,
             labelled: false,
             percent: false,
@@ -280,7 +273,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVMV = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'vaccinated',
+            title: 'vaccinated',
+            baseLabel: 'vaccinated, full',
             valueField: 'ageGroupRemovedVM2',
             colorKey: 'VACCINATION',
             strokeWidth: 1,
@@ -291,10 +285,12 @@ export class ChartAgeGroup {
             stacked: true,
             legend: true
         });
+
         this.seriesAgeGroupRemovedVMI = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'vaccinated, partial',
+            title: 'immunizing',
+            baseLabel: 'immunizing',
             valueField: 'ageGroupRemovedVM1',
             colorKey: 'SUSCEPTIBLE',
             strokeWidth: 1,
@@ -305,10 +301,12 @@ export class ChartAgeGroup {
             stacked: true,
             legend: false
         });
+
         this.seriesAgeGroupRemovedVMU = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'vaccinated, asymptomatic',
+            title: 'vaccinated, after asymptomatic infection',
+            baseLabel: 'vaccinated, after asymptomatic infection',
             valueField: 'ageGroupRemovedVMU',
             colorKey: 'REMOVED',
             strokeWidth: 1,
@@ -320,10 +318,14 @@ export class ChartAgeGroup {
             legend: false
         });
 
+        /**
+         * recovered after known infection
+         */
         this.seriesAgeGroupRemovedID = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'recovered',
+            title: 'recovered',
+            baseLabel: 'recovered after symptomatic infection',
             valueField: 'ageGroupRemovedID',
             colorKey: 'REMOVED',
             strokeWidth: 1,
@@ -334,10 +336,15 @@ export class ChartAgeGroup {
             stacked: true,
             legend: true
         });
+
+        /**
+         * recovered after asymptomatic infection
+         */
         this.seriesAgeGroupRemovedIU = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
-            baseLabel: 'recovered',
+            title: 'recovered',
+            baseLabel: 'recovered after asymptomatic infection',
             valueField: 'ageGroupRemovedIU',
             colorKey: 'REMOVED',
             strokeWidth: 1,
@@ -348,10 +355,13 @@ export class ChartAgeGroup {
             stacked: true,
             legend: false
         });
+        this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedIU);
+        this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedVMU);
 
         this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            title: 'susceptible',
             baseLabel: 'susceptible',
             valueField: 'ageGroupSusceptible',
             colorKey: 'SUSCEPTIBLE',
@@ -363,10 +373,12 @@ export class ChartAgeGroup {
             stacked: true,
             legend: true
         });
+        this.seriesAgeGroupSusceptible.bindToLegend(this.seriesAgeGroupRemovedVMI);
 
         this.seriesAgeGroupExposed = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            title: 'exposed',
             baseLabel: 'exposed',
             valueField: 'ageGroupExposed',
             colorKey: 'EXPOSED',
@@ -378,10 +390,10 @@ export class ChartAgeGroup {
             stacked: true,
             legend: true
         });
-        this.seriesAgeGroupExposedByStrain = new Map();
         this.seriesAgeGroupInfectious = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            title: 'infectious',
             baseLabel: 'infectious',
             valueField: 'ageGroupInfectious',
             colorKey: 'INFECTIOUS',
@@ -393,11 +405,14 @@ export class ChartAgeGroup {
             stacked: true,
             legend: true
         });
-        this.seriesAgeGroupInfectiousByStrain = new Map();
 
+        /**
+         * vaccinated (first)
+         */
         this.seriesAgeGroupRemovedVR1 = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            title: 'vaccinated',
             baseLabel: 'vaccinated, partial',
             valueField: 'ageGroupRemovedVR1',
             colorKey: 'SEASONALITY',
@@ -407,11 +422,16 @@ export class ChartAgeGroup {
             labelled: false,
             percent: true,
             stacked: false,
-            legend: false
+            legend: true
         });
+
+        /**
+         * vaccinated (complete)
+         */
         this.seriesAgeGroupRemovedVR2 = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            title: 'vaccinated',
             baseLabel: 'vaccinated, full',
             valueField: 'ageGroupRemovedVR2',
             colorKey: 'SEASONALITY',
@@ -423,16 +443,22 @@ export class ChartAgeGroup {
             stacked: false,
             legend: false
         });
+        this.seriesAgeGroupRemovedVR1.bindToLegend(this.seriesAgeGroupRemovedVR2);
+
+        /**
+         * vaccinated (control curve)
+         */
         this.seriesAgeGroupRemovedVRC = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotRelative,
+            title: 'vaccinated',
             baseLabel: 'vaccinated, full',
             valueField: 'ageGroupRemovedVRC',
             colorKey: 'INFECTIOUS',
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.45,
-            labelled: true,
+            labelled: false,
             percent: true,
             stacked: false,
             legend: false
@@ -441,6 +467,7 @@ export class ChartAgeGroup {
         this.seriesModification = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisModification,
+            title: 'mod',
             baseLabel: '',
             valueField: 'modValueY',
             colorKey: 'TIME',
@@ -698,8 +725,6 @@ export class ChartAgeGroup {
             modificationValuesStrain.forEach(strainValues => {
                 // this call implicitly updates the base label, explicity updates series label
                 this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setSeriesNote(ageGroup.getName());
-                this.getOrCreateSeriesAgeGroupExposedStrain(strainValues).setSeriesNote(ageGroup.getName());
-                this.getOrCreateSeriesAgeGroupInfectiousStrain(strainValues).setSeriesNote(ageGroup.getName());
             });
 
             if (ModelActions.getInstance().getKey() === 'VACCINATION' && ageGroup.getName() !== ModelConstants.AGEGROUP_NAME_______ALL) {
@@ -755,6 +780,7 @@ export class ChartAgeGroup {
             this.seriesAgeGroupIncidenceByStrain.set(strainValues.id, new ChartAgeGroupSeries({
                 chart: this.chart,
                 yAxis: this.yAxisPlotIncidence,
+                title: 'incidence',
                 baseLabel: strainValues.name,
                 valueField: `ageGroupIncidence${strainValues.id}`,
                 colorKey: 'INCIDENCE',
@@ -774,67 +800,7 @@ export class ChartAgeGroup {
 
         const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
-        seriesAgeGroup.getSeries().visible = this.chartMode === 'INCIDENCE';
-        return seriesAgeGroup;
-
-    }
-
-    getOrCreateSeriesAgeGroupExposedStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
-
-        if (!this.seriesAgeGroupExposedByStrain.has(strainValues.id)) {
-            this.seriesAgeGroupExposedByStrain.set(strainValues.id, new ChartAgeGroupSeries({
-                chart: this.chart,
-                yAxis: this.yAxisPlotRelative,
-                baseLabel: strainValues.name,
-                valueField: `ageGroupExposed${strainValues.id}`,
-                colorKey: 'EXPOSED',
-                strokeWidth: 1,
-                dashed: true,
-                locationOnPath: this.seriesAgeGroupLabelLocation,
-                labelled: false,
-                percent: true,
-                stacked: true,
-                legend: false
-            }));
-            this.seriesAgeGroupLabelLocation += 0.1;
-            if (this.seriesAgeGroupLabelLocation > 0.8) {
-                this.seriesAgeGroupLabelLocation = 0.5;
-            }
-        }
-
-        const seriesAgeGroup = this.seriesAgeGroupExposedByStrain.get(strainValues.id);
-        seriesAgeGroup.setBaseLabel(strainValues.name);
-        seriesAgeGroup.getSeries().visible = this.chartMode === 'EXPOSED';
-        return seriesAgeGroup;
-
-    }
-
-    getOrCreateSeriesAgeGroupInfectiousStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
-
-        if (!this.seriesAgeGroupInfectiousByStrain.has(strainValues.id)) {
-            this.seriesAgeGroupInfectiousByStrain.set(strainValues.id, new ChartAgeGroupSeries({
-                chart: this.chart,
-                yAxis: this.yAxisPlotRelative,
-                baseLabel: strainValues.name,
-                valueField: `ageGroupInfectious${strainValues.id}`,
-                colorKey: 'INFECTIOUS',
-                strokeWidth: 1,
-                dashed: true,
-                locationOnPath: this.seriesAgeGroupLabelLocation,
-                labelled: false,
-                percent: true,
-                stacked: true,
-                legend: false
-            }));
-            this.seriesAgeGroupLabelLocation += 0.1;
-            if (this.seriesAgeGroupLabelLocation > 0.8) {
-                this.seriesAgeGroupLabelLocation = 0.5;
-            }
-        }
-
-        const seriesAgeGroup = this.seriesAgeGroupInfectiousByStrain.get(strainValues.id);
-        seriesAgeGroup.setBaseLabel(strainValues.name);
-        seriesAgeGroup.getSeries().visible = this.chartMode === 'EXPOSED';
+        seriesAgeGroup.setVisible(this.chartMode === 'INCIDENCE');
         return seriesAgeGroup;
 
     }
@@ -845,16 +811,16 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.renderer.grid.template.disabled = !visible;
         this.yAxisPlotRelative.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupSusceptible.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedID.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedIU.getSeries().visible = visible;
+        this.seriesAgeGroupSusceptible.setVisible(visible);
+        this.seriesAgeGroupRemovedID.setVisible(visible);
+        this.seriesAgeGroupRemovedIU.setVisible(visible);
 
-        this.seriesAgeGroupRemovedVMI.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedVMV.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedVMU.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedVR1.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedVR2.getSeries().visible = visible;
-        this.seriesAgeGroupRemovedVRC.getSeries().visible = false;
+        this.seriesAgeGroupRemovedVMI.setVisible(visible);
+        this.seriesAgeGroupRemovedVMV.setVisible(visible);
+        this.seriesAgeGroupRemovedVMU.setVisible(visible);
+        this.seriesAgeGroupRemovedVR1.setVisible(visible);
+        this.seriesAgeGroupRemovedVR2.setVisible(visible);
+        this.seriesAgeGroupRemovedVRC.setVisible(false);
 
     }
 
@@ -864,26 +830,8 @@ export class ChartAgeGroup {
         this.yAxisPlotRelative.renderer.grid.template.disabled = !visible;
         this.yAxisPlotRelative.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupExposed.getSeries().visible = visible;
-        this.seriesAgeGroupInfectious.getSeries().visible = visible;
-
-        // set everything to invisible
-        this.seriesAgeGroupExposedByStrain.forEach(seriesAgeGroupExposed => {
-            seriesAgeGroupExposed.getSeries().visible = false;
-        });
-        this.seriesAgeGroupInfectiousByStrain.forEach(seriesAgeGroupInfectious => {
-            seriesAgeGroupInfectious.getSeries().visible = false;
-        });
-        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
-
-        // specific exposed makes sense only if there is more than one strain
-        if (visible && modificationValuesStrain.length > 1) {
-            // turn all active strain back on
-            modificationValuesStrain.forEach(strainValues => {
-                this.getOrCreateSeriesAgeGroupExposedStrain(strainValues).getSeries().visible = false;
-                this.getOrCreateSeriesAgeGroupInfectiousStrain(strainValues).getSeries().visible = false;
-            });
-        }
+        this.seriesAgeGroupExposed.setVisible(visible);
+        this.seriesAgeGroupInfectious.setVisible(visible);
 
     }
 
@@ -892,13 +840,13 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.visible = visible;
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
-        this.seriesAgeGroupIncidence.getSeries().visible = visible;
-        this.seriesAgeGroupIncidenceR.getSeries().visible = visible;
-        this.seriesAgeGroupCases.getSeries().visible = visible;
+        this.seriesAgeGroupIncidence.setVisible(visible);
+        this.seriesAgeGroupIncidenceR.setVisible(visible);
+        this.seriesAgeGroupCases.setVisible(visible);
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
-            seriesAgeGroupIncidence.getSeries().visible = false;
+            seriesAgeGroupIncidence.setVisible(false);
         });
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
 
@@ -906,18 +854,16 @@ export class ChartAgeGroup {
         if (visible && modificationValuesStrain.length > 1) {
             // turn all active strain back on
             modificationValuesStrain.forEach(strainValues => {
-                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).getSeries().visible = true;
+                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setVisible(true);
             });
         }
 
     }
 
     setChartMode(chartMode: CHART_MODE______KEY): void {
-
         this.chartMode = chartMode;
         ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
         this.requestRenderModelData();
-
     }
 
     getMaxInfections(): number {
@@ -978,8 +924,6 @@ export class ChartAgeGroup {
         modificationValuesStrain.forEach(strainValues => {
             // be sure there are series for each strain
             this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues);
-            this.getOrCreateSeriesAgeGroupExposedStrain(strainValues);
-            this.getOrCreateSeriesAgeGroupInfectiousStrain(strainValues);
         });
 
         this.setChartMode(this.chartMode);
