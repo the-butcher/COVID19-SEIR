@@ -1,3 +1,4 @@
+import { Legend } from '@amcharts/amcharts4/charts';
 import { Axis, Chart, Series, XYChart } from '@amcharts/amcharts4/charts';
 import { color } from '@amcharts/amcharts4/core';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -104,6 +105,22 @@ export class ChartUtil {
         series.sequencedInterpolation = true;
 
         series.tooltip.exportable = true;
+
+    }
+
+    configureLegend(chart: Chart): void {
+
+        chart.legend = new Legend();
+        chart.legend.fontFamily = ControlsConstants.FONT_FAMILY;
+        chart.legend.fontSize = ControlsConstants.FONT_SIZE - 3;
+        // chart.legend.position = 'left'; // items in vertical order
+        // chart.legend.reverseOrder = true; // reverse, or active would be bottom
+        chart.legend.markers.template.width = 16; // smaller boxes
+        chart.legend.markers.template.height = 12;
+        chart.legend.markers.template.fillOpacity = 0.7;
+        chart.legend.maxWidth = 1000; // let the label be long if required
+        chart.legend.itemContainers.template.paddingTop = 3; // have items closer together
+        chart.legend.itemContainers.template.paddingBottom = 3;
 
     }
 

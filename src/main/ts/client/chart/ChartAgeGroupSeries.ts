@@ -20,6 +20,7 @@ export interface IChartAgeGroupSeriesParams {
     locationOnPath: number;
     percent: boolean;
     stacked: boolean;
+    legend: boolean;
 }
 
 /**
@@ -72,8 +73,9 @@ export class ChartAgeGroupSeries {
 
         this.series.sequencedInterpolation = false;
 
+        this.series.hiddenInLegend = !params.legend;
         this.series.stacked = params.stacked;
-        this.series.fillOpacity = params.stacked ? 0.1 : 0.0;
+        this.series.fillOpacity = params.stacked ? 0.7 : 0.0;
         this.series.strokeOpacity = params.stacked ? 0.7 : 1.0;
         this.series.strokeWidth = params.strokeWidth;
         if (params.dashed) {
@@ -126,7 +128,7 @@ export class ChartAgeGroupSeries {
         if (ObjectUtil.isNotEmpty(seriesNote)) {
             this.seriesLabel.text = this.seriesLabel.text + ' (' + seriesNote + ')';
         }
-        this.series.name = seriesNote;
+        this.series.name = this.seriesLabel.text; // seriesNote;
 
         clearInterval(this.intervalHandle);
         this.intervalHandle = window.setInterval(() => {

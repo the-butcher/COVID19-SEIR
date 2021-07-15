@@ -112,7 +112,7 @@ export class ControlsConstants {
     }
 
     static readonly COLORS: {[K in COMPARTMENT__COLORS]:string} = {
-        'SUSCEPTIBLE': '#0e77d4',
+        'SUSCEPTIBLE': '#515f6c',
         'EXPOSED': '#bb890c',
         'INFECTIOUS': '#da0edf',
         'REMOVED': '#83ca0d',
@@ -164,13 +164,13 @@ export class ControlsConstants {
         },
         'VACCINATED': {
             id: ObjectUtil.createId(),
-            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].REMOVED_VC,
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].SUSCEPTIBLE,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.54, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: () => 1,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesEIVisible(false);
+                chart.setSeriesEIVisible(true);
                 chart.setSeriesSRVisible(true);
                 chart.setAxisRelativeMax(1.01);
             }
