@@ -53,14 +53,13 @@ export class SliderModification extends Slider {
                 if (type === 'stop') {
                     this.updateModificationInstants();
                     this.indicateUpdate(this.modificationIcons[index].getId());
-                    // this.handleThumbPicked(index);
+                    this.handleThumbPicked(index);
                 }
                 // if (type === 'cursor') {
                 //     ControlsTime.getInstance().getChartContactMatrix().exportToPng();
                 // }
             },
             handleThumbPicked: (index) => {
-                // console.log('thumb picked');
                 const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
                 ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
             }

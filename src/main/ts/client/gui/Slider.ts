@@ -283,6 +283,8 @@ export class Slider {
 
     setRange(range: number[]): void {
 
+        console.warn('range', range);
+
         this.minValue = Math.min(...range);
         this.maxValue = Math.max(...range);
         this.clearTicks();
@@ -544,7 +546,7 @@ export class Slider {
     /**
      * handle a pointerup anywhere in the document
      */
-     handlePointerUp(e: PointerEvent): void {
+    handlePointerUp(e: PointerEvent): void {
 
         if (this.disabled) {
             return;
@@ -552,7 +554,6 @@ export class Slider {
 
         if (this.clickableThumbIndex >= 0) {
 
-            // console.log('clicked');
             if (this.inputEnabled && e.target === this.sliderThumbs[this.clickableThumbIndex].getLabelContainer()) {
                 this.sliderThumbs[this.clickableThumbIndex].displayInput();
             } else {
@@ -562,7 +563,7 @@ export class Slider {
         } else if (this.draggableThumbIndex >= 0) {
 
             this.handleValueChange(this.draggableThumbIndex, this.getValue(this.draggableThumbIndex), 'stop');
-            this.handleThumbPicked(this.draggableThumbIndex);
+            // this.handleThumbPicked(this.draggableThumbIndex);
 
         }
 

@@ -90,7 +90,7 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 * AModification - isBlendable
 #### Issues
-* add control for interpolate true|false and implements in modifications
+* add control for blendable true|false and implement in modifications
   * contact
   * testing
 * allow floating point config on initial strain incidence

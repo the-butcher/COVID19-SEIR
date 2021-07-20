@@ -1,3 +1,5 @@
+import { QueryUtil } from './QueryUtil';
+import { ModelInstants } from './../../model/ModelInstants';
 import { CategoryAxis, Column, ColumnSeries, Legend, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -35,7 +37,7 @@ export interface IModificationData {
  */
 export class ChartAgeGroup {
 
-    static readonly showDiffDisplay = false;
+    // static readonly showDiffDisplay = false;
 
     static readonly FIELD______INDEX = 'index';
     static readonly FIELD_CATEGORY_X = 'categoryX';
@@ -124,7 +126,7 @@ export class ChartAgeGroup {
         useTheme(am4themes_animated);
 
         this.absValue = 0;
-        this.ageGroupIndex = 10;
+        this.ageGroupIndex = -1;
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
@@ -259,9 +261,9 @@ export class ChartAgeGroup {
             title: 'incidence',
             baseLabel: 'incidence',
             valueField: 'ageGroupIncidenceR',
-            colorKey: 'SEASONALITY',
-            strokeWidth: 1,
-            dashed: true,
+            colorKey: 'STRAIN',
+            strokeWidth: 2,
+            dashed: false,
             locationOnPath: 0.35,
             labelled: false,
             percent: false,
@@ -536,7 +538,7 @@ export class ChartAgeGroup {
             // this.setSeriesAgeGroup(index);
             ModelActions.getInstance().toggleAgeGroup(index);
         });
-        if (ChartAgeGroup.showDiffDisplay) {
+        if (QueryUtil.getInstance().isDiffDisplay()) {
             this.columnTemplate.propertyFields.fill = 'color';
         }
 
@@ -749,9 +751,18 @@ export class ChartAgeGroup {
             y: documentCoordinate.y - offsetY
         }
 
-        const positionX = this.xAxis.pointToPosition(offsetCoordinate);
-        const categoryX = this.xAxis.positionToCategory(positionX);
-        const valueX = this.findDataItemByCategory(categoryX).instant;
+        const minInstant = ModelInstants.getInstance().getMinInstant();
+        const maxInstant = ModelInstants.getInstance().getMaxInstant();
+
+        const minCategoryX = TimeUtil.formatCategoryDate(minInstant);
+        const maxCategoryX = TimeUtil.formatCategoryDate(maxInstant);
+        const minPointX =  this.xAxis.categoryToPoint(minCategoryX).x;
+        const maxPointX =  this.xAxis.categoryToPoint(maxCategoryX).x;
+        const fctPointX = (offsetCoordinate.x - minPointX) / (maxPointX - minPointX);
+        const vacPointX = minInstant + (maxInstant - minInstant) * fctPointX;
+
+        // round to closest midnight
+        const valueX = Math.round(vacPointX / TimeUtil.MILLISECONDS_PER____DAY) * TimeUtil.MILLISECONDS_PER____DAY;
 
         const positionY =  this.yAxisPlotRelative.pointToPosition(offsetCoordinate);
         const valueY = this.yAxisPlotRelative.positionToValue(positionY);
@@ -765,11 +776,23 @@ export class ChartAgeGroup {
 
     toDocumentCoordinate(vaccinationCoordinate: ICoordinate): ICoordinate {
 
-        const categoryX = TimeUtil.formatCategoryDate(vaccinationCoordinate.x);
         const containerBounds = document.getElementById('chartDivAgeGroupPlot').getBoundingClientRect();
+
+        const offsetX = containerBounds.left + this.chart.pixelPaddingLeft + this.chart.plotContainer.pixelX + this.xAxis.pixelX;
+        const offsetY = containerBounds.top + this.chart.pixelPaddingTop + this.chart.plotContainer.pixelY + this.yAxisPlotRelative.pixelY;
+
+        const minCategoryX = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getMinInstant());
+        const maxCategoryX = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getMaxInstant());
+        const minPointX =  this.xAxis.categoryToPoint(minCategoryX).x;
+        const maxPointX =  this.xAxis.categoryToPoint(maxCategoryX).x;
+        const fctPointX = (vaccinationCoordinate.x - ModelInstants.getInstance().getMinInstant()) / (ModelInstants.getInstance().getMaxInstant() - ModelInstants.getInstance().getMinInstant());
+
+        const pointX = minPointX + (maxPointX - minPointX) * fctPointX;
+        const pointY = this.yAxisPlotRelative.valueToPoint(vaccinationCoordinate.y).y;
+
         return {
-            x: containerBounds.left + this.chart.pixelPaddingLeft + this.chart.plotContainer.pixelX + this.xAxis.pixelX + this.xAxis.categoryToPoint(categoryX).x,
-            y: containerBounds.top + this.chart.pixelPaddingTop + this.chart.plotContainer.pixelY + this.yAxisPlotRelative.pixelY + this.yAxisPlotRelative.valueToPoint(vaccinationCoordinate.y).y
+            x: offsetX + pointX,
+            y: offsetY + pointY
         }
 
     }
@@ -841,7 +864,7 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
         this.seriesAgeGroupIncidence.setVisible(visible);
-        this.seriesAgeGroupIncidenceR.setVisible(visible);
+        this.seriesAgeGroupIncidenceR.setVisible(false);
         this.seriesAgeGroupCases.setVisible(visible);
 
         // set everything to invisible
@@ -929,10 +952,16 @@ export class ChartAgeGroup {
         this.setChartMode(this.chartMode);
 
         this.modelData = modelData;
-        this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups(), new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
-            name: ModelConstants.AGEGROUP_NAME_______ALL,
-            pG: Demographics.getInstance().getAbsTotal()
-        })];
+        if (!this.ageGroupsWithTotal) {
+            this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups()];
+            if (this.ageGroupsWithTotal.length > 1) {
+                this.ageGroupsWithTotal.push(new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
+                    name: ModelConstants.AGEGROUP_NAME_______ALL,
+                    pG: Demographics.getInstance().getAbsTotal()
+                }));
+            }
+            this.ageGroupIndex = this.ageGroupsWithTotal.length - 1;
+        }
 
         // does not need to go through age ModelActions, because it just reapplies
         this.setSeriesAgeGroup(this.ageGroupIndex);
@@ -1079,7 +1108,7 @@ export class ChartAgeGroup {
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
                 let color: string;
-                if (ChartAgeGroup.showDiffDisplay && dataItemA && dataItemB) {
+                if (QueryUtil.getInstance().isDiffDisplay() && dataItemA && dataItemB) {
 
                     const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
                     value -= baseIncidence;
@@ -1090,10 +1119,10 @@ export class ChartAgeGroup {
                     let g = 0;
                     let b = 0;
                     if (value >= 0) {
-                        g = value / 25; // .05;
+                        g = value / 20; // .05;
                     }
                     else {
-                        r = value / -25; // -.05;
+                        r = value / -20; // -.05;
                     }
                     const rgb = [r, g, b];
                     const hsv = [0, 0, 0];
@@ -1123,7 +1152,7 @@ export class ChartAgeGroup {
 
         // console.log('chartData', chartData);
 
-        if (this.chart.data.length === chartData.length && !ChartAgeGroup.showDiffDisplay) {
+        if (this.chart.data.length === chartData.length && !QueryUtil.getInstance().isDiffDisplay()) {
             for (let i = 0; i < chartData.length; i++) {
                 for (const key of Object.keys(chartData[i])) { // const key in chartData[i]
                     this.chart.data[i][key] = chartData[i][key];

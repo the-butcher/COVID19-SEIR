@@ -55,7 +55,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return this.getContactCategoryMultiplier(contactCategoryName);
     }
 
-    getContacts(indexContact: number, indexParticipant: number): number {
+    getValue(indexContact: number, indexParticipant: number): number {
         let value = 0;
         this.contactCategories.forEach(contactCategory => {
             value += contactCategory.getData(indexContact, indexParticipant) * this.getMultiplier(contactCategory.getName());

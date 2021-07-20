@@ -81,10 +81,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     }
 
     getTestingRatio(ageGroupIndex: number): number {
-        return this.modificationTesting.getTestingRatio(ageGroupIndex);
+        return this.modificationTesting.getValue(ageGroupIndex);
     }
 
-    getContacts(indexContact: number, indexParticipant: number): number {
+    getValue(indexContact: number, indexParticipant: number): number {
 
         /**
          * reduction through people isolating after a positive test
@@ -102,7 +102,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {
         return {
-            'time': this.getContacts(indexContact, indexParticipant).toFixed(4)
+            'time': this.getValue(indexContact, indexParticipant).toFixed(4)
         };
     }
 
@@ -113,7 +113,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      * @returns
      */
     getContactValue(indexContact: number, indexParticipant: number): number {
-        return this.modificationContact.getContacts(indexContact, indexParticipant);
+        return this.modificationContact.getValue(indexContact, indexParticipant);
     }
 
     getContactMultiplier(ageGroupIndex: number): number {

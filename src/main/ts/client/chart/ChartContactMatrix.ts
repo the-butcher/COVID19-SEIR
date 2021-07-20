@@ -285,16 +285,17 @@ export class ChartContactMatrix {
         heatRule.minValue = 0;
         heatRule.maxValue = 1;
 
-        // const matrixContactTotal = demographics.getMatrixSum();
         const maxCellTotal = contactMatrix.getMaxCellTotal();
         this.yAxisPlot.max = contactMatrix.getMaxColTotal();
+
+        console.log('this.yAxisPlot.max', contactMatrix, this.yAxisPlot.max);
 
         let matrixSum = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {
             let columnContactsCurr = 0;
             for (let indexY = 0; indexY < ageGroups.length; indexY++) {
 
-                let ratio = this.axisDirection === 'CONTACT_PARTICIPANT' ? contactMatrix.getContacts(indexX, indexY) : contactMatrix.getContacts(indexY, indexX);
+                let ratio = this.axisDirection === 'CONTACT_PARTICIPANT' ? contactMatrix.getValue(indexX, indexY) : contactMatrix.getValue(indexY, indexX);
                 const population = this.axisDirection === 'CONTACT_PARTICIPANT' ? ageGroups[indexX].getAbsValue() : ageGroups[indexY].getAbsValue();
 
                 columnContactsCurr += ratio;

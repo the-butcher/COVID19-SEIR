@@ -32,8 +32,8 @@ export class ContactMatrixDelegate implements IContactMatrix {
         return this.maxColTotal;
     }
 
-    getContacts(indexContact: number, indexParticipant: number): number {
-        return this.contactMatrix.getContacts(indexContact, indexParticipant);
+    getValue(indexContact: number, indexParticipant: number): number {
+        return this.contactMatrix.getValue(indexContact, indexParticipant);
     }
 
     getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {

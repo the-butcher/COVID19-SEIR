@@ -8,7 +8,7 @@ export interface IContactMatrix {
 
     getInstant(): number;
 
-    getContacts(indexContact: number, indexParticipant: number): number;
+    getValue(indexContact: number, indexParticipant: number): number;
 
     getSummary(indexContact: number, indexParticipant: number): {[K: string]: string};
 

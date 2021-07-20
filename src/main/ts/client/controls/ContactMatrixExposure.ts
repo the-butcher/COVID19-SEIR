@@ -53,7 +53,7 @@ export class ContactMatrixExposure implements IContactMatrix {
         return this.maxColTotal; // 0.0028;
     }
 
-    getContacts(indexContact: number, indexParticipant: number): number {
+    getValue(indexContact: number, indexParticipant: number): number {
         if (this.contacts) {
             return this.contacts[indexContact][indexParticipant];
         }

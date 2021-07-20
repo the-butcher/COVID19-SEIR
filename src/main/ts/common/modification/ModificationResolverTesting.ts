@@ -33,7 +33,7 @@ export class ModificationResolverTesting extends AModificationResolver<IModifica
         const demographics = Demographics.getInstance();
         let totalTestingValue = 0;
         for (let indexContact = 0; indexContact < demographics.getAgeGroups().length; indexContact++) {
-            const testingVal = this.getModification(instant).getTestingRatio(indexContact);
+            const testingVal = this.getModification(instant).getValue(indexContact);
             totalTestingValue += testingVal * demographics.getAgeGroups()[indexContact].getAbsValue();
         }
         return totalTestingValue / Demographics.getInstance().getAbsTotal();

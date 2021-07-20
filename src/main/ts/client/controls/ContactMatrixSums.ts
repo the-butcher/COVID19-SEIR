@@ -23,7 +23,7 @@ export class ContactMatrixSums {
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
             let columnContactsCurr = 0;
             for (let indexParticipant = 0; indexParticipant < ageGroups.length; indexParticipant++) {
-                contact = this.contactMatrix.getContacts(indexContact, indexParticipant) * ageGroups[indexContact].getAbsValue();
+                contact = this.contactMatrix.getValue(indexContact, indexParticipant) * ageGroups[indexContact].getAbsValue();
                 columnContactsCurr += contact;
                 this.matrixSum += contact;
             }

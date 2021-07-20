@@ -3,6 +3,7 @@ import { color, create, Label, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
+import { IContactColumns } from '../../common/modification/IContactColumns';
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
 import { ControlsConstants } from '../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
@@ -19,7 +20,7 @@ export interface IChartDataHeat {
  * @author h.fleischer
  * @since 16.05.2021
  */
-export class ChartTesting {
+export class ChartContactColumns {
 
     private readonly chart: XYChart;
     private readonly xAxis: CategoryAxis;
@@ -111,14 +112,14 @@ export class ChartTesting {
 
     }
 
-    async redraw(modification: ModificationTesting): Promise<void> {
+    async redraw(modification: IContactColumns): Promise<void> {
 
         const demographics = Demographics.getInstance();
         const chartData = [];
         const ageGroups = demographics.getAgeGroups();
 
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
-            const testingVal = modification.getTestingRatio(indexContact);
+            const testingVal = modification.getValue(indexContact);
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
                 participantY: Math.max(0.00000000001, testingVal),
@@ -127,7 +128,7 @@ export class ChartTesting {
             });
         }
 
-        this.valueTotalLabel.text = (modification.getTestingRatioTotal() * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        this.valueTotalLabel.text = (modification.getValueTotal() * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;

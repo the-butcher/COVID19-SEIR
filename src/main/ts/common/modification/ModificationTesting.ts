@@ -3,6 +3,7 @@ import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
 import { Demographics } from '../demographics/Demographics';
 import { AModification } from './AModification';
+import { IContactColumns } from './IContactColumns';
 import { IModificationValuesTesting } from './IModificationValuesTesting';
 
 /**
@@ -12,7 +13,7 @@ import { IModificationValuesTesting } from './IModificationValuesTesting';
  * @author h.fleischer
  * @since 18.04.2021
  */
-export class ModificationTesting extends AModification<IModificationValuesTesting> {
+export class ModificationTesting extends AModification<IModificationValuesTesting> implements IContactColumns {
 
     private readonly absTotal: number;
     private readonly ageGroups: AgeGroup[];
@@ -55,14 +56,14 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
         return this.getContactCategoryMultiplier(contactCategoryName);
     }
 
-    getTestingRatio(ageGroupIndex: number): number {
+    getValue(ageGroupIndex: number): number {
         return this.testingValsByIndexContact[ageGroupIndex];
     }
 
-    getTestingRatioTotal(): number {
+    getValueTotal(): number {
         let totalTestingValue = 0;
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            totalTestingValue += this.getTestingRatio(indexContact) * this.ageGroups[indexContact].getAbsValue();
+            totalTestingValue += this.getValue(indexContact) * this.ageGroups[indexContact].getAbsValue();
         }
         return totalTestingValue / this.absTotal;
     }

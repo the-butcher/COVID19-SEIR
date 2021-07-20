@@ -94,7 +94,7 @@ export class ModelImplInfectious implements IModelSeir {
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
 
             }
-            const dailyActual = dailyTested / modificationTesting.getTestingRatio(ageGroup.getIndex());
+            const dailyActual = dailyTested / modificationTesting.getValue(ageGroup.getIndex());
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
             this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
 

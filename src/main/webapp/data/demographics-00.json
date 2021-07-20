@@ -1,0 +1,14 @@
+{
+  "groups": [
+    {
+      "name": "TOTAL",
+      "pG": 8900000
+    }
+  ],
+  "matrices": [
+    {
+      "name": "all",
+      "data": [[ 1 ]]
+    }
+  ]
+}

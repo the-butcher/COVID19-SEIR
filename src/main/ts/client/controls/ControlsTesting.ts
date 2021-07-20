@@ -1,7 +1,7 @@
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { ChartTesting } from '../chart/ChartTesting';
+import { ChartContactColumns } from '../chart/ChartContactColumns';
 import { SliderModification } from '../gui/SliderModification';
 import { SliderTestingCategory } from '../gui/SliderTestingCategory';
 import { Controls } from './Controls';
@@ -22,14 +22,14 @@ export class ControlsTesting {
     }
     private static instance: ControlsTesting;
 
-    private readonly chartTesting: ChartTesting;
+    private readonly chartTesting: ChartContactColumns;
     private readonly slidersTesting: SliderTestingCategory[];
 
     private modification: ModificationTesting;
 
     constructor() {
 
-        this.chartTesting = new ChartTesting('chartTestingDiv');
+        this.chartTesting = new ChartContactColumns('chartTestingDiv');
         this.slidersTesting = [];
 
         Demographics.getInstance().getContactCategories().forEach(contactCategory => {

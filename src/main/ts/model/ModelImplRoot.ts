@@ -103,7 +103,7 @@ export class ModelImplRoot implements IModelSeir {
 
             // shares of removal, initial share of vaccination premultiplied
             const shareOfIU = absValueIU / ageGroup.getAbsValue();
-            const shareOfID = absValueID / ageGroup.getAbsValue();
+            // const shareOfID = absValueID / ageGroup.getAbsValue();
 
             // the "gap" between 1st shot and 2nd shot
             const absValue12 = absValueV1 - absValueV2;
