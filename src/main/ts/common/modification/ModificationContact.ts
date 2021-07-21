@@ -3,7 +3,7 @@ import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
 import { Demographics } from '../demographics/Demographics';
 import { AModification } from './AModification';
-import { IContactMatrix } from './IContactMatrix';
+import { IContactCells } from './IContactCells';
 import { IModificationValuesContact } from './IModificationValuesContact';
 
 /**
@@ -13,12 +13,10 @@ import { IModificationValuesContact } from './IModificationValuesContact';
  * @author h.fleischer
  * @since 18.04.2021
  */
-export class ModificationContact extends AModification<IModificationValuesContact> implements IContactMatrix {
+export class ModificationContact extends AModification<IModificationValuesContact> implements IContactCells {
 
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
-    private readonly maxCellTotal: number;
-    private readonly maxColTotal: number;
 
     constructor(modificationParams: IModificationValuesContact) {
 
@@ -30,21 +28,11 @@ export class ModificationContact extends AModification<IModificationValuesContac
         const demographics = Demographics.getInstance();
         this.ageGroups.push(...demographics.getAgeGroups());
         this.contactCategories.push(...demographics.getContactCategories());
-        this.maxCellTotal = demographics.getMaxCellTotal();
-        this.maxColTotal = demographics.getMaxColTotal();
 
     }
 
     getInstant(): number {
         return this.modificationValues.instant;
-    }
-
-    getMaxColTotal(): number {
-        return this.maxColTotal;
-    }
-
-    getMaxCellTotal(): number {
-        return this.maxCellTotal;
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
@@ -55,20 +43,12 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return this.getContactCategoryMultiplier(contactCategoryName);
     }
 
-    getValue(indexContact: number, indexParticipant: number): number {
+    getCellValue(indexContact: number, indexParticipant: number): number {
         let value = 0;
         this.contactCategories.forEach(contactCategory => {
             value += contactCategory.getData(indexContact, indexParticipant) * this.getMultiplier(contactCategory.getName());
         });
         return value;
-    }
-
-    getSummary(indexContact: number, indexParticipant: number): {[K: string]: string} {
-        let summary: {[K: string]: string} = {};
-        this.contactCategories.forEach(contactCategory => {
-            summary[contactCategory.getName()] = (contactCategory.getData(indexContact, indexParticipant) * this.getMultiplier(contactCategory.getName())).toFixed(4);
-        });
-        return summary;
     }
 
     private getContactCategoryMultiplier(contactCategoryName: string): number {

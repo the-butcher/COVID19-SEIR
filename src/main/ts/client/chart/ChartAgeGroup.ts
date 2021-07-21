@@ -1,6 +1,4 @@
-import { QueryUtil } from './QueryUtil';
-import { ModelInstants } from './../../model/ModelInstants';
-import { CategoryAxis, Column, ColumnSeries, Legend, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
+import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
@@ -15,6 +13,7 @@ import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
 import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
+import { ModelInstants } from './../../model/ModelInstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ColorUtil } from './../../util/ColorUtil';
 import { ICoordinate } from './../../util/ICoordinate';
@@ -23,6 +22,7 @@ import { ControlsVaccination } from './../controls/ControlsVaccination';
 import { ModelActions } from './../gui/ModelActions';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
+import { QueryUtil } from './QueryUtil';
 
 export interface IModificationData {
     modValueY: number,
@@ -864,7 +864,7 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
         this.seriesAgeGroupIncidence.setVisible(visible);
-        this.seriesAgeGroupIncidenceR.setVisible(false);
+        this.seriesAgeGroupIncidenceR.setVisible(visible);
         this.seriesAgeGroupCases.setVisible(visible);
 
         // set everything to invisible
@@ -1099,30 +1099,25 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
         for (const dataItem of this.modelData) {
 
-            const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
-            const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
-            // console.log('incidenceItem', dataItemA, dataItemB);
-
+            const baseIncidences = QueryUtil.getInstance().isDiffDisplay() ? BaseData.getInstance().findIncidences(dataItem.instant, this.ageGroupsWithTotal) : [];
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
                 let color: string;
-                if (QueryUtil.getInstance().isDiffDisplay() && dataItemA && dataItemB) {
+                if (ObjectUtil.isNotEmpty(baseIncidences)) {
 
-                    const baseIncidence = (dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupHeat.getAbsValue();
+                    const baseIncidence = baseIncidences[ageGroupHeat.getIndex()];
                     value -= baseIncidence;
-                    // const baseVaccination = dataItemB[ageGroupHeat.getName()][ModelConstants.BASE_DATA_INDEX_VACC1ST] / ageGroupHeat.getAbsValue();
-                    // value -= baseVaccination;
 
                     let r = 0;
                     let g = 0;
                     let b = 0;
                     if (value >= 0) {
-                        g = value / 20; // .05;
+                        g = value / 20;
                     }
                     else {
-                        r = value / -20; // -.05;
+                        r = value / -20;
                     }
                     const rgb = [r, g, b];
                     const hsv = [0, 0, 0];

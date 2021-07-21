@@ -119,7 +119,7 @@ export class ChartContactColumns {
         const ageGroups = demographics.getAgeGroups();
 
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
-            const testingVal = modification.getValue(indexContact);
+            const testingVal = modification.getColumnValue(indexContact);
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
                 participantY: Math.max(0.00000000001, testingVal),
@@ -128,7 +128,7 @@ export class ChartContactColumns {
             });
         }
 
-        this.valueTotalLabel.text = (modification.getValueTotal() * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        this.valueTotalLabel.text = (modification.getValueSum() * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;

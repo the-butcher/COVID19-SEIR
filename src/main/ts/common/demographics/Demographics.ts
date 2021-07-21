@@ -41,10 +41,9 @@ export class Demographics {
     private readonly absTotal: number;
     private ageGroups: AgeGroup[];
     private contactCategories: ContactCategory[];
-    private maxCellTotal: number;
-    private maxColTotal: number;
-    // private exposuresPerContact: number;
-    private matrixSum: number;
+    // private maxCellValue: number;
+    // private maxColumnValue: number;
+    private valueSum: number;
 
     constructor(path: string, demographicsConfig: IDemographicsConfig) {
 
@@ -198,7 +197,7 @@ export class Demographics {
          * calculate a value total across all categories and age groups
          */
         // let populationContactTotal = 0;
-        this.matrixSum = 0; // the total cell value in the contact matrix
+        this.valueSum = 0; // the total cell value in the contact matrix
         let populationG;
         this.contactCategories = [];
 
@@ -214,7 +213,7 @@ export class Demographics {
                     matrixSumCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
                 }
             }
-            this.matrixSum += matrixSumCategory;
+            this.valueSum += matrixSumCategory;
 
         });
 
@@ -225,19 +224,19 @@ export class Demographics {
         /**
          * evaluate max combined cell value
          */
-        this.maxCellTotal = 0;
-        this.maxColTotal = 0;
+        // this.maxCellValue = 0;
+        // this.maxColumnValue = 0;
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            let colTotal = 0;
+            // let colTotal = 0;
             for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
                 let curCombinedCellValue = 0;
                 this.contactCategories.forEach(contactCategory => {
                     curCombinedCellValue += contactCategory.getData(indexContact, indexParticipant);
                 });
-                colTotal += curCombinedCellValue;
-                this.maxCellTotal = Math.max(this.maxCellTotal, curCombinedCellValue);
+                // colTotal += curCombinedCellValue;
+                // this.maxCellValue = Math.max(this.maxCellValue, curCombinedCellValue);
             }
-            this.maxColTotal = Math.max(this.maxColTotal, colTotal);
+            // this.maxColumnValue = Math.max(this.maxColumnValue, colTotal);
         };
 
     }
@@ -250,17 +249,17 @@ export class Demographics {
         return this.demographicsConfig;
     }
 
-    getMatrixSum(): number {
-        return this.matrixSum;
+    getValueSum(): number {
+        return this.valueSum;
     }
 
-    getMaxColTotal(): number {
-        return this.maxColTotal;
-    }
+    // getMaxColumnValue(): number {
+    //     return this.maxColumnValue;
+    // }
 
-    getMaxCellTotal(): number {
-        return this.maxCellTotal;
-    }
+    // getMaxCellValue(): number {
+    //     return this.maxCellValue;
+    // }
 
     getAbsTotal(): number {
         return this.absTotal;

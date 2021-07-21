@@ -1,4 +1,4 @@
-import { TimeUtil } from './../../util/TimeUtil';
+import { ContactMatrixSums } from './../controls/ContactMatrixSums';
 import { CategoryAxis, ColumnSeries, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
 import { color, create, Label, percent, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -6,9 +6,11 @@ import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IContactMatrix } from '../../common/modification/IContactMatrix';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { TimeUtil } from './../../util/TimeUtil';
 import { ControlsConstants } from './../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
 import { IconMatrixAxis } from './IconMatrixAxis';
+import { IContactCells } from '../../common/modification/IContactCells';
 
 export interface IChartData {
     categoryX?: string;
@@ -191,10 +193,6 @@ export class ChartContactMatrix {
                 }
             }
         });
-        columnTemplate.events.on('hit', e => {
-            const chartData = e.target.dataItem.dataContext as IChartData;
-            console.log(this.contactMatrix.getSummary(chartData.indexX, chartData.indexY));
-        });
 
         this.seriesHeat.heatRules.push({
             target: columnTemplate,
@@ -269,10 +267,14 @@ export class ChartContactMatrix {
         } else {
             this.toggleAxisContact();
         }
-        this.redraw(this.contactMatrix);
+        this.acceptContactCells(this.contactMatrix.getInstant(), this.contactMatrix);
     }
 
-    async redraw(contactMatrix: IContactMatrix): Promise<void> {
+    async acceptContactCells(instant: number, contactCells: IContactCells): Promise<void> {
+        return this.acceptContactMatrix(new ContactMatrixSums(instant, contactCells, this.axisDirection));
+    }
+
+    async acceptContactMatrix(contactMatrix: IContactMatrix): Promise<void> {
 
         this.contactMatrix = contactMatrix;
 
@@ -285,45 +287,42 @@ export class ChartContactMatrix {
         heatRule.minValue = 0;
         heatRule.maxValue = 1;
 
-        const maxCellTotal = contactMatrix.getMaxCellTotal();
-        this.yAxisPlot.max = contactMatrix.getMaxColTotal();
-
-        console.log('this.yAxisPlot.max', contactMatrix, this.yAxisPlot.max);
+        const maxCellValue = contactMatrix.getMaxCellValue();
+        this.yAxisPlot.max = contactMatrix.getMaxColumnValue();
 
         let matrixSum = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {
-            let columnContactsCurr = 0;
+            let columnValue = 0;
             for (let indexY = 0; indexY < ageGroups.length; indexY++) {
 
-                let ratio = this.axisDirection === 'CONTACT_PARTICIPANT' ? contactMatrix.getValue(indexX, indexY) : contactMatrix.getValue(indexY, indexX);
+                let cellValue = this.axisDirection === 'CONTACT_PARTICIPANT' ? contactMatrix.getCellValue(indexX, indexY) : contactMatrix.getCellValue(indexY, indexX);
                 const population = this.axisDirection === 'CONTACT_PARTICIPANT' ? ageGroups[indexX].getAbsValue() : ageGroups[indexY].getAbsValue();
 
-                columnContactsCurr += ratio;
-                matrixSum += ratio * population;
+                columnValue += cellValue;
+                matrixSum += cellValue * population;
 
-                ratio = Math.max(0.00000000001, ratio);
+                cellValue = Math.max(0.00000000001, cellValue);
                 chartData.push({
                     categoryX: ageGroups[indexX].getName(),
                     categoryY: ageGroups[indexY].getName(),
                     indexX,
                     indexY,
-                    ratio,
-                    gamma: Math.pow(ratio / maxCellTotal, 1 / 1.25), // apply some gamma for better value perception
-                    // label: ratio.toLocaleString(undefined, ModelConstants.LOCALE_FORMAT_FLOAT_1) // ChartUtil.getInstance().formatPercentage(contacts)
+                    ratio: cellValue,
+                    gamma: Math.pow(cellValue / maxCellValue, 1 / 1.25), // apply some gamma for better value perception
                 });
 
             }
             plotData.push({
                 plotX: ageGroups[indexX].getName(),
-                plotY: columnContactsCurr,
-                ratio: columnContactsCurr
+                plotY: columnValue,
+                ratio: columnValue
             });
 
         }
 
         chartData.push(...plotData);
 
-        matrixSum = matrixSum / demographics.getMatrixSum();
+        matrixSum = matrixSum / demographics.getValueSum();
         if (this.showToggleAndPercentage) {
             this.valueTotalLabel.text = (matrixSum * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
         } else {

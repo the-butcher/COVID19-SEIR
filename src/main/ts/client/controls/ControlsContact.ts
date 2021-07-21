@@ -48,7 +48,7 @@ export class ControlsContact {
         this.modification.acceptUpdate({
             multipliers
         });
-        this.chartContact.redraw(this.modification);
+        this.chartContact.acceptContactCells(this.modification.getInstant(), this.modification);
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
     }
@@ -63,7 +63,7 @@ export class ControlsContact {
         });
 
         requestAnimationFrame(() => {
-            this.chartContact.redraw(modification);
+            this.chartContact.acceptContactCells(modification.getInstant(), modification);
             this.slidersCategory.forEach(sliderCategory => {
                 sliderCategory.handleResize();
             });

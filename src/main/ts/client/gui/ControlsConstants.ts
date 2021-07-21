@@ -181,7 +181,6 @@ export class ControlsConstants {
                 return modificationResolver;
             },
             showInEditor: modification => {
-                // TODO build an appropriate effective contact matrix here
                 ControlsTime.getInstance().acceptModification(modification as ModificationTime);
             },
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED

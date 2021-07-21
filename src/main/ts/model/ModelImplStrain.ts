@@ -141,7 +141,7 @@ export class ModelImplStrain implements IModelSeir {
 
                 this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] = 0;
 
-                const baseContactRate = modificationTime.getValue(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
+                const baseContactRate = modificationTime.getCellValue(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
                 compartmentE = infectiousModelParticipant.getFirstCompartment();
 
                 nrmESum = 0;

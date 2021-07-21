@@ -1,7 +1,7 @@
 export interface IContactColumns {
 
-    getValue(ageGroupIndex: number): number;
+    getColumnValue(ageGroupIndex: number): number;
 
-    getValueTotal(): number;
+    getValueSum(): number;
 
 }

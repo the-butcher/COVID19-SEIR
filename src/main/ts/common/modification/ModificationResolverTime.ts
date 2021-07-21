@@ -1,15 +1,14 @@
-import { ModelInstants } from './../../model/ModelInstants';
-import { ContactMatrixDelegate } from '../../client/controls/ContactMatrixDelegate';
-import { IContactMatrix } from './IContactMatrix';
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
+import { ContactCellsExposure } from '../../client/controls/ContactCellsExposure';
+import { ContactMatrixDelegate } from '../../client/controls/ContactMatrixDelegate';
 import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { ContactMatrixExposure } from './../../client/controls/ContactMatrixExposure';
+import { TimeUtil } from '../../util/TimeUtil';
+import { ModelInstants } from './../../model/ModelInstants';
 import { AModificationResolver } from './AModificationResolver';
+import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationTime } from './ModificationTime';
-import { ModelConstants } from '../../model/ModelConstants';
-import { TimeUtil } from '../../util/TimeUtil';
 
 /**
  * modification resolver for time modifications
@@ -28,7 +27,7 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
     }
     private static instance: ModificationResolverTime;
 
-    private contactMatrices: ContactMatrixExposure[];
+    private contactMatrices: IContactMatrix[];
     private modificationData: IModificationData[];
     private maxCellTotal: number;
     private maxColTotal: number;
@@ -49,15 +48,15 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
         this.contactMatrices = [];
         this.modificationData = [];
         for (let instant = minChartInstant; instant <= maxChartInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            this.contactMatrices.push(new ContactMatrixExposure(instant));
+            this.contactMatrices.push(new ContactMatrixSums(instant, new ContactCellsExposure(instant), 'CONTACT_PARTICIPANT'));
         }
 
-        this.maxCellTotal = Math.max(...this.contactMatrices.map(m => m.getMaxCellTotal()));
-        this.maxColTotal = Math.max(...this.contactMatrices.map(m => m.getMaxColTotal()));
+        this.maxCellTotal = Math.max(...this.contactMatrices.map(m => m.getMaxCellValue()));
+        this.maxColTotal = Math.max(...this.contactMatrices.map(m => m.getMaxColumnValue()));
 
         this.modificationData = this.contactMatrices.map(m => {
             return {
-                modValueY: new ContactMatrixSums(m).getMatrixSum(),
+                modValueY: m.getValueSum(),
                 categoryX: TimeUtil.formatCategoryDate(m.getInstant())
             }
         });
@@ -77,8 +76,8 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
     }
 
     findContactMatrix(instant: number): IContactMatrix {
-        const contactMatrixExposure = this.contactMatrices.find(m => m.getInstant() === instant);
-        return new ContactMatrixDelegate(contactMatrixExposure, this.maxCellTotal, this.maxColTotal);
+        const contactMatrix = this.contactMatrices.find(m => m.getInstant() === instant);
+        return new ContactMatrixDelegate(instant, contactMatrix, this.maxCellTotal, this.maxColTotal);
     }
 
     getValue(instant: number): number {

@@ -23,9 +23,9 @@ describe("test value", () => {
             deletable: false,
             draggable: false
         });
-        expect(modificationTesting.getValue(0)).toBeCloseTo(0.3, 3);
-        expect(modificationTesting.getValue(4)).toBeCloseTo(0.3, 3);
-        expect(modificationTesting.getValue(9)).toBeCloseTo(0.3, 3);
+        expect(modificationTesting.getColumnValue(0)).toBeCloseTo(0.3, 3);
+        expect(modificationTesting.getColumnValue(4)).toBeCloseTo(0.3, 3);
+        expect(modificationTesting.getColumnValue(9)).toBeCloseTo(0.3, 3);
         // expect(modificationTesting.getContactMultiplier(0)).toBeCloseTo(0.839, 3);
         // expect(modificationTesting.getContactMultiplier(4)).toBeCloseTo(0.839, 3);
         // expect(modificationTesting.getContactMultiplier(9)).toBeCloseTo(0.839, 3);
@@ -46,9 +46,9 @@ describe("test value", () => {
             deletable: false,
             draggable: false
         });
-        expect(modificationTesting.getValue(0)).toBeCloseTo(0.5, 3);
-        expect(modificationTesting.getValue(4)).toBeCloseTo(0.5, 3);
-        expect(modificationTesting.getValue(9)).toBeCloseTo(0.5, 3);
+        expect(modificationTesting.getColumnValue(0)).toBeCloseTo(0.5, 3);
+        expect(modificationTesting.getColumnValue(4)).toBeCloseTo(0.5, 3);
+        expect(modificationTesting.getColumnValue(9)).toBeCloseTo(0.5, 3);
         // expect(modificationTesting.getContactMultiplier(0)).toBeCloseTo(0.7315, 3);
         // expect(modificationTesting.getContactMultiplier(4)).toBeCloseTo(0.7315, 3);
         // expect(modificationTesting.getContactMultiplier(9)).toBeCloseTo(0.7315, 3);
@@ -69,9 +69,9 @@ describe("test value", () => {
             deletable: false,
             draggable: false
         });
-        expect(modificationTesting.getValue(0)).toBeCloseTo(0.7, 3);
-        expect(modificationTesting.getValue(4)).toBeCloseTo(0.7, 3);
-        expect(modificationTesting.getValue(9)).toBeCloseTo(0.7, 3);
+        expect(modificationTesting.getColumnValue(0)).toBeCloseTo(0.7, 3);
+        expect(modificationTesting.getColumnValue(4)).toBeCloseTo(0.7, 3);
+        expect(modificationTesting.getColumnValue(9)).toBeCloseTo(0.7, 3);
         // expect(modificationTesting.getContactMultiplier(0)).toBeCloseTo(0.6242, 3);
         // expect(modificationTesting.getContactMultiplier(4)).toBeCloseTo(0.6242, 3);
         // expect(modificationTesting.getContactMultiplier(9)).toBeCloseTo(0.6242, 3);

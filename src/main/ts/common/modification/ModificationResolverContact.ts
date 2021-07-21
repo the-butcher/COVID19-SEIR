@@ -1,8 +1,7 @@
-import { TimeUtil } from './../../util/TimeUtil';
-import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { Demographics } from '../demographics/Demographics';
 import { ContactMatrixSums } from './../../client/controls/ContactMatrixSums';
+import { TimeUtil } from './../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesContact } from './IModificationValuesContact';
 import { ModificationContact } from './ModificationContact';
@@ -80,7 +79,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
     }
 
     getValue(instant: number): number {
-        return new ContactMatrixSums(this.getModification(instant)).getMatrixSum() / Demographics.getInstance().getMatrixSum();
+        return new ContactMatrixSums(instant, this.getModification(instant), 'CONTACT_PARTICIPANT').getValueSum() / Demographics.getInstance().getValueSum();
     }
 
 }

@@ -1,19 +1,13 @@
-/**
- * definition for types that can provide a cell-value by contact- and participant index
- *
- * @author h.fleischer
- * @since 11.04.2021
- */
-export interface IContactMatrix {
+import { IContactColumns } from './IContactColumns';
+import { IContactCells } from './IContactCells';
+export interface IContactMatrix extends IContactCells, IContactColumns {
 
     getInstant(): number;
 
-    getValue(indexContact: number, indexParticipant: number): number;
+    getMaxCellValue(): number;
 
-    getSummary(indexContact: number, indexParticipant: number): {[K: string]: string};
+    getMaxColumnValue(): number;
 
-    getMaxColTotal(): number;
-
-    getMaxCellTotal(): number;
+    getValueSum(): number;
 
 }

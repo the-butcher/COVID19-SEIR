@@ -1,5 +1,8 @@
+import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { ModelConstants } from './../ModelConstants';
 import { JsonLoader } from '../../util/JsonLoader';
+import { ControlsConstants } from '../../client/gui/ControlsConstants';
+import { TimeUtil } from '../../util/TimeUtil';
 
 export interface IBaseDataConfig {
     [K: string]: IBaseDataItem;
@@ -72,6 +75,17 @@ export class BaseData {
         return this.baseDataset[categoryX];
     }
 
+    findIncidences(instant: number, ageGroups: AgeGroup[]): number[] {
+
+        const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
+        const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(instant));
+        if (dataItemA && dataItemB) {
+            return ageGroups.map(g => (dataItemB[g.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[g.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / g.getAbsValue());
+        } else {
+            return [];
+        }
+
+    }
 
 
 }

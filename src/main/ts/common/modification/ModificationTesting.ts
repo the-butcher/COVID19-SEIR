@@ -56,14 +56,14 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
         return this.getContactCategoryMultiplier(contactCategoryName);
     }
 
-    getValue(ageGroupIndex: number): number {
+    getColumnValue(ageGroupIndex: number): number {
         return this.testingValsByIndexContact[ageGroupIndex];
     }
 
-    getValueTotal(): number {
+    getValueSum(): number {
         let totalTestingValue = 0;
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            totalTestingValue += this.getValue(indexContact) * this.ageGroups[indexContact].getAbsValue();
+            totalTestingValue += this.getColumnValue(indexContact) * this.ageGroups[indexContact].getAbsValue();
         }
         return totalTestingValue / this.absTotal;
     }
