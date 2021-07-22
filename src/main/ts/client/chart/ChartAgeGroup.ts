@@ -1099,13 +1099,15 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
         for (const dataItem of this.modelData) {
 
-            const baseIncidences = QueryUtil.getInstance().isDiffDisplay() ? BaseData.getInstance().findIncidences(dataItem.instant, this.ageGroupsWithTotal) : [];
+            const baseIncidences = QueryUtil.getInstance().isDiffDisplay() ? BaseData.getInstance().findIncidences(dataItem.instant, this.ageGroupsWithTotal) : undefined;
             this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
                 let color: string;
                 if (ObjectUtil.isNotEmpty(baseIncidences)) {
+
+                    console.log(TimeUtil.formatCategoryDate(dataItem.instant), baseIncidences, baseIncidences === []);
 
                     const baseIncidence = baseIncidences[ageGroupHeat.getIndex()];
                     value -= baseIncidence;
@@ -1145,7 +1147,7 @@ export class ChartAgeGroup {
 
         this.applyMaxHeat(maxValue);
 
-        // console.log('chartData', chartData);
+        // console.log('heatData', heatData);
 
         if (this.chart.data.length === chartData.length && !QueryUtil.getInstance().isDiffDisplay()) {
             for (let i = 0; i < chartData.length; i++) {

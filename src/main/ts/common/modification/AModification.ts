@@ -67,7 +67,7 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     isBlendable(): boolean {
-        return this.instantB > new Date('2021-08-30').getTime();
+        return this.getInstantA() > new Date('2021-08-30').getTime();
     }
 
     abstract acceptUpdate(update: Partial<P>): void

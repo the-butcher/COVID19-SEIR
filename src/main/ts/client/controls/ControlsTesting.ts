@@ -29,7 +29,7 @@ export class ControlsTesting {
 
     constructor() {
 
-        this.chartTesting = new ChartContactColumns('chartTestingDiv');
+        this.chartTesting = new ChartContactColumns('chartTestingDiv', 0.00, 1.01);
         this.slidersTesting = [];
 
         Demographics.getInstance().getContactCategories().forEach(contactCategory => {
@@ -47,7 +47,7 @@ export class ControlsTesting {
         this.modification.acceptUpdate({
             multipliers
         });
-        this.chartTesting.redraw(this.modification);
+        this.chartTesting.acceptContactColumns(this.modification);
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
     }
@@ -62,7 +62,7 @@ export class ControlsTesting {
         });
 
         requestAnimationFrame(() => {
-            this.chartTesting.redraw(modification);
+            this.chartTesting.acceptContactColumns(modification);
             this.slidersTesting.forEach(sliderTesting => {
                 sliderTesting.handleResize();
             });

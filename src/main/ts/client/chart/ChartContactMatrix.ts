@@ -44,7 +44,11 @@ export class ChartContactMatrix {
 
     private fullDataUpdate: boolean;
     private axisDirection: AXIS_DIRECTION;
-    private contactMatrix: IContactMatrix;
+    private contactCells: IContactCells;
+
+    private instant: number;
+    private maxCellValue: number;
+    private maxColumnValue: number
     private readonly valueTotalLabel: Label;
 
     private readonly showToggleAndPercentage: boolean;
@@ -267,16 +271,15 @@ export class ChartContactMatrix {
         } else {
             this.toggleAxisContact();
         }
-        this.acceptContactCells(this.contactMatrix.getInstant(), this.contactMatrix);
+        this.acceptContactCells(this.instant, this.contactCells, this.maxCellValue, this.maxColumnValue);
     }
 
-    async acceptContactCells(instant: number, contactCells: IContactCells): Promise<void> {
-        return this.acceptContactMatrix(new ContactMatrixSums(instant, contactCells, this.axisDirection));
-    }
+    async acceptContactCells(instant: number, contactCells: IContactCells, maxCellValue: number, maxColumnValue: number): Promise<void> {
 
-    async acceptContactMatrix(contactMatrix: IContactMatrix): Promise<void> {
-
-        this.contactMatrix = contactMatrix;
+        this.instant = instant;
+        this.contactCells = contactCells;
+        this.maxCellValue = maxCellValue;
+        this.maxColumnValue = maxColumnValue;
 
         const demographics = Demographics.getInstance();
         const chartData: IChartData[] = [];
@@ -286,16 +289,14 @@ export class ChartContactMatrix {
         const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
         heatRule.minValue = 0;
         heatRule.maxValue = 1;
-
-        const maxCellValue = contactMatrix.getMaxCellValue();
-        this.yAxisPlot.max = contactMatrix.getMaxColumnValue();
+        this.yAxisPlot.max = this.maxColumnValue;
 
         let matrixSum = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {
             let columnValue = 0;
             for (let indexY = 0; indexY < ageGroups.length; indexY++) {
 
-                let cellValue = this.axisDirection === 'CONTACT_PARTICIPANT' ? contactMatrix.getCellValue(indexX, indexY) : contactMatrix.getCellValue(indexY, indexX);
+                let cellValue = this.axisDirection === 'CONTACT_PARTICIPANT' ? this.contactCells.getCellValue(indexX, indexY) : this.contactCells.getCellValue(indexY, indexX);
                 const population = this.axisDirection === 'CONTACT_PARTICIPANT' ? ageGroups[indexX].getAbsValue() : ageGroups[indexY].getAbsValue();
 
                 columnValue += cellValue;
@@ -308,7 +309,7 @@ export class ChartContactMatrix {
                     indexX,
                     indexY,
                     ratio: cellValue,
-                    gamma: Math.pow(cellValue / maxCellValue, 1 / 1.25), // apply some gamma for better value perception
+                    gamma: Math.pow(cellValue / this.maxCellValue, 1 / 1.25), // apply some gamma for better value perception
                 });
 
             }
@@ -326,7 +327,7 @@ export class ChartContactMatrix {
         if (this.showToggleAndPercentage) {
             this.valueTotalLabel.text = (matrixSum * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
         } else {
-            this.valueTotalLabel.text = TimeUtil.formatCategoryDate(this.contactMatrix.getInstant());
+            this.valueTotalLabel.text = TimeUtil.formatCategoryDate(this.instant);
         }
 
         if (this.fullDataUpdate) {

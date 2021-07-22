@@ -1,11 +1,11 @@
 import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ContactCellsExposure } from '../../client/controls/ContactCellsExposure';
-import { ContactMatrixDelegate } from '../../client/controls/ContactMatrixDelegate';
 import { ContactMatrixSums } from '../../client/controls/ContactMatrixSums';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { ModelInstants } from './../../model/ModelInstants';
 import { AModificationResolver } from './AModificationResolver';
+import { IContactCells } from './IContactCells';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationTime } from './ModificationTime';
@@ -29,8 +29,8 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
 
     private contactMatrices: IContactMatrix[];
     private modificationData: IModificationData[];
-    private maxCellTotal: number;
-    private maxColTotal: number;
+    private maxCellValue: number;
+    private maxColumnValue: number;
 
     private constructor() {
         super('TIME');
@@ -51,8 +51,8 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
             this.contactMatrices.push(new ContactMatrixSums(instant, new ContactCellsExposure(instant), 'CONTACT_PARTICIPANT'));
         }
 
-        this.maxCellTotal = Math.max(...this.contactMatrices.map(m => m.getMaxCellValue()));
-        this.maxColTotal = Math.max(...this.contactMatrices.map(m => m.getMaxColumnValue()));
+        this.maxCellValue = Math.max(...this.contactMatrices.map(m => m.getMaxCellValue()));
+        this.maxColumnValue = Math.max(...this.contactMatrices.map(m => m.getMaxColumnValue()));
 
         this.modificationData = this.contactMatrices.map(m => {
             return {
@@ -75,9 +75,17 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
         return 'exposure / day';
     }
 
-    findContactMatrix(instant: number): IContactMatrix {
-        const contactMatrix = this.contactMatrices.find(m => m.getInstant() === instant);
-        return new ContactMatrixDelegate(instant, contactMatrix, this.maxCellTotal, this.maxColTotal);
+    getMaxCellValue(): number {
+        return this.maxCellValue;
+    }
+
+    getMaxColumnValue(): number {
+        return this.maxColumnValue;
+    }
+
+    findContactCells(instant: number): IContactCells {
+        return this.contactMatrices.find(m => m.getInstant() === instant);
+        // return new ContactMatrixDelegate(instant, contactMatrix, this.maxCellValue, this.maxColumnValue);
     }
 
     getValue(instant: number): number {

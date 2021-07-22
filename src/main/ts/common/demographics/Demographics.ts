@@ -41,8 +41,8 @@ export class Demographics {
     private readonly absTotal: number;
     private ageGroups: AgeGroup[];
     private contactCategories: ContactCategory[];
-    // private maxCellValue: number;
-    // private maxColumnValue: number;
+    private maxCellValue: number;
+    private maxColumnValue: number;
     private valueSum: number;
 
     constructor(path: string, demographicsConfig: IDemographicsConfig) {
@@ -138,7 +138,7 @@ export class Demographics {
                     1, // 15-24
                     1.1, // 25-34
                     0.80, // 35-44
-                    0.80, // 45-54
+                    1.00, // 45-54
                     4.0, // 55-64
                     70, // 65-74
                     1, // 75-84
@@ -151,9 +151,9 @@ export class Demographics {
                     0.50, // <= 04
                     1.00, // 05-14
                     0.90, // 15-24
-                    1.30, // 25-34
+                    1.00, // 25-34
                     0.85, // 35-44
-                    0.80, // 45-54
+                    1.00, // 45-54
                     1.00, // 55-64
                     1.00, // 65-74
                     1.00, // 75-84
@@ -164,10 +164,10 @@ export class Demographics {
             if (matrixConfig.name === 'risk') {
                 corrections = [
                     0.00, // <= 04
-                    0.13, // 05-14
+                    0.10, // 05-14
                     2.40, // 15-24
-                    0.73, // 25-34
-                    0.27, // 35-44
+                    0.55, // 25-34
+                    0.15, // 35-44
                     0.04, // 45-54
                     0.02, // 55-64
                     0.00, // 65-74
@@ -217,26 +217,22 @@ export class Demographics {
 
         });
 
-        // this.exposuresPerContact = 0.07315426234883828; // this.absTotal / this.matrixSum;
-        // console.log('this.contactCategories', this.contactCategories);
-        // console.log('exposuresPerContact', this.exposuresPerContact);
-
         /**
          * evaluate max combined cell value
          */
-        // this.maxCellValue = 0;
-        // this.maxColumnValue = 0;
+        this.maxCellValue = 0;
+        this.maxColumnValue = 0;
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            // let colTotal = 0;
+            let colTotal = 0;
             for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
                 let curCombinedCellValue = 0;
                 this.contactCategories.forEach(contactCategory => {
                     curCombinedCellValue += contactCategory.getData(indexContact, indexParticipant);
                 });
-                // colTotal += curCombinedCellValue;
-                // this.maxCellValue = Math.max(this.maxCellValue, curCombinedCellValue);
+                colTotal += curCombinedCellValue;
+                this.maxCellValue = Math.max(this.maxCellValue, curCombinedCellValue);
             }
-            // this.maxColumnValue = Math.max(this.maxColumnValue, colTotal);
+            this.maxColumnValue = Math.max(this.maxColumnValue, colTotal);
         };
 
     }
@@ -253,13 +249,13 @@ export class Demographics {
         return this.valueSum;
     }
 
-    // getMaxColumnValue(): number {
-    //     return this.maxColumnValue;
-    // }
+    getMaxColumnValue(): number {
+        return this.maxColumnValue;
+    }
 
-    // getMaxCellValue(): number {
-    //     return this.maxCellValue;
-    // }
+    getMaxCellValue(): number {
+        return this.maxCellValue;
+    }
 
     getAbsTotal(): number {
         return this.absTotal;

@@ -82,7 +82,7 @@ export class BaseData {
         if (dataItemA && dataItemB) {
             return ageGroups.map(g => (dataItemB[g.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[g.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / g.getAbsValue());
         } else {
-            return [];
+            return undefined;
         }
 
     }

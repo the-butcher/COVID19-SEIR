@@ -90,6 +90,9 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 * AModification - isBlendable
 #### Issues
+* exposure / day appears to give wrong (too high) numbers
+* exposure matrix has wrong values (all zero)
+* reintroduce the exposure chart view
 * add control for blendable true|false and implement in modifications
   * contact
   * testing

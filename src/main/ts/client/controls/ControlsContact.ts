@@ -1,9 +1,9 @@
-import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
 import { SliderContactCategory } from '../gui/SliderContactCategory';
 import { SliderModification } from '../gui/SliderModification';
+import { Demographics } from './../../common/demographics/Demographics';
 import { Controls } from './Controls';
 
 /**
@@ -48,9 +48,15 @@ export class ControlsContact {
         this.modification.acceptUpdate({
             multipliers
         });
-        this.chartContact.acceptContactCells(this.modification.getInstant(), this.modification);
+
+        this.applyToChartContact();
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
+    }
+
+    applyToChartContact(): void {
+        const demographics = Demographics.getInstance();
+        this.chartContact.acceptContactCells(this.modification.getInstant(), this.modification, demographics.getMaxCellValue(), demographics.getMaxColumnValue());
     }
 
     acceptModification(modification: ModificationContact): void {
@@ -63,7 +69,7 @@ export class ControlsContact {
         });
 
         requestAnimationFrame(() => {
-            this.chartContact.acceptContactCells(modification.getInstant(), modification);
+            this.applyToChartContact();
             this.slidersCategory.forEach(sliderCategory => {
                 sliderCategory.handleResize();
             });

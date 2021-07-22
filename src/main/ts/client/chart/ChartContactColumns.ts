@@ -30,7 +30,7 @@ export class ChartContactColumns {
 
     private fullDataUpdate: boolean;
 
-    constructor(container: string) {
+    constructor(container: string, yMin: number, yMax: number) {
 
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
@@ -59,15 +59,14 @@ export class ChartContactColumns {
         /**
          * y-axis
          */
-         ChartUtil.getInstance().configureAxis(this.yAxis, 'cases discovered');
+        ChartUtil.getInstance().configureAxis(this.yAxis, 'cases discovered');
         this.yAxis.tooltip.disabled = true;
         this.yAxis.renderer.labels.template.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, ControlsConstants.LABEL_PERCENT___FIXED);
-            // return (parseFloat(value) * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED) + '%'
         });
 
-        this.yAxis.min = 0.00;
-        this.yAxis.max = 1.01;
+        this.yAxis.min = yMin;
+        this.yAxis.max = yMax;
         this.yAxis.strictMinMax = true;
 
         this.seriesHeat = this.chart.series.push(new LineSeries());
@@ -112,7 +111,7 @@ export class ChartContactColumns {
 
     }
 
-    async redraw(modification: IContactColumns): Promise<void> {
+    async acceptContactColumns(modification: IContactColumns): Promise<void> {
 
         const demographics = Demographics.getInstance();
         const chartData = [];
@@ -122,7 +121,7 @@ export class ChartContactColumns {
             const testingVal = modification.getColumnValue(indexContact);
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
-                participantY: Math.max(0.00000000001, testingVal),
+                participantY: testingVal,
                 label: ControlsConstants.LABEL_PERCENT__FLOAT_2.format(testingVal), // (testingVal * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%',
                 color: ChartUtil.getInstance().toColor(testingVal, ControlsConstants.HEATMAP_______PLAIN) // INCIDENCE is for color only
             });

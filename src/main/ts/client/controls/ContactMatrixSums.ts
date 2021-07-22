@@ -58,7 +58,7 @@ export class ContactMatrixSums implements IContactMatrix {
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
             let columnValue = 0;
             for (let indexParticipant = 0; indexParticipant < ageGroups.length; indexParticipant++) {
-                cellValue = this.contactCells.getCellValue(indexContact, indexParticipant); // * ageGroups[indexContact].getAbsValue();
+                cellValue = this.contactCells.getCellValue(indexContact, indexParticipant) * ageGroups[indexContact].getAbsValue();
                 columnValue += cellValue;
                 this.maxCellValue = Math.max(this.maxCellValue, cellValue);
                 this.valueSum += cellValue;
