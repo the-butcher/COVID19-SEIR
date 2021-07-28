@@ -116,6 +116,7 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_REMOVED = 1;
     static readonly BASE_DATA_INDEX_VACC1ST = 2;
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
+    static readonly BASE_DATA_INDEX___TESTS = 4;
 
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];

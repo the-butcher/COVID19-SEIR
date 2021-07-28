@@ -67,7 +67,7 @@ export interface ILabellingDefinition {
     format(value: number): string;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'EXPOSED';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
@@ -145,7 +145,7 @@ export class ControlsConstants {
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(true);
-                chart.setSeriesEIVisible(false);
+                chart.setSeriesEIVisible(false, true);
                 chart.setSeriesSRVisible(false);
             }
         },
@@ -157,8 +157,21 @@ export class ControlsConstants {
             getHeatMax: () => 1,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesEIVisible(true);
+                chart.setSeriesEIVisible(true, true);
                 chart.setSeriesSRVisible(true);
+                chart.setAxisRelativeMax(1.01);
+            }
+        },
+        'EXPOSED': {
+            id: ObjectUtil.createId(),
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID___________ALL],
+            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
+            getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatMax: (maxValue) => maxValue,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(false);
+                chart.setSeriesEIVisible(true, false);
+                chart.setSeriesSRVisible(false);
                 chart.setAxisRelativeMax(1.01);
             }
         }

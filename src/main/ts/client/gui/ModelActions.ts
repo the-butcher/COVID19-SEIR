@@ -106,7 +106,12 @@ export class ModelActions {
             iconKey: 'VACCINATION',
             handleClick: () => ModelActions.getInstance().toggleChartMode('VACCINATED')
         }));
-
+        this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
+            label: 'EXPOSED',
+            iconKey: 'EXPOSED',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('EXPOSED')
+        }));
 
         const ageGroups = [...Demographics.getInstance().getAgeGroups()].reverse();
         this.ageGroupIcons.push(new IconChartMode({

@@ -105,12 +105,12 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedVR2: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupRemovedVRC: ChartAgeGroupSeries; // control curve (maybe possible to replace with stacked curves)
     protected readonly seriesAgeGroupIncidenceR: ChartAgeGroupSeries; // real incidence
+    protected readonly seriesTotalTestsR: ChartAgeGroupSeries; // real test numbers
 
     protected readonly seriesModification: ChartAgeGroupSeries;
 
     protected readonly seriesHeat: ColumnSeries;
 
-    private maxInfectious: number;
     private absValue: number; // the absolute value of the age-group currently displayed
     private ageGroupIndex: number;
     private modelData: IDataItem[];
@@ -271,6 +271,22 @@ export class ChartAgeGroup {
             legend: false
         });
         this.seriesAgeGroupIncidenceByStrain = new Map();
+
+        this.seriesTotalTestsR = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotIncidence,
+            title: 'tests',
+            baseLabel: 'tests',
+            valueField: 'totalTestsR',
+            colorKey: 'TESTING',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.35,
+            labelled: true,
+            percent: false,
+            stacked: false,
+            legend: false
+        });
 
         this.seriesAgeGroupRemovedVMV = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -563,7 +579,7 @@ export class ChartAgeGroup {
             const ticks = SliderModification.getInstance().getTickValues().filter(t => t > minInstant && t < maxInstant);
 
             SliderModification.getInstance().setRange([minInstant, ...ticks, maxInstant]);
-            this.applyMaxIncidence();
+            this.applyMaxYAxisValue();
 
         });
 
@@ -710,6 +726,7 @@ export class ChartAgeGroup {
             this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
             this.seriesAgeGroupIncidenceR.setSeriesNote(ageGroup.getName());
             this.seriesAgeGroupCases.setSeriesNote(ageGroup.getName());
+            this.seriesTotalTestsR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
 
             this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
             this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
@@ -847,7 +864,7 @@ export class ChartAgeGroup {
 
     }
 
-    setSeriesEIVisible(visible: boolean): void {
+    setSeriesEIVisible(visible: boolean, stacked: boolean): void {
 
         this.yAxisPlotRelative.visible = visible;
         this.yAxisPlotRelative.renderer.grid.template.disabled = !visible;
@@ -855,6 +872,9 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupExposed.setVisible(visible);
         this.seriesAgeGroupInfectious.setVisible(visible);
+
+        this.seriesAgeGroupExposed.setStacked(stacked);
+        this.seriesAgeGroupInfectious.setStacked(stacked);
 
     }
 
@@ -883,14 +903,14 @@ export class ChartAgeGroup {
 
     }
 
+    setSeriesTestingVisible(visible: boolean): void {
+        this.seriesTotalTestsR.setVisible(visible);
+    }
+
     setChartMode(chartMode: CHART_MODE______KEY): void {
         this.chartMode = chartMode;
         ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
         this.requestRenderModelData();
-    }
-
-    getMaxInfections(): number {
-        return this.maxInfectious;
     }
 
     setAxisRelativeMax(max: number): void {
@@ -970,37 +990,40 @@ export class ChartAgeGroup {
 
     }
 
-    applyMaxIncidence(): void {
+    applyMaxYAxisValue(): void {
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
-
-            // console.log(this.xAxis.start, this.xAxis.end);
 
             const minCategory = this.xAxis.positionToCategory(this.xAxis.start);
             const maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
             const minInstant = this.findDataItemByCategory(minCategory).instant;
             const maxInstant = this.findDataItemByCategory(maxCategory).instant;
-            // console.log(minCategory, minInstant, ' >> ', maxCategory, maxInstant);
 
             let maxIncidence = 0;
-            this.maxInfectious = 0;
+            let maxInfectious = 0;
             for (const dataItem of this.modelData) {
                 if (dataItem.instant >= minInstant && dataItem.instant <= maxInstant) {
                     this.ageGroupsWithTotal.forEach(ageGroupHeat => {
                         maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
-                        this.maxInfectious = Math.max(this.maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
+                        maxInfectious = Math.max(maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
                     });
                 }
             }
 
             this.yAxisPlotIncidence.min = 0;
             this.yAxisPlotIncidence.max = maxIncidence * 1.05;
-            // this.yAxisPlotIncidence.strictMinMax = true;
-            // this.yAxisPlotIncidence.start = 0;
-            // this.yAxisPlotIncidence.end = 1;
 
-            // console.log('maxIncidence', maxIncidence);
-            this.applyMaxHeat(maxIncidence);
+            this.yAxisPlotRelative.min = 0;
+            this.yAxisPlotRelative.max = maxInfectious * 1.05;
+
+            console.log('maxInfectious', maxInfectious);
+
+            if (this.chartMode === 'INCIDENCE') {
+                this.applyMaxHeat(maxIncidence);
+            } else {
+                this.applyMaxHeat(maxInfectious);
+            }
+
 
         }
 
@@ -1056,15 +1079,22 @@ export class ChartAgeGroup {
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
-            const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
-            const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
+            const dataItem14 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 14));
+            const dataItem07 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
+            const dataItem00 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
             let ageGroupRemovedVR1 = null;
             let ageGroupRemovedVR2 = null;
             let ageGroupIncidenceR = null;
-            if (dataItemA && dataItemB) {
-                ageGroupRemovedVR1 = BaseData.getVacc1(dataItemB, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
-                ageGroupRemovedVR2 = BaseData.getVacc2(dataItemB, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
-                ageGroupIncidenceR = (dataItemB[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
+            let totalTestsR = null;
+            if (dataItem07 && dataItem00) {
+                ageGroupRemovedVR1 = BaseData.getVacc1(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
+                ageGroupRemovedVR2 = BaseData.getVacc2(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
+                ageGroupIncidenceR = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
+                if (dataItem14) {
+                    const diff07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]) / 2;
+                    const diff14 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem14[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]) / 4;
+                    totalTestsR = (diff07 + diff14) * 1000 / ageGroupPlot.getAbsValue();
+                }
             }
 
             const item = {
@@ -1082,6 +1112,7 @@ export class ChartAgeGroup {
                 ageGroupRemovedVRC,
                 ageGroupIncidence,
                 ageGroupIncidenceR,
+                totalTestsR,
                 ageGroupCases
             }
 

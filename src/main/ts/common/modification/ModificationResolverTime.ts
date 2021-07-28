@@ -72,7 +72,7 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
     }
 
     getTitle(): string {
-        return 'exposure / day';
+        return 'exposure/day';
     }
 
     getMaxCellValue(): number {
@@ -85,7 +85,6 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
 
     findContactCells(instant: number): IContactCells {
         return this.contactMatrices.find(m => m.getInstant() === instant);
-        // return new ContactMatrixDelegate(instant, contactMatrix, this.maxCellValue, this.maxColumnValue);
     }
 
     getValue(instant: number): number {

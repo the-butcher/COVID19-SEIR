@@ -80,9 +80,7 @@ export class ChartAgeGroupSeries {
         this.series.sequencedInterpolation = false;
 
         this.series.hiddenInLegend = true; // !params.legend;
-        this.series.stacked = params.stacked;
-        this.series.fillOpacity = params.stacked ? 0.7 : 0.0;
-        this.series.strokeOpacity = params.stacked ? 0.7 : 1.0;
+        this.setStacked(params.stacked);
         this.series.strokeWidth = params.strokeWidth;
         if (params.dashed) {
             this.series.strokeDasharray = params.strokeWidth * 2 + ',' + params.strokeWidth * 2;
@@ -121,17 +119,14 @@ export class ChartAgeGroupSeries {
 
         });
 
-        if (params.stacked) {
-            this.series.segments.template.interactionsEnabled = true;
-            this.series.segments.template.events.on('over', () => {
-                this.series.tooltip.disabled = false;
-            });
-            this.series.segments.template.events.on('out', () => {
-                this.series.tooltip.disabled = true;
-            });
-        }
-
         this.series.name = params.title;
+
+        this.series.segments.template.events.on('over', () => {
+            this.series.tooltip.disabled = false;
+        });
+        this.series.segments.template.events.on('out', () => {
+            this.series.tooltip.disabled = true;
+        });
 
 
     }
@@ -139,6 +134,20 @@ export class ChartAgeGroupSeries {
     setVisible(visible: boolean): void {
         this.series.hiddenInLegend = !visible || !this.hasLegend;
         this.series.visible = visible;
+    }
+
+    setStacked(stacked: boolean): void {
+
+        this.series.stacked = stacked;
+
+        this.series.stacked = stacked;
+        this.series.fillOpacity = stacked ? 0.7 : 0.0;
+        this.series.strokeOpacity = stacked ? 0.7 : 1.0;
+
+        this.series.segments.template.interactionsEnabled = stacked;
+
+        this.series.tooltip.disabled = stacked;
+
     }
 
     bindToLegend(bindableSeries: ChartAgeGroupSeries): void {
