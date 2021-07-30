@@ -21,7 +21,8 @@ describe("test value", () => {
                 'other': 0.30
             },
             deletable: false,
-            draggable: false
+            draggable: false,
+            blendable: false,
         });
         expect(modificationTesting.getColumnValue(0)).toBeCloseTo(0.3, 3);
         expect(modificationTesting.getColumnValue(4)).toBeCloseTo(0.3, 3);
@@ -44,7 +45,8 @@ describe("test value", () => {
                 'other': 0.50
             },
             deletable: false,
-            draggable: false
+            draggable: false,
+            blendable: false
         });
         expect(modificationTesting.getColumnValue(0)).toBeCloseTo(0.5, 3);
         expect(modificationTesting.getColumnValue(4)).toBeCloseTo(0.5, 3);
@@ -67,7 +69,8 @@ describe("test value", () => {
                 'other': 0.70
             },
             deletable: false,
-            draggable: false
+            draggable: false,
+            blendable: false
         });
         expect(modificationTesting.getColumnValue(0)).toBeCloseTo(0.7, 3);
         expect(modificationTesting.getColumnValue(4)).toBeCloseTo(0.7, 3);

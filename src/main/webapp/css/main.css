@@ -58,6 +58,20 @@ input {
   color: var(--color-text);
 }
 
+.toggle-outer {
+  width: inherit;
+  display: flex;
+  flex-direction: row;
+  padding: 12px 0px 12px 16px;
+  cursor: pointer;
+}
+
+.toggle-inner {
+  width: 24px;
+  height: 24px;
+}
+
+
 .model-mode {
   width: 30px;
   height: 30px;

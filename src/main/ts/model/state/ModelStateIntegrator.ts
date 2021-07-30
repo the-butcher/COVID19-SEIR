@@ -82,7 +82,8 @@ export class ModelStateIntegrator {
             instant: tT,
             name: 'step',
             deletable: false,
-            draggable: false
+            draggable: false,
+            blendable: false
         });
         modificationTime.setInstants(tT, tT); // tT, tT is by purpose, standing for instant, instant
 

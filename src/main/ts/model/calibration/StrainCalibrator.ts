@@ -65,7 +65,8 @@ export class StrainCalibrator {
                 instant: new Date('2021-07-10').getTime(),
                 seasonality: 1.00,
                 deletable: false,
-                draggable: false
+                draggable: false,
+                blendable: false
             },
             modificationValuesStrain,
             {
@@ -78,7 +79,8 @@ export class StrainCalibrator {
                     'risk': 0.0 / Math.sqrt(2),
                 },
                 deletable: false,
-                draggable: false
+                draggable: false,
+                blendable: false
             },
             modificationValuesTesting,
             {
@@ -90,7 +92,8 @@ export class StrainCalibrator {
                 quarantine: 0.0,
                 dead: 0.0,
                 deletable: false,
-                draggable: false
+                draggable: false,
+                blendable: false
             },
             {
                 id: 'calibrate (time)',
@@ -98,7 +101,8 @@ export class StrainCalibrator {
                 name: 'calibrate (time)',
                 instant: preInstant,
                 deletable: false,
-                draggable: false
+                draggable: false,
+                blendable: false
             },
             {
                 id: "calibrate (vaccination)",
@@ -107,7 +111,8 @@ export class StrainCalibrator {
                 instant: preInstant,
                 vaccinationCurves,
                 deletable: false,
-                draggable: false
+                draggable: false,
+                blendable: false
             }
         ];
         Modifications.setInstanceFromValues(modificationValuesCalibrate);
@@ -118,7 +123,8 @@ export class StrainCalibrator {
             name: 'calibrate (time)',
             instant: preInstant,
             deletable: false,
-            draggable: false
+            draggable: false,
+            blendable: false
         }) as ModificationTime;
         modificationTimeCalibrate.setInstants(preInstant, preInstant);
 

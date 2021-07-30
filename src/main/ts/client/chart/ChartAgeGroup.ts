@@ -285,7 +285,7 @@ export class ChartAgeGroup {
             labelled: true,
             percent: false,
             stacked: false,
-            legend: false
+            legend: true
         });
 
         this.seriesAgeGroupRemovedVMV = new ChartAgeGroupSeries({
@@ -1011,12 +1011,12 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = maxIncidence * 1.05;
+            this.yAxisPlotIncidence.max = 150; // maxIncidence * 1.05;
 
             this.yAxisPlotRelative.min = 0;
             this.yAxisPlotRelative.max = maxInfectious * 1.05;
 
-            console.log('maxInfectious', maxInfectious);
+            // console.log('maxInfectious', maxInfectious);
 
             if (this.chartMode === 'INCIDENCE') {
                 this.applyMaxHeat(maxIncidence);
@@ -1091,9 +1091,10 @@ export class ChartAgeGroup {
                 ageGroupRemovedVR2 = BaseData.getVacc2(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupIncidenceR = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
                 if (dataItem14) {
-                    const diff07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]) / 2;
-                    const diff14 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem14[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]) / 4;
-                    totalTestsR = (diff07 + diff14) * 1000 / ageGroupPlot.getAbsValue();
+                    const diffCase07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
+                    const diffTest07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]);
+                    // totalTestsR = diffCase07 * 10000 / diffTest07;
+                    totalTestsR = diffTest07 * 1000 / ageGroupPlot.getAbsValue();
                 }
             }
 
@@ -1138,7 +1139,7 @@ export class ChartAgeGroup {
                 let color: string;
                 if (ObjectUtil.isNotEmpty(baseIncidences)) {
 
-                    console.log(TimeUtil.formatCategoryDate(dataItem.instant), baseIncidences, baseIncidences === []);
+                    // console.log(TimeUtil.formatCategoryDate(dataItem.instant), baseIncidences, baseIncidences === []);
 
                     const baseIncidence = baseIncidences[ageGroupHeat.getIndex()];
                     value -= baseIncidence;

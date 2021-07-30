@@ -182,6 +182,7 @@ export class SliderModification extends Slider {
                     instant,
                     deletable: true,
                     draggable: true,
+                    blendable: false,
                     primary: false
                 } as IModificationValues; // copy previous values
 

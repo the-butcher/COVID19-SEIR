@@ -31,6 +31,7 @@ describe("test value", () => {
             dstIncidence: 1,
             deletable: true,
             draggable: true,
+            blendable: false,
             primary: false
         };
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
@@ -49,6 +50,7 @@ describe("test value", () => {
             dstIncidence: 1,
             deletable: true,
             draggable: true,
+            blendable: false,
             primary: false
         };
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);

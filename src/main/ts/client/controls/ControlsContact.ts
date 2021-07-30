@@ -1,3 +1,4 @@
+import { IconToggle } from './../gui/IconToggle';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
@@ -23,7 +24,8 @@ export class ControlsContact {
     private static instance: ControlsContact;
 
     private readonly chartContact: ChartContactMatrix;
-    private slidersCategory: SliderContactCategory[];
+    private readonly slidersCategory: SliderContactCategory[];
+    private readonly iconBlendable: IconToggle;
 
     private modification: ModificationContact;
 
@@ -31,6 +33,15 @@ export class ControlsContact {
 
         this.chartContact = new ChartContactMatrix('chartContactDiv', true);
         this.slidersCategory = [];
+
+        this.iconBlendable = new IconToggle({
+            container: 'slidersCategoryDiv',
+            state: false,
+            handleToggle: state => {
+                this.handleChange();
+            },
+            label: 'interpolate from previous'
+        });
 
         Demographics.getInstance().getContactCategories().forEach(contactCategory => {
             this.slidersCategory.push(new SliderContactCategory(contactCategory));
@@ -45,8 +56,10 @@ export class ControlsContact {
         this.slidersCategory.forEach(sliderCategory => {
             multipliers[sliderCategory.getName()] = sliderCategory.getValue();
         });
+        const blendable = this.iconBlendable.getState();
         this.modification.acceptUpdate({
-            multipliers
+            multipliers,
+            blendable
         });
 
         this.applyToChartContact();
@@ -67,6 +80,7 @@ export class ControlsContact {
         this.slidersCategory.forEach(sliderCategory => {
             sliderCategory.setValue(modification.getMultiplier(sliderCategory.getName()));
         });
+        this.iconBlendable.toggle(modification.isBlendable());
 
         requestAnimationFrame(() => {
             this.applyToChartContact();

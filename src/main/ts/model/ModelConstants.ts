@@ -54,6 +54,7 @@ export class ModelConstants {
                 dstIncidence: 1,
                 deletable: true,
                 draggable: true,
+                blendable: false,
                 primary: false
             }),
         },
@@ -66,6 +67,7 @@ export class ModelConstants {
                 name: 'contact',
                 multipliers: {},
                 deletable: true,
+                blendable: false,
                 draggable: true
             }),
         },
@@ -78,20 +80,12 @@ export class ModelConstants {
                 instant,
                 multipliers: {},
                 deletable: true,
-                draggable: true
+                draggable: true,
+                blendable: false
             }),
         },
         'VACCINATION': {
             createValuesModification: (modificationValues) => new ModificationVaccination(modificationValues as IModificationValuesVaccination),
-            // createDefaultModification: (instant: number) => new ModificationVaccination({
-            //     id: ObjectUtil.createId(),
-            //     key: 'VACCINATION',
-            //     name: 'vaccinations',
-            //     instant,
-            //     vaccinationCurves: {},
-            //     deletable: false,
-            //     draggable: false
-            // }),
         },
         'SEASONALITY': {
             createValuesModification: (modificationValues) => new ModificationSeasonality(modificationValues as IModificationValuesSeasonality),

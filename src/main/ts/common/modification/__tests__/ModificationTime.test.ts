@@ -23,7 +23,8 @@ describe("test value", () => {
             name: 'initial discovery',
             instant: new Date('2021-05-01').getTime(),
             deletable: false,
-            draggable: false
+            draggable: false,
+            blendable: false
         });
         modificationTime.setInstants(1625875200000, 1625875200000);
         expect(modificationTime.getTestingRatio(0)).toBeCloseTo(0.3, 3);
@@ -44,7 +45,8 @@ describe("test value", () => {
             name: 'initial discovery',
             instant: new Date('2021-05-01').getTime(),
             deletable: false,
-            draggable: false
+            draggable: false,
+            blendable: false
         });
         modificationTime.setInstants(1625875200000, 1625875200000);
         expect(modificationTime.getTestingRatio(0)).toBeCloseTo(0.3, 3);

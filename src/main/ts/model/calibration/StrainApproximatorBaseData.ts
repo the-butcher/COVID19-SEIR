@@ -62,7 +62,8 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             key: 'TIME',
             name: 'straintime',
             deletable: true,
-            draggable: true
+            draggable: true,
+            blendable: false
         }) as ModificationTime;
         modificationTime.setInstants(this.instantPre, this.instantPre);
 
@@ -137,8 +138,29 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                 // incidence at model-min
                 heatmapDstIncidencesB[ageGroup.getIndex()] += casesToIncidence(heatmapCasesDeltaDstAB, ageGroup.getAbsValue());
 
+                if (ageGroup.getName() === '<= 04') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
+                }
                 if (ageGroup.getName() === '05-14') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
+                }
+                if (ageGroup.getName() === '15-24') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 0;
+                }
+                if (ageGroup.getName() === '25-34') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 4;
+                }
+                if (ageGroup.getName() === '45-54') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 0;
+                }
+                if (ageGroup.getName() === '55-64') {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 4;
+                }
+                if (ageGroup.getName() === '75-84') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 4;
+                }
+                if (ageGroup.getName() === '>= 85') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
                 }
 
             });

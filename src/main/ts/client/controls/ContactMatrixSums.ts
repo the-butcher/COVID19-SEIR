@@ -25,6 +25,10 @@ export class ContactMatrixSums implements IContactMatrix {
         return this.instant;
     }
 
+    logSummary(ageGroupName: string): void {
+        this.contactCells.logSummary(ageGroupName);
+    }
+
     getCellValue(indexContact: number, indexParticipant: number): number {
         return this.contactCells.getCellValue(indexContact, indexParticipant);
     }

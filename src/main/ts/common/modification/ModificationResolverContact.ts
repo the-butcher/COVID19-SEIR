@@ -35,7 +35,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         const modificationA = super.getModification(instant);
         const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1));
 
-        if (modificationA && modificationB && modificationB.isBlendable() &&  modificationA.getInstantA() < modificationB.getInstantA()) {
+        if (modificationA && modificationB && modificationB.isBlendable() && modificationA.getInstantA() < modificationB.getInstantA()) {
 
             const modificationValuesA = modificationA.getModificationValues();
             const modificationValuesB = modificationB.getModificationValues();
@@ -66,8 +66,9 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 key: 'CONTACT',
                 name: 'interpolation',
                 instant,
-                deletable: false,
-                draggable: false,
+                deletable: true,
+                draggable: true,
+                blendable: modificationB.isBlendable(),
                 multipliers
             });
             return interpolatedModification;

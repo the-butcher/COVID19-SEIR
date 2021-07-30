@@ -10,4 +10,6 @@ export interface IContactCells {
 
     getCellValue(indexContact: number, indexParticipant: number): number;
 
+    logSummary(ageGroupName: string): void;
+
 }

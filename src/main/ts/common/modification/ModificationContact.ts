@@ -1,3 +1,5 @@
+import { AXIS_DIRECTION } from './../../client/chart/ChartContactMatrix';
+import { ContactMatrixSums } from './../../client/controls/ContactMatrixSums';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
@@ -31,12 +33,30 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
     }
 
+    logSummary(ageGroupName: string): void {
+        const ageGroupContact = this.ageGroups.find(g => g.getName() === ageGroupName);
+        console.log('ageGroupContact', ageGroupContact);
+        const summary: { [K: string]: number} = {};
+        let total = 0;
+        this.contactCategories.forEach(contactCategory => {
+            let sum = 0;
+            this.ageGroups.forEach(ageGroupParticipant => {
+                sum += contactCategory.getData(ageGroupContact.getIndex(), ageGroupParticipant.getIndex()) * this.getMultiplier(contactCategory.getName());
+            });
+            summary[contactCategory.getName()] = sum;
+            total += sum;
+        });
+        summary['total'] = total;
+        console.log(summary);
+    }
+
     getInstant(): number {
         return this.modificationValues.instant;
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
         this.modificationValues = {...this.modificationValues, ...update};
+        console.log('this.modificationValues', this.modificationValues);
     }
 
     getMultiplier(contactCategoryName: string): number {
