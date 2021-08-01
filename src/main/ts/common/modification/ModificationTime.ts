@@ -31,6 +31,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         super('INSTANT', modificationParams);
     }
 
+    logSummary(): void {
+        // do nothing
+    }
+
     acceptUpdate(update: Partial<IModificationValuesTime>): void {
         // nothing to be updated
     }

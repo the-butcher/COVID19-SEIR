@@ -13,10 +13,6 @@ export class ModificationSeasonality extends AModification<IModificationValuesSe
         super('INSTANT', modificationParams);
     }
 
-    acceptUpdate(update: Partial<IModificationValuesSeasonality>): void {
-        this.modificationValues = {...this.modificationValues, ...update};
-    }
-
     getSeasonality(): number {
         return this.modificationValues.seasonality;
     }

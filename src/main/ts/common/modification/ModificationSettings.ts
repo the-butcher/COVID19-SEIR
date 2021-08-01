@@ -14,10 +14,6 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         super('RANGE', modificationParams);
     }
 
-    acceptUpdate(update: Partial<IModificationValuesSettings>): void {
-        this.modificationValues = {...this.modificationValues, ...update};
-    }
-
     getUndetected(): number {
         return this.modificationValues.undetected;
     }

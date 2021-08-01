@@ -234,9 +234,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.30,
             labelled: true,
-            percent: false,
+            // percent: false,
             stacked: false,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         this.seriesAgeGroupLabelLocation = 0.5;
@@ -251,9 +252,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.10,
             labelled: true,
-            percent: false,
+            // percent: false,
             stacked: false,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         });
         this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -266,9 +268,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.35,
             labelled: false,
-            percent: false,
+            // percent: false,
             stacked: false,
-            legend: false
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         });
         this.seriesAgeGroupIncidenceByStrain = new Map();
 
@@ -283,9 +286,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.35,
             labelled: true,
-            percent: false,
+            // percent: false,
             stacked: false,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         });
 
         this.seriesAgeGroupRemovedVMV = new ChartAgeGroupSeries({
@@ -299,9 +303,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.15,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         this.seriesAgeGroupRemovedVMI = new ChartAgeGroupSeries({
@@ -315,9 +320,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.05,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: false
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         this.seriesAgeGroupRemovedVMU = new ChartAgeGroupSeries({
@@ -331,9 +337,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.25,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: false
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         /**
@@ -350,9 +357,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.15,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         /**
@@ -369,9 +377,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.25,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: false
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
         this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedIU);
         this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedVMU);
@@ -387,9 +396,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.05,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
         this.seriesAgeGroupSusceptible.bindToLegend(this.seriesAgeGroupRemovedVMI);
 
@@ -404,9 +414,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.25,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS
         });
         this.seriesAgeGroupInfectious = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -419,9 +430,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.45,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: true,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS
         });
 
         /**
@@ -438,9 +450,10 @@ export class ChartAgeGroup {
             dashed: true,
             locationOnPath: 0.25,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: false,
-            legend: true
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         /**
@@ -457,9 +470,10 @@ export class ChartAgeGroup {
             dashed: true,
             locationOnPath: 0.35,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: false,
-            legend: false
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
         this.seriesAgeGroupRemovedVR1.bindToLegend(this.seriesAgeGroupRemovedVR2);
 
@@ -477,9 +491,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.45,
             labelled: false,
-            percent: true,
+            // percent: true,
             stacked: false,
-            legend: false
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         this.seriesModification = new ChartAgeGroupSeries({
@@ -493,9 +508,10 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.70,
             labelled: true,
-            percent: true,
+            // percent: true,
             stacked: false,
-            legend: false
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         });
 
         this.chart.cursor = new XYCursor();
@@ -676,6 +692,10 @@ export class ChartAgeGroup {
         return this.ageGroupIndex <= 9 ? this.ageGroupIndex : -1;
     }
 
+    getAbsValue(): number {
+        return this.absValue;
+    }
+
     setInstant(instant: number): void {
         const point = this.xAxis.anyToPoint(TimeUtil.formatCategoryDate(instant));
         this.chart.cursor.triggerMove(point, 'soft'); // https://www.amcharts.com/docs/v4/tutorials/sticky-chart-cursor/
@@ -828,9 +848,10 @@ export class ChartAgeGroup {
                 dashed: true,
                 locationOnPath: this.seriesAgeGroupLabelLocation,
                 labelled: true,
-                percent: false,
+                // percent: false,
                 stacked: false,
-                legend: false
+                legend: false,
+                labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
             }));
             this.seriesAgeGroupLabelLocation += 0.1;
             if (this.seriesAgeGroupLabelLocation > 0.8) {

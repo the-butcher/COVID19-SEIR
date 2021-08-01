@@ -18,10 +18,6 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         return this.modificationValues.primary;
     }
 
-    acceptUpdate(update: Partial<IModificationValuesStrain>): void {
-        this.modificationValues = {...this.modificationValues, ...update};
-    }
-
     getR0(): number {
         return this.modificationValues.r0;
     }

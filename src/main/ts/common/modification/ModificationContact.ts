@@ -54,11 +54,6 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return this.modificationValues.instant;
     }
 
-    acceptUpdate(update: Partial<IModificationValuesContact>): void {
-        this.modificationValues = {...this.modificationValues, ...update};
-        console.log('this.modificationValues', this.modificationValues);
-    }
-
     getMultiplier(contactCategoryName: string): number {
         return this.getContactCategoryMultiplier(contactCategoryName);
     }

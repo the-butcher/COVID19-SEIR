@@ -43,7 +43,7 @@ export class ControlsTime {
 
     acceptModification(modification: ModificationTime): void {
 
-        console.log('time update');
+        // console.log('time update');
 
         Controls.acceptModification(modification);
         const modificationResolver = ModificationResolverTime.getInstance();
@@ -61,7 +61,7 @@ export class ControlsTime {
                 getColumnValue: i => diffIncidences[i],
                 getValueSum: () => 0
             })
-            console.log('diffIncidences', diffIncidences);
+            // console.log('diffIncidences', diffIncidences);
         };
 
         requestAnimationFrame(() => {

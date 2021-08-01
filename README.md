@@ -90,10 +90,12 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 * AModification - isBlendable
 #### Issues
+* show absolute numbers in exposure / infected
 * exposure / day appears to give wrong (too high) numbers
 * exposure matrix has wrong values (all zero)
 * reintroduce the exposure chart view
   * zoom-y on chart-draw, not only after zooming
+* show contact diff view only in diff-display (for now)
 * allow floating point config on initial strain incidence
 * take care of corrections on matrices (bake them into matrices)
 * wiki on github

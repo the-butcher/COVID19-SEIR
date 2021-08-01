@@ -1,6 +1,7 @@
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { StorageUtil } from '../storage/StorageUtil';
 import { IModificationValues } from './../../common/modification/IModificationValues';
 import { ModelInstants } from './../../model/ModelInstants';
 import { TimeUtil } from './../../util/TimeUtil';
@@ -91,6 +92,8 @@ export class SliderModification extends Slider {
         modificationIcon.getBulletGroupElement().style.transform = 'rotate(45deg) scale(0.95)';
 
         ControlsConstants.MODIFICATION_PARAMS[modificationIcon.getKey()].handleModificationUpdate(); // update after a modification was edited
+
+        StorageUtil.getInstance().setSaveRequired(true);
 
         setTimeout(() => {
             modificationIcon.getBulletGroupElement().style.transform = 'rotate(0deg) scale(0.75)';

@@ -301,7 +301,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                 }
 
             }
-            console.log('lastDataItems', lastDataItems, new Date(dstInstant));
+            // console.log('lastDataItems', lastDataItems, new Date(dstInstant));
 
             for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 

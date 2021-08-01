@@ -48,7 +48,7 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
     }
 
     acceptUpdate(update: Partial<IModificationValuesTesting>): void {
-        this.modificationValues = {...this.modificationValues, ...update};
+        super.acceptUpdate(update);
         this.rebuildContactVals();
     }
 

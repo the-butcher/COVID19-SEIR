@@ -97,6 +97,11 @@ export class ControlsConstants {
         format: value => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`
     }
 
+    static readonly LABEL_PERCENT__FLOAT_2_ABS: ILabellingDefinition = {
+        format: value => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}% - ${(value * ChartAgeGroup.getInstance().getAbsValue()).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`
+    }
+
+
     /**
      * primarily for percentage axes
      */

@@ -1,5 +1,5 @@
+import { MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ModelInstants } from './../../model/ModelInstants';
-import { ModelConstants, MODIFICATION_NATURE, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
 
@@ -70,7 +70,10 @@ export abstract class AModification<P extends IModificationValues> implements IM
         return this.modificationValues.blendable;
     }
 
-    abstract acceptUpdate(update: Partial<P>): void
+    acceptUpdate(update: Partial<P>): void {
+        this.modificationValues = {...this.modificationValues, ...update};
+        // StorageUtil.getInstance().setSaveRequired(true);
+    }
 
     getModificationValues(): P {
         return this.modificationValues;

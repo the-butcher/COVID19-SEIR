@@ -179,7 +179,7 @@ export class StrainCalibrator {
 
         modificationValuesStrain.r0 = originalR0;
 
-        console.log('transmissionRisk', modificationValuesStrain.transmissionRisk);
+        // console.log('transmissionRisk', modificationValuesStrain.transmissionRisk);
 
     }
 

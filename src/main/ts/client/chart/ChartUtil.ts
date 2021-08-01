@@ -1,3 +1,4 @@
+import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { Legend } from '@amcharts/amcharts4/charts';
 import { Axis, Chart, Series, XYChart } from '@amcharts/amcharts4/charts';
 import { color } from '@amcharts/amcharts4/core';
@@ -39,6 +40,13 @@ export class ChartUtil {
         chart.language.locale._decimalSeparator = this.separatorDecimal;
     }
 
+    /**
+     * format the given value with the given labelling definition, with respect to the given age-group
+     * @param value
+     * @param labellingDefinition
+     * @param ageGroup
+     * @returns
+     */
     formatLabelOrTooltipValue = (value: string, labellingDefinition: ILabellingDefinition) => {
         if (value) {
             value = value.replace(this.separatorThousand, '');

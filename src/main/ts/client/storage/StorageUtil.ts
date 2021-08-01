@@ -31,14 +31,27 @@ export class StorageUtil {
     private static instance: StorageUtil;
 
     private readonly storageEnabled: boolean;
+    private saveRequired: boolean;
 
     constructor() {
         this.storageEnabled = this.evalStorageEnabled();
+        this.setSaveRequired(false);
+        window.onbeforeunload = e => {
+            if (this.saveRequired) {
+                (e || window.event).returnValue = 'leave without saving?';
+            }
+        };
+    }
+
+    setSaveRequired(saveRequired: boolean): void {
+        this.saveRequired = saveRequired;
+        document.getElementById('saveRequiredDiv').style.opacity = this.saveRequired ? '1' : '0';
     }
 
     storeModifications(): void {
         if (this.isStorageEnabled()) {
             localStorage.setItem(StorageUtil.STORAGE_KEY_MODIFICATIONS, JSON.stringify(this.createStorableConfig()));
+            StorageUtil.getInstance().setSaveRequired(false);
         }
     }
 
