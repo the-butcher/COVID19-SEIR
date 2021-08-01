@@ -1,3 +1,4 @@
+import { ModelInstants } from './../../model/ModelInstants';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModification } from '../../common/modification/IModification';
 import { IModificationValues } from '../../common/modification/IModificationValues';
@@ -321,8 +322,8 @@ export class ControlsConstants {
 
     static createWorkerInput(): IWorkerInput {
         return {
-            minInstant: SliderModification.getInstance().getMinValue(),
-            maxInstant: SliderModification.getInstance().getMaxValue(),
+            minInstant: ModelInstants.getInstance().getMinInstant(), // SliderModification.getInstance().getMinValue(),
+            maxInstant: ModelInstants.getInstance().getMaxInstant(),
             demographicsConfig: Demographics.getInstance().getDemographicsConfig(),
             modificationValues: Modifications.getInstance().buildModificationValues(),
             baseDataConfig: BaseData.getInstance().getBaseDataConfig(),

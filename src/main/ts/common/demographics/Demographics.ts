@@ -118,7 +118,7 @@ export class Demographics {
 
             if (matrixConfig.name === 'family') {
                 corrections = [
-                    0.70, // <= 04
+                    0.55, // <= 04
                     0.75, // 05-14
                     0.95, // 15-24
                     1.10, // 25-34

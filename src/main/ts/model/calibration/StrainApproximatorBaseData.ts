@@ -5,6 +5,7 @@ import { Modifications } from '../../common/modification/Modifications';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
 import { ModificationTime } from '../../common/modification/ModificationTime';
+import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { ModelConstants } from '../ModelConstants';
 import { ModelImplRoot } from '../ModelImplRoot';
@@ -40,6 +41,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
 
         this.instantDst = ModelInstants.getInstance().getMinInstant();
         this.instantPre = ModelInstants.getInstance().getPreInstant();
+
         this.referenceDataRemoved = this.baseData.findBaseData(TimeUtil.formatCategoryDate(this.instantPre));
 
     }
@@ -56,6 +58,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
          * get all strain values as currently in modifications instance
          */
         const modificationsStrain = this.modifications.findModificationsByType('STRAIN').map(m => m as ModificationStrain);
+
         const modificationTime = ModelConstants.MODIFICATION_PARAMS['TIME'].createValuesModification({
             id: 'straintime',
             instant: this.instantPre,
@@ -139,7 +142,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                 heatmapDstIncidencesB[ageGroup.getIndex()] += casesToIncidence(heatmapCasesDeltaDstAB, ageGroup.getAbsValue());
 
                 if (ageGroup.getName() === '<= 04') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
                 }
                 if (ageGroup.getName() === '05-14') {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
@@ -183,8 +186,8 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             heatmapDstIncidenceTotal += casesToIncidence(heatmapCasesDeltaDstAB, this.demographics.getAbsTotal());
 
         }
-        console.log(`pre incidence (ages age-groups, strains: ALL, date: ${TimeUtil.formatCategoryDate(this.instantPre)})`, heatmapPreIncidencesB, heatmapPreIncidenceTotal);
-        console.log(`dst incidence (ages age-groups, strains: ALL, date: ${TimeUtil.formatCategoryDate(this.instantDst)})`, heatmapDstIncidencesB, heatmapDstIncidenceTotal);
+        // console.log(`pre incidence (ages age-groups, strains: ALL, date: ${TimeUtil.formatCategoryDate(this.instantPre)})`, heatmapPreIncidencesB, heatmapPreIncidenceTotal);
+        // console.log(`dst incidence (ages age-groups, strains: ALL, date: ${TimeUtil.formatCategoryDate(this.instantDst)})`, heatmapDstIncidencesB, heatmapDstIncidenceTotal);
 
         let primaryStrainPreIncidence = heatmapPreIncidenceTotal;
         let primaryStrainDstIncidence = heatmapDstIncidenceTotal;
@@ -203,8 +206,8 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                 preIncidence: strainPreIncidence,
                 dstIncidence: strainDstIncidence
             });
-            console.log(`pre incidence (strain: ${modificationsStrain[strainIndexA].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantPre)})`, modificationsStrain[strainIndexA].getIncidence());
-            console.log(`dst incidence (strain: ${modificationsStrain[strainIndexA].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantDst)})`, modificationsStrain[strainIndexA].getIncidence());
+            // console.log(`pre incidence (strain: ${modificationsStrain[strainIndexA].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantPre)})`, modificationsStrain[strainIndexA].getIncidence());
+            // console.log(`dst incidence (strain: ${modificationsStrain[strainIndexA].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantDst)})`, modificationsStrain[strainIndexA].getIncidence());
 
         }
 
@@ -213,8 +216,8 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             preIncidence: primaryStrainPreIncidence,
             dstIncidence: primaryStrainDstIncidence,
         });
-        console.log(`pre incidence (strain: ${modificationsStrain[0].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantPre)})`, modificationsStrain[0].getIncidence());
-        console.log(`dst incidence (strain: ${modificationsStrain[0].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantDst)})`, modificationsStrain[0].getIncidence());
+        // console.log(`pre incidence (strain: ${modificationsStrain[0].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantPre)})`, modificationsStrain[0].getIncidence());
+        // console.log(`dst incidence (strain: ${modificationsStrain[0].getName()}, date: ${TimeUtil.formatCategoryDate(this.instantDst)})`, modificationsStrain[0].getIncidence());
 
         for (let strainIndexA = 0; strainIndexA < modificationsStrain.length; strainIndexA++) {
 
@@ -284,6 +287,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
 
                 // iterate if there is time between strains
                 if (modificationsStrain[strainIndex].getInstantA() > dstInstant) {
+
                     dstInstant = modificationsStrain[strainIndex].getInstantA();
                     modelData = await modelStateIntegrator.buildModelData(dstInstant, curInstant => curInstant === dstInstant, modelProgress => {
                         progressCallback({
@@ -297,6 +301,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                 }
 
             }
+            console.log('lastDataItems', lastDataItems, new Date(dstInstant));
 
             for (let strainIndex = 0; strainIndex < modificationsStrain.length; strainIndex++) {
 

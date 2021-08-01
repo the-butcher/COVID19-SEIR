@@ -93,9 +93,7 @@ A higher discovery rate means:
 * exposure / day appears to give wrong (too high) numbers
 * exposure matrix has wrong values (all zero)
 * reintroduce the exposure chart view
-* add control for blendable true|false and implement in modifications
-  * contact
-  * testing
+  * zoom-y on chart-draw, not only after zooming
 * allow floating point config on initial strain incidence
 * take care of corrections on matrices (bake them into matrices)
 * wiki on github
@@ -130,6 +128,11 @@ A higher discovery rate means:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* ~~add control for blendable true|false and implement in modifications~~
+  * ~~contact~~
+  * ~~testing~~
+* ~~blendable state for testing does not reflect saved value --> missing code in acceptModification ~~
+* ~~model does not build after zooming in --> ModelInput had invalid values~~
 * ~~have a second look at contact matrix normalization because age-groups could not be properly fit so far.~~
 * ~~vaccination must not be creatable~~
 * ~~age-group toggle from chart does not reflect in side-list~~

@@ -1,4 +1,4 @@
-import { TimeUtil } from '../util/TimeUtil';
+import { TimeUtil } from './../util/TimeUtil';
 import { ModelConstants } from './ModelConstants';
 
 export class ModelInstants {
@@ -19,6 +19,7 @@ export class ModelInstants {
         this.ticks = ticks;
         this.minInstant = Math.min(...ticks);
         this.maxInstant = Math.max(...ticks);
+        // console.log('instants', TimeUtil.formatCategoryDate(this.minInstant), TimeUtil.formatCategoryDate(this.maxInstant));
     }
 
     getPreInstant(): number {

@@ -88,7 +88,7 @@ export class IconToggle {
             this.innerPath.style.transform = 'scale(1.2, 1.2) translate(12px, 0px)';
             this.outerPath.style.fill = 'var(--color-text)';
         } else {
-            this.innerPath.style.transform = 'scale(1.0, 1.0) translate(0px, 0px)';
+            this.innerPath.style.transform = 'scale(0.8, 0.8) translate(0px, 0px)';
             this.outerPath.style.fill = 'var(--color-panel-bg)';
         }
     }

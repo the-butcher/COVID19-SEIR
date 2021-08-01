@@ -40,7 +40,7 @@ export class ControlsContact {
             handleToggle: state => {
                 this.handleChange();
             },
-            label: 'interpolate from previous'
+            label: 'smooth transition'
         });
 
         Demographics.getInstance().getContactCategories().forEach(contactCategory => {
