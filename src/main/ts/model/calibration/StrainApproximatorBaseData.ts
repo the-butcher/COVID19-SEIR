@@ -151,10 +151,10 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 0;
                 }
                 if (ageGroup.getName() === '25-34') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 4;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 0;
                 }
                 if (ageGroup.getName() === '45-54') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 0;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 2;
                 }
                 if (ageGroup.getName() === '55-64') {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 4;

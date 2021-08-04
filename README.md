@@ -89,6 +89,16 @@ A higher discovery rate means:
 * StrainApproximatorBaseData - manual increase of incidence to correct for awkward data
 * Demographics corrections on the matrices
 * AModification - isBlendable
+#### Thoughts
+* goal is to reliably identify a total share of cases identified (the model needs then to make assumptions which age-group gets which share)
+* positivity rate in pcr is influenced by antigen
+* assuming that some pcr confirm previous positi
+* found / tested_antigen = positivity_rate_antigen (the actual amount of positive tests should already reflect sensitivity)
+*
+* There are different shares of PCR and Antigen Tests per province (i.e. Vienna having almost equal shares)
+* no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
+
+
 #### Issues
 * show absolute numbers in exposure / infected
 * exposure / day appears to give wrong (too high) numbers

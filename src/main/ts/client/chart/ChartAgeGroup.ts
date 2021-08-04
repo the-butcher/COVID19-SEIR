@@ -237,7 +237,7 @@ export class ChartAgeGroup {
             // percent: false,
             stacked: false,
             legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         });
 
         this.seriesAgeGroupLabelLocation = 0.5;
@@ -1115,7 +1115,7 @@ export class ChartAgeGroup {
                     const diffCase07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
                     const diffTest07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]);
                     // totalTestsR = diffCase07 * 10000 / diffTest07;
-                    totalTestsR = diffTest07 * 1000 / ageGroupPlot.getAbsValue();
+                    totalTestsR = diffTest07 * 250 / ageGroupPlot.getAbsValue();
                 }
             }
 
