@@ -1,3 +1,4 @@
+import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
@@ -20,15 +21,21 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
     private readonly contactCategories: ContactCategory[];
     private readonly ageGroupTotalsByIndexContact: number[];
     private readonly testingValsByIndexContact: number[];
+    private maxColumnValue: number;
+    private columnSum: number;
+    private maxColumnSum: number;
 
     constructor(valuesTesting: IModificationValuesTesting) {
 
         super('RANGE', valuesTesting);
 
+        this.maxColumnValue = -1;
+        this.columnSum = -1;
         this.ageGroups = [];
         this.contactCategories = [];
         this.ageGroupTotalsByIndexContact = [];
         this.testingValsByIndexContact = [];
+        this.maxColumnSum = -1;
 
         this.absTotal = Demographics.getInstance().getAbsTotal();
 
@@ -60,19 +67,32 @@ export class ModificationTesting extends AModification<IModificationValuesTestin
         return this.testingValsByIndexContact[ageGroupIndex];
     }
 
-    getValueSum(): number {
-        let totalTestingValue = 0;
-        for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            totalTestingValue += this.getColumnValue(indexContact) * this.ageGroups[indexContact].getAbsValue();
+    getMaxColumnValue(): number {
+        if (this.maxColumnValue < 0) {
+            this.maxColumnValue = ContactCellsUtil.findMaxColumnValue(this);
         }
-        return totalTestingValue / this.absTotal;
+        return this.maxColumnValue;
+    }
+
+    getColumnSum(): number {
+        if (this.columnSum < 0) {
+            this.columnSum = ContactCellsUtil.findMatrixValue(this);
+        }
+        return this.columnSum;
+    }
+
+    getMaxColumnSum(): number {
+        return this.maxColumnSum;
     }
 
     private rebuildContactVals(): void {
+        this.maxColumnSum = 0;
         for (let ageGroupIndex = 0; ageGroupIndex < this.ageGroups.length; ageGroupIndex++) {
             let contactVal = 0;
             this.contactCategories.forEach(contactCategory => {
-                contactVal += this.getMultiplier(contactCategory.getName()) * contactCategory.getAgeGroupTotal(ageGroupIndex) /  this.ageGroupTotalsByIndexContact[ageGroupIndex];
+                const categoryContact = contactCategory.getAgeGroupTotal(ageGroupIndex) / this.ageGroupTotalsByIndexContact[ageGroupIndex];
+                contactVal += this.getMultiplier(contactCategory.getName()) * categoryContact;
+                this.maxColumnSum += categoryContact;
             });
             this.testingValsByIndexContact[ageGroupIndex] = Math.min(1, contactVal);
         }

@@ -155,15 +155,15 @@ export class StrainCalibrator {
             // single step on the strain model
             strainModel.apply(modelState, ModelStateIntegrator.DT, preInstant, modificationTimeCalibrate);
 
-            const absDeltas = strainModel.getAbsDeltas();
-            let absDeltaAvg = 0;
-            for (let i = 0; i < absDeltas.length; i++) {
-                modificationValuesStrain.preIncidences[i] *= 1 / absDeltas[i]; // this could be a place to calibrate testing-ratio
-                absDeltaAvg += absDeltas[i];
+            const nrmDeltas = strainModel.getNrmDeltas();
+            let nrmDeltaAvg = 0;
+            for (let i = 0; i < nrmDeltas.length; i++) {
+                modificationValuesStrain.preIncidences[i] *= 1 / nrmDeltas[i]; // this could be a place to calibrate testing-ratio
+                nrmDeltaAvg += nrmDeltas[i];
             }
-            absDeltaAvg /= absDeltas.length;
+            nrmDeltaAvg /= nrmDeltas.length;
 
-            modificationValuesStrain.transmissionRisk *= absDeltaAvg; // with different incidences there are slightly different transmission risks needed to maintain equilibrium
+            modificationValuesStrain.transmissionRisk *= nrmDeltaAvg; // with different incidences there are slightly different transmission risks needed to maintain equilibrium
 
             const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N));
             const modelIncidence = modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * demographics.getAbsTotal() * 100000 / demographics.getAbsTotal();

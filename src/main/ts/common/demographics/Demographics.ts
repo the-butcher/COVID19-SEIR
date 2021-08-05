@@ -42,8 +42,9 @@ export class Demographics {
     private ageGroups: AgeGroup[];
     private contactCategories: ContactCategory[];
     private maxCellValue: number;
+    private readonly columnValues: number[];
     private maxColumnValue: number;
-    private valueSum: number;
+    private matrixValue: number;
 
     constructor(path: string, demographicsConfig: IDemographicsConfig) {
 
@@ -52,6 +53,7 @@ export class Demographics {
 
         this.demographicsConfig = demographicsConfig;
         this.ageGroups = [];
+        this.columnValues = [];
 
         let pN1 = 0;
         for (let ageGroupIndex = 0; ageGroupIndex < demographicsConfig.groups.length; ageGroupIndex++) {
@@ -200,8 +202,8 @@ export class Demographics {
          * calculate a value total across all categories and age groups
          */
         // let populationContactTotal = 0;
-        this.valueSum = 0; // the total cell value in the contact matrix
-        let populationG;
+        this.matrixValue = 0; // the total cell value in the contact matrix
+        // let populationG;
         this.contactCategories = [];
 
         contactCategoryParams.forEach(contactCategoryParam => {
@@ -209,14 +211,14 @@ export class Demographics {
             const contactCategory = new ContactCategory(contactCategoryParam);
             this.contactCategories.push(contactCategory);
 
-            let matrixSumCategory = 0;
-            for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-                populationG = this.ageGroups[indexContact].getAbsValue(); // population of the "contact" age group
-                for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
-                    matrixSumCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
-                }
-            }
-            this.valueSum += matrixSumCategory;
+            // let matrixSumCategory = 0;
+            // for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
+            //     populationG = this.ageGroups[indexContact].getAbsValue(); // population of the "contact" age group
+            //     for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
+            //         matrixSumCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
+            //     }
+            // }
+            // this.valueSum += matrixSumCategory;
 
         });
 
@@ -235,9 +237,16 @@ export class Demographics {
                 colTotal += curCombinedCellValue;
                 this.maxCellValue = Math.max(this.maxCellValue, curCombinedCellValue);
             }
+            this.columnValues[indexContact] = colTotal;
+            this.matrixValue += colTotal;
             this.maxColumnValue = Math.max(this.maxColumnValue, colTotal);
         };
+        // console.log('this.matrixValue', this.matrixValue, this.columnValues.reduce((prev, curr) => prev + curr, 0));
 
+    }
+
+    getInstant(): number {
+        return -1;
     }
 
     getPath(): string {
@@ -248,8 +257,12 @@ export class Demographics {
         return this.demographicsConfig;
     }
 
-    getValueSum(): number {
-        return this.valueSum;
+    getMatrixValue(): number {
+        return this.matrixValue;
+    }
+
+    getColumnValue(ageGroupIndex: number): number {
+        return this.columnValues[ageGroupIndex];
     }
 
     getMaxColumnValue(): number {

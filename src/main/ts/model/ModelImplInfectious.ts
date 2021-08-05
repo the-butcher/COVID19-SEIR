@@ -128,8 +128,8 @@ export class ModelImplInfectious implements IModelSeir {
 
                     const increments = ModelState.empty();
 
-                    const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
-                    const continuationValue = continuationRate * modelState.getNrmValue(sourceCompartment);
+                    // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
+                    const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
 
                     /**
                      * move from infectious compartment to next infectious compartment, if any
@@ -141,13 +141,13 @@ export class ModelImplInfectious implements IModelSeir {
                     }
 
                     /**
-                     * at incubation time (which might be the time that infections are registered) copy the relevant number into the incidence model
+                     * at incubation time (which is assumed to be the time that infections are registered) copy the relevant number into the incidence model
                      * only consider cases that have been discovered
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
-                        const compartmentCases = this.compartmentsIncidence[0]; // this.parentModel.getIncidenceModel(this.ageGroupIndex).getIncomingCompartment();
+                        const compartmentDiscoveredCases = this.compartmentsIncidence[0];
                         const discoveredNrmCases = continuationValue * modificationTime.getTestingRatio(this.ageGroupIndex);
-                        increments.addNrmValue(discoveredNrmCases, compartmentCases);
+                        increments.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
                     }
                     return increments;
 
@@ -168,8 +168,8 @@ export class ModelImplInfectious implements IModelSeir {
 
                 apply: (modelState: IModelState, dT: number, tT: number) => {
 
-                    const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
-                    const continuationValue = continuationRate * modelState.getNrmValue(sourceCompartment);
+                    // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
+                    const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
                     const increments = ModelState.empty();
                     increments.addNrmValue(-continuationValue, sourceCompartment);
                     if (targetCompartment) {

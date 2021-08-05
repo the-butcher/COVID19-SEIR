@@ -3,6 +3,7 @@ import { BaseData } from '../../model/calibration/BaseData';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { ChartContactColumns } from '../chart/ChartContactColumns';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { Demographics } from './../../common/demographics/Demographics';
 import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
 import { ModelConstants } from './../../model/ModelConstants';
@@ -30,7 +31,7 @@ export class ControlsTime {
 
     constructor() {
         this.chartContactMatrix = new ChartContactMatrix('chartTimeDiv', false);
-        this.chartDiffIncidences = new ChartContactColumns('chartDiffIncidenceDiv', -20, 20);
+        this.chartDiffIncidences = new ChartContactColumns('chartDiffIncidenceDiv', -20, 20, ControlsConstants.LABEL_ABSOLUTE_FIXED, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2);
     }
 
     getChartContactMatrix(): ChartContactMatrix {
@@ -47,25 +48,28 @@ export class ControlsTime {
 
         Controls.acceptModification(modification);
         const modificationResolver = ModificationResolverTime.getInstance();
-        const contactCells = modificationResolver.findContactCells(modification.getInstantA());
-        const maxCellValue = modificationResolver.getMaxCellValue();
-        const maxColumnValue = modificationResolver.getMaxColumnValue();
-
+        const contactMatrix = modificationResolver.findContactMatrix(modification.getInstantA());
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
         const dataItem = ChartAgeGroup.getInstance().findDataItemByInstant(modification.getInstant());
         const baseIncidences = BaseData.getInstance().findIncidences(modification.getInstant(), ageGroups);
         if (ObjectUtil.isNotEmpty(baseIncidences)) {
+
+            // build a difference for each age group
             const diffIncidences = ageGroups.map(g => dataItem.valueset[g.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL] - baseIncidences[g.getIndex()]);
+
+            const maxColumnSum = ageGroups.length * 10;
             this.chartDiffIncidences.acceptContactColumns({
                 getColumnValue: i => diffIncidences[i],
-                getValueSum: () => 0
+                getMaxColumnValue: () => 0,
+                getColumnSum: () => 0,
+                getMaxColumnSum: () => maxColumnSum,
             })
             // console.log('diffIncidences', diffIncidences);
         };
 
         requestAnimationFrame(() => {
-            this.chartContactMatrix.acceptContactCells(modification.getInstant(), contactCells, maxCellValue, maxColumnValue);
+            this.chartContactMatrix.acceptContactMatrix(contactMatrix);
         });
 
     }

@@ -1,6 +1,4 @@
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { Demographics } from '../demographics/Demographics';
-import { ContactMatrixSums } from './../../client/controls/ContactMatrixSums';
 import { TimeUtil } from './../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesContact } from './IModificationValuesContact';
@@ -80,7 +78,8 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
     }
 
     getValue(instant: number): number {
-        return new ContactMatrixSums(instant, this.getModification(instant), 'CONTACT_PARTICIPANT').getValueSum() / Demographics.getInstance().getValueSum();
+        const modification = this.getModification(instant);
+        return modification.getMatrixSum() / modification.getMaxMatrixSum();
     }
 
 }

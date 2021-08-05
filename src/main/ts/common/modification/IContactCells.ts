@@ -8,7 +8,22 @@ import { IContactColumns } from './IContactColumns';
  */
 export interface IContactCells {
 
+    /**
+     * get the cell value identified by contact-index and participant-index
+     * @param indexContact
+     * @param indexParticipant
+     */
     getCellValue(indexContact: number, indexParticipant: number): number;
+
+    /**
+     * get the maximum cell value in this instance
+     */
+    getMaxCellValue(): number;
+
+    /**
+     * the the sum of all cell values
+     */
+    getCellSum(): number;
 
     logSummary(ageGroupName: string): void;
 

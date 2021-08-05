@@ -135,6 +135,7 @@ export class ModelStateIntegrator {
 
             this.integrate(ModelStateIntegrator.DT, this.curInstant);
 
+            // sum up strain exposures to a single exposure matrix
             modificationValuesStrain.forEach(modificationValueStrain => {
                 const strainModel = this.model.findStrainModel(modificationValueStrain.id);
                 const strainExposure = strainModel.getNrmExposure();

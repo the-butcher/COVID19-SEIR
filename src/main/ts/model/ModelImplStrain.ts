@@ -97,7 +97,7 @@ export class ModelImplStrain implements IModelSeir {
         return initialState;
     }
 
-    getAbsDeltas(): number[] {
+    getNrmDeltas(): number[] {
         return this.nrmDeltas;
     }
 
@@ -129,6 +129,7 @@ export class ModelImplStrain implements IModelSeir {
 
             this.nrmExposure[infectiousModelContact.getAgeGroupIndex()] = [];
 
+            // calculate a normalized value of infectious individuals
             nrmI = 0
             infectiousModelContact.getCompartments().forEach(compartmentI => {
                 if (compartmentI.getCompartmentType() === ECompartmentType.I__INFECTIOUS) {
@@ -141,6 +142,7 @@ export class ModelImplStrain implements IModelSeir {
 
                 this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] = 0;
 
+                // contact rate and exposed compartment
                 const baseContactRate = modificationTime.getCellValue(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
                 compartmentE = infectiousModelParticipant.getFirstCompartment();
 
@@ -158,20 +160,21 @@ export class ModelImplStrain implements IModelSeir {
                     this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
 
                 });
-                result.addNrmValue(nrmESum, compartmentE); // wrap total exposure into a single call to save some time
+                result.addNrmValue(nrmESum, compartmentE);
 
             });
 
         });
 
+        // calculate a ratio between infections and exposure to be used by calibration
         this.infectiousModels.forEach(infectiousModelContact => {
             this.nrmDeltas[infectiousModelContact.getAgeGroupIndex()] = nrm_ISums[infectiousModelContact.getAgeGroupIndex()] / nrmSESums[infectiousModelContact.getAgeGroupIndex()];
         });
 
         /**
-         * S->E = S * SUM(I / Tinf)
-         * E->I = lat * E
-         * I->S = I / Tinf
+         * S->E = S * SUM(I / Tinfectious)
+         * E->I = latency * E
+         * I->S = I / Tinfectious
          */
         // console.log('absSESums', absSESums, 'abs_ISums', abs_ISums, 'absDeltas', absDeltas);
 

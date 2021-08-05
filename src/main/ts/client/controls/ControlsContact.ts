@@ -68,8 +68,7 @@ export class ControlsContact {
     }
 
     applyToChartContact(): void {
-        const demographics = Demographics.getInstance();
-        this.chartContact.acceptContactCells(this.modification.getInstant(), this.modification, demographics.getMaxCellValue(), demographics.getMaxColumnValue());
+        this.chartContact.acceptContactMatrix(this.modification);
     }
 
     acceptModification(modification: ModificationContact): void {

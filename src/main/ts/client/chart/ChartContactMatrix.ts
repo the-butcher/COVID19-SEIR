@@ -1,4 +1,3 @@
-import { ContactMatrixSums } from './../controls/ContactMatrixSums';
 import { CategoryAxis, ColumnSeries, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
 import { color, create, Label, percent, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -9,8 +8,6 @@ import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ControlsConstants } from './../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
-import { IconMatrixAxis } from './IconMatrixAxis';
-import { IContactCells } from '../../common/modification/IContactCells';
 
 export interface IChartData {
     categoryX?: string;
@@ -23,7 +20,7 @@ export interface IChartData {
     plotY?: number;
 }
 
-export type AXIS_DIRECTION = 'CONTACT_PARTICIPANT' | 'PARTICIPANT_CONTACT';
+// export type AXIS_DIRECTION = 'CONTACT_PARTICIPANT' | 'PARTICIPANT_CONTACT';
 
 /**
  * contact-matrix chart
@@ -43,17 +40,14 @@ export class ChartContactMatrix {
     private readonly seriesPlot: LineSeries;
 
     private fullDataUpdate: boolean;
-    private axisDirection: AXIS_DIRECTION;
-    private contactCells: IContactCells;
+    // private axisDirection: AXIS_DIRECTION;
+    private contactMatrix: IContactMatrix;
 
-    private instant: number;
-    private maxCellValue: number;
-    private maxColumnValue: number
     private readonly valueTotalLabel: Label;
 
     private readonly showToggleAndPercentage: boolean;
 
-    private axisIcon: IconMatrixAxis;
+    // private axisIcon: IconMatrixAxis;
 
     constructor(container: string, showToggleAndPercentage: boolean) {
 
@@ -62,7 +56,7 @@ export class ChartContactMatrix {
 
         this.fullDataUpdate = true;
         this.showToggleAndPercentage = showToggleAndPercentage;
-        this.axisDirection = 'CONTACT_PARTICIPANT';
+        // this.axisDirection = 'CONTACT_PARTICIPANT';
 
         this.chart = create(container, XYChart);
         this.chart.leftAxesContainer.layout = 'absolute';
@@ -164,11 +158,11 @@ export class ChartContactMatrix {
             if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
                 const chartData = target.dataItems.values[indexCurr]?.dataContext as IChartData;
                 const rate = chartData.ratio.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
-                if (this.axisDirection === 'CONTACT_PARTICIPANT') {
+                // if (this.axisDirection === 'CONTACT_PARTICIPANT') {
                     return `${ChartUtil.getInstance().formatContactLine('contact', chartData.plotX)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
-                } else {
-                    return `${ChartUtil.getInstance().formatContactLine('participant', chartData.plotX)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
-                }
+                // } else {
+                //     return `${ChartUtil.getInstance().formatContactLine('participant', chartData.plotX)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
+                // }
             }
         });
 
@@ -184,7 +178,7 @@ export class ChartContactMatrix {
         columnTemplate.height = percent(98);
         columnTemplate.tooltipText = '{categoryX}';
         columnTemplate.events.on('hit', e => {
-            this.contactCells.logSummary(e.target.dataItem['categoryX']);
+            this.contactMatrix.logSummary(e.target.dataItem['categoryX']);
         });
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
@@ -193,11 +187,11 @@ export class ChartContactMatrix {
                 const chartData = target.dataItem.dataContext as IChartData;
                 const rate = chartData.ratio.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
                 const total = (chartData.ratio * ageGroups[chartData.indexX].getAbsValue()).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
-                if (this.axisDirection === 'CONTACT_PARTICIPANT') {
+                // if (this.axisDirection === 'CONTACT_PARTICIPANT') {
                     return `${ChartUtil.getInstance().formatContactLine('contact', chartData.categoryX)}\n${ChartUtil.getInstance().formatContactLine('participant', chartData.categoryY)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}\n${ChartUtil.getInstance().formatContactLine('total', total)}`;
-                } else {
-                    return `${ChartUtil.getInstance().formatContactLine('participant', chartData.categoryX)}\n${ChartUtil.getInstance().formatContactLine('contact', chartData.categoryY)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}\n${ChartUtil.getInstance().formatContactLine('total', total)}`;
-                }
+                // } else {
+                //     return `${ChartUtil.getInstance().formatContactLine('participant', chartData.categoryX)}\n${ChartUtil.getInstance().formatContactLine('contact', chartData.categoryY)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}\n${ChartUtil.getInstance().formatContactLine('total', total)}`;
+                // }
             }
         });
 
@@ -233,19 +227,6 @@ export class ChartContactMatrix {
         this.chart.events.on('ready', e => {
             (this.seriesHeat.bulletsContainer.element.node.parentNode as SVGGElement).setAttributeNS(null, 'clip-path', '');
             (this.seriesPlot.element.node.firstChild as SVGGElement).setAttributeNS(null, 'clip-path', '');
-            setTimeout(() => {
-
-                this.axisIcon = new IconMatrixAxis();
-                document.getElementById(container).appendChild(this.axisIcon.getSvgContainer());
-                this.axisIcon.getSvgContainer().addEventListener('pointerup', () => {
-                    this.toggleAxes();
-                });
-                this.axisIcon.getSvgContainer().style.display = this.showToggleAndPercentage ? 'block' : 'none';
-
-                this.toggleAxisContact();
-
-
-            }, 100);
         });
 
     }
@@ -254,65 +235,32 @@ export class ChartContactMatrix {
         this.chart.exporting.export("png");
     }
 
-    toggleAxisContact(): void {
-        this.axisDirection = 'CONTACT_PARTICIPANT';
-        this.xAxisPlot.title.text = 'contact';
-        this.yAxisHeat.title.text = 'participant';
-        this.axisIcon.setAngle(0);
-    }
+    async acceptContactMatrix(contactMatrix: IContactMatrix): Promise<void> {
 
-    toggleAxisParticipant(): void {
-        this.axisDirection = 'PARTICIPANT_CONTACT';
-        this.xAxisPlot.title.text = 'participant';
-        this.yAxisHeat.title.text = 'contact';
-        this.axisIcon.setAngle(-90);
-    }
+        this.contactMatrix = contactMatrix;
 
-    toggleAxes(): void {
-        if (this.axisDirection === 'CONTACT_PARTICIPANT') {
-            this.toggleAxisParticipant();
-        } else {
-            this.toggleAxisContact();
-        }
-        this.acceptContactCells(this.instant, this.contactCells, this.maxCellValue, this.maxColumnValue);
-    }
-
-    async acceptContactCells(instant: number, contactCells: IContactCells, maxCellValue: number, maxColumnValue: number): Promise<void> {
-
-        this.instant = instant;
-        this.contactCells = contactCells;
-        this.maxCellValue = maxCellValue;
-        this.maxColumnValue = maxColumnValue;
-
-        const demographics = Demographics.getInstance();
         const chartData: IChartData[] = [];
         const plotData: IChartData[] = [];
-        const ageGroups = demographics.getAgeGroups();
+        const ageGroups = Demographics.getInstance().getAgeGroups();
 
         const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
         heatRule.minValue = 0;
         heatRule.maxValue = 1;
-        this.yAxisPlot.max = this.maxColumnValue;
+        this.yAxisPlot.max = contactMatrix.getMaxColumnValue();
 
-        let matrixSum = 0;
+        // let matrixValue = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {
-            let columnValue = 0;
+            const columnValue = contactMatrix.getColumnValue(indexX);
             for (let indexY = 0; indexY < ageGroups.length; indexY++) {
 
-                let cellValue = this.axisDirection === 'CONTACT_PARTICIPANT' ? this.contactCells.getCellValue(indexX, indexY) : this.contactCells.getCellValue(indexY, indexX);
-                const population = this.axisDirection === 'CONTACT_PARTICIPANT' ? ageGroups[indexX].getAbsValue() : ageGroups[indexY].getAbsValue();
-
-                columnValue += cellValue;
-                matrixSum += cellValue * population;
-
-                cellValue = Math.max(0.00000000001, cellValue);
+                const cellValue = Math.max(0.00000000001, this.contactMatrix.getCellValue(indexX, indexY));
                 chartData.push({
                     categoryX: ageGroups[indexX].getName(),
                     categoryY: ageGroups[indexY].getName(),
                     indexX,
                     indexY,
                     ratio: cellValue,
-                    gamma: Math.pow(cellValue / this.maxCellValue, 1 / 1.25), // apply some gamma for better value perception
+                    gamma: Math.pow(cellValue / contactMatrix.getMaxCellValue(), 1 / 1.25), // apply some gamma for better value perception
                 });
 
             }
@@ -326,11 +274,13 @@ export class ChartContactMatrix {
 
         chartData.push(...plotData);
 
-        matrixSum = matrixSum / demographics.getValueSum();
+        const matrixValue = contactMatrix.getMatrixSum() / contactMatrix.getMaxMatrixSum();
+        // console.log('matrixValue', contactMatrix.getMatrixSum(), contactMatrix.getMaxMatrixSum());
+
         if (this.showToggleAndPercentage) {
-            this.valueTotalLabel.text = (matrixSum * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+            this.valueTotalLabel.text = (matrixValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
         } else {
-            this.valueTotalLabel.text = TimeUtil.formatCategoryDate(this.instant);
+            this.valueTotalLabel.text = TimeUtil.formatCategoryDate(contactMatrix.getInstant());
         }
 
         if (this.fullDataUpdate) {
@@ -347,7 +297,7 @@ export class ChartContactMatrix {
         }
 
         // full update required after setting all values to 0 (maybe an amcharts bug)
-        this.fullDataUpdate = matrixSum === 0;
+        this.fullDataUpdate = matrixValue === 0;
 
     }
 

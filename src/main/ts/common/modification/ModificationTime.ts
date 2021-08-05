@@ -1,6 +1,8 @@
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
+import { ContactCellsUtil } from '../../util/ContactCellsUtil';
+import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
-import { IContactCells } from './IContactCells';
+import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationContact } from './ModificationContact';
 import { ModificationResolverContact } from './ModificationResolverContact';
@@ -19,7 +21,7 @@ import { ModificationVaccination } from './ModificationVaccination';
  * @author h.fleischer
  * @since 18.04.2021
  */
-export class ModificationTime extends AModification<IModificationValuesTime> implements IContactCells {
+export class ModificationTime extends AModification<IModificationValuesTime> implements IContactMatrix {
 
     private modificationContact: ModificationContact;
     private modificationTesting: ModificationTesting;
@@ -27,8 +29,14 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private modificationSeasonality: ModificationSeasonality;
     private modificationSettings: ModificationSettings;
 
+    private maxCellValue: number;
+    private maxColumnValue: number;
+    private valueSum: number;
+    private columnValues: number[];
+
     constructor(modificationParams: IModificationValuesTime) {
         super('INSTANT', modificationParams);
+        this.maxCellValue = -1;
     }
 
     logSummary(): void {
@@ -68,6 +76,17 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationVaccination = Modifications.getInstance().findModificationsByType('VACCINATION')[0] as ModificationVaccination; // not mutable, thus reusable
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
         this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
+        this.resetValues();
+    }
+
+    resetValues(): void {
+        this.maxCellValue = -1;
+        this.maxColumnValue = -1;
+        this.valueSum = -1;
+        this.columnValues = [];
+        for (let indexContact = 0; indexContact < Demographics.getInstance().getAgeGroups().length; indexContact++) {
+            this.columnValues[indexContact] = -1;
+        }
     }
 
     getSeasonality(): number {
@@ -92,6 +111,50 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         return this.getContactValue(indexContact, indexParticipant) * multiplierTesting *  multiplierSeasonality;
 
+    }
+
+    getMaxCellValue(): number {
+        if (this.maxCellValue < 0) {
+            this.maxCellValue = ContactCellsUtil.findMaxCellValue(this);
+        }
+        return this.maxCellValue;
+    }
+
+    getColumnValue(indexAgeGroup: number): number {
+        if (this.columnValues[indexAgeGroup] < 0) {
+            this.columnValues[indexAgeGroup] = ContactCellsUtil.findColumnValue(indexAgeGroup, this);
+        }
+        return this.columnValues[indexAgeGroup];
+    }
+
+    getMaxColumnValue(): number {
+        if (this.maxColumnValue < 0) {
+            this.maxColumnValue = ContactCellsUtil.findMaxColumnValue(this);
+        }
+        return this.maxColumnValue;
+    }
+
+    getCellSum(): number {
+        return this.getMatrixSum();
+    }
+
+    getColumnSum(): number {
+        return this.getMatrixSum();
+    }
+
+    getMatrixSum(): number {
+        if (this.valueSum < 0) {
+            this.valueSum = ContactCellsUtil.findMatrixValue(this);
+        }
+        return this.valueSum;
+    }
+
+    getMaxColumnSum(): number {
+        return this.getMaxMatrixSum();
+    }
+
+    getMaxMatrixSum(): number {
+        return this.getMatrixSum();
     }
 
     getContactValue(indexContact: number, indexParticipant: number): number {

@@ -1,3 +1,4 @@
+import { ControlsConstants } from './../gui/ControlsConstants';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationTesting } from '../../common/modification/ModificationTesting';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -31,7 +32,7 @@ export class ControlsTesting {
 
     constructor() {
 
-        this.chartTesting = new ChartContactColumns('chartTestingDiv', 0.00, 1.01);
+        this.chartTesting = new ChartContactColumns('chartTestingDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
         this.slidersTesting = [];
 
         this.iconBlendable = new IconToggle({

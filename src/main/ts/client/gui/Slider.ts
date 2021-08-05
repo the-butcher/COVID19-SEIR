@@ -283,7 +283,7 @@ export class Slider {
 
     setRange(range: number[]): void {
 
-        console.warn('range', range);
+        // console.warn('range', range);
 
         this.minValue = Math.min(...range);
         this.maxValue = Math.max(...range);

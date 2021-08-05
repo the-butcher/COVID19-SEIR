@@ -1,10 +1,10 @@
+import { ILabellingDefinition } from './../gui/ControlsConstants';
 import { CategoryAxis, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
 import { color, create, Label, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IContactColumns } from '../../common/modification/IContactColumns';
-import { ModificationTesting } from '../../common/modification/ModificationTesting';
 import { ControlsConstants } from '../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
 
@@ -27,15 +27,17 @@ export class ChartContactColumns {
     private readonly yAxis: ValueAxis;
     private readonly seriesHeat: LineSeries;
     private readonly valueTotalLabel: Label;
+    private readonly labellingDefinitionTooltip: ILabellingDefinition;
 
     private fullDataUpdate: boolean;
 
-    constructor(container: string, yMin: number, yMax: number) {
+    constructor(container: string, yMin: number, yMax: number, labellingDefinitionAxis: ILabellingDefinition, labellingDefinitionTooltip: ILabellingDefinition) {
 
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
 
         this.fullDataUpdate = true;
+        this.labellingDefinitionTooltip = labellingDefinitionTooltip;
 
         this.chart = create(container, XYChart);
         this.chart.zoomOutButton.disabled = true;
@@ -62,7 +64,7 @@ export class ChartContactColumns {
         ChartUtil.getInstance().configureAxis(this.yAxis, 'cases discovered');
         this.yAxis.tooltip.disabled = true;
         this.yAxis.renderer.labels.template.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, ControlsConstants.LABEL_PERCENT___FIXED);
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, labellingDefinitionAxis);
         });
 
         this.yAxis.min = yMin;
@@ -111,23 +113,26 @@ export class ChartContactColumns {
 
     }
 
-    async acceptContactColumns(modification: IContactColumns): Promise<void> {
+    async acceptContactColumns(contactColumns: IContactColumns): Promise<void> {
+
+        // console.log('contactColumns', contactColumns);
 
         const demographics = Demographics.getInstance();
         const chartData = [];
         const ageGroups = demographics.getAgeGroups();
 
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
-            const testingVal = modification.getColumnValue(indexContact);
+            const testingVal = contactColumns.getColumnValue(indexContact);
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
                 participantY: testingVal,
-                label: ControlsConstants.LABEL_PERCENT__FLOAT_2.format(testingVal), // (testingVal * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2) + '%',
+                label: this.labellingDefinitionTooltip.format(testingVal),
                 color: ChartUtil.getInstance().toColor(testingVal, ControlsConstants.HEATMAP_______PLAIN) // INCIDENCE is for color only
             });
         }
 
-        this.valueTotalLabel.text = (modification.getValueSum() * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        const columnValue = contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
+        this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;

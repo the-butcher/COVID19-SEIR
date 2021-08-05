@@ -219,7 +219,7 @@ export class ControlsConstants {
             showInEditor: modification => {
                 ControlsTime.getInstance().acceptModification(modification as ModificationTime);
             },
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2 //FIXED
         },
         'STRAIN': {
             icon: 'M 7.85 -0.98 H 7.1 c -1.75 0 -2.62 -2.11 -1.39 -3.35 L 6.24 -4.86 A 0.98 0.98 90 0 0 4.86 -6.24 L 4.33 -5.72 c -1.24 1.24 -3.35 0.36 -3.35 -1.39 V -7.85 a 0.98 0.98 90 0 0 -1.96 0 V -7.1 c 0 1.75 -2.11 2.62 -3.35 1.39 L -4.86 -6.24 A 0.98 0.98 90 0 0 -6.24 -4.86 l 0.53 0.53 c 1.24 1.24 0.36 3.35 -1.39 3.35 H -7.85 a 0.98 0.98 90 1 0 0 1.96 H -7.1 c 1.75 0 2.62 2.11 1.39 3.35 L -6.24 4.86 A 0.98 0.98 90 0 0 -4.86 6.24 l 0.53 -0.53 c 1.24 -1.24 3.35 -0.36 3.35 1.39 v 0.74 a 0.98 0.98 90 0 0 1.96 0 V 7.1 c 0 -1.75 2.11 -2.62 3.35 -1.39 L 4.86 6.24 A 0.98 0.98 90 0 0 6.24 4.86 l -0.53 -0.53 c -1.24 -1.24 -0.36 -3.35 1.39 -3.35 h 0.74 a 0.98 0.98 90 1 0 0 -1.96 Z M -1.1 0.55 a 1.66 1.66 90 1 1 1.66 -1.66 A 1.66 1.66 90 0 1 -1.1 0.55 Z m 2.76 1.93 a 0.83 0.83 90 1 1 0.83 -0.83 A 0.83 0.83 90 0 1 1.66 2.48 Z',

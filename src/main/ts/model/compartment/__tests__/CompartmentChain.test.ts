@@ -72,7 +72,8 @@ describe("test value", () => {
             dstIncidence: 1,
             deletable: true,
             draggable: true,
-            primary: false
+            primary: false,
+            blendable: false
         };
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
         let totalReproduction = 0;
