@@ -36,7 +36,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     constructor(modificationParams: IModificationValuesTime) {
         super('INSTANT', modificationParams);
-        this.maxCellValue = -1;
+        this.resetValues();
     }
 
     logSummary(): void {

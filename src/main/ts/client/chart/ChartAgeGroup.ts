@@ -1,4 +1,4 @@
-import { CategoryAxis, Column, ColumnSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
+import { CategoryAxis, Column, ColumnSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
@@ -75,6 +75,7 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupIncidenceByStrain: Map<string, ChartAgeGroupSeries>;
 
     protected readonly seriesAgeGroupCases: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupCasesR: StepLineSeries;
 
     protected readonly seriesAgeGroupSusceptible: ChartAgeGroupSeries;
 
@@ -239,6 +240,14 @@ export class ChartAgeGroup {
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         });
+        this.seriesAgeGroupCasesR = this.chart.series.push(new StepLineSeries());
+        this.seriesAgeGroupCasesR.dataFields.categoryX =  ChartAgeGroup.FIELD_CATEGORY_X;
+        // this.seriesAgeGroupCasesR.hiddenInLegend = true;
+        this.seriesAgeGroupCasesR.dataFields.valueY = 'ageGroupCasesR';
+        this.seriesAgeGroupCasesR.fillOpacity = 0.5;
+        this.seriesAgeGroupCasesR.stroke = null;
+        this.seriesAgeGroupCasesR.xAxis = this.xAxis;
+        this.seriesAgeGroupCasesR.yAxis = this.yAxisPlotAbsolute;
 
         this.seriesAgeGroupLabelLocation = 0.5;
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
@@ -1102,11 +1111,13 @@ export class ChartAgeGroup {
 
             const dataItem14 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 14));
             const dataItem07 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
+            const dataItem01 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 1));
             const dataItem00 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
             let ageGroupRemovedVR1 = null;
             let ageGroupRemovedVR2 = null;
             let ageGroupIncidenceR = null;
             let totalTestsR = null;
+            let seriesAgeGroupCasesR = null;
             if (dataItem07 && dataItem00) {
                 ageGroupRemovedVR1 = BaseData.getVacc1(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupRemovedVR2 = BaseData.getVacc2(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
@@ -1116,8 +1127,12 @@ export class ChartAgeGroup {
                     const diffTest07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]);
                     // totalTestsR = diffCase07 * 10000 / diffTest07;
                     totalTestsR = diffTest07 * 250 / ageGroupPlot.getAbsValue();
+                    const diffCase01 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem01[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
+                    seriesAgeGroupCasesR = diffCase01;
                 }
             }
+
+            console.log('seriesAgeGroupCasesR', seriesAgeGroupCasesR);
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1135,7 +1150,8 @@ export class ChartAgeGroup {
                 ageGroupIncidence,
                 ageGroupIncidenceR,
                 totalTestsR,
-                ageGroupCases
+                ageGroupCases,
+                seriesAgeGroupCasesR
             }
 
             modificationValuesStrain.forEach(modificationValueStrain => {

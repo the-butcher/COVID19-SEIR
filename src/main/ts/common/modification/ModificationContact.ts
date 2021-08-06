@@ -33,12 +33,21 @@ export class ModificationContact extends AModification<IModificationValuesContac
         this.ageGroups.push(...demographics.getAgeGroups());
         this.contactCategories.push(...demographics.getContactCategories());
 
+        this.resetValues();
+
+    }
+
+    acceptUpdate(update: Partial<IModificationValuesContact>): void {
+        super.acceptUpdate(update);
+        this.resetValues();
+    }
+
+    resetValues(): void {
         this.matrixValue = -1;
         this.columnValues = [];
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
             this.columnValues[indexContact] = -1;
         }
-
     }
 
     logSummary(ageGroupName: string): void {

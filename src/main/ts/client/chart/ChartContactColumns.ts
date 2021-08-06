@@ -27,6 +27,8 @@ export class ChartContactColumns {
     private readonly yAxis: ValueAxis;
     private readonly seriesHeat: LineSeries;
     private readonly valueTotalLabel: Label;
+
+    private readonly labellingDefinitionAxis: ILabellingDefinition;
     private readonly labellingDefinitionTooltip: ILabellingDefinition;
 
     private fullDataUpdate: boolean;
@@ -37,6 +39,7 @@ export class ChartContactColumns {
         useTheme(am4themes_animated);
 
         this.fullDataUpdate = true;
+        this.labellingDefinitionAxis = labellingDefinitionAxis;
         this.labellingDefinitionTooltip = labellingDefinitionTooltip;
 
         this.chart = create(container, XYChart);
@@ -132,7 +135,8 @@ export class ChartContactColumns {
         }
 
         const columnValue = contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
-        this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        // this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        this.valueTotalLabel.text = this.labellingDefinitionTooltip.format(columnValue); // ControlsConstants.LOCALE_FORMAT_FIXED (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;

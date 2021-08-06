@@ -31,7 +31,7 @@ export class ControlsTime {
 
     constructor() {
         this.chartContactMatrix = new ChartContactMatrix('chartTimeDiv', false);
-        this.chartDiffIncidences = new ChartContactColumns('chartDiffIncidenceDiv', -20, 20, ControlsConstants.LABEL_ABSOLUTE_FIXED, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2);
+        this.chartDiffIncidences = new ChartContactColumns('chartDiffIncidenceDiv', -20, 20, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2);
     }
 
     getChartContactMatrix(): ChartContactMatrix {
@@ -57,12 +57,13 @@ export class ControlsTime {
 
             // build a difference for each age group
             const diffIncidences = ageGroups.map(g => dataItem.valueset[g.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL] - baseIncidences[g.getIndex()]);
-
+            const columnSum = diffIncidences.reduce((prev, curr) => prev + curr, 0);
             const maxColumnSum = ageGroups.length * 10;
+
             this.chartDiffIncidences.acceptContactColumns({
                 getColumnValue: i => diffIncidences[i],
                 getMaxColumnValue: () => 0,
-                getColumnSum: () => 0,
+                getColumnSum: () => columnSum,
                 getMaxColumnSum: () => maxColumnSum,
             })
             // console.log('diffIncidences', diffIncidences);

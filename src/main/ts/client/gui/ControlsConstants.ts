@@ -211,7 +211,7 @@ export class ControlsConstants {
                 ChartAgeGroup.getInstance().setInstant(instant);
             },
             getModificationResolver: () => {
-                console.log('create or get time resolver');
+                // console.log('create or get time resolver');
                 const modificationResolver = ModificationResolverTime.getInstance();
                 modificationResolver.buildModificationData();
                 return modificationResolver;

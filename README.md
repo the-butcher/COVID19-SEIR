@@ -99,6 +99,7 @@ A higher discovery rate means:
 
 
 #### Issues
+* adding a modification does not put storage in needs-save state
 * interpolated test rate gives above min and below max
 * show absolute numbers in exposure / infected
 * exposure / day appears to give wrong (too high) numbers

@@ -72,7 +72,6 @@ export abstract class AModification<P extends IModificationValues> implements IM
 
     acceptUpdate(update: Partial<P>): void {
         this.modificationValues = {...this.modificationValues, ...update};
-        // StorageUtil.getInstance().setSaveRequired(true);
     }
 
     getModificationValues(): P {
