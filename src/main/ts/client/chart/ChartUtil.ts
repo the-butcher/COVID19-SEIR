@@ -161,11 +161,11 @@ export class ChartUtil {
         axis.renderer.minHeight = 58;
         axis.renderer.grid.template.disabled = false;
         axis.renderer.grid.template.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
-        axis.renderer.events.on('sizechanged', e => {
-            // console.log('axis width changed', e, title);
-        })
-
         axis.renderer.minGridDistance = 12;
+        // axis.renderer.events.on('sizechanged', e => {
+        //     // console.log('axis width changed', e, title);
+        // })
+
 
         axis.fontFamily = ControlsConstants.FONT_FAMILY;
         axis.fontSize = ControlsConstants.FONT_SIZE - 2;

@@ -7,7 +7,6 @@ import { IModificationValuesStrain } from '../../common/modification/IModificati
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/calibration/BaseData';
 import { Color } from '../../util/Color';
-import { TimeUtil } from '../../util/TimeUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
@@ -18,6 +17,7 @@ import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ColorUtil } from './../../util/ColorUtil';
 import { ICoordinate } from './../../util/ICoordinate';
 import { ObjectUtil } from './../../util/ObjectUtil';
+import { TimeUtil } from './../../util/TimeUtil';
 import { ControlsVaccination } from './../controls/ControlsVaccination';
 import { ModelActions } from './../gui/ModelActions';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
@@ -172,10 +172,18 @@ export class ChartAgeGroup {
         this.xAxis.renderer.labels.template.horizontalCenter = 'right';
         this.xAxis.renderer.labels.template.verticalCenter = 'middle';
         this.xAxis.rangeChangeDuration = 0;
+        this.xAxis.renderer.grid.template.disabled = true;
 
         this.xAxis.tooltip.label.rotation = -90;
         this.xAxis.tooltip.label.horizontalCenter = 'right';
         this.xAxis.tooltip.label.verticalCenter = 'middle';
+
+        this.addWeekendRanges();
+        // this.xAxis.renderer.minGridDistance = 4;
+        // this.xAxis.renderer.grid.template.adapter.add('stroke', (value, target) => {
+        //     console.log('value', value, target?.dataItem?.dataContext?.['categoryX']);
+        //     return value;
+        // });
 
         this.yAxisPlotAbsolute = this.chart.yAxes.push(new ValueAxis());
         ChartUtil.getInstance().configureAxis(this.yAxisPlotAbsolute, 'population');
@@ -235,19 +243,23 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.30,
             labelled: true,
-            // percent: false,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         });
         this.seriesAgeGroupCasesR = this.chart.series.push(new StepLineSeries());
         this.seriesAgeGroupCasesR.dataFields.categoryX =  ChartAgeGroup.FIELD_CATEGORY_X;
-        // this.seriesAgeGroupCasesR.hiddenInLegend = true;
         this.seriesAgeGroupCasesR.dataFields.valueY = 'ageGroupCasesR';
-        this.seriesAgeGroupCasesR.fillOpacity = 0.5;
-        this.seriesAgeGroupCasesR.stroke = null;
+        this.seriesAgeGroupCasesR.hiddenState.transitionDuration = 0;
+        this.seriesAgeGroupCasesR.defaultState.transitionDuration = 0;
+        this.seriesAgeGroupCasesR.interpolationDuration = 0;
+        this.seriesAgeGroupCasesR.sequencedInterpolation = false;
+        this.seriesAgeGroupCasesR.stroke = color(ControlsConstants.COLORS.CASES).brighten(0.20);
+        this.seriesAgeGroupCasesR.strokeWidth = 0.5;
+        this.seriesAgeGroupCasesR.strokeOpacity = 0.75;
         this.seriesAgeGroupCasesR.xAxis = this.xAxis;
         this.seriesAgeGroupCasesR.yAxis = this.yAxisPlotAbsolute;
+        this.seriesAgeGroupCasesR.name = 'cases (actual)';
 
         this.seriesAgeGroupLabelLocation = 0.5;
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
@@ -261,7 +273,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.10,
             labelled: true,
-            // percent: false,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
@@ -269,7 +280,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
-            title: 'incidence',
+            title: 'incidence (actual)',
             baseLabel: 'incidence',
             valueField: 'ageGroupIncidenceR',
             colorKey: 'STRAIN',
@@ -277,9 +288,8 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.35,
             labelled: false,
-            // percent: false,
             stacked: false,
-            legend: false,
+            legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         });
         this.seriesAgeGroupIncidenceByStrain = new Map();
@@ -295,7 +305,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.35,
             labelled: true,
-            // percent: false,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
@@ -312,7 +321,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.15,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -329,7 +337,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.05,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -346,7 +353,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.25,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -366,7 +372,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.15,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -386,7 +391,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.25,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -405,7 +409,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.05,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -423,7 +426,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.25,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS
@@ -439,7 +441,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.45,
             labelled: false,
-            // percent: true,
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS
@@ -459,7 +460,6 @@ export class ChartAgeGroup {
             dashed: true,
             locationOnPath: 0.25,
             labelled: false,
-            // percent: true,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -479,7 +479,6 @@ export class ChartAgeGroup {
             dashed: true,
             locationOnPath: 0.35,
             labelled: false,
-            // percent: true,
             stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -500,7 +499,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.45,
             labelled: false,
-            // percent: true,
             stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -517,7 +515,6 @@ export class ChartAgeGroup {
             dashed: false,
             locationOnPath: 0.70,
             labelled: true,
-            // percent: true,
             stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
@@ -592,6 +589,9 @@ export class ChartAgeGroup {
             maxValue: 1,
         });
 
+        /**
+         * when the xAxis range changes, modification-slider ticks need to be scaled as well
+         */
         this.xAxis.events.on('startendchanged', e => {
 
             // console.log('startendchanged')
@@ -605,6 +605,23 @@ export class ChartAgeGroup {
 
             SliderModification.getInstance().setRange([minInstant, ...ticks, maxInstant]);
             this.applyMaxYAxisValue();
+
+            // const instantW0 = ModelInstants.getInstance().getMinInstant();
+            // const instantW1 = instantW0 + TimeUtil.MILLISECONDS_PER___WEEK;
+            // const categoryW0 = TimeUtil.formatCategoryDate(instantW0);
+            // const categoryW1 = TimeUtil.formatCategoryDate(instantW1);
+            // const positionW0 = this.xAxis.categoryToPosition(categoryW0);
+            // const positionW1 = this.xAxis.categoryToPosition(categoryW1);
+            // const pointW0 = this.xAxis.positionToCoordinate(positionW0);
+            // const pointW1 = this.xAxis.positionToCoordinate(positionW1);
+            // const diffW10 = pointW1 - pointW0;
+            // if (diffW10 > 12 * 6) {
+            //     this.xAxis.renderer.minGridDistance = 12;
+            // } else {
+            //     this.xAxis.renderer.minGridDistance = 12 * 6;
+            // }
+            // console.log('diff-pos', pointW1 - pointW0);
+
 
         });
 
@@ -736,7 +753,7 @@ export class ChartAgeGroup {
                     const templateColumn = this.seriesHeat.columns.getIndex(0);
 
                     const minX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x - templateColumn.realWidth / 2;
-                    const maxX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x + templateColumn.realWidth / 2;
+                    // const maxX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x + templateColumn.realWidth / 2;
 
                     const minY = this.yAxisHeat.categoryToPoint(this.ageGroupsWithTotal[ageGroupIndex].getName()).y - templateColumn.realHeight / 2;
                     const maxY = minY + templateColumn.realHeight;
@@ -782,6 +799,34 @@ export class ChartAgeGroup {
             }
 
         }
+
+    }
+
+    addWeekendRanges(): void {
+
+        // let sunInstant = new Date('2021-01-03'); // Date and time (GMT): Sunday, 3. January 2021 12:00:00;
+
+        const minInstant = ModelInstants.getInstance().getMinInstant();
+        const maxInstant = ModelInstants.getInstance().getMaxInstant();
+
+
+        for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+
+            const range = this.xAxis.axisRanges.create();
+            range.category = TimeUtil.formatCategoryDate(instant);
+            range.axisFill.fillOpacity = 0.00;
+            range.axisFill.strokeOpacity = 0.75;
+            range.axisFill.strokeWidth = 0.50;
+            range.label.visible = false;
+            // range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
+            if (new Date(instant).getDay() === 0) {
+                range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.20);
+            } else {
+                range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
+            }
+
+        }
+
 
     }
 
@@ -843,10 +888,17 @@ export class ChartAgeGroup {
 
     }
 
+    /**
+     * ensures presence of a series for the given strain
+     *
+     * @param strainValues
+     * @returns
+     */
     getOrCreateSeriesAgeGroupIncidenceStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
 
         if (!this.seriesAgeGroupIncidenceByStrain.has(strainValues.id)) {
-            this.seriesAgeGroupIncidenceByStrain.set(strainValues.id, new ChartAgeGroupSeries({
+
+            const seriesAgeGroupIncidenceStrain = new ChartAgeGroupSeries({
                 chart: this.chart,
                 yAxis: this.yAxisPlotIncidence,
                 title: 'incidence',
@@ -861,11 +913,17 @@ export class ChartAgeGroup {
                 stacked: false,
                 legend: false,
                 labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
-            }));
+            });
+
+            // toggle strain incidence with primary incidence
+            this.seriesAgeGroupIncidence.bindToLegend(seriesAgeGroupIncidenceStrain);
+
+            this.seriesAgeGroupIncidenceByStrain.set(strainValues.id, seriesAgeGroupIncidenceStrain);
             this.seriesAgeGroupLabelLocation += 0.1;
             if (this.seriesAgeGroupLabelLocation > 0.8) {
                 this.seriesAgeGroupLabelLocation = 0.5;
             }
+
         }
 
         const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
@@ -916,6 +974,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidence.setVisible(visible);
         this.seriesAgeGroupIncidenceR.setVisible(visible);
         this.seriesAgeGroupCases.setVisible(visible);
+        this.seriesAgeGroupCasesR.visible = visible;
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1041,19 +1100,17 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = 150; // maxIncidence * 1.05;
+            // this.yAxisPlotIncidence.max = 180;
+            this.yAxisPlotIncidence.max = maxIncidence * 1.05;
 
             this.yAxisPlotRelative.min = 0;
             this.yAxisPlotRelative.max = maxInfectious * 1.05;
-
-            // console.log('maxInfectious', maxInfectious);
 
             if (this.chartMode === 'INCIDENCE') {
                 this.applyMaxHeat(maxIncidence);
             } else {
                 this.applyMaxHeat(maxInfectious);
             }
-
 
         }
 
@@ -1117,22 +1174,23 @@ export class ChartAgeGroup {
             let ageGroupRemovedVR2 = null;
             let ageGroupIncidenceR = null;
             let totalTestsR = null;
-            let seriesAgeGroupCasesR = null;
-            if (dataItem07 && dataItem00) {
+            let ageGroupCasesR = null;
+            if (dataItem07 && dataItem01 && dataItem00) {
+
                 ageGroupRemovedVR1 = BaseData.getVacc1(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupRemovedVR2 = BaseData.getVacc2(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
+
                 ageGroupIncidenceR = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
+                const diffCase01 = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem01[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
+                ageGroupCasesR = diffCase01;
+
                 if (dataItem14) {
-                    const diffCase07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
+                    // const diffCase07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
                     const diffTest07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]);
                     // totalTestsR = diffCase07 * 10000 / diffTest07;
                     totalTestsR = diffTest07 * 250 / ageGroupPlot.getAbsValue();
-                    const diffCase01 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem01[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
-                    seriesAgeGroupCasesR = diffCase01;
                 }
             }
-
-            console.log('seriesAgeGroupCasesR', seriesAgeGroupCasesR);
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1151,7 +1209,7 @@ export class ChartAgeGroup {
                 ageGroupIncidenceR,
                 totalTestsR,
                 ageGroupCases,
-                seriesAgeGroupCasesR
+                ageGroupCasesR
             }
 
             modificationValuesStrain.forEach(modificationValueStrain => {

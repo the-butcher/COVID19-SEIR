@@ -97,26 +97,21 @@ A higher discovery rate means:
 * There are different shares of PCR and Antigen Tests per province (i.e. Vienna having almost equal shares)
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
-
 #### Issues
 * adding a modification does not put storage in needs-save state
 * interpolated test rate gives above min and below max
-* show absolute numbers in exposure / infected
-* exposure / day appears to give wrong (too high) numbers
-* exposure matrix has wrong values (all zero)
 * reintroduce the exposure chart view
   * zoom-y on chart-draw, not only after zooming
 * show contact diff view only in diff-display (for now)
 * allow floating point config on initial strain incidence
-* take care of corrections on matrices (bake them into matrices)
+* take care of corrections on matrices (bake them into matrices?)
 * wiki on github
 * border cases
   * all testing sliders on zero renders an all zero chart,
   * single testing slider on 1 percent leads to diagram stretching further an further
-  * limit incidence range on modifications later than MIN_DATE to i.e. 10
-  * validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)
+  * ~~limit incidence range on modifications later than MIN_DATE to i.e. 10~~
+  * ~~validity check for when i.e. too many vaccinations have been configured in settings or initial percentage of recovered does not validate → reset to last valid state (???)~~
   * keep history in local storage (or internal, reset modification after validation problems)
-* find a way to reliably reproduce scenarios from 11.2020 and 03.2021
 
 #### Backlog
 * y-axis modes in relative chart (max, age-group-max, manual)
@@ -141,6 +136,10 @@ A higher discovery rate means:
   * move transmission-risk calculation away from worker (could improve performance for not running each time, but only when a strain is changed)
 
 #### Solved issues
+* ~~find a way to reliably reproduce scenarios from 11.2020 and 03.2021~~
+* ~~show absolute numbers in exposure / infected~~
+* ~~exposure / day appears to give wrong (too high) numbers~~
+* ~~exposure matrix has wrong values (all zero)~~
 * ~~add control for blendable true|false and implement in modifications~~
   * ~~contact~~
   * ~~testing~~

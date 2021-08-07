@@ -1,5 +1,5 @@
 {
-  "model_______version": "AT_0_00_01",
+  "model_______version": "AT_0_00_02",
   "model______basedata": "data/heatmap-data-at.json",
   "model__demographics": "data/demographics-at.json",
   "model_____daterange": [
@@ -7,8 +7,7 @@
     "2021-06-01",
     "2021-07-01",
     "2021-08-01",
-    "2021-09-01",
-    "2021-10-01"
+    "2021-09-01"
   ],
   "model_modifications": [
     {
@@ -16,9 +15,9 @@
       "key": "SETTINGS",
       "name": "initial state",
       "instant": 1619827200000,
-      "undetected": 1,
+      "undetected": 1.5,
       "vaccinated": 0.09,
-      "quarantine": 0.5,
+      "quarantine": 0.67,
       "dead": 0,
       "deletable": false,
       "draggable": false
@@ -31,7 +30,7 @@
       "r0": 4.4,
       "serialInterval": 4.8,
       "intervalScale": 1,
-      "dstIncidence": 148.79823693755566,
+      "dstIncidence": 150.68580378667878,
       "deletable": false,
       "draggable": false,
       "primary": true
@@ -42,12 +41,12 @@
       "name": "initial NPIs",
       "instant": 1619827200000,
       "multipliers": {
-        "family": 0.67,
-        "school": 0.22,
-        "nursing": 0.4,
-        "work": 0.36,
-        "other": 0.13,
-        "risk": 0.01
+        "family": 0.72,
+        "school": 0.27,
+        "nursing": 0.36,
+        "work": 0.21,
+        "other": 0.27,
+        "risk": 0.025
       },
       "deletable": false,
       "draggable": false
@@ -55,15 +54,15 @@
     {
       "id": "5971a",
       "key": "TESTING",
-      "name": "initial discovery",
+      "name": "initial testing",
       "instant": 1619827200000,
       "multipliers": {
-        "family": 0.6,
-        "school": 0.5,
+        "family": 0.55,
+        "school": 0.4,
         "nursing": 0.75,
         "work": 0.5,
-        "other": 0.25,
-        "risk": 0.25
+        "other": 0.1,
+        "risk": 0.1
       },
       "deletable": false,
       "draggable": false
@@ -77,7 +76,7 @@
         "75-84": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.7580985403035823
+            "y": 0.758730270428473
           },
           "cA1": {
             "x": 1621036800000,
@@ -89,7 +88,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.3901437305982884
+            "y": 0.3908730190462634
           },
           "cA2": {
             "x": 1624838400000,
@@ -109,31 +108,31 @@
         ">= 85": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.8153142604661439
+            "y": 0.8156898265768253
           },
           "cA1": {
             "x": 1622073600000,
-            "y": 0.8725895
+            "y": 0.8728622
           },
           "cB1": {
             "x": 1630454400000,
-            "y": 0.9103735999999999
+            "y": 0.9099292
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.7061217276041092
+            "y": 0.7070672705180603
           },
           "cA2": {
-            "x": 1622678400000,
-            "y": 0.7179888
+            "x": 1622073600000,
+            "y": 0.728311
           },
           "cB2": {
-            "x": 1624924800000,
-            "y": 0.9103735999999999
+            "x": 1626480000000,
+            "y": 0.9099292
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.9103735999999999
+            "y": 0.9099292
           },
           "sD": 1.15,
           "sC": 0.95
@@ -141,31 +140,31 @@
         "65-74": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.5521528202509397
+            "y": 0.5528404401242228
           },
           "cA1": {
-            "x": 1620777600000,
-            "y": 0.8519753999999999
+            "x": 1620864000000,
+            "y": 0.8543287
           },
           "cB1": {
-            "x": 1623542400000,
-            "y": 0.8657114
+            "x": 1623801600000,
+            "y": 0.8728622
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.10580676575201743
+            "y": 0.10607278794824443
           },
           "cA2": {
-            "x": 1627776000000,
-            "y": 0.5943244000000001
+            "x": 1627516800000,
+            "y": 0.6356535999999999
           },
           "cB2": {
-            "x": 1619222400000,
-            "y": 0.8657114
+            "x": 1619827200000,
+            "y": 0.8728622
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.8657114
+            "y": 0.8728622
           },
           "sD": 1.25,
           "sC": 0.01
@@ -173,31 +172,31 @@
         "55-64": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.2607767440373425
+            "y": 0.26112283394078906
           },
           "cA1": {
             "x": 1623110400000,
-            "y": 0.8004452
+            "y": 0.8005866
           },
           "cB1": {
-            "x": 1621555200000,
-            "y": 0.8004452
+            "x": 1621814400000,
+            "y": 0.808
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.07767760086962082
+            "y": 0.07786543257241511
           },
           "cA2": {
-            "x": 1627862400000,
-            "y": 0.21986690000000006
+            "x": 1628726400000,
+            "y": 0.3836182000000001
           },
           "cB2": {
-            "x": 1619222400000,
-            "y": 0.8004452
+            "x": 1618963200000,
+            "y": 0.808
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.8004452
+            "y": 0.808
           },
           "sD": 0.95,
           "sC": 1e-12
@@ -205,31 +204,31 @@
         "45-54": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.1828419388285251
+            "y": 0.18311783047208208
           },
           "cA1": {
-            "x": 1623542400000,
-            "y": 0.37445750000000005
+            "x": 1623628800000,
+            "y": 0.3836182000000001
           },
           "cB1": {
-            "x": 1619222400000,
-            "y": 0.7351688999999999
+            "x": 1619049600000,
+            "y": 0.7301694000000001
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.06434347909858402
+            "y": 0.06451141314248829
           },
           "cA2": {
             "x": 1627862400000,
-            "y": 0.1442886
+            "y": 0.14455120000000002
           },
           "cB2": {
             "x": 1620950400000,
-            "y": 0.7351688999999999
+            "y": 0.7301694000000001
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.7351688999999999
+            "y": 0.7301694000000001
           },
           "sD": 0.9,
           "sC": 1e-12
@@ -237,31 +236,31 @@
         "35-44": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.150443713316507
+            "y": 0.150701641632865
           },
           "cA1": {
-            "x": 1625443200000,
-            "y": 0.3916376
+            "x": 1626048000000,
+            "y": 0.4243818
           },
           "cB1": {
-            "x": 1620864000000,
-            "y": 0.7214328999999999
+            "x": 1619827200000,
+            "y": 0.691244
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.05236370446352187
+            "y": 0.05251863170305045
           },
           "cA2": {
-            "x": 1627603200000,
-            "y": 0.09962639999999995
+            "x": 1628208000000,
+            "y": 0.14825789999999997
           },
           "cB2": {
-            "x": 1623542400000,
-            "y": 0.7214328999999999
+            "x": 1622678400000,
+            "y": 0.691244
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.7214328999999999
+            "y": 0.691244
           },
           "sD": 0.9,
           "sC": 0.000001
@@ -269,31 +268,31 @@
         "25-34": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.11825347592698279
+            "y": 0.11853717442908777
           },
           "cA1": {
-            "x": 1624838400000,
-            "y": 0.250783
+            "x": 1626739200000,
+            "y": 0.35210620000000004
           },
           "cB1": {
-            "x": 1622764800000,
-            "y": 0.7214328999999999
+            "x": 1620000000000,
+            "y": 0.6208268
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.03869382893724722
+            "y": 0.03884022728964542
           },
           "cA2": {
-            "x": 1628553600000,
-            "y": 0.0961924
+            "x": 1629158400000,
+            "y": 0.13343109999999994
           },
           "cB2": {
-            "x": 1624838400000,
-            "y": 0.7214328999999999
+            "x": 1622937600000,
+            "y": 0.6208268
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.7214328999999999
+            "y": 0.6208268
           },
           "sD": 0.9,
           "sC": 0.0001
@@ -301,31 +300,31 @@
         "15-24": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.06317122302158273
+            "y": 0.06332609548724656
           },
           "cA1": {
-            "x": 1626566400000,
-            "y": 0.1442886
+            "x": 1627603200000,
+            "y": 0.21496840000000003
           },
           "cB1": {
-            "x": 1622419200000,
-            "y": 0.6630246000000001
+            "x": 1620777600000,
+            "y": 0.5967382999999999
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.020774885546108568
+            "y": 0.020857553956834533
           },
           "cA2": {
-            "x": 1630108800000,
-            "y": 0.030916100000000026
+            "x": 1629849600000,
+            "y": 0.04448039999999997
           },
           "cB2": {
             "x": 1624320000000,
-            "y": 0.6630246000000001
+            "y": 0.5967382999999999
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.6630246000000001
+            "y": 0.5967382999999999
           },
           "sD": 0.95,
           "sC": 0.0001
@@ -333,19 +332,19 @@
         "05-14": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.00011685207589483313
+            "y": 0.00011921272389270855
           },
           "cA1": {
             "x": 1631232000000,
             "y": 0
           },
           "cB1": {
-            "x": 1622592000000,
-            "y": 0.14085460000000002
+            "x": 1619740800000,
+            "y": 0.07968899999999997
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.000023606479978754168
+            "y": 0.000027147451975567293
           },
           "cA2": {
             "x": 1633478400000,
@@ -353,11 +352,11 @@
           },
           "cB2": {
             "x": 1635120000000,
-            "y": 0.14085460000000002
+            "y": 0.07968899999999997
           },
           "pBN": {
             "x": 1638316800000,
-            "y": 0.14085460000000002
+            "y": 0.07968899999999997
           },
           "sD": 1.1,
           "sC": 0.002
@@ -404,8 +403,8 @@
       "instant": 1620691200000,
       "name": "delta",
       "r0": 6.6000000000000005,
-      "serialInterval": 4.8,
-      "intervalScale": 1,
+      "serialInterval": 4,
+      "intervalScale": 1.7719163549651558,
       "dstIncidence": 2,
       "deletable": true,
       "draggable": true
@@ -413,48 +412,68 @@
     {
       "id": "e2be1",
       "key": "CONTACT",
-      "name": "loss of compliance",
-      "instant": 1621209600000,
+      "name": "lift class split",
+      "instant": 1621123200000,
       "multipliers": {
-        "family": 0.67,
-        "school": 0.22,
-        "nursing": 0.4,
-        "work": 0.31,
-        "other": 0.16,
-        "risk": 0.12
+        "family": 0.72,
+        "school": 0.29,
+        "nursing": 0.66,
+        "work": 0.26,
+        "other": 0.34,
+        "risk": 0.13
       },
       "deletable": true,
       "draggable": true,
-      "primary": false
+      "primary": false,
+      "blendable": false
     },
     {
       "id": "25fd0",
       "key": "TESTING",
       "name": "more tests in school",
-      "instant": 1621382400000,
+      "instant": 1621123200000,
       "multipliers": {
-        "family": 0.6,
-        "school": 0.7000000000000001,
+        "family": 0.55,
+        "school": 0.5,
         "nursing": 0.75,
         "work": 0.5,
-        "other": 0.25,
-        "risk": 0.25
+        "other": 0.15,
+        "risk": 0.1
       },
       "deletable": true,
       "draggable": true,
-      "primary": false
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "c2c86",
+      "key": "TESTING",
+      "name": "more tests",
+      "instant": 1622937600000,
+      "multipliers": {
+        "family": 0.55,
+        "school": 0.55,
+        "nursing": 0.9,
+        "work": 0.6,
+        "other": 0.2,
+        "risk": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true
     },
     {
       "id": "4ca64",
       "key": "CONTACT",
       "name": "gain of compliance",
-      "instant": 1623196800000,
+      "instant": 1623024000000,
       "multipliers": {
-        "family": 0.67,
-        "school": 0.22,
-        "nursing": 0.4,
-        "work": 0.2,
-        "other": 0.2,
+        "family": 0.72,
+        "school": 0.29,
+        "nursing": 0.55,
+        "work": 0.25,
+        "other": 0.25,
         "risk": 0.05
       },
       "deletable": true,
@@ -462,21 +481,110 @@
       "primary": false
     },
     {
-      "id": "6e78f",
-      "key": "CONTACT",
-      "name": "loss of compliance",
-      "instant": 1624579200000,
+      "id": "76cf8",
+      "key": "TESTING",
+      "name": "less tests",
+      "instant": 1623456000000,
       "multipliers": {
-        "family": 0.71,
-        "school": 0.22,
-        "nursing": 0.4,
+        "family": 0.55,
+        "school": 0.55,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.2,
+        "risk": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true
+    },
+    {
+      "id": "ddf22",
+      "key": "CONTACT",
+      "name": "lift school mask mandate",
+      "instant": 1623801600000,
+      "multipliers": {
+        "family": 0.72,
+        "school": 0.39,
+        "nursing": 0.5,
         "work": 0.2,
-        "other": 0.21,
-        "risk": 0.23
+        "other": 0.45,
+        "risk": 0.05
       },
       "deletable": true,
       "draggable": true,
       "primary": false
+    },
+    {
+      "id": "f2c23",
+      "key": "TESTING",
+      "name": "minor adjustments",
+      "instant": 1623974400000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.55,
+        "school": 0.55,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.25,
+        "risk": 0.1
+      },
+      "primary": false
+    },
+    {
+      "id": "b080",
+      "key": "CONTACT",
+      "name": "loosing compliance",
+      "instant": 1624492800000,
+      "multipliers": {
+        "family": 0.72,
+        "school": 0.38,
+        "nursing": 0.8,
+        "work": 0.2,
+        "other": 0.3,
+        "risk": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false
+    },
+    {
+      "id": "b3545",
+      "key": "TESTING",
+      "name": "minor adjustments",
+      "instant": 1624492800000,
+      "multipliers": {
+        "family": 0.55,
+        "school": 0.55,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.2,
+        "risk": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true
+    },
+    {
+      "id": "8ee61",
+      "key": "CONTACT",
+      "name": "loosing compliance",
+      "instant": 1624752000000,
+      "multipliers": {
+        "family": 0.72,
+        "school": 0.38,
+        "nursing": 0.8,
+        "work": 0.2,
+        "other": 0.5,
+        "risk": 0.5
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
     },
     {
       "id": "ea37",
@@ -488,97 +596,210 @@
       "draggable": true
     },
     {
-      "id": "7005a",
+      "id": "1d519",
       "key": "CONTACT",
-      "name": "summer break",
-      "instant": 1625788800000,
+      "name": "begin of holidays",
+      "instant": 1625097600000,
+      "multipliers": {
+        "family": 0.72,
+        "school": 0,
+        "nursing": 0.8,
+        "work": 0.15,
+        "other": 0.65,
+        "risk": 0.87
+      },
       "deletable": true,
       "draggable": true,
-      "multipliers": {
-        "family": 0.75,
-        "school": 0.05,
-        "nursing": 0.4,
-        "work": 0.2,
-        "other": 0.23,
-        "risk": 0.72
-      },
-      "primary": false
+      "primary": false,
+      "blendable": false
     },
     {
-      "id": "56f7e",
+      "id": "95da6",
       "key": "TESTING",
-      "name": "reduced testing",
-      "instant": 1625788800000,
+      "name": "begin of holidays",
+      "instant": 1625356800000,
       "multipliers": {
-        "family": 0.6,
-        "school": 0.5,
-        "nursing": 0.75,
+        "family": 0.4,
+        "school": 0,
+        "nursing": 0.5,
         "work": 0.5,
-        "other": 0.25,
-        "risk": 0.25
+        "other": 0.2,
+        "risk": 0.13
       },
       "deletable": true,
       "draggable": true,
-      "primary": false
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "238d0",
+      "key": "CONTACT",
+      "name": "holidays settled",
+      "instant": 1626220800000,
+      "multipliers": {
+        "family": 0.72,
+        "school": 0,
+        "nursing": 0.8,
+        "work": 0.15,
+        "other": 0.52,
+        "risk": 0.35000000000000003
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true
+    },
+    {
+      "id": "21acf",
+      "key": "TESTING",
+      "name": "cluster?",
+      "instant": 1626220800000,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.35000000000000003,
+        "risk": 0.31
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "67677",
+      "key": "TESTING",
+      "name": "cluster mid?",
+      "instant": 1626480000000,
+      "multipliers": {
+        "family": 0.45,
+        "school": 0,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.25,
+        "risk": 0.2
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "15762",
+      "key": "TESTING",
+      "name": "cluster end?",
+      "instant": 1626912000000,
+      "multipliers": {
+        "family": 0.4,
+        "school": 0,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.2,
+        "risk": 0.12
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "935fd",
+      "key": "CONTACT",
+      "name": "more risk",
+      "instant": 1626912000000,
+      "multipliers": {
+        "family": 0.72,
+        "school": 0,
+        "nursing": 0.8,
+        "work": 0.15,
+        "other": 0.85,
+        "risk": 0.32
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "997cc",
+      "key": "TESTING",
+      "name": "cluster?",
+      "instant": 1627171200000,
+      "multipliers": {
+        "family": 0.25,
+        "school": 0,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.38,
+        "risk": 0.24
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "62547",
+      "key": "CONTACT",
+      "name": "adjustments",
+      "instant": 1627603200000,
+      "multipliers": {
+        "family": 0.72,
+        "school": 0,
+        "nursing": 0.8,
+        "work": 0.15,
+        "other": 0.8,
+        "risk": 0.35000000000000003
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true
+    },
+    {
+      "id": "c1fa8",
+      "key": "TESTING",
+      "name": "cluster mid?",
+      "instant": 1627603200000,
+      "multipliers": {
+        "family": 0.25,
+        "school": 0,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.25,
+        "risk": 0.2
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
+    },
+    {
+      "id": "663d4",
+      "key": "TESTING",
+      "name": "cluster end?",
+      "instant": 1627862400000,
+      "multipliers": {
+        "family": 0.35000000000000003,
+        "school": 0,
+        "nursing": 0.5,
+        "work": 0.5,
+        "other": 0.2,
+        "risk": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": false
     },
     {
       "id": "b3f4d",
       "key": "TIME",
       "name": "effective settings",
-      "instant": 1626220800000,
+      "instant": 1628294400000,
       "deletable": false,
       "draggable": true
-    },
-    {
-      "id": "2d860",
-      "key": "CONTACT",
-      "name": "back to school",
-      "instant": 1630972800000,
-      "multipliers": {
-        "family": 0.9500000000000001,
-        "school": 0.05,
-        "nursing": 0.5,
-        "work": 0.6,
-        "other": 0.5,
-        "risk": 1
-      },
-      "deletable": true,
-      "draggable": true,
-      "primary": false
-    },
-    {
-      "id": "d6e66",
-      "key": "CONTACT",
-      "name": "back to school 1",
-      "instant": 1630972800000,
-      "multipliers": {
-        "family": 0.75,
-        "school": 0.05,
-        "nursing": 0.4,
-        "work": 0.2,
-        "other": 0.25,
-        "risk": 0.72
-      },
-      "deletable": true,
-      "draggable": true,
-      "primary": false
-    },
-    {
-      "id": "a8b39",
-      "key": "CONTACT",
-      "name": "back to school 2",
-      "instant": 1631577600000,
-      "multipliers": {
-        "family": 0.75,
-        "school": 0.5,
-        "nursing": 0.5,
-        "work": 0.5,
-        "other": 0.5,
-        "risk": 0.72
-      },
-      "deletable": true,
-      "draggable": true,
-      "primary": false
     }
   ]
 }

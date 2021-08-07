@@ -35,7 +35,7 @@ export interface IModificationDefinitions {
 
 export class ModelConstants {
 
-    static readonly CONFIG_VERSION = 'AT_0_00_01';
+    static readonly CONFIG_VERSION = 'AT_0_00_02';
 
     static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IModificationDefinitions} = {
         'TIME': {
