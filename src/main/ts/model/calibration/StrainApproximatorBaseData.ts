@@ -3,7 +3,7 @@ import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
-import { ModificationTesting } from '../../common/modification/ModificationTesting';
+import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
@@ -72,11 +72,11 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
 
         const modificationContact = this.modifications.findModificationsByType('CONTACT')[0] as ModificationContact;
         const modificationValueContact = modificationContact.getModificationValues();
-        const modificationTesting = this.modifications.findModificationsByType('TESTING')[0] as ModificationTesting;
-        const modificationValueTesting = modificationTesting.getModificationValues();
+        const modificationDiscovery = this.modifications.findModificationsByType('TESTING')[0] as ModificationDiscovery;
+        const modificationValueDiscovery = modificationDiscovery.getModificationValues();
 
         modificationValueContact.instant = this.instantPre;
-        modificationValueTesting.instant = this.instantPre;
+        modificationValueDiscovery.instant = this.instantPre;
 
         // fill with zeroes for each age group
         const heatmapPreIncidencesB = ageGroups.map(() => 0);
@@ -148,22 +148,22 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
                 }
                 if (ageGroup.getName() === '15-24') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 0;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 2;
                 }
                 if (ageGroup.getName() === '25-34') {
                     heatmapDstIncidencesB[ageGroup.getIndex()] -= 0;
                 }
                 if (ageGroup.getName() === '45-54') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 2;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
                 }
                 if (ageGroup.getName() === '55-64') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 4;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
                 }
                 if (ageGroup.getName() === '75-84') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 4;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 2;
                 }
                 if (ageGroup.getName() === '>= 85') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
                 }
 
             });

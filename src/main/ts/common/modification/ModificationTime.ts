@@ -1,18 +1,26 @@
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
+import { AgeGroup } from '../demographics/AgeGroup';
+import { ContactCategory } from '../demographics/ContactCategory';
 import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
+import { IContactCategories } from './IContactCategories';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { ModificationContact } from './ModificationContact';
+import { ModificationDiscovery } from './ModificationDiscovery';
 import { ModificationResolverContact } from './ModificationResolverContact';
+import { ModificationResolverDiscovery } from './ModificationResolverDiscovery';
 import { ModificationResolverSeasonality } from './ModificationResolverSeasonality';
-import { ModificationResolverTesting } from './ModificationResolverTesting';
 import { Modifications } from './Modifications';
 import { ModificationSeasonality } from './ModificationSeasonality';
 import { ModificationSettings } from './ModificationSettings';
-import { ModificationTesting } from './ModificationTesting';
 import { ModificationVaccination } from './ModificationVaccination';
+
+export interface IRatios {
+    contact: number;
+    discovery: number;
+}
 
 /**
  * implementation of IModification for a specific instant
@@ -21,10 +29,10 @@ import { ModificationVaccination } from './ModificationVaccination';
  * @author h.fleischer
  * @since 18.04.2021
  */
-export class ModificationTime extends AModification<IModificationValuesTime> implements IContactMatrix {
+export class ModificationTime extends AModification<IModificationValuesTime> implements IContactMatrix, IContactCategories {
 
     private modificationContact: ModificationContact;
-    private modificationTesting: ModificationTesting;
+    private modificationDiscovery: ModificationDiscovery;
     private modificationVaccination: ModificationVaccination;
     private modificationSeasonality: ModificationSeasonality;
     private modificationSettings: ModificationSettings;
@@ -34,9 +42,20 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private valueSum: number;
     private columnValues: number[];
 
+    private readonly ageGroups: AgeGroup[];
+    private readonly contactCategories: ContactCategory[];
+    private readonly absTotal: number;
+
     constructor(modificationParams: IModificationValuesTime) {
         super('INSTANT', modificationParams);
+        this.ageGroups = [...Demographics.getInstance().getAgeGroups()];
+        this.contactCategories = [...Demographics.getInstance().getCategories()];
+        this.absTotal = Demographics.getInstance().getAbsTotal();
         this.resetValues();
+    }
+
+    getCategories(): ContactCategory[] {
+        return this.contactCategories;
     }
 
     logSummary(): void {
@@ -72,7 +91,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     setInstants(instantA: number, instantB: number): void {
         super.setInstants(instantA, instantB);
         this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA());
-        this.modificationTesting = new ModificationResolverTesting().getModification(this.getInstantA());
+        this.modificationDiscovery = new ModificationResolverDiscovery().getModification(this.getInstantA());
         this.modificationVaccination = Modifications.getInstance().findModificationsByType('VACCINATION')[0] as ModificationVaccination; // not mutable, thus reusable
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
         this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
@@ -80,6 +99,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     }
 
     resetValues(): void {
+
         this.maxCellValue = -1;
         this.maxColumnValue = -1;
         this.valueSum = -1;
@@ -87,29 +107,74 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         for (let indexContact = 0; indexContact < Demographics.getInstance().getAgeGroups().length; indexContact++) {
             this.columnValues[indexContact] = -1;
         }
+
     }
 
     getSeasonality(): number {
         return this.modificationSeasonality.getSeasonality();
     }
 
-    getTestingRatio(ageGroupIndex: number): number {
-        return this.modificationTesting.getColumnValue(ageGroupIndex);
+    getRatios(ageGroupIndex: number): IRatios {
+
+        let contactTotal = 0;
+        let discoveryTotal = 0;
+        this.contactCategories.forEach(contactCategory => {
+
+            // current contact ratio for contact category
+            const contactRatioCategory = this.modificationContact.getCategoryValue(contactCategory.getName());
+            // total contact in the requested age group in contact category
+            const contactGroupCategory = contactCategory.getColumnValue(ageGroupIndex);
+            // current total contact as of base contact-rate and contact-ratio in contact category
+            const contactTotalCategory = contactRatioCategory * contactGroupCategory;
+
+            // current discovery ratio for category
+            const discoveryRatioCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName());
+
+            // current share of discovered in currentTotal
+            contactTotal += contactTotalCategory;
+            discoveryTotal += discoveryRatioCategory * contactTotalCategory;
+
+        });
+
+        return {
+            contact: contactTotal,
+            discovery: discoveryTotal / contactTotal
+        };
+
+    }
+
+    getDiscoveryRatioTotal(): number {
+        let discoveryTotal = 0;
+        this.ageGroups.forEach(ageGroup => {
+            discoveryTotal += ageGroup.getAbsValue() * this.getRatios(ageGroup.getIndex()).discovery;
+        });
+        return discoveryTotal / this.absTotal;
+    }
+
+    getQuarantineMultiplier(ageGroupIndex: number): number {
+        const shareOfInfectionBeforeIncubation = CompartmentChain.getInstance().getShareOfPresymptomaticInfection();
+        const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
+        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getRatios(ageGroupIndex).discovery * this.modificationSettings.getQuarantine());
     }
 
     getCellValue(indexContact: number, indexParticipant: number): number {
-
-        /**
-         * reduction through people isolating after a positive test
-         */
-        const multiplierTesting = this.getContactMultiplier(indexContact) * this.getContactMultiplier(indexParticipant);
 
         /**
          * reduction through seasonality
          */
         const multiplierSeasonality = this.modificationSeasonality.getSeasonality();
 
-        return this.getContactValue(indexContact, indexParticipant) * multiplierTesting *  multiplierSeasonality;
+        /**
+         * reduction through quarantine
+         */
+        const multiplierQuarantine = this.getQuarantineMultiplier(indexContact) * this.getQuarantineMultiplier(indexParticipant);
+
+        /**
+         * contact value for this age group (category reductions get considered in ModificationContact)
+         */
+        const contactValue = this.modificationContact.getCellValue(indexContact, indexParticipant);
+
+        return contactValue * multiplierQuarantine *  multiplierSeasonality;
 
     }
 
@@ -134,11 +199,15 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.maxColumnValue;
     }
 
-    getCellSum(): number {
+    getColumnSum(): number {
         return this.getMatrixSum();
     }
 
-    getColumnSum(): number {
+    getMaxColumnSum(): number {
+        return this.getMaxMatrixSum();
+    }
+
+    getCellSum(): number {
         return this.getMatrixSum();
     }
 
@@ -149,22 +218,11 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.valueSum;
     }
 
-    getMaxColumnSum(): number {
-        return this.getMaxMatrixSum();
-    }
 
     getMaxMatrixSum(): number {
         return this.getMatrixSum();
     }
 
-    getContactValue(indexContact: number, indexParticipant: number): number {
-        return this.modificationContact.getCellValue(indexContact, indexParticipant);
-    }
 
-    getContactMultiplier(ageGroupIndex: number): number {
-        const shareOfInfectionBeforeIncubation = CompartmentChain.getInstance().getShareOfPresymptomaticInfection();
-        const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
-        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getTestingRatio(ageGroupIndex) * this.modificationSettings.getQuarantine());
-    }
 
 }

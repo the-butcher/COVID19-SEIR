@@ -1,5 +1,5 @@
-import { IContactColumns } from './IContactColumns';
 import { IContactCells } from './IContactCells';
+import { IContactColumns } from './IContactColumns';
 export interface IContactMatrix extends IContactCells, IContactColumns {
 
     /**
@@ -16,5 +16,6 @@ export interface IContactMatrix extends IContactCells, IContactColumns {
      * get the maximum value that a matrix of this kind could possibly have
      */
     getMaxMatrixSum(): number;
+
 
 }

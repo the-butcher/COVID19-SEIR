@@ -1,3 +1,5 @@
+import { ContactCategory } from '../demographics/ContactCategory';
+
 export interface IContactColumns {
 
     getColumnValue(ageGroupIndex: number): number;

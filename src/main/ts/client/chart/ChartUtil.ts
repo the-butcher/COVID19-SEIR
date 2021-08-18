@@ -112,7 +112,7 @@ export class ChartUtil {
 
         series.sequencedInterpolation = true;
 
-        series.tooltip.exportable = true;
+        series.tooltip.exportable = false;
 
     }
 

@@ -6,11 +6,11 @@ import { IModificationValuesContact } from './IModificationValuesContact';
 import { IModificationValuesSeasonality } from './IModificationValuesSeasonality';
 import { IModificationValuesSettings } from './IModificationValuesSettings';
 import { IModificationValuesStrain } from './IModificationValuesStrain';
-import { IModificationValuesTesting } from './IModificationValuesTesting';
+import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
 
-export type IAnyModificationValue = IModificationValuesTime | IModificationValuesContact | IModificationValuesStrain | IModificationValuesTesting | IModificationValuesSettings | IModificationValuesTesting | IModificationValuesSeasonality | IModificationValuesVaccination;
+export type IAnyModificationValue = IModificationValuesTime | IModificationValuesContact | IModificationValuesStrain | IModificationValuesDiscovery | IModificationValuesSettings | IModificationValuesDiscovery | IModificationValuesSeasonality | IModificationValuesVaccination;
 
 /**
  * central storage of modification instances of various types

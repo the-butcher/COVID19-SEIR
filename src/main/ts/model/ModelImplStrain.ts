@@ -2,7 +2,7 @@ import { TimeUtil } from './../util/TimeUtil';
 import { BaseData } from './calibration/BaseData';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
-import { ModificationTesting } from '../common/modification/ModificationTesting';
+import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
@@ -33,7 +33,7 @@ export class ModelImplStrain implements IModelSeir {
     private readonly nrmDeltas: number[];
     private nrmExposure: number[][];
 
-    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting, baseData: BaseData) {
+    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, baseData: BaseData) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
@@ -46,7 +46,7 @@ export class ModelImplStrain implements IModelSeir {
 
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
-            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTesting, baseData);
+            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime, baseData);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
         });
@@ -202,7 +202,7 @@ export class ModelImplStrain implements IModelSeir {
             const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
 
             // based upon age-group testing ratios move from infectious to known recovery / unknown recovery
-            const ratioD = modificationTime.getTestingRatio(ageGroupIndex);
+            const ratioD = modificationTime.getRatios(ageGroupIndex).discovery;
             const ratioU = 1 - ratioD;
 
             // removal from last infectious happens in infectious model (TODO find a more readable version)

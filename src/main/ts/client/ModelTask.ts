@@ -59,7 +59,7 @@ export class ModelTask {
                 ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
 
                 SliderModification.getInstance().setProgress(0);
-                ModelTask.worker.terminate();
+                // ModelTask.worker.terminate();
                 ModelTask.worker = null;
 
             } else {

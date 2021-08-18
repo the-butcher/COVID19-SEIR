@@ -2,7 +2,7 @@
 import { Modifications } from '../../common/modification/Modifications';
 import { ModificationContact } from './../../common/modification/ModificationContact';
 import { ModificationStrain } from './../../common/modification/ModificationStrain';
-import { ModificationTesting } from './../../common/modification/ModificationTesting';
+import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ModelInstants } from './../ModelInstants';
 import { IModelProgress } from './../state/ModelStateIntegrator';
 import { IBaseDataItem } from './BaseData';
@@ -52,11 +52,11 @@ export class StrainApproximatorCalibrate implements IStrainApproximator {
         const modificationsStrain = this.modifications.findModificationsByType('STRAIN').map(m => m as ModificationStrain);
         const modificationContact = this.modifications.findModificationsByType('CONTACT')[0] as ModificationContact;
         const modificationValueContact = modificationContact.getModificationValues();
-        const modificationTesting = this.modifications.findModificationsByType('TESTING')[0] as ModificationTesting;
-        const modificationValueTesting = modificationTesting.getModificationValues();
+        const modificationDiscovery = this.modifications.findModificationsByType('TESTING')[0] as ModificationDiscovery;
+        const modificationValueDiscovery = modificationDiscovery.getModificationValues();
 
         modificationValueContact.instant = instantPre;
-        modificationValueTesting.instant = instantPre;
+        modificationValueDiscovery.instant = instantPre;
 
         console.log('modificationsStrain', modificationsStrain);
 

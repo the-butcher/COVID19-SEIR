@@ -9,7 +9,7 @@ import { ModificationResolverVaccination } from '../../common/modification/Modif
 import { ModificationSeasonality } from '../../common/modification/ModificationSeasonality';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
-import { ModificationTesting } from '../../common/modification/ModificationTesting';
+import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
 import { BaseData } from '../../model/calibration/BaseData';
@@ -20,14 +20,14 @@ import { ControlsContact } from '../controls/ControlsContact';
 import { ControlsSeasonality } from '../controls/ControlsSeasonality';
 import { ControlsSettings } from '../controls/ControlsSettings';
 import { ControlsStrain } from '../controls/ControlsStrain';
-import { ControlsTesting } from '../controls/ControlsTesting';
+import { ControlsDiscovery } from '../controls/ControlsDiscovery';
 import { ControlsTime } from '../controls/ControlsTime';
 import { ControlsVaccination } from '../controls/ControlsVaccination';
 import { ModelTask } from '../ModelTask';
 import { IModificationResolver } from './../../common/modification/IModificationResolver';
 import { ModificationResolverSeasonality } from './../../common/modification/ModificationResolverSeasonality';
 import { ModificationResolverStrain } from './../../common/modification/ModificationResolverStrain';
-import { ModificationResolverTesting } from './../../common/modification/ModificationResolverTesting';
+import { ModificationResolverDiscovery } from '../../common/modification/ModificationResolverDiscovery';
 import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
 import { Modifications } from './../../common/modification/Modifications';
 import { IWorkerInput } from './../../model/IWorkerInput';
@@ -255,9 +255,9 @@ export class ControlsConstants {
             },
             handleModificationDrag: () => {},
             getModificationResolver: () => {
-                return new ModificationResolverTesting();
+                return new ModificationResolverDiscovery();
             },
-            showInEditor: modification => ControlsTesting.getInstance().acceptModification(modification as ModificationTesting),
+            showInEditor: modification => ControlsDiscovery.getInstance().acceptModification(modification as ModificationDiscovery),
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
         'VACCINATION': {

@@ -98,6 +98,9 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
+* ModificationResolverDiscovery alters the apps-time modification, TODO instantiate mod-time and set instants on that instance
+* there appears to be a clear issue with schools at zero contact level and testing rate still affecting the model, apparently some pre multiplication is missing in contact rate
+  * contact-categories are summed to a single value by age group, this may have to be split to categories, and then (or later, at the proper time), be multiplied with actual contact
 * adding a modification does not put storage in needs-save state
 * interpolated test rate gives above min and below max
 * reintroduce the exposure chart view

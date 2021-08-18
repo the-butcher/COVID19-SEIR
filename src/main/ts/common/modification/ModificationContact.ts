@@ -1,3 +1,4 @@
+import { IContactCategories } from './IContactCategories';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
@@ -14,7 +15,7 @@ import { IModificationValuesContact } from './IModificationValuesContact';
  * @author h.fleischer
  * @since 18.04.2021
  */
-export class ModificationContact extends AModification<IModificationValuesContact> implements IContactMatrix {
+export class ModificationContact extends AModification<IModificationValuesContact> implements IContactCategories, IContactMatrix {
 
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
@@ -31,10 +32,21 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
         const demographics = Demographics.getInstance();
         this.ageGroups.push(...demographics.getAgeGroups());
-        this.contactCategories.push(...demographics.getContactCategories());
+        this.contactCategories.push(...demographics.getCategories());
 
         this.resetValues();
 
+    }
+
+    getCategories(): ContactCategory[] {
+        return this.contactCategories;
+    }
+
+    getCategoryValue(contactCategoryName: string): number {
+        if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
+            this.modificationValues.multipliers[contactCategoryName] = 1.0;
+        }
+        return this.modificationValues.multipliers[contactCategoryName];
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
@@ -58,7 +70,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
         this.contactCategories.forEach(contactCategory => {
             let sum = 0;
             this.ageGroups.forEach(ageGroupParticipant => {
-                sum += contactCategory.getData(ageGroupContact.getIndex(), ageGroupParticipant.getIndex()) * this.getMultiplier(contactCategory.getName());
+                sum += contactCategory.getCellValue(ageGroupContact.getIndex(), ageGroupParticipant.getIndex()) * this.getCategoryValue(contactCategory.getName());
             });
             summary[contactCategory.getName()] = sum;
             total += sum;
@@ -71,14 +83,10 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return this.modificationValues.instant;
     }
 
-    getMultiplier(contactCategoryName: string): number {
-        return this.getContactCategoryMultiplier(contactCategoryName);
-    }
-
     getCellValue(indexContact: number, indexParticipant: number): number {
         let value = 0;
         this.contactCategories.forEach(contactCategory => {
-            value += contactCategory.getData(indexContact, indexParticipant) * this.getMultiplier(contactCategory.getName());
+            value += contactCategory.getCellValue(indexContact, indexParticipant) * this.getCategoryValue(contactCategory.getName());
         });
         return value;
     }
@@ -90,11 +98,19 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return this.columnValues[indexAgeGroup];
     }
 
-    getCellSum(): number {
+    getColumnSum(): number {
         return this.getMatrixSum();
     }
 
-    getColumnSum(): number {
+    getMaxColumnValue(): number {
+        return Demographics.getInstance().getMaxColumnValue();
+    }
+
+    getMaxColumnSum(): number {
+        return this.getMaxMatrixSum();
+    }
+
+    getCellSum(): number {
         return this.getMatrixSum();
     }
 
@@ -109,23 +125,15 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return Demographics.getInstance().getMaxCellValue();
     }
 
-    getMaxColumnValue(): number {
-        return Demographics.getInstance().getMaxColumnValue();
-    }
-
-    getMaxColumnSum(): number {
-        return this.getMaxMatrixSum();
-    }
-
     getMaxMatrixSum(): number {
         return Demographics.getInstance().getMatrixValue();
     }
 
-    private getContactCategoryMultiplier(contactCategoryName: string): number {
-        if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
-            this.modificationValues.multipliers[contactCategoryName] = 1.0;
-        }
-        return this.modificationValues.multipliers[contactCategoryName];
-    }
+    // private getContactCategoryMultiplier(contactCategoryName: string): number {
+    //     if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
+    //         this.modificationValues.multipliers[contactCategoryName] = 1.0;
+    //     }
+    //     return this.modificationValues.multipliers[contactCategoryName];
+    // }
 
 }

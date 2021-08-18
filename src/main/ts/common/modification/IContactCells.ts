@@ -1,4 +1,3 @@
-import { IContactColumns } from './IContactColumns';
 
 /**
  * definition for types that can provide a cell-value by contact- and participant index

@@ -287,7 +287,7 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.35,
-            labelled: false,
+            labelled: true,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2

@@ -2,12 +2,12 @@ import { TimeUtil } from './../util/TimeUtil';
 import { IModification } from '../common/modification/IModification';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IModificationValuesContact } from '../common/modification/IModificationValuesContact';
-import { IModificationValuesTesting } from '../common/modification/IModificationValuesTesting';
+import { IModificationValuesDiscovery } from '../common/modification/IModificationValueDiscovery';
 import { ModificationContact } from '../common/modification/ModificationContact';
 import { ModificationSeasonality } from '../common/modification/ModificationSeasonality';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
-import { ModificationTesting } from '../common/modification/ModificationTesting';
+import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { ModificationVaccination } from '../common/modification/ModificationVaccination';
 import { ObjectUtil } from '../util/ObjectUtil';
@@ -72,8 +72,8 @@ export class ModelConstants {
             }),
         },
         'TESTING': {
-            createValuesModification: (modificationValues) => new ModificationTesting(modificationValues as IModificationValuesTesting),
-            createDefaultModification: (instant: number) => new ModificationTesting({
+            createValuesModification: (modificationValues) => new ModificationDiscovery(modificationValues as IModificationValuesDiscovery),
+            createDefaultModification: (instant: number) => new ModificationDiscovery({
                 id: ObjectUtil.createId(),
                 key: 'TESTING',
                 name: 'testing',
@@ -112,7 +112,7 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
     static readonly BASE_DATA_INDEX___TESTS = 4;
 
-    static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
+    static readonly RANGE____PERCENTAGE_100 = [0.00, 0.50, 1.00, 1.50, 2.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
     static readonly RANGE________INCUBATION = [1, 7, 14];

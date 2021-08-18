@@ -1,7 +1,6 @@
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
-import { ModificationTesting } from '../common/modification/ModificationTesting';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { StrainUtil } from '../util/StrainUtil';
 import { TimeUtil } from './../util/TimeUtil';
@@ -37,8 +36,7 @@ export class ModelImplInfectious implements IModelSeir {
 
     private integrationSteps: IModelIntegrationStep[];
 
-
-    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTesting: ModificationTesting, baseData: BaseData) {
+    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, baseData: BaseData) {
 
         this.parentModel = parentModel;
         this.compartmentsInfectious = [];
@@ -94,7 +92,7 @@ export class ModelImplInfectious implements IModelSeir {
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
 
             }
-            const dailyActual = dailyTested / modificationTesting.getColumnValue(ageGroup.getIndex());
+            const dailyActual = dailyTested / modificationTime.getRatios(ageGroup.getIndex()).discovery;
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
             this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
 
@@ -102,13 +100,12 @@ export class ModelImplInfectious implements IModelSeir {
 
         };
 
-
         this.nrmValue = absCompartmentInfectiousSum / this.absTotal;
         for (let i = 0; i < 7; i++) {
             const instantB = TimeUtil.MILLISECONDS_PER____DAY * - (i + 1.5);
             if (strainValues.preGrowthRate) {
                 const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantB, strainValues.serialInterval * strainValues.intervalScale);
-                dailyTested = incidenceC * ageGroup.getAbsValue() / 700000; // // incidenceC
+                dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
             }
             const compartmentType = i == 0 ? ECompartmentType.X__INCUBATE_0 : ECompartmentType.X__INCUBATE_N;
             this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER____DAY)));
@@ -146,7 +143,7 @@ export class ModelImplInfectious implements IModelSeir {
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
-                        const discoveredNrmCases = continuationValue * modificationTime.getTestingRatio(this.ageGroupIndex);
+                        const discoveredNrmCases = continuationValue * modificationTime.getRatios(this.ageGroupIndex).discovery;
                         increments.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
                     }
                     return increments;

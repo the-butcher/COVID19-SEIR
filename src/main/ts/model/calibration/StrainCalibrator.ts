@@ -1,7 +1,7 @@
 import { IVaccinationConfig } from './../../common/demographics/IVaccinationConfig';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { IModificationValuesTesting } from '../../common/modification/IModificationValuesTesting';
+import { IModificationValuesDiscovery } from '../../common/modification/IModificationValueDiscovery';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
@@ -26,7 +26,7 @@ export class StrainCalibrator {
         // no public instance
     }
 
-    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesTesting, baseData: BaseData): void {
+    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesDiscovery, baseData: BaseData): void {
 
         const ageGroups = demographics.getAgeGroups();
 

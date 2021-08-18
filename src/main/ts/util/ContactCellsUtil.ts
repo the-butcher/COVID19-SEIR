@@ -1,6 +1,6 @@
+import { IContactMatrix } from './../common/modification/IContactMatrix';
 import { Demographics } from '../common/demographics/Demographics';
 import { IContactCells } from './../common/modification/IContactCells';
-import { IContactColumns } from './../common/modification/IContactColumns';
 
 export class ContactCellsUtil {
 
@@ -28,7 +28,7 @@ export class ContactCellsUtil {
         return columnValue;
     }
 
-    static findMaxColumnValue(contactColumns: IContactColumns): number {
+    static findMaxColumnValue(contactColumns: IContactMatrix): number {
         const ageGroups = Demographics.getInstance().getAgeGroups();
         let maxColumnValue = 0;
         for (let indexColumn = 0; indexColumn < ageGroups.length; indexColumn++) {
@@ -37,11 +37,13 @@ export class ContactCellsUtil {
         return maxColumnValue;
     }
 
-    static findMatrixValue(contactColumns: IContactColumns): number {
+    static findMatrixValue(contactCells: IContactCells): number {
         const ageGroups = Demographics.getInstance().getAgeGroups();
         let valueSum = 0;
-        for (let indexColumn = 0; indexColumn < ageGroups.length; indexColumn++) {
-            valueSum += contactColumns.getColumnValue(indexColumn);
+        for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
+            for (let indexParticipant = 0; indexParticipant < ageGroups.length; indexParticipant++) {
+                valueSum += contactCells.getCellValue(indexContact, indexParticipant);
+            }
         }
         return valueSum;
     }

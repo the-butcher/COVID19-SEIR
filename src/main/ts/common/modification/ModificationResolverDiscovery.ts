@@ -1,10 +1,10 @@
-import { TimeUtil } from './../../util/TimeUtil';
-import { IModificationData } from '../../client/chart/ChartAgeGroup';
+import { ModificationTime } from './ModificationTime';
+import { Modifications } from './Modifications';
+import { ModificationResolverTime } from './ModificationResolverTime';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { Demographics } from '../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
-import { IModificationValuesTesting } from './IModificationValuesTesting';
-import { ModificationTesting } from './ModificationTesting';
+import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
+import { ModificationDiscovery } from './ModificationDiscovery';
 
 /**
  * modification resolver for testing modifications
@@ -12,7 +12,7 @@ import { ModificationTesting } from './ModificationTesting';
  * @author h.fleischer
  * @since 25.05.2021
  */
-export class ModificationResolverTesting extends AModificationResolver<IModificationValuesTesting, ModificationTesting> {
+export class ModificationResolverDiscovery extends AModificationResolver<IModificationValuesDiscovery, ModificationDiscovery> {
 
     constructor() {
         super('TESTING');
@@ -30,7 +30,7 @@ export class ModificationResolverTesting extends AModificationResolver<IModifica
         return 'discovery rate';
     }
 
-    getModification(instant: number): ModificationTesting {
+    getModification(instant: number): ModificationDiscovery {
 
         const modificationA = super.getModification(instant);
         const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1));
@@ -57,7 +57,7 @@ export class ModificationResolverTesting extends AModificationResolver<IModifica
                 multipliers[key] = multiplier;
             });
 
-            const interpolatedModification = new ModificationTesting({
+            const interpolatedModification = new ModificationDiscovery({
                 id: ObjectUtil.createId(),
                 key: 'TESTING',
                 name: 'interpolation',
@@ -76,13 +76,19 @@ export class ModificationResolverTesting extends AModificationResolver<IModifica
     }
 
     getValue(instant: number): number {
-        const demographics = Demographics.getInstance();
-        let totalTestingValue = 0;
-        for (let indexContact = 0; indexContact < demographics.getAgeGroups().length; indexContact++) {
-            const testingVal = this.getModification(instant).getColumnValue(indexContact);
-            totalTestingValue += testingVal * demographics.getAgeGroups()[indexContact].getAbsValue();
-        }
-        return totalTestingValue / Demographics.getInstance().getAbsTotal();
+
+        const modificationTime = Modifications.getInstance().findModificationsByType('TIME')[0] as ModificationTime;
+        modificationTime.setInstants(instant, instant);
+        return modificationTime.getDiscoveryRatioTotal();
+
+        // const demographics = Demographics.getInstance();
+        // let totalTestingValue = 0;
+        // for (let indexContact = 0; indexContact < demographics.getAgeGroups().length; indexContact++) {
+        //     const testingVal = this.getModification(instant).getColumnValue(indexContact);
+        //     totalTestingValue += testingVal * demographics.getAgeGroups()[indexContact].getAbsValue();
+        // }
+        // return totalTestingValue / Demographics.getInstance().getAbsTotal();
+
     }
 
 }

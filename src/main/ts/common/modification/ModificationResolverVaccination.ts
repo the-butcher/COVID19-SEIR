@@ -29,13 +29,11 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
     }
 
     getValue(instant: number): number {
-
         const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
         if (dataItemCur) {
             return dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].REMOVED_V2;
         }
         return Number.NaN;
-
     }
 
 }

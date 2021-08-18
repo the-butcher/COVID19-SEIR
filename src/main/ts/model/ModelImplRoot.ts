@@ -1,7 +1,7 @@
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
-import { ModificationTesting } from '../common/modification/ModificationTesting';
+import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from '../util/TimeUtil';
 import { Modifications } from './../common/modification/Modifications';
@@ -78,12 +78,17 @@ export class ModelImplRoot implements IModelSeir {
         this.compartmentsRemovedU = [];
         this.vaccinationModels = [];
 
+        const modificationTime = modifications.findModificationsByType('TIME')[0] as ModificationTime;
+        modificationTime.setInstants(ModelInstants.getInstance().getMinInstant(), ModelInstants.getInstance().getMinInstant());
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
-        const modificationTesting = modifications.findModificationsByType('TESTING')[0] as ModificationTesting;
+
+        // const modificationTesting = modifications.findModificationsByType('TESTING')[0] as ModificationDiscovery;
+
+        // console.log('modificationTime', modificationTime, modificationTesting);
 
         this.demographics = demographics;
         modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {
-            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTesting, baseData));
+            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTime, baseData));
         });
 
         demographics.getAgeGroups().forEach(ageGroup => {

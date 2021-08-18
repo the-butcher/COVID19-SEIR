@@ -1,12 +1,13 @@
-import { ControlsConstants } from './../gui/ControlsConstants';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { Demographics } from '../../common/demographics/Demographics';
-import { ModificationTesting } from '../../common/modification/ModificationTesting';
+import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { ChartContactColumns } from '../chart/ChartContactColumns';
+import { ChartDiscovery } from '../chart/ChartDiscovery';
 import { IconToggle } from '../gui/IconToggle';
 import { SliderModification } from '../gui/SliderModification';
 import { SliderTestingCategory } from '../gui/SliderTestingCategory';
 import { Controls } from './Controls';
+import { ModificationTime } from '../../common/modification/ModificationTime';
 
 /**
  * controller for editing testing modifications
@@ -14,25 +15,25 @@ import { Controls } from './Controls';
  * @author h.fleischer
  * @since 25.05.2021
  */
-export class ControlsTesting {
+export class ControlsDiscovery {
 
-    static getInstance(): ControlsTesting {
+    static getInstance(): ControlsDiscovery {
         if (ObjectUtil.isEmpty(this.instance)) {
-            this.instance = new ControlsTesting();
+            this.instance = new ControlsDiscovery();
         }
         return this.instance;
     }
-    private static instance: ControlsTesting;
+    private static instance: ControlsDiscovery;
 
-    private readonly chartTesting: ChartContactColumns;
+    private readonly chartTesting: ChartDiscovery;
     private readonly slidersTesting: SliderTestingCategory[];
     private readonly iconBlendable: IconToggle;
 
-    private modification: ModificationTesting;
+    private modification: ModificationDiscovery;
 
     constructor() {
 
-        this.chartTesting = new ChartContactColumns('chartTestingDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
+        this.chartTesting = new ChartDiscovery('chartTestingDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
         this.slidersTesting = [];
 
         this.iconBlendable = new IconToggle({
@@ -44,7 +45,7 @@ export class ControlsTesting {
             label: 'smooth transition'
         });
 
-        Demographics.getInstance().getContactCategories().forEach(contactCategory => {
+        Demographics.getInstance().getCategories().forEach(contactCategory => {
             this.slidersTesting.push(new SliderTestingCategory(contactCategory.getName()));
         });
 
@@ -61,28 +62,44 @@ export class ControlsTesting {
             multipliers,
             blendable
         });
-        this.chartTesting.acceptContactColumns(this.modification);
+        this.updateChart(this.modification.getInstantA());
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
     }
 
-    acceptModification(modification: ModificationTesting): void {
+    acceptModification(modification: ModificationDiscovery): void {
 
         Controls.acceptModification(modification);
         this.modification = modification;
 
         this.slidersTesting.forEach(sliderTesting => {
-            sliderTesting.setValue(modification.getMultiplier(sliderTesting.getName()));
+            sliderTesting.setValue(modification.getCategoryValue(sliderTesting.getName()));
         });
         this.iconBlendable.toggle(modification.isBlendable());
 
+        this.updateChart(modification.getInstantA());
+
+    }
+
+    updateChart(instant: number): void {
+
+        const modificationTime = new ModificationTime({
+            id: ObjectUtil.createId(),
+            key: 'TIME',
+            instant,
+            name: 'step',
+            deletable: false,
+            draggable: false,
+            blendable: false
+        });
+        modificationTime.setInstants(instant, instant);
+
         requestAnimationFrame(() => {
-            this.chartTesting.acceptContactColumns(modification);
+            this.chartTesting.acceptModificationTime(modificationTime);
             this.slidersTesting.forEach(sliderTesting => {
                 sliderTesting.handleResize();
             });
         });
-
     }
 
 }

@@ -27,7 +27,6 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
     }
 
     getValue(instant: number): number {
-
         const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
         if (dataItemCur) {
             const value = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].TOTAL;

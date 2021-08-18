@@ -1,6 +1,6 @@
 import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
-import { IModificationValuesTesting } from './common/modification/IModificationValuesTesting';
+import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
 import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/calibration/BaseData';
 import { IWorkerInput } from './model/IWorkerInput';
@@ -44,7 +44,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         /**
          * calibrate strain values to have transmission risk set properly (in an SEIS model the strain would then hold equilibrium at R0=1 and the strain's initial incidence)
          */
-        const modificationValuesTesting = modificationValues.find(m => m.key === 'TESTING') as IModificationValuesTesting;
+        const modificationValuesTesting = modificationValues.find(m => m.key === 'TESTING') as IModificationValuesDiscovery;
         modificationValues.filter(m => m.key === 'STRAIN').forEach((modificationValuesStrain: IModificationValuesStrain) => {
             StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain, modificationValuesTesting, BaseData.getInstance());
         });

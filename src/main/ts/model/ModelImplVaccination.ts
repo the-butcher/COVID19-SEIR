@@ -109,9 +109,11 @@ export class ModelImplVaccination implements IModelSeir {
     getAgeGroupIndex(): number {
         return this.ageGroupIndex;
     }
+
     getAgeGroupTotal(): number {
         return this.ageGroupTotal;
     }
+
     getAgeGroupName(): string {
         return this.ageGroupName;
     }

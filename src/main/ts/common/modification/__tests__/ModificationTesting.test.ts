@@ -1,14 +1,14 @@
 import { describe, expect, it } from '@jest/globals';
 import model2config from '../../../../webapp/data/demographics-at.json';
 import { ObjectUtil } from '../../../util/ObjectUtil';
-import { ModificationTesting } from '../ModificationTesting';
+import { ModificationDiscovery } from '../ModificationDiscovery';
 import { Demographics } from './../../demographics/Demographics';
 import { IDemographicsConfig } from './../../demographics/IDemographicsConfig';
 
 describe("test value", () => {
     Demographics.setInstanceFromConfig('test', model2config as IDemographicsConfig);
     it("should return 0.3 as testing ratio, 0.839 as contact multiplier", () => {
-        const modificationTesting = new ModificationTesting({
+        const modificationTesting = new ModificationDiscovery({
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
@@ -32,7 +32,7 @@ describe("test value", () => {
         // expect(modificationTesting.getContactMultiplier(9)).toBeCloseTo(0.839, 3);
     });
     it("should return 0.5 as testing ratio, 0.7315 as contact multiplier", () => {
-        const modificationTesting = new ModificationTesting({
+        const modificationTesting = new ModificationDiscovery({
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',
@@ -56,7 +56,7 @@ describe("test value", () => {
         // expect(modificationTesting.getContactMultiplier(9)).toBeCloseTo(0.7315, 3);
     });
     it("should return 0.7 as testing ratio, 0.6242 as contact multiplier", () => {
-        const modificationTesting = new ModificationTesting({
+        const modificationTesting = new ModificationDiscovery({
             id: ObjectUtil.createId(),
             key: 'TESTING',
             name: 'initial discovery',

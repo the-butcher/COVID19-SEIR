@@ -1,5 +1,5 @@
 import { ModelConstants } from '../../model/ModelConstants';
-import { ControlsTesting } from '../controls/ControlsTesting';
+import { ControlsDiscovery } from '../controls/ControlsDiscovery';
 import { ControlsConstants } from './ControlsConstants';
 import { IconSlider } from './IconSlider';
 import { Slider } from './Slider';
@@ -36,7 +36,7 @@ export class SliderTestingCategory extends Slider {
             },
             handleValueChange: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
-                    ControlsTesting.getInstance().handleChange();
+                    ControlsDiscovery.getInstance().handleChange();
                 }
             },
             handleThumbPicked: (index) => {

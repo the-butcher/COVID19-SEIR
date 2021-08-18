@@ -43,7 +43,7 @@ export class ControlsContact {
             label: 'smooth transition'
         });
 
-        Demographics.getInstance().getContactCategories().forEach(contactCategory => {
+        Demographics.getInstance().getCategories().forEach(contactCategory => {
             this.slidersCategory.push(new SliderContactCategory(contactCategory));
         });
 
@@ -77,7 +77,7 @@ export class ControlsContact {
         this.modification = modification;
 
         this.slidersCategory.forEach(sliderCategory => {
-            sliderCategory.setValue(modification.getMultiplier(sliderCategory.getName()));
+            sliderCategory.setValue(modification.getCategoryValue(sliderCategory.getName()));
         });
         this.iconBlendable.toggle(modification.isBlendable());
 
