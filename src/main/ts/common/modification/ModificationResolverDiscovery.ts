@@ -77,7 +77,16 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
 
     getValue(instant: number): number {
 
-        const modificationTime = Modifications.getInstance().findModificationsByType('TIME')[0] as ModificationTime;
+        const modificationTime = new ModificationTime({
+            id: ObjectUtil.createId(),
+            key: 'TIME',
+            instant: instant,
+            name: 'discovery value helper',
+            deletable: false,
+            draggable: false,
+            blendable: false
+        });
+        // const modificationTime = Modifications.getInstance().findModificationsByType('TIME')[0] as ModificationTime;
         modificationTime.setInstants(instant, instant);
         return modificationTime.getDiscoveryRatioTotal();
 

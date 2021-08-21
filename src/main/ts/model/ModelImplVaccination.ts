@@ -28,12 +28,12 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly compartmentI: CompartmentBase;
 
     /**
-     * pure model based --> should match the vacc_2 curve
+     * pure model based --> people fully vaccinated, should be configured to match the vacc_2 curve
      */
     private readonly compartmentV: CompartmentBase;
 
     /**
-     * people immunized after previously infected
+     * people immunized after previously having been infected
      */
     private readonly compartmentU: CompartmentBase;
 
