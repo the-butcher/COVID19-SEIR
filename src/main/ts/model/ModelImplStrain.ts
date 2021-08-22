@@ -145,7 +145,7 @@ export class ModelImplStrain implements IModelSeir {
 
                 // contact rate and exposed compartment
                 const baseContactRate = modificationTime.getCellValue(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
-                compartmentE = infectiousModelParticipant.getFirstCompartment();
+                compartmentE = infectiousModelParticipant.getFirstCompartment('PRIMARY');
 
                 nrmESum = 0;
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
@@ -196,7 +196,7 @@ export class ModelImplStrain implements IModelSeir {
             // ~~~CALIBRATION
             // const compartmentSusceptible = this.parentModel.getCompartmentsSusceptible(ageGroupIndex)[0];
 
-            const outgoingCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
+            const outgoingCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment('PRIMARY');
 
             const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
             const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);

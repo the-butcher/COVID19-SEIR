@@ -1,3 +1,4 @@
+import { TimeUtil } from './../util/TimeUtil';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
@@ -18,6 +19,7 @@ import { ModelInstants } from './ModelInstants';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 import { IModelProgress, ModelStateIntegrator } from './state/ModelStateIntegrator';
+import { RationalDurationFixed } from './rational/RationalDurationFixed';
 
 /**
  * root model holding a set of age-specific submodels
@@ -120,10 +122,12 @@ export class ModelImplRoot implements IModelSeir {
             const vaccinationModel = new ModelImplVaccination(this, demographics, absValue12 - absValueVU, absValueVU, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R__REMOVED_ID, this.demographics.getAbsTotal(), absValueID, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+            const durationToReexposable = modificationSettings.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
+
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R__REMOVED_ID, this.demographics.getAbsTotal(), absValueID, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable));
             this.compartmentsRemovedD.push(compartmentRemovedD);
 
-            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.demographics.getAbsTotal(), absValueIU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
+            const compartmentRemovedU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.demographics.getAbsTotal(), absValueIU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable));
             this.compartmentsRemovedU.push(compartmentRemovedU);
 
         });
@@ -147,6 +151,15 @@ export class ModelImplRoot implements IModelSeir {
 
     getCompartmentsSusceptible(ageGroupIndex: number): CompartmentBase[] {
         return [this.compartmentsSusceptible[ageGroupIndex], this.vaccinationModels[ageGroupIndex].getCompartmentI()];
+    }
+
+    /**
+     * get compartments holding "immunized" population, fully vaccinated or recovered
+     * @param ageGroupIndex
+     * @returns
+     */
+    getCompartmentsReexposable(ageGroupIndex: number): CompartmentBase[] {
+        return [this.vaccinationModels[ageGroupIndex].getCompartmentV(), this.vaccinationModels[ageGroupIndex].getCompartmentU()];
     }
 
     getCompartmentRemovedD(ageGroupIndex: number): CompartmentBase {
@@ -210,6 +223,29 @@ export class ModelImplRoot implements IModelSeir {
             initialState.add(vaccinationModel.getInitialState());
         });
         return initialState;
+    }
+
+    applyReexposure(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
+
+        const result = ModelState.empty();
+
+        for (let ageGroupIndex = 0; ageGroupIndex < this.compartmentsSusceptible.length; ageGroupIndex++) {
+
+            const compartmentRemovedD = this.compartmentsRemovedD[ageGroupIndex];
+            const compartmentRemovedU = this.compartmentsRemovedU[ageGroupIndex];
+            const compartmentSusceptible = this.compartmentsSusceptible[ageGroupIndex];
+
+            const continuationValueD = compartmentRemovedD.getContinuationRatio().getRate(dT, tT) * state.getNrmValue(compartmentRemovedD);
+            const continuationValueU = compartmentRemovedU.getContinuationRatio().getRate(dT, tT) * state.getNrmValue(compartmentRemovedU);
+
+            result.addNrmValue(-continuationValueD, compartmentRemovedD);
+            result.addNrmValue(-continuationValueU, compartmentRemovedU);
+            result.addNrmValue(continuationValueD + continuationValueU, compartmentSusceptible);
+
+        }
+
+        return result;
+
     }
 
     applyVaccination(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
@@ -328,6 +364,7 @@ export class ModelImplRoot implements IModelSeir {
 
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
         const result = this.applyVaccination(state, dT, tT, modificationTime);
+        result.add(this.applyReexposure(state, dT, tT, modificationTime));
         this.strainModels.forEach(strainModel => {
             result.add(strainModel.apply(state, dT, tT, modificationTime));
         });

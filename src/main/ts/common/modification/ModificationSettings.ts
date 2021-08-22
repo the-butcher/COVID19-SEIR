@@ -22,6 +22,10 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         return this.modificationValues.quarantine;
     }
 
+    getReexposure(): number {
+        return this.modificationValues.reexposure;
+    }
+
     getDead(): number {
         return this.modificationValues.dead;
     }

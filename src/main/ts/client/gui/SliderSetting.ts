@@ -15,12 +15,12 @@ export class SliderSetting extends Slider {
 
         document.getElementById('slidersSettingsDiv').appendChild(container);
 
-        let labelFormat = ControlsConstants.LOCALE_FORMAT_FIXED;
-        let inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
-        if (steps < 0.01) {
-            labelFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
-            inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
-        }
+        // let labelFormat = ControlsConstants.LOCALE_FORMAT_FIXED;
+        // let inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
+        // if (steps < 0.01) {
+        //     labelFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
+        //     inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
+        // }
 
         super({
             container,

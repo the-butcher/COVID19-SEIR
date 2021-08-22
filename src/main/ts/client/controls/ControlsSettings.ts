@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -23,6 +24,7 @@ export class ControlsSettings {
 
     private sliderUndetected: SliderSetting;
     private sliderQuarantine: SliderSetting;
+    private sliderReexposure: SliderSetting;
     // private sliderDead: SliderSetting;
 
     private modification: ModificationSettings;
@@ -31,6 +33,7 @@ export class ControlsSettings {
 
         this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false);
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true);
+        this.sliderReexposure = new SliderSetting("reexposure (months)", ModelConstants.RANGE________REEXPOSURE, 1, false);
         // this.sliderDead = new SliderSetting("deceased", ModelConstants.RANGE__PERCENTAGE__10, 0.001);
 
     }
@@ -39,10 +42,14 @@ export class ControlsSettings {
 
         const undetected = this.sliderUndetected.getValue();
         const quarantine = this.sliderQuarantine.getValue();
+        const reexposure = this.sliderReexposure.getValue();
+        console.log('changing reexposure to', reexposure);
+
         const dead = 0; // const dead = this.sliderDead.getValue();
         this.modification.acceptUpdate({
             undetected,
             quarantine,
+            reexposure,
             dead
         });
 
@@ -57,10 +64,18 @@ export class ControlsSettings {
 
         this.sliderUndetected.setValue(this.modification.getUndetected());
         this.sliderQuarantine.setValue(this.modification.getQuarantine());
+
+        let reexposure = this.modification.getReexposure();
+        if (ObjectUtil.isEmpty(reexposure)) {
+            reexposure = 12;
+        }
+        this.sliderReexposure.setValue(reexposure);
         // this.sliderDead.setValue(this.modification.getDead());
+
         requestAnimationFrame(() => {
             this.sliderUndetected.handleResize();
             this.sliderQuarantine.handleResize();
+            this.sliderReexposure.handleResize();
         });
 
         this.modification = modification;

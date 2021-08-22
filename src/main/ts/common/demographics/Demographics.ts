@@ -121,7 +121,7 @@ export class Demographics implements IContactCategories {
 
             if (matrixConfig.name === 'family') {
                 corrections = [
-                    0.60, // <= 04
+                    0.50, // <= 04
                     0.75, // 05-14
                     0.85, // 15-24
                     1.10, // 25-34
@@ -155,8 +155,8 @@ export class Demographics implements IContactCategories {
                     0.20, // 05-14
                     0.75, // 15-24
                     1.10, // 25-34
-                    0.90, // 35-44
-                    1.10, // 45-54
+                    0.95, // 35-44
+                    1.00, // 45-54
                     1.20, // 55-64
                     1.20, // 65-74
                     1.65, // 75-84
@@ -172,8 +172,8 @@ export class Demographics implements IContactCategories {
                     0.00, // <= 04
                     0.05, // 05-14
                     2.00, // 15-24
-                    1.50, // 25-34
-                    0.50, // 35-44
+                    1.45, // 25-34
+                    0.55, // 35-44
                     0.04, // 45-54
                     0.02, // 55-64
                     0.00, // 65-74

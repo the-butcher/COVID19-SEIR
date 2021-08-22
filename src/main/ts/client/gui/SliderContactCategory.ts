@@ -18,11 +18,11 @@ export class SliderContactCategory extends Slider {
 
         super({
             container,
-            min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
-            max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE_250),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE_250),
             step: 0.005, // 200
             values: [1.0],
-            ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
+            ticks: [...ModelConstants.RANGE____PERCENTAGE_250],
             label: contactCategoryConfig.getName(),
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();

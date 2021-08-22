@@ -20,6 +20,13 @@ import { IModificationValuesVaccination } from './../common/modification/IModifi
 export type MODIFICATION_NATURE = 'INSTANT' | 'RANGE';
 export type MODIFICATION____KEY = 'TIME' | 'STRAIN' | 'CONTACT' | 'TESTING' | 'VACCINATION' | 'SEASONALITY' | 'SETTINGS';
 
+/**
+ * enumeration of infectious type
+ * PRIMARY - infected, having been susceptible previously
+ * BREAKTHROUGH - infected, having been vaccinated previously
+ */
+export type INFECTIOUS_____TYPE = 'PRIMARY' | 'BREAKTHROUGH';
+
 export interface IModificationDefinitions {
     createDefaultModification?: (instant: number) => IModification<IModificationValues>;
     createValuesModification: (modificationValues: IModificationValues) => IModification<IModificationValues>;
@@ -112,9 +119,11 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
     static readonly BASE_DATA_INDEX___TESTS = 4;
 
-    static readonly RANGE____PERCENTAGE_100 = [0.00, 0.50, 1.00, 1.50, 2.00, 2.25];
+    static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00, 2.50];
+    static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
+    static readonly RANGE________REEXPOSURE = [6, 9, 12, 15, 18, 21, 24];
     static readonly RANGE________INCUBATION = [1, 7, 14];
     static readonly RANGE____INCIDENCE_1000 = [0, 250, 500, 750, 1000];
     static readonly RANGE_____INCIDENCE__10 = [0, 2, 4, 6, 8, 10];

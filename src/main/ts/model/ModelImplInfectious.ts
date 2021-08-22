@@ -1,3 +1,4 @@
+import { INFECTIOUS_____TYPE } from './ModelConstants';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
@@ -186,11 +187,11 @@ export class ModelImplInfectious implements IModelSeir {
         return this.parentModel.getRootModel();
     }
 
-    getFirstCompartment(): CompartmentInfectious {
+    getFirstCompartment(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious {
         return this.compartmentsInfectious[0];
     }
 
-    getLastCompartment(): CompartmentInfectious {
+    getLastCompartment(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious {
         return this.compartmentsInfectious[this.compartmentsInfectious.length - 1];
     }
 

@@ -97,9 +97,19 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
+* reexposure
+  * add some strain (read about common terms to express this) ratio (maybe a secondary r0-reexposure) that can be used to determine reproduction for reexposure
+  * adapt ModelImplInfectious to hold a second compartment chain
+  * in ModelImplStrain include second chain compartment to nrm_ISums calculation
+  * let recovered (discovered or undiscovered) slowly feed back to susceptible -> exposed -> infectious -> recovered
+  * depending on strain, there will be some amount of infection in vaccinated itself
+    * should go to separate compartment chain and may be less infectious there, but still some
+  * add exposed from second loop to second compartment chain
+  * from last compartment of second chain, individuals go where?
+
 * ModificationResolverDiscovery alters the apps-time modification, TODO instantiate mod-time and set instants on that instance
 * adding a modification does not put storage in needs-save state
-* interpolated test rate gives above min and below max
+* interpolated test rate gives above min and b#elow max
 * reintroduce the exposure chart view
   * zoom-y on chart-draw, not only after zooming
 * allow floating point config on initial strain incidence

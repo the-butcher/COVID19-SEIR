@@ -14,8 +14,13 @@ export interface IModificationValuesStrain extends IModificationValues {
      */
     r0: number;
 
+    // /**
+    //  * get the escape rate (a ratio)
+    //  */
+    // rE: number;
+
     /**
-     * is this the primary strain in the model;
+     * is this the primary strain in the model (the first strain and as such not-deletable)
      */
     primary: boolean;
 

@@ -97,6 +97,7 @@ export class ControlsVaccination {
 
     showVaccinationCurve(ageGroup: string): void {
 
+        console.log('vacc curve');
         // return;
 
         this.ageGroup = ageGroup;

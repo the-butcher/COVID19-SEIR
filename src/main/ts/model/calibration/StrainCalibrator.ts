@@ -90,6 +90,7 @@ export class StrainCalibrator {
                 instant: preInstant,
                 undetected: 0.0,
                 quarantine: 0.0,
+                reexposure: Number.MAX_SAFE_INTEGER,
                 dead: 0.0,
                 deletable: false,
                 draggable: false,
