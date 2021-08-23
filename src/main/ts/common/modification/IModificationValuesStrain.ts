@@ -14,10 +14,15 @@ export interface IModificationValuesStrain extends IModificationValues {
      */
     r0: number;
 
-    // /**
-    //  * get the escape rate (a ratio)
-    //  */
-    // rE: number;
+    /**
+     * a ratio of vaccinated population that, given the properties of this strain, will still be susceptible to infection
+     */
+    breakthroughRisk?: number
+
+    /**
+     * a secondary reproduction number, applicable to breakthrough cases
+     */
+    rB?: number;
 
     /**
      * is this the primary strain in the model (the first strain and as such not-deletable)
@@ -51,6 +56,7 @@ export interface IModificationValuesStrain extends IModificationValues {
      */
     preGrowthRate?: number[];
 
-    transmissionRisk?: number
+    transmissionRisk?: number;
+
 
 }

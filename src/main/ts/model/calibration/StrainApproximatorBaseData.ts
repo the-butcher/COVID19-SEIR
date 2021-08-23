@@ -145,10 +145,10 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
                 }
                 if (ageGroup.getName() === '05-14') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 6;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 4;
                 }
                 if (ageGroup.getName() === '15-24') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 2;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 1;
                 }
                 if (ageGroup.getName() === '25-34') {
                     heatmapDstIncidencesB[ageGroup.getIndex()] -= 0;
@@ -163,7 +163,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                     heatmapDstIncidencesB[ageGroup.getIndex()] -= 2;
                 }
                 if (ageGroup.getName() === '>= 85') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 8;
                 }
 
             });

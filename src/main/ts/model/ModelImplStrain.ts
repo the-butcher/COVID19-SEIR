@@ -29,6 +29,7 @@ export class ModelImplStrain implements IModelSeir {
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly transmissionRisk: number;
+    private readonly breakthroughRisk: number;
 
     private readonly nrmDeltas: number[];
     private nrmExposure: number[][];
@@ -38,6 +39,7 @@ export class ModelImplStrain implements IModelSeir {
         this.parentModel = parentModel;
         this.infectiousModels = [];
         this.transmissionRisk = strainValues.transmissionRisk;
+        this.breakthroughRisk = strainValues.breakthroughRisk;
 
         this.nrmDeltas = [];
 
@@ -132,7 +134,12 @@ export class ModelImplStrain implements IModelSeir {
 
             // calculate a normalized value of infectious individuals
             nrmI = 0
-            infectiousModelContact.getCompartments().forEach(compartmentI => {
+            infectiousModelContact.getCompartments('PRIMARY').forEach(compartmentI => {
+                if (compartmentI.getCompartmentType() === ECompartmentType.I__INFECTIOUS) {
+                    nrmI += state.getNrmValue(compartmentI) * compartmentI.getReproductionRatio().getRate(dT);
+                }
+            });
+            infectiousModelContact.getCompartments('BREAKTHROUGH').forEach(compartmentI => {
                 if (compartmentI.getCompartmentType() === ECompartmentType.I__INFECTIOUS) {
                     nrmI += state.getNrmValue(compartmentI) * compartmentI.getReproductionRatio().getRate(dT);
                 }
@@ -145,7 +152,6 @@ export class ModelImplStrain implements IModelSeir {
 
                 // contact rate and exposed compartment
                 const baseContactRate = modificationTime.getCellValue(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
-                compartmentE = infectiousModelParticipant.getFirstCompartment('PRIMARY');
 
                 nrmESum = 0;
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
@@ -153,7 +159,7 @@ export class ModelImplStrain implements IModelSeir {
                     nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
                     nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk;
 
-                    // result.addNrmValue(+nrmE, compartmentE);
+                    // remove from susceptible compartment (adding to exposed happens after loop in a single call)
                     result.addNrmValue(-nrmE, compartmentS);
 
                     nrmESum += nrmE;
@@ -161,6 +167,24 @@ export class ModelImplStrain implements IModelSeir {
                     this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
 
                 });
+                compartmentE = infectiousModelParticipant.getFirstCompartment('PRIMARY');
+                result.addNrmValue(nrmESum, compartmentE);
+
+                nrmESum = 0;
+                this.getRootModel().getCompartmentsReexposable(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
+
+                    nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
+                    nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk * this.breakthroughRisk;
+
+                    // remove from reexposable compartment (adding to exposed happens after loop in a single call)
+                    result.addNrmValue(-nrmE, compartmentS);
+
+                    nrmESum += nrmE;
+                    nrmSESums[infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
+                    this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
+
+                });
+                compartmentE = infectiousModelParticipant.getFirstCompartment('BREAKTHROUGH');
                 result.addNrmValue(nrmESum, compartmentE);
 
             });
@@ -210,6 +234,22 @@ export class ModelImplStrain implements IModelSeir {
             result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
             // ~~~CALIBRATION
             // result.addNrmValue(continuationValue, compartmentSusceptible);
+
+        }
+
+        /**
+         * return breakthrough infection to vaccinated (or maybe there could be a specific compartment for that)
+         */
+        for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
+
+            const compartmentRemovedV = this.parentModel.getCompartmentRemovedV(ageGroupIndex);
+
+            const outgoingCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment('BREAKTHROUGH');
+
+            const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
+            const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
+
+            result.addNrmValue(continuationValue, compartmentRemovedV);
 
         }
 

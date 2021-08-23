@@ -7,7 +7,7 @@ describe("test value", () => {
         const compartmentParams = new CompartmentChain().getCompartmentParams();
         let totalReproduction = 0;
         compartmentParams.forEach(compartmentParam => {
-            totalReproduction += compartmentParam.reproduction;
+            totalReproduction += compartmentParam.r0;
         });
         expect(totalReproduction).toBe(1);
     });
@@ -56,7 +56,7 @@ describe("test value", () => {
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
         let totalReproduction = 0;
         compartmentParams.forEach(compartmentParam => {
-            totalReproduction += compartmentParam.reproduction;
+            totalReproduction += compartmentParam.r0;
         });
         expect(totalReproduction).toBe(3);
     });
@@ -78,7 +78,7 @@ describe("test value", () => {
         const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
         let totalReproduction = 0;
         compartmentParams.forEach(compartmentParam => {
-            totalReproduction += compartmentParam.reproduction;
+            totalReproduction += compartmentParam.r0;
         });
         expect(totalReproduction).toBeCloseTo(3.4, 8);
     });

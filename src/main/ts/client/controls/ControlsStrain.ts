@@ -32,10 +32,13 @@ export class ControlsStrain {
     private readonly sliderReproduction: Slider;
     private readonly sliderSerialInterval: Slider;
     private readonly sliderIncidence: Slider;
+    private readonly sliderBreakthroughRisk: Slider;
 
     private readonly weibullCanvasContainer = 'weibullCanvas';
 
     private r0: number;
+    private rB: number;
+    private breakthroughRisk: number;
     private serialInterval: number;
     private intervalScale: number;
     private incidence: number;
@@ -49,9 +52,9 @@ export class ControlsStrain {
             min: Math.min(...ModelConstants.RANGE________________R0),
             max: Math.max(...ModelConstants.RANGE________________R0),
             step: 0.01,
-            values: [1.0],
+            values: [0.0, 1.0],
             ticks: [...ModelConstants.RANGE___SERIAL_INTERVAL],
-            label: 'R<sub>0</sub>',
+            label: 'R<sub>B</sub>/R<sub>0</sub>',
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
             },
@@ -63,8 +66,13 @@ export class ControlsStrain {
                 }
             },
             handleValueChange: (index, value, type) => {
-                this.r0 = value;
-                this.redrawCanvas();
+                if (index === 0) {
+                    this.rB = value;
+                    this.redrawCanvas();
+                } else {
+                    this.r0 = value;
+                    this.redrawCanvas();
+                }
                 if (type === 'stop' || type === 'input') {
                     this.handleChange();
                 }
@@ -164,6 +172,40 @@ export class ControlsStrain {
             }
         });
 
+        this.sliderBreakthroughRisk = new Slider({
+            container: 'sliderBreakthroughDiv',
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
+            step: 0.01,
+            values: [0.0],
+            ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
+            label: 'breakthrough ratio',
+            thumbCreateFunction: (index: number) => {
+                return new IconSlider();
+            },
+            labelFormatFunction: (index, value, type) => {
+                return ControlsConstants.LABEL_PERCENT___FIXED.format(value);
+            },
+            handleValueChange: (index, value, type) => {
+                this.breakthroughRisk = value;
+                console.log('this.breakthroughRisk', this.breakthroughRisk);
+                if (type === 'stop' || type === 'input') {
+                    this.handleChange();
+                }
+            },
+            handleThumbPicked: (index) => {
+                // nothing
+            },
+            inputFunctions: {
+                inputFormatFunction: (index, value) => {
+                    return ControlsConstants.LABEL_PERCENT___FIXED.format(value);
+                },
+                inputHandleFunction: (index, value) => {
+                    return parseFloat(value.replace(',', '.')) / 100;
+                }
+            }
+        });
+
         // initial redraw of internal canvas
         this.redrawCanvas();
 
@@ -183,13 +225,23 @@ export class ControlsStrain {
         const strain = modification.getModificationValues();
 
         this.r0 = strain.r0;
+        this.rB = strain.rB;
+        if (ObjectUtil.isEmpty(this.rB)) {
+            this.rB = 0;
+        }
+        this.breakthroughRisk = strain.breakthroughRisk;
+        if (ObjectUtil.isEmpty(this.breakthroughRisk)) {
+            this.breakthroughRisk = 0;
+        }
         this.serialInterval = strain.serialInterval;
         this.intervalScale = strain.intervalScale;
         this.incidence = strain.dstIncidence;
 
         this.sliderSerialInterval.setValueAndRedraw(0, StrainUtil.calculateLatency(this.serialInterval, this.intervalScale), true); // = [Strain.calculateLatency(this.serialInterval, this.intervalScale), this.serialInterval];
         this.sliderSerialInterval.setValueAndRedraw(1, this.serialInterval, true);
-        this.sliderReproduction.setValueAndRedraw(0, this.r0, true);
+        this.sliderReproduction.setValueAndRedraw(0, this.rB, true);
+        this.sliderReproduction.setValueAndRedraw(1, this.r0, true);
+        this.sliderBreakthroughRisk.setValueAndRedraw(0, this.breakthroughRisk, true);
         this.sliderIncidence.setValueAndRedraw(0, this.incidence, true);
 
         requestAnimationFrame(() => {
@@ -207,6 +259,8 @@ export class ControlsStrain {
 
         this.modification.acceptUpdate({
             r0: this.r0,
+            rB: this.rB,
+            breakthroughRisk: this.breakthroughRisk,
             serialInterval: this.serialInterval,
             intervalScale: this.intervalScale,
             dstIncidence: this.incidence
@@ -270,7 +324,7 @@ export class ControlsStrain {
             const xDim = xMax - xMin;
 
             const yMin = toCanvasY(0);
-            const yDim = compartmentParam.reproduction * 300 / xDim; // TODO magic number
+            const yDim = compartmentParam.r0 * 300 / xDim; // TODO magic number
             const yMax = toCanvasY(yDim);
 
             const hue = compartmentParam.presymptomatic ? 0.94 : 0.83;

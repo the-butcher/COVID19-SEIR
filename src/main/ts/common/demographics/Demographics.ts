@@ -127,7 +127,7 @@ export class Demographics implements IContactCategories {
                     1.10, // 25-34
                     1.00, // 35-44
                     1.00, // 45-54
-                    1.05, // 55-64
+                    1.10, // 55-64
                     1.00, // 65-74
                     1.00, // 75-84
                     1.00  // >= 85
@@ -172,8 +172,8 @@ export class Demographics implements IContactCategories {
                     0.00, // <= 04
                     0.05, // 05-14
                     2.00, // 15-24
-                    1.45, // 25-34
-                    0.55, // 35-44
+                    1.75, // 25-34
+                    0.60, // 35-44
                     0.04, // 45-54
                     0.02, // 55-64
                     0.00, // 65-74
@@ -202,25 +202,12 @@ export class Demographics implements IContactCategories {
         /**
          * calculate a value total across all categories and age groups
          */
-        // let populationContactTotal = 0;
         this.matrixValue = 0; // the total cell value in the contact matrix
-        // let populationG;
         this.contactCategories = [];
 
         contactCategoryParams.forEach(contactCategoryParam => {
-
             const contactCategory = new ContactCategory(contactCategoryParam);
             this.contactCategories.push(contactCategory);
-
-            // let matrixSumCategory = 0;
-            // for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
-            //     populationG = this.ageGroups[indexContact].getAbsValue(); // population of the "contact" age group
-            //     for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
-            //         matrixSumCategory += contactCategoryParam.data[indexContact][indexParticipant] * populationG;
-            //     }
-            // }
-            // this.valueSum += matrixSumCategory;
-
         });
 
         /**

@@ -1,4 +1,3 @@
-import { INFECTIOUS_____TYPE } from './ModelConstants';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
@@ -12,6 +11,7 @@ import { CompartmentInfectious } from './compartment/CompartmentInfectious';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
+import { INFECTIOUS_____TYPE } from './ModelConstants';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelImplStrain } from './ModelImplStrain';
 import { RationalDurationFixed } from './rational/RationalDurationFixed';
@@ -32,7 +32,8 @@ export class ModelImplInfectious implements IModelSeir {
     private readonly ageGroupIndex: number;
     private readonly ageGroupTotal: number;
 
-    private readonly compartmentsInfectious: CompartmentInfectious[];
+    private readonly compartmentsInfectiousPrimary: CompartmentInfectious[];
+    private readonly compartmentsInfectiousBreakthrough: CompartmentInfectious[];
     private readonly compartmentsIncidence: CompartmentBase[];
 
     private integrationSteps: IModelIntegrationStep[];
@@ -40,13 +41,15 @@ export class ModelImplInfectious implements IModelSeir {
     constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, baseData: BaseData) {
 
         this.parentModel = parentModel;
-        this.compartmentsInfectious = [];
+        this.compartmentsInfectiousPrimary = [];
+        this.compartmentsInfectiousBreakthrough = [];
         this.compartmentsIncidence = [];
         this.integrationSteps = [];
 
         this.absTotal = demographics.getAbsTotal();
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupTotal = ageGroup.getAbsValue();
+
 
         // make some assumptions about initial cases (duplicated code in ModelImplIncidence)
         let dailyTested = strainValues.preIncidence * ageGroup.getAbsValue() / 700000;
@@ -95,7 +98,8 @@ export class ModelImplInfectious implements IModelSeir {
             }
             const dailyActual = dailyTested / modificationTime.getRatios(ageGroup.getIndex()).discovery;
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
-            this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.reproduction, duration, compartmentParam.presymptomatic));
+            this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic));
+            this.compartmentsInfectiousBreakthrough.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, 0, this.ageGroupIndex, strainValues.id, compartmentParam.rB, duration, compartmentParam.presymptomatic));
 
             absCompartmentInfectiousSum += absCompartment;
 
@@ -116,10 +120,46 @@ export class ModelImplInfectious implements IModelSeir {
         /**
          * connect infection compartments among each other
          */
-        for (let compartmentIndex = 0; compartmentIndex < this.compartmentsInfectious.length; compartmentIndex++) {
+        this.linkCompartmentsInfectious(this.compartmentsInfectiousPrimary);
+        this.linkCompartmentsInfectious(this.compartmentsInfectiousBreakthrough);
 
-            const sourceCompartment = this.compartmentsInfectious[compartmentIndex];
-            const targetCompartment = this.compartmentsInfectious[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
+        /**
+         * connect incidence compartments among each other, last compartment juts looses its population to nowhere without further propagation
+         */
+        for (let compartmentIndex = 0; compartmentIndex < this.compartmentsIncidence.length; compartmentIndex++) {
+
+            const sourceCompartment = this.compartmentsIncidence[compartmentIndex];
+            const targetCompartment = this.compartmentsIncidence[compartmentIndex + 1]; // will evaluate to null and be caught further down
+            this.integrationSteps.push({
+
+                apply: (modelState: IModelState, dT: number, tT: number) => {
+
+                    // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
+                    const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
+                    const increments = ModelState.empty();
+                    increments.addNrmValue(-continuationValue, sourceCompartment);
+                    if (targetCompartment) {
+                        increments.addNrmValue(continuationValue, targetCompartment);
+                    }
+                    return increments;
+
+                }
+
+            });
+
+        }
+
+    }
+
+    linkCompartmentsInfectious(compartmentsInfectious: CompartmentInfectious[]): void {
+
+        /**
+         * connect infection compartments among each other
+         */
+         for (let compartmentIndex = 0; compartmentIndex < compartmentsInfectious.length; compartmentIndex++) {
+
+            const sourceCompartment = compartmentsInfectious[compartmentIndex];
+            const targetCompartment = compartmentsInfectious[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
             this.integrationSteps.push({
 
                 apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
@@ -155,32 +195,6 @@ export class ModelImplInfectious implements IModelSeir {
 
         }
 
-        /**
-         * connect incidence compartments among each other, last compartment juts looses its population to nowhere without further propagation
-         */
-        for (let compartmentIndex = 0; compartmentIndex < this.compartmentsIncidence.length; compartmentIndex++) {
-
-            const sourceCompartment = this.compartmentsIncidence[compartmentIndex];
-            const targetCompartment = this.compartmentsIncidence[compartmentIndex + 1]; // will evaluate to null and be caught further down
-            this.integrationSteps.push({
-
-                apply: (modelState: IModelState, dT: number, tT: number) => {
-
-                    // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
-                    const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
-                    const increments = ModelState.empty();
-                    increments.addNrmValue(-continuationValue, sourceCompartment);
-                    if (targetCompartment) {
-                        increments.addNrmValue(continuationValue, targetCompartment);
-                    }
-                    return increments;
-
-                }
-
-            });
-
-        }
-
     }
 
     getRootModel(): ModelImplRoot {
@@ -188,15 +202,27 @@ export class ModelImplInfectious implements IModelSeir {
     }
 
     getFirstCompartment(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious {
-        return this.compartmentsInfectious[0];
+        if (infectiousType === 'PRIMARY') {
+            return this.compartmentsInfectiousPrimary[0];
+        } else {
+            return this.compartmentsInfectiousBreakthrough[0];
+        }
     }
 
     getLastCompartment(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious {
-        return this.compartmentsInfectious[this.compartmentsInfectious.length - 1];
+        if (infectiousType === 'PRIMARY') {
+            return this.compartmentsInfectiousPrimary[this.compartmentsInfectiousPrimary.length - 1];
+        } else {
+            return this.compartmentsInfectiousBreakthrough[this.compartmentsInfectiousBreakthrough.length - 1];
+        }
     }
 
-    getCompartments(): CompartmentInfectious[] {
-        return this.compartmentsInfectious;
+    getCompartments(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious[] {
+        if (infectiousType === 'PRIMARY') {
+            return this.compartmentsInfectiousPrimary;
+        } else {
+            return this.compartmentsInfectiousBreakthrough;
+        }
     }
 
     /**
@@ -212,7 +238,7 @@ export class ModelImplInfectious implements IModelSeir {
 
     getNrmInfectious(modelState: IModelState, dT: number): number {
         let nrmInfectious = 0;
-        this.compartmentsInfectious.forEach(compartmentInfectious => {
+        this.compartmentsInfectiousPrimary.forEach(compartmentInfectious => {
             nrmInfectious += modelState.getNrmValue(compartmentInfectious) * compartmentInfectious.getReproductionRatio().getRate(dT);
         });
         return nrmInfectious;
@@ -241,7 +267,7 @@ export class ModelImplInfectious implements IModelSeir {
 
     getInitialState(): IModelState {
         const initialState = ModelState.empty();
-        this.compartmentsInfectious.forEach(compartment => {
+        this.compartmentsInfectiousPrimary.forEach(compartment => {
             initialState.addNrmValue(compartment.getNrmValue(), compartment);
         });
         this.compartmentsIncidence.forEach(compartment => {

@@ -7,9 +7,10 @@ import { RationalDurationFixed } from '../rational/RationalDurationFixed';
 
 export interface ICompartmentParams {
     type: ECompartmentType;
-    reproduction: number; // reproduction outbound from this specific compartment
+    r0: number; // reproduction outbound from this specific compartment
+    rB: number;
     instantA: number; // start of this compartment (with respect to mean)
-    instantB: number; //   end of this compartment (with respect to mean)
+    instantB: number; // end of this compartment (with respect to mean)
     i0Normal: number;
     presymptomatic: boolean;
 }
@@ -69,7 +70,8 @@ export class CompartmentChain {
             shareOfPreSymptomaticInfection1 += reproduction;
             this.compartmentParams.push({
                 type: ECompartmentType.I__INFECTIOUS,
-                reproduction,
+                r0: reproduction,
+                rB: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,
                 i0Normal: normalizedDuration,
@@ -81,9 +83,11 @@ export class CompartmentChain {
         normalizedDuration = (1 - normalizedIncubation) / compartmentCount; // the duration of each compartment after incubation
         for (let compartmentIndex = 1; compartmentIndex <= compartmentCount; compartmentIndex++) {
             instantB = normalizedIncubation + normalizedDuration * compartmentIndex;
+            reproduction = (Weibull.getInstance().getNormalizedDistribution(instantB) - Weibull.getInstance().getNormalizedDistribution(instantA));
             this.compartmentParams.push({
                 type: ECompartmentType.I__INFECTIOUS,
-                reproduction: (Weibull.getInstance().getNormalizedDistribution(instantB) - Weibull.getInstance().getNormalizedDistribution(instantA)),
+                r0: reproduction,
+                rB: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,
                 i0Normal: normalizedDuration,
@@ -113,7 +117,8 @@ export class CompartmentChain {
 
         strainedCompartmentParams.push({
             type: ECompartmentType.E_____EXPOSED,
-            reproduction: CompartmentChain.NO_REPRODUCTION,
+            r0: CompartmentChain.NO_REPRODUCTION,
+            rB: CompartmentChain.NO_REPRODUCTION,
             instantA: 0,
             instantB: Math.round(toStrainedValue(this.compartmentParams[0].instantA) * TimeUtil.MILLISECONDS_PER____DAY),
             i0Normal: 0,
@@ -123,7 +128,8 @@ export class CompartmentChain {
         this.compartmentParams.forEach(compartmentParam => {
             strainedCompartmentParams.push({
                 type: compartmentParam.type,
-                reproduction: compartmentParam.reproduction * strainValues.r0,
+                r0: compartmentParam.r0 * strainValues.r0,
+                rB: compartmentParam.rB * strainValues.rB,
                 instantA: Math.round(toStrainedValue(compartmentParam.instantA) * TimeUtil.MILLISECONDS_PER____DAY),
                 instantB: Math.round(toStrainedValue(compartmentParam.instantB) * TimeUtil.MILLISECONDS_PER____DAY),
                 i0Normal: compartmentParam.i0Normal,
