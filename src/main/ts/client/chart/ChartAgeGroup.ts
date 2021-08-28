@@ -628,7 +628,7 @@ export class ChartAgeGroup {
         });
 
         this.yAxisPlotIncidence.adapter.add('min', (value, target) => {
-            console.log('min', value);
+            // console.log('min', value);
             value = 0;
             this.yAxisPlotAbsolute.min = value * this.absValue / 700000;
             return value;
@@ -992,7 +992,7 @@ export class ChartAgeGroup {
     }
 
     setAxisRelativeMax(max: number): void {
-        console.log('rel');
+        // console.log('rel');
         this.yAxisPlotRelative.max = max;
     }
 
@@ -1146,6 +1146,9 @@ export class ChartAgeGroup {
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
 
+        let maxValue = 0;
+        const randomVd = Math.random() * 0.00001;
+
         const ageGroupPlot = this.ageGroupsWithTotal[this.ageGroupIndex];
         for (const dataItem of this.modelData) {
 
@@ -1162,36 +1165,25 @@ export class ChartAgeGroup {
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
-            const dataItem14 = BaseData.getInstance().findBaseDataItem(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 14);
-            const dataItem07 = BaseData.getInstance().findBaseDataItem(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7);
-            const dataItem01 = BaseData.getInstance().findBaseDataItem(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 1);
             const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
             let ageGroupRemovedVR1 = null;
             let ageGroupRemovedVR2 = null;
             let ageGroupIncidenceR = null;
             let totalTestsR = null;
             let ageGroupCasesR = null;
-            if (dataItem07 && dataItem01 && dataItem00) {
+            if (dataItem00) {
 
                 ageGroupRemovedVR1 = dataItem00.getVacc1(ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupRemovedVR2 = dataItem00.getVacc2(ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
 
-                const baseIncidences = BaseData.getInstance().findIncidences(dataItem.instant, this.ageGroupsWithTotal);
-                if (baseIncidences && baseIncidences.length > 0) {
-                    ageGroupIncidenceR = baseIncidences[ageGroupPlot.getIndex()];
-                } else {
-                    ageGroupIncidenceR = (dataItem00.getExposed(ageGroupPlot.getName()) - dataItem07.getExposed(ageGroupPlot.getName())) * 100000 / ageGroupPlot.getAbsValue();
-                }
+                ageGroupIncidenceR = dataItem00.getIncidence(ageGroupPlot.getIndex());
 
-                const diffCase01 = (dataItem00.getExposed(ageGroupPlot.getName()) - dataItem01.getExposed(ageGroupPlot.getName()));
+                const diffCase01 = dataItem00.getCasesM1(ageGroupPlot.getIndex()); // getExposed(ageGroupPlot.getName()) - dataItemM1.getExposed(ageGroupPlot.getName());
                 ageGroupCasesR = diffCase01;
 
-                if (dataItem14) {
-                    // const diffCase07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
-                    const diffTest07 = (dataItem00.getTests() - dataItem07.getTests());
-                    // totalTestsR = diffCase07 * 10000 / diffTest07;
-                    totalTestsR = diffTest07 * 250 / ageGroupPlot.getAbsValue();
-                }
+                const diffTest07 = dataItem00.getTestsM7(); // (dataItem00.getTests() - dataItemM7.getTests());
+                totalTestsR = diffTest07 * 250 / ageGroupPlot.getAbsValue();
+
             }
 
             const item = {
@@ -1222,23 +1214,14 @@ export class ChartAgeGroup {
 
             plotData.push(item);
 
-        }
-
-        let maxValue = 0;
-        const randomVd = Math.random() * 0.00001;
-        for (const dataItem of this.modelData) {
-
-            const baseIncidences = QueryUtil.getInstance().isDiffDisplay() ? BaseData.getInstance().findIncidences(dataItem.instant, this.ageGroupsWithTotal) : undefined;
-            this.ageGroupsWithTotal.forEach(ageGroupHeat => {
+           this.ageGroupsWithTotal.forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 
                 let color: string;
-                if (ObjectUtil.isNotEmpty(baseIncidences)) {
+                if (QueryUtil.getInstance().isDiffDisplay() && ObjectUtil.isNotEmpty(dataItem00)) {
 
-                    // console.log(TimeUtil.formatCategoryDate(dataItem.instant), baseIncidences, baseIncidences === []);
-
-                    const baseIncidence = baseIncidences[ageGroupHeat.getIndex()];
+                    const baseIncidence = dataItem00.getIncidence(ageGroupHeat.getIndex());
                     value -= baseIncidence;
 
                     let r = 0;
