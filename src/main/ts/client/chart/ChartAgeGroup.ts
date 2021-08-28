@@ -5,7 +5,7 @@ import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
-import { BaseData } from '../../model/calibration/BaseData';
+import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
@@ -1162,10 +1162,10 @@ export class ChartAgeGroup {
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
-            const dataItem14 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 14));
-            const dataItem07 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
-            const dataItem01 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 1));
-            const dataItem00 = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(dataItem.instant));
+            const dataItem14 = BaseData.getInstance().findBaseDataItem(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 14);
+            const dataItem07 = BaseData.getInstance().findBaseDataItem(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 7);
+            const dataItem01 = BaseData.getInstance().findBaseDataItem(dataItem.instant - TimeUtil.MILLISECONDS_PER____DAY * 1);
+            const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
             let ageGroupRemovedVR1 = null;
             let ageGroupRemovedVR2 = null;
             let ageGroupIncidenceR = null;
@@ -1173,22 +1173,22 @@ export class ChartAgeGroup {
             let ageGroupCasesR = null;
             if (dataItem07 && dataItem01 && dataItem00) {
 
-                ageGroupRemovedVR1 = BaseData.getVacc1(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
-                ageGroupRemovedVR2 = BaseData.getVacc2(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
+                ageGroupRemovedVR1 = dataItem00.getVacc1(ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
+                ageGroupRemovedVR2 = dataItem00.getVacc2(ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
 
                 const baseIncidences = BaseData.getInstance().findIncidences(dataItem.instant, this.ageGroupsWithTotal);
                 if (baseIncidences && baseIncidences.length > 0) {
                     ageGroupIncidenceR = baseIncidences[ageGroupPlot.getIndex()];
                 } else {
-                    ageGroupIncidenceR = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
+                    ageGroupIncidenceR = (dataItem00.getExposed(ageGroupPlot.getName()) - dataItem07.getExposed(ageGroupPlot.getName())) * 100000 / ageGroupPlot.getAbsValue();
                 }
 
-                const diffCase01 = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem01[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
+                const diffCase01 = (dataItem00.getExposed(ageGroupPlot.getName()) - dataItem01.getExposed(ageGroupPlot.getName()));
                 ageGroupCasesR = diffCase01;
 
                 if (dataItem14) {
                     // const diffCase07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
-                    const diffTest07 = (dataItem00[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS] - dataItem07[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS]);
+                    const diffTest07 = (dataItem00.getTests() - dataItem07.getTests());
                     // totalTestsR = diffCase07 * 10000 / diffTest07;
                     totalTestsR = diffTest07 * 250 / ageGroupPlot.getAbsValue();
                 }

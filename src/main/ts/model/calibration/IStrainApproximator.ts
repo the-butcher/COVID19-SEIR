@@ -1,5 +1,6 @@
 import { IModelProgress } from './../state/ModelStateIntegrator';
-import { IBaseDataItem } from './BaseData';
+import { IBaseDataItemConfig } from '../basedata/BaseData';
+import { IBaseDataItem } from '../basedata/BaseDataItem';
 
 /**
  * shallow definition for types that can approximate initial incidences in the model

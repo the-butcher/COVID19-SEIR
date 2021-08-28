@@ -13,8 +13,9 @@ import { ModelInstants } from '../ModelInstants';
 import { IDataItem, ModelStateIntegrator } from '../state/ModelStateIntegrator';
 import { StrainUtil } from './../../util/StrainUtil';
 import { IModelProgress } from './../state/ModelStateIntegrator';
-import { BaseData, IBaseDataItem } from './BaseData';
+import { BaseData, IBaseDataItemConfig } from '../basedata/BaseData';
 import { IStrainApproximator } from './IStrainApproximator';
+import { IBaseDataItem } from '../basedata/BaseDataItem';
 
 /**
  * implementation of IStrainApproximator for the standard use case
@@ -42,7 +43,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
         this.instantDst = ModelInstants.getInstance().getMinInstant();
         this.instantPre = ModelInstants.getInstance().getPreInstant();
 
-        this.referenceDataRemoved = this.baseData.findBaseData(TimeUtil.formatCategoryDate(this.instantPre));
+        this.referenceDataRemoved = this.baseData.findBaseDataItem(this.instantPre);
 
     }
 
@@ -109,23 +110,23 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             const instantDstA = this.instantDst + (offsetIndex - 7) * TimeUtil.MILLISECONDS_PER____DAY;
             const instantDstB = this.instantDst + offsetIndex * TimeUtil.MILLISECONDS_PER____DAY;
 
-            const dataItemPreA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA));
-            const dataItemPreB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB));
-            const dataItemPreC = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreC));
+            const dataItemPreA = this.baseData.findBaseDataItem(instantPreA);
+            const dataItemPreB = this.baseData.findBaseDataItem(instantPreB);
+            const dataItemPreC = this.baseData.findBaseDataItem(instantPreC);
 
-            const dataItemDstA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA));
-            const dataItemDstB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB));
+            const dataItemDstA = this.baseData.findBaseDataItem(instantDstA);
+            const dataItemDstB = this.baseData.findBaseDataItem(instantDstB);
 
             ageGroups.forEach(ageGroup => {
 
                 // cases at preload
-                const casesPreA = BaseData.getExposed(dataItemPreA, ageGroup.getName());
-                const casesPreB = BaseData.getExposed(dataItemPreB, ageGroup.getName());
-                const casesPreC = BaseData.getExposed(dataItemPreC, ageGroup.getName());
+                const casesPreA = dataItemPreA.getExposed(ageGroup.getName());
+                const casesPreB = dataItemPreB.getExposed(ageGroup.getName());
+                const casesPreC = dataItemPreC.getExposed(ageGroup.getName());
 
                 // cases at model-min
-                const casesDstA = BaseData.getExposed(dataItemDstA, ageGroup.getName());
-                const casesDstB = BaseData.getExposed(dataItemDstB, ageGroup.getName());
+                const casesDstA = dataItemDstA.getExposed(ageGroup.getName());
+                const casesDstB = dataItemDstB.getExposed(ageGroup.getName());
 
                 // case diffs (additional cases) at preload
                 const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
@@ -169,17 +170,17 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             });
 
             // total incidence at preload
-            const baseDataPreA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreA));
-            const baseDataPreB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantPreB));
-            const casesPreA = BaseData.getExposed(baseDataPreA, ModelConstants.AGEGROUP_NAME_______ALL);
-            const casesPreB = BaseData.getExposed(baseDataPreB, ModelConstants.AGEGROUP_NAME_______ALL);
+            const baseDataPreA = this.baseData.findBaseDataItem(instantPreA);
+            const baseDataPreB = this.baseData.findBaseDataItem(instantPreB);
+            const casesPreA = baseDataPreA.getExposed(ModelConstants.AGEGROUP_NAME_______ALL);
+            const casesPreB = baseDataPreB.getExposed(ModelConstants.AGEGROUP_NAME_______ALL);
             const heatmapCasesDeltaPreAB = casesPreB - casesPreA;
 
             // total case diff at model-min
-            const baseDataDstA = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstA));
-            const baseDataDstB = this.baseData.findBaseData(TimeUtil.formatCategoryDate(instantDstB));
-            const casesDstA = BaseData.getExposed(baseDataDstA, ModelConstants.AGEGROUP_NAME_______ALL);
-            const casesDstB = BaseData.getExposed(baseDataDstB, ModelConstants.AGEGROUP_NAME_______ALL);
+            const baseDataDstA = this.baseData.findBaseDataItem(instantDstA);
+            const baseDataDstB = this.baseData.findBaseDataItem(instantDstB);
+            const casesDstA = baseDataDstA.getExposed(ModelConstants.AGEGROUP_NAME_______ALL);
+            const casesDstB = baseDataDstB.getExposed(ModelConstants.AGEGROUP_NAME_______ALL);
             const heatmapCasesDeltaDstAB = casesDstB - casesDstA;
 
             heatmapPreIncidenceTotal += casesToIncidence(heatmapCasesDeltaPreAB, this.demographics.getAbsTotal());

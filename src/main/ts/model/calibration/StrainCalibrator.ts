@@ -1,3 +1,4 @@
+import { BaseDataItemCalibrate } from './../basedata/BaseDataItemCalibrate';
 import { IVaccinationConfig } from './../../common/demographics/IVaccinationConfig';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
@@ -10,7 +11,7 @@ import { ModelConstants } from '../ModelConstants';
 import { ModelImplRoot } from '../ModelImplRoot';
 import { ModelInstants } from '../ModelInstants';
 import { ModelStateIntegrator } from '../state/ModelStateIntegrator';
-import { BaseData } from './BaseData';
+import { BaseData } from '../basedata/BaseData';
 
 /**
  * utility type that takes care of calibrating a strain with respect to current age groups and testing (discovery) rates
@@ -135,19 +136,7 @@ export class StrainCalibrator {
         for (let interpolationIndex = 0; interpolationIndex < 20; interpolationIndex++) {
 
             // TODO build from demographic since actual age groups are configuration, not fixed
-            model = new ModelImplRoot(demographics, Modifications.getInstance(), {
-                "<= 04": [0, 0, 0, 0],
-                "05-14": [0, 0, 0, 0],
-                "15-24": [0, 0, 0, 0],
-                "25-34": [0, 0, 0, 0],
-                "35-44": [0, 0, 0, 0],
-                "45-54": [0, 0, 0, 0],
-                "55-64": [0, 0, 0, 0],
-                "65-74": [0, 0, 0, 0],
-                "75-84": [0, 0, 0, 0],
-                ">= 85": [0, 0, 0, 0],
-                "TOTAL": [0, 0, 0, 0]
-            }, baseData);
+            model = new ModelImplRoot(demographics, Modifications.getInstance(), new BaseDataItemCalibrate(), baseData);
             modelStateIntegrator = new ModelStateIntegrator(model, preInstant);
 
             const modelState = modelStateIntegrator.getModelState();

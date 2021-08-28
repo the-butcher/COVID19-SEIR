@@ -4,7 +4,8 @@ import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { Modifications } from './../common/modification/Modifications';
 import { TimeUtil } from './../util/TimeUtil';
-import { BaseData, IBaseDataItem } from './calibration/BaseData';
+import { BaseData, IBaseDataItemConfig } from './basedata/BaseData';
+import { IBaseDataItem } from './basedata/BaseDataItem';
 import { StrainApproximatorBaseData } from './calibration/StrainApproximatorBaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
@@ -94,14 +95,14 @@ export class ModelImplRoot implements IModelSeir {
         demographics.getAgeGroups().forEach(ageGroup => {
 
             // vaccinated at model init
-            const absValueV1 = BaseData.getVacc1(referenceDataRemoved, ageGroup.getName());
-            const absValueV2 = BaseData.getVacc2(referenceDataRemoved, ageGroup.getName());
+            const absValueV1 = referenceDataRemoved.getVacc1(ageGroup.getName());
+            const absValueV2 = referenceDataRemoved.getVacc2(ageGroup.getName());
 
             // total share of people already vaccinated twice
             const shareOfV2 = absValueV2 / ageGroup.getAbsValue();
 
             // removed at model init and reduced by initial share of vaccination
-            let absValueID = BaseData.getRemoved(referenceDataRemoved, ageGroup.getName());
+            let absValueID = referenceDataRemoved.getRemoved(ageGroup.getName());
             let absValueIU = absValueID * modificationSettings.getUndetected();
             absValueID *= (1 - shareOfV2);
             absValueIU *= (1 - shareOfV2);

@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Bezier } from 'bezier-js';
-import { BaseData } from '../../model/calibration/BaseData';
+import { BaseData } from '../../model/basedata/BaseData';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ModelInstants } from '../../model/ModelInstants';
 import { ModelStateIntegrator } from '../../model/state/ModelStateIntegrator';
@@ -52,13 +52,13 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
     getVaccinationConfig(ageGroup: string): IVaccinationConfig {
 
-        const categoryPre = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getPreInstant());
-        const baseDataPre = BaseData.getInstance().findBaseData(categoryPre);
+        // const categoryPre = TimeUtil.formatCategoryDate(ModelInstants.getInstance().getPreInstant());
+        const baseDataPre = BaseData.getInstance().findBaseDataItem(ModelInstants.getInstance().getPreInstant());
 
-        const absVacc1 = BaseData.getVacc1(baseDataPre, ageGroup);
+        const absVacc1 = baseDataPre.getVacc1(ageGroup);
         const grpVacc1 = absVacc1 / Demographics.getInstance().findAgeGroupByName(ageGroup).getAbsValue();
 
-        const absVacc2 = BaseData.getVacc2(baseDataPre, ageGroup);
+        const absVacc2 = baseDataPre.getVacc2(ageGroup);
         const grpVacc2 = absVacc2 / Demographics.getInstance().findAgeGroupByName(ageGroup).getAbsValue();
 
         const pA1: ICoordinate = {

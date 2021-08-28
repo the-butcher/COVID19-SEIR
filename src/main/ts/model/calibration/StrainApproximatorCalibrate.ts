@@ -5,7 +5,7 @@ import { ModificationStrain } from './../../common/modification/ModificationStra
 import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ModelInstants } from './../ModelInstants';
 import { IModelProgress } from './../state/ModelStateIntegrator';
-import { IBaseDataItem } from './BaseData';
+import { IBaseDataItemConfig } from '../basedata/BaseData';
 import { IStrainApproximator } from './IStrainApproximator';
 
 /**
@@ -27,7 +27,7 @@ export class StrainApproximatorCalibrate implements IStrainApproximator {
         this.modifications = modifications;
     }
 
-    getReferenceDataRemoved(): IBaseDataItem {
+    getReferenceDataRemoved(): IBaseDataItemConfig {
         // TODO build dynamically from age groups (do not hard code groups)
         return {
             "<= 04": [0, 0, 0, 0],

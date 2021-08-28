@@ -2,7 +2,7 @@ import { ModelConstants } from './../../model/ModelConstants';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesContact } from '../../common/modification/IModificationValuesContact';
 import { Modifications } from '../../common/modification/Modifications';
-import { BaseData } from '../../model/calibration/BaseData';
+import { BaseData } from '../../model/basedata/BaseData';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ControlsConstants } from '../gui/ControlsConstants';
 import { ModelActions } from '../gui/ModelActions';

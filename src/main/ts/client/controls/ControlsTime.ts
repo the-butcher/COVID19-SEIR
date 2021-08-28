@@ -1,5 +1,5 @@
 import { ModificationTime } from '../../common/modification/ModificationTime';
-import { BaseData } from '../../model/calibration/BaseData';
+import { BaseData } from '../../model/basedata/BaseData';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { ChartDiscovery } from '../chart/ChartDiscovery';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';

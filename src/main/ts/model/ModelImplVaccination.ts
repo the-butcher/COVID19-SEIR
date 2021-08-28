@@ -2,7 +2,7 @@ import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from './../util/TimeUtil';
-import { BaseData } from './calibration/BaseData';
+import { BaseData } from './basedata/BaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChain } from './compartment/CompartmentChain';
 import { ECompartmentType } from './compartment/ECompartmentType';
@@ -51,13 +51,11 @@ export class ModelImplVaccination implements IModelSeir {
         this.ageGroupName = ageGroup.getName();
 
         const instantPre = ModelInstants.getInstance().getPreInstant();
-        const categoryPre = TimeUtil.formatCategoryDate(instantPre);
-
-        const baseDatePre = BaseData.getInstance().findBaseData(categoryPre);
+        const baseDataItemPre = BaseData.getInstance().findBaseDataItem(instantPre);
 
         // the "control" compartment shows absolute number of first vaccinations
-        const absVacc1 = BaseData.getVacc1(baseDatePre, this.ageGroupName);
-        const absVacc2 = BaseData.getVacc2(baseDatePre, this.ageGroupName);
+        const absVacc1 = baseDataItemPre.getVacc1(this.ageGroupName);
+        const absVacc2 = baseDataItemPre.getVacc2(this.ageGroupName);
 
         this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);
         this.compartmentI = new CompartmentBase(ECompartmentType.R__REMOVED_VI, this.absTotal, absValueI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION);

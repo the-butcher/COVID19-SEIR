@@ -12,7 +12,6 @@ import { ModificationStrain } from '../../common/modification/ModificationStrain
 import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
-import { BaseData } from '../../model/calibration/BaseData';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { Color } from '../../util/Color';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
@@ -34,6 +33,7 @@ import { IWorkerInput } from './../../model/IWorkerInput';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { SliderModification } from './SliderModification';
+import { BaseData } from '../../model/basedata/BaseData';
 
 export interface IControlsDefinitions {
     icon: string;

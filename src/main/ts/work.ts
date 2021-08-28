@@ -2,7 +2,7 @@ import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
 import { Modifications } from './common/modification/Modifications';
-import { BaseData } from './model/calibration/BaseData';
+import { BaseData } from './model/basedata/BaseData';
 import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
