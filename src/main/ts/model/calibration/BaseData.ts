@@ -75,7 +75,26 @@ export class BaseData {
         return this.baseDataset[categoryX];
     }
 
+    /**
+     * calculates an array of incidences (age-group wise) for the given instant
+     * @param instant
+     * @param ageGroups
+     * @returns
+     */
     findIncidences(instant: number, ageGroups: AgeGroup[]): number[] {
+
+        // const incidences3 = this.findIncidences2(instant + TimeUtil.MILLISECONDS_PER____DAY * 3, ageGroups);
+        // const incidences4 = this.findIncidences2(instant + TimeUtil.MILLISECONDS_PER____DAY * 4, ageGroups);
+        // const incidences = [];
+        // if (incidences3 && incidences4) {
+        //     for (let i=0; i<incidences3.length; i++) {
+        //         incidences[i] = (incidences3[i] + incidences4[i]) / 2;
+        //     }
+        //     return incidences;
+
+        // } else {
+        //     return undefined;
+        // }
 
         const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
         const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(instant));
@@ -86,6 +105,18 @@ export class BaseData {
         }
 
     }
+
+    // findIncidences2(instant: number, ageGroups: AgeGroup[]): number[] {
+
+    //     const dataItemA = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(instant - TimeUtil.MILLISECONDS_PER____DAY * 7));
+    //     const dataItemB = BaseData.getInstance().findBaseData(TimeUtil.formatCategoryDate(instant));
+    //     if (dataItemA && dataItemB) {
+    //         return ageGroups.map(g => (dataItemB[g.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItemA[g.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / g.getAbsValue());
+    //     } else {
+    //         return undefined;
+    //     }
+
+    // }
 
 
 }

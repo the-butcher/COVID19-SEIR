@@ -220,11 +220,11 @@ export class ChartAgeGroup {
 
         // modification indicator axis
         this.yAxisModification = this.chart.yAxes.push(new ValueAxis());
+        this.yAxisModification.tooltip.exportable = false;
         this.yAxisModification.strictMinMax = true;
         this.yAxisModification.rangeChangeDuration = 0;
         this.yAxisModification.zoomable = false;
         ChartUtil.getInstance().configureAxis(this.yAxisModification, 'Mods');
-        // this.yAxisModification.tooltip.exportable = false;
         this.yAxisModification.renderer.labels.template.adapter.add('text', (value) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.getLabellingDefinition());
         });
@@ -271,7 +271,7 @@ export class ChartAgeGroup {
             colorKey: 'INCIDENCE',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.10,
+            locationOnPath: 0.90,
             labelled: true,
             stacked: false,
             legend: true,
@@ -292,6 +292,8 @@ export class ChartAgeGroup {
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         });
+        this.seriesAgeGroupIncidenceR.getSeries().tooltip.exportable = false;
+
         this.seriesAgeGroupIncidenceByStrain = new Map();
 
         this.seriesTotalTestsR = new ChartAgeGroupSeries({
@@ -625,27 +627,15 @@ export class ChartAgeGroup {
 
         });
 
-        // zoom in y-direction
-        // this.valueAxisAbsolute.adapter.add('start', (value, target) => {
-        //     if (this.yMin >= 0) {
-        //         value = (this.yMin - this.valueAxisAbsolute.min) / (this.valueAxisAbsolute.max - this.valueAxisAbsolute.min);
-        //     }
-        //     this.valueAxisIncidence.start = value;
-        //     return value;
-        // });
-        // this.valueAxisAbsolute.adapter.add('end', (value, target) => {
-        //     if (this.yMax >= 0) {
-        //         value = (this.yMax - this.valueAxisAbsolute.min) / (this.valueAxisAbsolute.max - this.valueAxisAbsolute.min);
-        //     }
-        //     this.valueAxisIncidence.end = value;
-        //     return value;
-        // });
-
         this.yAxisPlotIncidence.adapter.add('min', (value, target) => {
+            console.log('min', value);
+            value = 0;
             this.yAxisPlotAbsolute.min = value * this.absValue / 700000;
             return value;
         });
         this.yAxisPlotIncidence.adapter.add('max', (value, target) => {
+            // console.log('max', value);
+            // value = 1000;
             this.yAxisPlotAbsolute.max = value * this.absValue / 700000;
             return value;
         });
@@ -908,8 +898,7 @@ export class ChartAgeGroup {
                 strokeWidth: 1,
                 dashed: true,
                 locationOnPath: this.seriesAgeGroupLabelLocation,
-                labelled: true,
-                // percent: false,
+                labelled: false,
                 stacked: false,
                 legend: false,
                 labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
@@ -1003,6 +992,7 @@ export class ChartAgeGroup {
     }
 
     setAxisRelativeMax(max: number): void {
+        console.log('rel');
         this.yAxisPlotRelative.max = max;
     }
 
@@ -1027,6 +1017,7 @@ export class ChartAgeGroup {
 
             this.seriesModification.getSeries().stroke = color(modificationDefinition.color);
             this.seriesModification.getSeries().data = modificationData;
+            this.seriesModification.getSeries().tooltip.exportable = false;
 
         } else {
             // TODO reset display
@@ -1081,6 +1072,12 @@ export class ChartAgeGroup {
 
     applyMaxYAxisValue(): void {
 
+        // console.log('inc');
+        // this.yAxisPlotIncidence.max = 1000;
+        // this.yAxisPlotIncidence.strictMinMax = true;
+
+        // return;
+
         if (ObjectUtil.isNotEmpty(this.modelData)) {
 
             const minCategory = this.xAxis.positionToCategory(this.xAxis.start);
@@ -1100,7 +1097,6 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            // this.yAxisPlotIncidence.max = 180;
             this.yAxisPlotIncidence.max = maxIncidence * 1.05;
 
             this.yAxisPlotRelative.min = 0;
@@ -1180,7 +1176,13 @@ export class ChartAgeGroup {
                 ageGroupRemovedVR1 = BaseData.getVacc1(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupRemovedVR2 = BaseData.getVacc2(dataItem00, ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
 
-                ageGroupIncidenceR = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
+                const baseIncidences = BaseData.getInstance().findIncidences(dataItem.instant, this.ageGroupsWithTotal);
+                if (baseIncidences && baseIncidences.length > 0) {
+                    ageGroupIncidenceR = baseIncidences[ageGroupPlot.getIndex()];
+                } else {
+                    ageGroupIncidenceR = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem07[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]) * 100000 / ageGroupPlot.getAbsValue();
+                }
+
                 const diffCase01 = (dataItem00[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED] - dataItem01[ageGroupPlot.getName()][ModelConstants.BASE_DATA_INDEX_EXPOSED]);
                 ageGroupCasesR = diffCase01;
 

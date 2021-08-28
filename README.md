@@ -90,23 +90,13 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 * AModification - isBlendable
 #### Thoughts
-* goal is to reliably identify a total share of cases identified (the model needs then to make assumptions which age-group gets which share)
+* goal is to reliably identify a total share of cases found (the model needs then to make assumptions which age-group gets which share)
 * positivity rate in pcr is influenced by antigen
 * found / tested_antigen = positivity_rate_antigen (the actual amount of positive tests should already reflect sensitivity)
 * There are different shares of PCR and Antigen Tests per province (i.e. Vienna having almost equal shares)
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
-* reexposure
-  * ~~add some strain (read about common terms to express this) ratio (maybe a secondary r0-reexposure) that can be used to determine reproduction for reexposure~~
-  * ~~adapt ModelImplInfectious to hold a second compartment chain~~
-  * ~~in ModelImplStrain include second chain compartment to nrm_ISums calculation~~
-  * ~~let recovered (discovered or undiscovered) slowly feed back to susceptible -> exposed -> infectious -> recovered~~
-  * depending on strain, there will be some amount of infection in vaccinated itself
-    * should go to separate compartment chain and may be less infectious there, but still some
-  * add exposed from second loop to second compartment chain
-  * from last compartment of second chain, individuals go where?
-
 * ModificationResolverDiscovery alters the apps-time modification, TODO instantiate mod-time and set instants on that instance
 * adding a modification does not put storage in needs-save state
 * interpolated test rate gives above min and below max
@@ -127,12 +117,12 @@ A higher discovery rate means:
 * auto save (?), if auto save there needs to be a reset (could be done through local storage history)
 * implement coincident indicator on modifications, then iterate when selecting -> bring lower icons up z-wise so it can get selected
 * 'deceased'
-* add controls for vaccination strategy (?)
-  * add sliders for priority and refusal
-  * add chart showing 2 curves with priority and refusal (?)
-* add immune escape to strain modification (percentage of cases that are susceptible among recovered individuals)
-* zoomable chart and slider
-* color-only pickers for chart-mode
+* ~~add controls for vaccination strategy (?)~~
+  * ~~add sliders for priority and refusal~~
+  * ~~add chart showing 2 curves with priority and refusal (?)~~
+* ~~add immune escape to strain modification (percentage of cases that are susceptible among recovered individuals)~~
+* ~~zoomable chart and slider~~
+* ~~color-only pickers for chart-mode~~
 * testing, validity, plausibility
   * find and eliminate most prominent performance bottlenecks
   * will caching compartments on compartmentFilter improve performance?
@@ -141,6 +131,15 @@ A higher discovery rate means:
   * introduce simple undo/redo
 
 #### Solved issues
+* ~~reexposure~~
+  * ~~add some strain (read about common terms to express this) ratio (maybe a secondary r0-reexposure) that can be used to determine reproduction for reexposure~~
+  * ~~adapt ModelImplInfectious to hold a second compartment chain~~
+  * ~~in ModelImplStrain include second chain compartment to nrm_ISums calculation~~
+  * ~~let recovered (discovered or undiscovered) slowly feed back to susceptible -> exposed -> infectious -> recovered~~
+  * ~~depending on strain, there will be some amount of infection in vaccinated itself~~
+    * ~~should go to separate compartment chain and may be less infectious there, but still some~~
+  * ~~add exposed from second loop to second compartment chain~~
+  * ~~from last compartment of second chain, individuals go where? >> vaccination~~
 * ~~border cases~~
   * ~~all testing sliders on zero renders an all zero chart,~~
   * ~~single testing slider on 1 percent leads to diagram stretching further an further~~
