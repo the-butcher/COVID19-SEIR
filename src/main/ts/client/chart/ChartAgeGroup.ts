@@ -2,7 +2,6 @@ import { CategoryAxis, Column, ColumnSeries, StepLineSeries, ValueAxis, XYChart,
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
-import { Demographics } from '../../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
@@ -11,6 +10,7 @@ import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
 import { AgeGroup } from './../../common/demographics/AgeGroup';
+import { Demographics } from './../../common/demographics/Demographics';
 import { ModelConstants } from './../../model/ModelConstants';
 import { ModelInstants } from './../../model/ModelInstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
@@ -115,7 +115,7 @@ export class ChartAgeGroup {
     private absValue: number; // the absolute value of the age-group currently displayed
     private ageGroupIndex: number;
     private modelData: IDataItem[];
-    private ageGroupsWithTotal: AgeGroup[];
+    // private ageGroupsWithTotal: AgeGroup[];
     private chartMode: CHART_MODE______KEY;
 
     private ageGroupMarker: Rectangle;
@@ -697,15 +697,15 @@ export class ChartAgeGroup {
     }
 
     getAgeGroupName(): string {
-        if (this.ageGroupsWithTotal) {
-            return this.ageGroupsWithTotal[this.ageGroupIndex].getName();
-        } else {
-            return ModelConstants.AGEGROUP_NAME_______ALL;
-        }
+        // if (this.ageGroupsWithTotal) {
+            return Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex].getName();
+        // } else {
+        //     return ModelConstants.AGEGROUP_NAME_______ALL;
+        // }
     }
 
     getAgeGroupIndex(): number {
-        return this.ageGroupIndex <= 9 ? this.ageGroupIndex : -1;
+        return this.ageGroupIndex >= 0 ? this.ageGroupIndex : -1;
     }
 
     getAbsValue(): number {
@@ -730,7 +730,7 @@ export class ChartAgeGroup {
         if (ObjectUtil.isNotEmpty(this.modelData)) {
 
             this.ageGroupIndex = ageGroupIndex;
-            const ageGroup = this.ageGroupsWithTotal[this.ageGroupIndex];
+            const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
             this.absValue = ageGroup.getAbsValue();
 
             this.requestRenderModelData();
@@ -745,7 +745,7 @@ export class ChartAgeGroup {
                     const minX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x - templateColumn.realWidth / 2;
                     // const maxX = this.xAxis.categoryToPoint(TimeUtil.formatCategoryDate(SliderModification.getInstance().getMinValue())).x + templateColumn.realWidth / 2;
 
-                    const minY = this.yAxisHeat.categoryToPoint(this.ageGroupsWithTotal[ageGroupIndex].getName()).y - templateColumn.realHeight / 2;
+                    const minY = this.yAxisHeat.categoryToPoint(ageGroup.getName()).y - templateColumn.realHeight / 2;
                     const maxY = minY + templateColumn.realHeight;
 
                     // place the marker rectangle
@@ -1052,16 +1052,20 @@ export class ChartAgeGroup {
         this.setChartMode(this.chartMode);
 
         this.modelData = modelData;
-        if (!this.ageGroupsWithTotal) {
-            this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups()];
-            if (this.ageGroupsWithTotal.length > 1) {
-                this.ageGroupsWithTotal.push(new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
-                    name: ModelConstants.AGEGROUP_NAME_______ALL,
-                    pG: Demographics.getInstance().getAbsTotal()
-                }));
-            }
-            this.ageGroupIndex = this.ageGroupsWithTotal.length - 1;
+        if (this.ageGroupIndex < 0) {
+            this.ageGroupIndex = Demographics.getInstance().getAgeGroups().length; // could also get with total, then subtract 1
+            console.log('this.ageGroupIndex', this.ageGroupIndex);
         }
+        // if (!this.ageGroupsWithTotal) {
+            // this.ageGroupsWithTotal = [...Demographics.getInstance().getAgeGroups()];
+            // if (this.ageGroupsWithTotal.length > 1) {
+            //     this.ageGroupsWithTotal.push(new AgeGroup(Demographics.getInstance().getAgeGroups().length, {
+            //         name: ModelConstants.AGEGROUP_NAME_______ALL,
+            //         pG: Demographics.getInstance().getAbsTotal()
+            //     }));
+            // }
+            // 'this.ageGroupIndex = this.ageGroupsWithTotal.length - 1;
+        // }
 
         // does not need to go through age ModelActions, because it just reapplies
         this.setSeriesAgeGroup(this.ageGroupIndex);
@@ -1089,7 +1093,7 @@ export class ChartAgeGroup {
             let maxInfectious = 0;
             for (const dataItem of this.modelData) {
                 if (dataItem.instant >= minInstant && dataItem.instant <= maxInstant) {
-                    this.ageGroupsWithTotal.forEach(ageGroupHeat => {
+                    Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {
                         maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
                         maxInfectious = Math.max(maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
                     });
@@ -1149,7 +1153,7 @@ export class ChartAgeGroup {
         let maxValue = 0;
         const randomVd = Math.random() * 0.00001;
 
-        const ageGroupPlot = this.ageGroupsWithTotal[this.ageGroupIndex];
+        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
         for (const dataItem of this.modelData) {
 
             // data independent from sub-strains
@@ -1178,8 +1182,7 @@ export class ChartAgeGroup {
 
                 ageGroupIncidenceR = dataItem00.getIncidence(ageGroupPlot.getIndex());
 
-                const diffCase01 = dataItem00.getCasesM1(ageGroupPlot.getIndex()); // getExposed(ageGroupPlot.getName()) - dataItemM1.getExposed(ageGroupPlot.getName());
-                ageGroupCasesR = diffCase01;
+                ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());;
 
                 const diffTest07 = dataItem00.getTestsM7(); // (dataItem00.getTests() - dataItemM7.getTests());
                 totalTestsR = diffTest07 * 250 / ageGroupPlot.getAbsValue();
@@ -1214,7 +1217,7 @@ export class ChartAgeGroup {
 
             plotData.push(item);
 
-           this.ageGroupsWithTotal.forEach(ageGroupHeat => {
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
 

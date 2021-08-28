@@ -1,3 +1,4 @@
+import { ModelConstants } from './../../model/ModelConstants';
 import { JsonLoader } from '../../util/JsonLoader';
 import { IContactCategories } from '../modification/IContactCategories';
 import { AgeGroup } from './AgeGroup';
@@ -41,6 +42,8 @@ export class Demographics implements IContactCategories {
      */
     private readonly absTotal: number;
     private ageGroups: AgeGroup[];
+    private ageGroupTotal: AgeGroup;
+
     private contactCategories: ContactCategory[];
     private maxCellValue: number;
     private readonly columnValues: number[];
@@ -63,6 +66,11 @@ export class Demographics implements IContactCategories {
             this.ageGroups.push(new AgeGroup(ageGroupIndex, ageGroupParams));
         }
         this.absTotal = pN1;
+
+        this.ageGroupTotal = new AgeGroup(this.ageGroups.length, {
+            name: ModelConstants.AGEGROUP_NAME_______ALL,
+            pG: this.absTotal
+        });
 
         const contactCategoryParams: IContactMatrixConfig[] = [];
         demographicsConfig.matrices.forEach(matrixConfig => {
@@ -267,6 +275,10 @@ export class Demographics implements IContactCategories {
 
     getAgeGroups(): AgeGroup[] {
         return this.ageGroups;
+    }
+
+    getAgeGroupsWithTotal(): AgeGroup[] {
+        return [...this.ageGroups, this.ageGroupTotal];
     }
 
     findAgeGroupByName(ageGroup: string): AgeGroup {

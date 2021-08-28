@@ -53,7 +53,7 @@ export class BaseDataItem implements IBaseDataItem {
         if (this.incidences.length === 0) {
             const dataItemM1 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 1);
             const dataItemM7 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 7);
-            Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                 this.incidences[ageGroup.getIndex()] = (this.getExposed(ageGroup.getName()) - dataItemM7.getExposed(ageGroup.getName())) * 100000 / ageGroup.getAbsValue();
                 this.casesM1[ageGroup.getIndex()] = this.getExposed(ageGroup.getName()) - dataItemM1.getExposed(ageGroup.getName());
             });
