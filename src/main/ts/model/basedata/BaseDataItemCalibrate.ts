@@ -1,4 +1,25 @@
-export class BaseDataItemCalibrate {
+import { IBaseDataItem } from './BaseDataItem';
+export class BaseDataItemCalibrate implements IBaseDataItem {
+
+    getInstant(): number {
+        return -1;
+    }
+
+    getIncidence(ageGroupIndex: number): number {
+        return 0;
+    }
+
+    getTestsM7(): number {
+        return 0;
+    }
+
+    getCasesM1(ageGroupIndex: number): number {
+        return 0;
+    }
+
+    getAverage(ageGroupIndex: number): number {
+        return 0;
+    }
 
     getExposed(ageGroupName: string): number {
         return 0;

@@ -20,6 +20,9 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             ModelInstants.setInstanceFromValues(modelConfig.model_____daterange.map(d => new Date(d).getTime()))
             Modifications.setInstanceFromValues(modelConfig.model_modifications);
 
+            // needs model-instants to be ready
+            BaseData.getInstance().calculateDailyStats();
+
             // initialize model mode
             ModelActions.getInstance();
 

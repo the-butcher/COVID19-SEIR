@@ -1,12 +1,12 @@
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ModelInstants } from './../../model/ModelInstants';
 import { IModification } from './IModification';
+import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
 import { IModificationValues } from './IModificationValues';
 import { IModificationValuesContact } from './IModificationValuesContact';
 import { IModificationValuesSeasonality } from './IModificationValuesSeasonality';
 import { IModificationValuesSettings } from './IModificationValuesSettings';
 import { IModificationValuesStrain } from './IModificationValuesStrain';
-import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
 
@@ -76,16 +76,22 @@ export class Modifications {
     deleteModification(id: string): void {
         // const modification = this.findModificationById(id);
         this.modifications = this.modifications.filter(m => m.getId() !== id);
+        this.sortModifications();
     }
 
     addModification(modification: IModification<IModificationValues>): void {
         this.modifications.push(modification);
+        this.sortModifications();
     }
 
-    updateModificationInstants(): void {
+    sortModifications(): void {
         this.modifications = this.modifications.sort((a, b) => {
             return a.getInstantA() - b.getInstantA();
         });
+    }
+
+    updateModificationInstants(): void {
+        this.sortModifications();
         Object.keys(ModelConstants.MODIFICATION_PARAMS).forEach((key: MODIFICATION____KEY) => {
             const typedModifications = this.findModificationsByType(key);
             if (typedModifications.length > 0) {

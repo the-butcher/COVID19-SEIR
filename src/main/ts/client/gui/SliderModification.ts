@@ -197,6 +197,7 @@ export class SliderModification extends Slider {
                  */
                 this.selectableModificationId = modification.getId(); // store id to have the modification selected once updated modifications display
                 Modifications.getInstance().addModification(modification);
+                StorageUtil.getInstance().setSaveRequired(true);
                 this.showModifications(modification.getKey());
                 ControlsConstants.MODIFICATION_PARAMS[key].handleModificationUpdate(); // update after a modification was created
 
@@ -257,6 +258,7 @@ export class SliderModification extends Slider {
             if (typedModifications[index].isDeletable()) {
                 modificationIcon.getHandleGroupElement().addEventListener('click', () => {
                     Modifications.getInstance().deleteModification(modificationIcon.getId());
+                    StorageUtil.getInstance().setSaveRequired(true);
                     this.selectableModificationId = this.modificationIcons[index - 1].getId(); // set previous modification as selectable -> prevent edit controls showing values of a non-existing modification
                     this.showModifications(typedModifications[index].getKey());
                     ControlsConstants.MODIFICATION_PARAMS[key].handleModificationUpdate(); // update after a modification was deleted

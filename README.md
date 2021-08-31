@@ -97,13 +97,7 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
-* ModificationResolverDiscovery alters the apps-time modification, TODO instantiate mod-time and set instants on that instance
-* adding a modification does not put storage in needs-save state
 * interpolated test rate gives above min and below max
-* reintroduce the exposure chart view
-  * zoom-y on chart-draw, not only after zooming
-* allow floating point config on initial strain incidence
-* take care of corrections on matrices (bake them into matrices?)
 * wiki on github
 
 #### Backlog
@@ -131,6 +125,13 @@ A higher discovery rate means:
   * introduce simple undo/redo
 
 #### Solved issues
+* ~~hide base-data tooltip in prediction areas~~
+* ~~ModificationResolverDiscovery alters the apps-time modification, TODO instantiate mod-time and set instants on that instance~~
+* ~~adding a modification does not put storage in needs-save state~~
+* ~~reintroduce the exposure chart view~~
+  * ~~zoom-y on chart-draw, not only after zooming~~
+* ~~allow floating point config on initial strain incidence~~
+* ~~take care of corrections on matrices (bake them into matrices?)~~
 * ~~reexposure~~
   * ~~add some strain (read about common terms to express this) ratio (maybe a secondary r0-reexposure) that can be used to determine reproduction for reexposure~~
   * ~~adapt ModelImplInfectious to hold a second compartment chain~~

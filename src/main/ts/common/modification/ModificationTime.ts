@@ -41,6 +41,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private maxColumnValue: number;
     private valueSum: number;
     private columnValues: number[];
+    private cellValues: number[][];
+    private ratiosByAgeGroup: IRatios[];
 
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
@@ -89,6 +91,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      * @param instantB
      */
     setInstants(instantA: number, instantB: number): void {
+
         super.setInstants(instantA, instantB);
         this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA());
         this.modificationDiscovery = new ModificationResolverDiscovery().getModification(this.getInstantA());
@@ -96,6 +99,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
         this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
         this.resetValues();
+
     }
 
     resetValues(): void {
@@ -104,6 +108,9 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.maxColumnValue = -1;
         this.valueSum = -1;
         this.columnValues = [];
+        this.ratiosByAgeGroup = [];
+        this.cellValues = [];
+
         for (let indexContact = 0; indexContact < Demographics.getInstance().getAgeGroups().length; indexContact++) {
             this.columnValues[indexContact] = -1;
         }
@@ -116,30 +123,36 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     getRatios(ageGroupIndex: number): IRatios {
 
-        let contactTotal = 0;
-        let discoveryTotal = 0;
-        this.contactCategories.forEach(contactCategory => {
+        if (!this.ratiosByAgeGroup[ageGroupIndex]) {
 
-            // current contact ratio for contact category
-            const contactRatioCategory = this.modificationContact.getCategoryValue(contactCategory.getName());
-            // total contact in the requested age group in contact category
-            const contactGroupCategory = contactCategory.getColumnValue(ageGroupIndex);
-            // current total contact as of base contact-rate and contact-ratio in contact category
-            const contactTotalCategory = contactRatioCategory * contactGroupCategory;
+            let contactTotal = 0;
+            let discoveryTotal = 0;
+            this.contactCategories.forEach(contactCategory => {
 
-            // current discovery ratio for category
-            const discoveryRatioCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName());
+                // current contact ratio for contact category
+                const contactRatioCategory = this.modificationContact.getCategoryValue(contactCategory.getName());
+                // total contact in the requested age group in contact category
+                const contactGroupCategory = contactCategory.getColumnValue(ageGroupIndex);
+                // current total contact as of base contact-rate and contact-ratio in contact category
+                const contactTotalCategory = contactRatioCategory * contactGroupCategory;
 
-            // current share of discovered in currentTotal
-            contactTotal += contactTotalCategory;
-            discoveryTotal += discoveryRatioCategory * contactTotalCategory;
+                // current discovery ratio for category
+                const discoveryRatioCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName());
 
-        });
+                // current share of discovered in currentTotal
+                contactTotal += contactTotalCategory;
+                discoveryTotal += discoveryRatioCategory * contactTotalCategory;
 
-        return {
-            contact: contactTotal,
-            discovery: discoveryTotal / contactTotal
-        };
+            });
+
+            this.ratiosByAgeGroup[ageGroupIndex] = {
+                contact: contactTotal,
+                discovery: discoveryTotal / contactTotal
+            };
+
+        }
+
+        return this.ratiosByAgeGroup[ageGroupIndex];
 
     }
 
@@ -159,22 +172,34 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     getCellValue(indexContact: number, indexParticipant: number): number {
 
-        /**
-         * reduction through seasonality
-         */
-        const multiplierSeasonality = this.modificationSeasonality.getSeasonality();
+        if (!this.cellValues[indexContact]) {
+            this.cellValues[indexContact] = [];
+        }
 
-        /**
-         * reduction through quarantine
-         */
-        const multiplierQuarantine = this.getQuarantineMultiplier(indexContact) * this.getQuarantineMultiplier(indexParticipant);
+        if (!this.cellValues[indexContact][indexParticipant]) {
 
-        /**
-         * contact value for this age group (category reductions get considered in ModificationContact)
-         */
-        const contactValue = this.modificationContact.getCellValue(indexContact, indexParticipant);
+            /**
+             * reduction through seasonality
+             */
+            const multiplierSeasonality = this.modificationSeasonality.getSeasonality();
 
-        return contactValue * multiplierQuarantine *  multiplierSeasonality;
+            /**
+             * reduction through quarantine
+             */
+            const multiplierQuarantine = this.getQuarantineMultiplier(indexContact) * this.getQuarantineMultiplier(indexParticipant);
+
+            /**
+             * contact value for this age group (category reductions get considered in ModificationContact)
+             */
+            const contactValue = this.modificationContact.getCellValue(indexContact, indexParticipant);
+
+            this.cellValues[indexContact][indexParticipant] = contactValue * multiplierQuarantine *  multiplierSeasonality;
+
+        }
+
+        return this.cellValues[indexContact][indexParticipant];
+
+
 
     }
 

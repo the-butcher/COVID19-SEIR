@@ -162,7 +162,7 @@ export class Demographics implements IContactCategories {
                     0.05, // <= 04
                     0.20, // 05-14
                     0.75, // 15-24
-                    1.10, // 25-34
+                    0.95, // 25-34
                     0.95, // 35-44
                     1.00, // 45-54
                     1.20, // 55-64
@@ -179,8 +179,8 @@ export class Demographics implements IContactCategories {
                 corrections = [
                     0.00, // <= 04
                     0.05, // 05-14
-                    2.00, // 15-24
-                    1.75, // 25-34
+                    1.92, // 15-24
+                    1.92, // 25-34
                     0.60, // 35-44
                     0.04, // 45-54
                     0.02, // 55-64

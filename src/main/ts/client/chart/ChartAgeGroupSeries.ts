@@ -19,10 +19,10 @@ export interface IChartAgeGroupSeriesParams {
     dashed: boolean;
     labelled: boolean;
     locationOnPath: number;
-    // percent: boolean;
     stacked: boolean;
     legend: boolean;
     labellingDefinition: ILabellingDefinition;
+    seriesConstructor: () => LineSeries | StepLineSeries;
 }
 
 /**
@@ -55,9 +55,9 @@ export class ChartAgeGroupSeries {
         this.baseLabel = params.baseLabel;
         this.valueField = params.valueField;
         this.locationOnPath = params.locationOnPath;
-        this.labellingDefinition = params.labellingDefinition; // params.percent ? ControlsConstants.LABEL_PERCENT__FLOAT_2 : ControlsConstants.LABEL_ABSOLUTE_FLOAT_2;
+        this.labellingDefinition = params.labellingDefinition;
 
-        this.series = params.chart.series.push(new LineSeries());
+        this.series = params.chart.series.push(params.seriesConstructor());
         this.series.showOnInit = false;
         this.boundSeries = [];
         this.hasLegend = params.legend;
@@ -91,17 +91,19 @@ export class ChartAgeGroupSeries {
         this.series.fontSize = ControlsConstants.FONT_SIZE;
         ChartUtil.getInstance().configureAgeGroupSeries(this, ControlsConstants.COLORS[params.colorKey], true);
 
-        this.series.adapter.add('tooltipText', (value, target) => {
-            const indexCurr = target.tooltipDataItem.index;
-            if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
-                const itemCurr = target.dataItems.values[indexCurr];
-                const valueCurr = itemCurr.dataContext[this.valueField];
-                return valueCurr ? `${this.seriesLabel.text}: ${this.labellingDefinition.format(valueCurr)}` : undefined;
-            } else {
-                return value;
-            }
-        });
-
+        if (this.series instanceof LineSeries) {
+            (this.series as LineSeries).adapter.add('tooltipText', (value, target) => {
+                const indexCurr = target.tooltipDataItem.index;
+                if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
+                    const itemCurr = target.dataItems.values[indexCurr];
+                    const valueCurr = itemCurr.dataContext[this.valueField];
+                    return valueCurr ? `${this.seriesLabel.text}: ${this.labellingDefinition.format(valueCurr)}` : undefined;
+                } else {
+                    // console.log('no index found', this.series.name);
+                    return value;
+                }
+            });
+        }
         this.series.tooltip.disabled = !params.labelled;
         this.seriesLabel.disabled =  !params.labelled;
 
@@ -117,7 +119,7 @@ export class ChartAgeGroupSeries {
         });
 
         this.series.events.on('ready', () => {
-
+            // do nothing
         });
 
         this.series.name = params.title;

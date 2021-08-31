@@ -1,3 +1,4 @@
+import { ChartAgeGroupFlow } from './chart/ChartAgeGroupFlow';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
 import { IWorkerInput } from '../model/IWorkerInput';
@@ -45,6 +46,9 @@ export class ModelTask {
 
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
                 await ChartAgeGroup.getInstance().renderModelData();
+
+                // await ChartAgeGroupFlow.getInstance().acceptModelData(modelProgress.data);
+                // await ChartAgeGroupFlow.getInstance().renderModelData();
 
                 /**
                  * primary strain has a "floating value", update the value on the gui instance of that modification

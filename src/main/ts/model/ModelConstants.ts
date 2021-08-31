@@ -1,13 +1,12 @@
-import { TimeUtil } from './../util/TimeUtil';
 import { IModification } from '../common/modification/IModification';
+import { IModificationValuesDiscovery } from '../common/modification/IModificationValueDiscovery';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IModificationValuesContact } from '../common/modification/IModificationValuesContact';
-import { IModificationValuesDiscovery } from '../common/modification/IModificationValueDiscovery';
 import { ModificationContact } from '../common/modification/ModificationContact';
+import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { ModificationSeasonality } from '../common/modification/ModificationSeasonality';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
-import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { ModificationVaccination } from '../common/modification/ModificationVaccination';
 import { ObjectUtil } from '../util/ObjectUtil';
@@ -42,7 +41,7 @@ export interface IModificationDefinitions {
 
 export class ModelConstants {
 
-    static readonly CONFIG_VERSION = 'AT_0_00_02';
+    static readonly CONFIG_VERSION = 'AT_0_00_03';
 
     static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IModificationDefinitions} = {
         'TIME': {
@@ -105,8 +104,7 @@ export class ModelConstants {
     static readonly PRELOAD_________________DAYS = 7;
     static readonly APPROXIMATION_________CYCLES = 3;
 
-    static readonly V1_TO_V2_______DEFAULT_WEEKS = 8;
-    // static readonly V1_TO_V2______DEFAULT_MILLIS = 8 * TimeUtil.MILLISECONDS_PER___WEEK;
+    // static readonly V1_TO_V2_______DEFAULT_WEEKS = 8;
 
     static readonly AGE_GROUP_ALL = -1;
 
@@ -119,7 +117,7 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
     static readonly BASE_DATA_INDEX___TESTS = 4;
 
-    static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00, 2.50];
+    static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00];
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];

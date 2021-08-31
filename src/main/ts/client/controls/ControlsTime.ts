@@ -1,3 +1,4 @@
+import { ChartAgeGroupFlow } from './../chart/ChartAgeGroupFlow';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { BaseData } from '../../model/basedata/BaseData';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
@@ -49,6 +50,8 @@ export class ControlsTime {
         Controls.acceptModification(modification);
         const modificationResolver = ModificationResolverTime.getInstance();
         const contactMatrix = modificationResolver.findContactMatrix(modification.getInstantA());
+
+        // ChartAgeGroupFlow.getInstance().setInstant(modification.getInstant());
 
         // const ageGroups = Demographics.getInstance().getAgeGroups();
         // const dataItem = ChartAgeGroup.getInstance().findDataItemByInstant(modification.getInstant());

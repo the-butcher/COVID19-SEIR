@@ -1,10 +1,10 @@
-import { IContactCategories } from './IContactCategories';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
 import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
+import { IContactCategories } from './IContactCategories';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesContact } from './IModificationValuesContact';
 
@@ -129,11 +129,5 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return Demographics.getInstance().getMatrixValue();
     }
 
-    // private getContactCategoryMultiplier(contactCategoryName: string): number {
-    //     if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
-    //         this.modificationValues.multipliers[contactCategoryName] = 1.0;
-    //     }
-    //     return this.modificationValues.multipliers[contactCategoryName];
-    // }
 
 }
