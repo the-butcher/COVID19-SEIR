@@ -134,16 +134,16 @@ export class StorageUtil {
             if (ObjectUtil.isNotEmpty(loadedConfigRaw)) {
                 const loadedConfig: IStoredConfig = JSON.parse(loadedConfigRaw);
 
-                let loadedConfigHasRisk = false;
-                loadedConfig.model_modifications.filter(m => m.key === 'CONTACT').forEach((modification: IModificationValuesContact) => {
-                    if (modification.multipliers['risk']) {
-                        loadedConfigHasRisk = true;
-                    }
-                });
+                // let loadedConfigHasRisk = false;
+                // loadedConfig.model_modifications.filter(m => m.key === 'CONTACT').forEach((modification: IModificationValuesContact) => {
+                //     if (modification.multipliers['risk']) {
+                //         loadedConfigHasRisk = true;
+                //     }
+                // });
 
                 let loadedConfigVersion = loadedConfig.model_______version || 'NO_VERSION';
 
-                if (loadedConfigHasRisk && loadedConfigVersion === ModelConstants.CONFIG_VERSION) {
+                if (/* loadedConfigHasRisk && */ loadedConfigVersion === ModelConstants.CONFIG_VERSION) {
                     return loadedConfig;
                 } else {
                     console.warn('found invalid config-version', loadedConfigVersion, 'falling back to default config');

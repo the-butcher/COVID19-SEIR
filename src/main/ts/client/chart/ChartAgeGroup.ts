@@ -9,6 +9,7 @@ import { Color } from '../../util/Color';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
+import { AgeGroup } from './../../common/demographics/AgeGroup';
 import { Demographics } from './../../common/demographics/Demographics';
 import { ModelConstants } from './../../model/ModelConstants';
 import { ModelInstants } from './../../model/ModelInstants';

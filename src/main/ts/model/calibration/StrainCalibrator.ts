@@ -76,8 +76,8 @@ export class StrainCalibrator {
                 name: 'calibrate (contact)',
                 instant: preInstant,
                 multipliers: {
-                    'other': 1 / Math.sqrt(2),
-                    'risk': 0.0 / Math.sqrt(2),
+                    // 'school': 0.75,
+                    'other': 1 / 2.5
                 },
                 deletable: false,
                 draggable: false,
