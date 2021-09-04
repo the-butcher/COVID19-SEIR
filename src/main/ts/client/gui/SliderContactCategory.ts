@@ -10,9 +10,9 @@ import { Slider } from './Slider';
 export class SliderContactCategory extends Slider {
 
     private readonly contactCategoryConfig: ContactCategory;
-    private readonly canvas: HTMLCanvasElement;
+    private readonly ageGroupProfilesDivs: HTMLDivElement[];
 
-    private modification: ModificationContact;
+    private corrections: { [K in string] : number };
 
     constructor(contactCategoryConfig: ContactCategory) {
 
@@ -67,20 +67,127 @@ export class SliderContactCategory extends Slider {
             }
         });
 
-        // <canvas id="weibullCanvas" style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
-        this.canvas = document.createElement('canvas');
-        this.canvas.style.position = 'absolute';
-        this.canvas.style.left = '0px';
-        this.canvas.style.top = '0px';
-        this.canvas.width = 240;
-        this.canvas.height = 27;
-        canvasContainer.append(this.canvas);
+        this.corrections = {};
+
+        const ageGroups = Demographics.getInstance().getAgeGroups();
+        this.ageGroupProfilesDivs = [];
+        const xStp = 240 / ageGroups.length;
+
+        ageGroups.forEach(ageGroup => {
+
+            const ageGroupProfileContainer = document.createElement('div');
+
+            ageGroupProfileContainer.style.position = 'absolute';
+            ageGroupProfileContainer.style.left = `${xStp * ageGroup.getIndex()}px`;
+            ageGroupProfileContainer.style.top = `0px`;
+            ageGroupProfileContainer.style.width = `${xStp}px`;
+            ageGroupProfileContainer.style.height = '27px';
+
+            const ageGroupProfileDiv = document.createElement('div');
+            ageGroupProfileDiv.style.position = 'absolute';
+            ageGroupProfileDiv.style.left = '1px';
+            ageGroupProfileDiv.style.bottom = '0px';
+            ageGroupProfileDiv.style.width = 'calc(100% - 2px)';
+            ageGroupProfileDiv.style.height = '27px';
+            ageGroupProfileDiv.style.backgroundColor = '#444444';
+            ageGroupProfileDiv.style.transition = 'top 250ms ease-in-out, height 250ms ease-in-out';
+
+            this.ageGroupProfilesDivs.push(ageGroupProfileDiv);
+
+            ageGroupProfileContainer.appendChild(ageGroupProfileDiv);
+            canvasContainer.appendChild(ageGroupProfileContainer);
+
+            const svgElementMore = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svgElementMore.setAttributeNS(null, 'viewBox', '-5 -5 10 10');
+            svgElementMore.style.position = 'absolute';
+            svgElementMore.style.left = `${xStp / 2}px`;
+            svgElementMore.style.display = 'none';
+            svgElementMore.style.width = '12px';
+            svgElementMore.style.height = '12px';
+            svgElementMore.addEventListener('pointerover', e => {
+                svgElementLess.setAttributeNS(null, 'fill', '#666666');
+            });
+            svgElementMore.addEventListener('pointerout', e => {
+                svgElementLess.setAttributeNS(null, 'fill', '#444444');
+            });
+            svgElementMore.addEventListener('pointerup', e => {
+                this.moreCorrection(ageGroup.getName());
+            })
+
+            const pathMore = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathMore.setAttributeNS(null, 'fill', '#444444');
+            pathMore.setAttributeNS(null, 'd', 'M 3.52 -4.48 H -3.52 C -4.05 -4.48 -4.48 -4.05 -4.48 -3.52 V 3.52 C -4.48 4.05 -4.05 4.48 -3.52 4.48 H 3.52 C 4.05 4.48 4.48 4.05 4.48 3.52 V -3.52 C 4.48 -4.05 4.05 -4.48 3.52 -4.48 Z M 2.88 0.56 C 2.88 0.692 2.772 0.8 2.64 0.8 H 0.8 V 2.64 C 0.8 2.772 0.692 2.88 0.56 2.88 H -0.56 C -0.692 2.88 -0.8 2.772 -0.8 2.64 V 0.8 H -2.64 C -2.772 0.8 -2.88 0.692 -2.88 0.56 V -0.56 C -2.88 -0.692 -2.772 -0.8 -2.64 -0.8 H -0.8 V -2.64 C -0.8 -2.772 -0.692 -2.88 -0.56 -2.88 H 0.56 C 0.692 -2.88 0.8 -2.772 0.8 -2.64 V -0.8 H 2.64 C 2.772 -0.8 2.88 -0.692 2.88 -0.56 V 0.56 Z');
+            svgElementMore.appendChild(pathMore);
+
+            const svgElementLess = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svgElementLess.setAttributeNS(null, 'viewBox', '-5 -5 10 10');
+            svgElementLess.setAttributeNS(null, 'fill', '#444444');
+            svgElementLess.style.position = 'absolute';
+            svgElementLess.style.left = '0px';
+            svgElementLess.style.display = 'none';
+            svgElementLess.style.width = '12px';
+            svgElementLess.style.height = '12px';
+            svgElementLess.style.cursor = 'pointer';
+            svgElementLess.addEventListener('pointerover', e => {
+                svgElementLess.setAttributeNS(null, 'fill', '#666666');
+            });
+            svgElementLess.addEventListener('pointerout', e => {
+                svgElementLess.setAttributeNS(null, 'fill', '#444444');
+            });
+            svgElementLess.addEventListener('pointerup', e => {
+                this.lessCorrection(ageGroup.getName());
+            });
+
+            const pathLess = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathLess.setAttributeNS(null, 'd', 'M 3.52 -4.48 H -3.52 C -4.05 -4.48 -4.48 -4.05 -4.48 -3.52 V 3.52 C -4.48 4.05 -4.05 4.48 -3.52 4.48 H 3.52 C 4.05 4.48 4.48 4.05 4.48 3.52 V -3.52 C 4.48 -4.05 4.05 -4.48 3.52 -4.48 Z M -2.64 0.8 C -2.772 0.8 -2.88 0.692 -2.88 0.56 V -0.56 C -2.88 -0.692 -2.772 -0.8 -2.64 -0.8 H 2.64 C 2.772 -0.8 2.88 -0.692 2.88 -0.56 V 0.56 C 2.88 0.692 2.772 0.8 2.64 0.8 H -2.64 Z');
+            svgElementLess.appendChild(pathLess);
+
+            ageGroupProfileContainer.appendChild(svgElementMore);
+            ageGroupProfileContainer.appendChild(svgElementLess);
+
+            const isLess = (e: MouseEvent) => {
+                const boundingRect = ageGroupProfileDiv.getBoundingClientRect();
+                return e.clientX < boundingRect.left + boundingRect.width / 2;
+            };
+            const lessMore = (e: MouseEvent) => {
+                if (isLess(e)) {
+                    svgElementLess.style.display = 'block';
+                    svgElementMore.style.display = 'none';
+                } else {
+                    svgElementLess.style.display = 'none';
+                    svgElementMore.style.display = 'block';
+                }
+            };
+
+            ageGroupProfileContainer.addEventListener('pointermove', lessMore);
+            ageGroupProfileContainer.addEventListener('pointerover', lessMore);
+            ageGroupProfileContainer.addEventListener('pointerout', e => {
+                svgElementLess.style.display = 'none';
+                svgElementMore.style.display = 'none';
+            });
+
+
+        });
 
         this.setLabelPosition(13);
         this.contactCategoryConfig = contactCategoryConfig;
 
-        // this.redrawCanvas();
+    }
 
+    getCorrections(): { [K in string] : number } {
+        return this.corrections;
+    }
+
+    lessCorrection(ageGroupName: string): void {
+        this.corrections[ageGroupName] = this.corrections[ageGroupName] * 0.99;
+        ControlsContact.getInstance().handleChange();
+        this.redrawCanvas();
+    }
+
+    moreCorrection(ageGroupName: string): void {
+        this.corrections[ageGroupName] = this.corrections[ageGroupName] / 0.99;
+        ControlsContact.getInstance().handleChange();
+        this.redrawCanvas();
     }
 
     setValueAndRedraw(index: number, value: number, animated: boolean): void {
@@ -89,43 +196,34 @@ export class SliderContactCategory extends Slider {
     }
 
     acceptModification(modification: ModificationContact): void {
-        this.modification = modification;
+        const ageGroups = Demographics.getInstance().getAgeGroups();
+        ageGroups.forEach(ageGroup => {
+            this.corrections[ageGroup.getName()] = modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex());
+        });
+        // console.log('this.corrections', this.corrections);
         this.redrawCanvas();
     }
 
     redrawCanvas(): void {
 
-        const context = this.canvas.getContext("2d");
-        context.fillStyle = 'rgba(63, 63, 63, 1.00)'; // ControlsConstants.COLORS.CONTACT
-        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         const ageGroups = Demographics.getInstance().getAgeGroups();
         const scale = 0.75 * this.getValue();
 
-        const xStp = 240 / ageGroups.length;
-        const xPad = 2;
-
-
-
         ageGroups.forEach(ageGroup => {
 
-            context.fillStyle = 'rgba(63, 63, 63, 1.00)';
-            if (this.modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex()) !== 1) {
-                context.fillStyle = 'rgba(255, 63, 63, 1.00)';
+            const ageGroupProfileDiv = this.ageGroupProfilesDivs[ageGroup.getIndex()];
+            const value = this.contactCategoryConfig.getColumnValue(ageGroup.getIndex()) * scale + 1;
+
+            // ageGroupProfileDiv.style.top = `${27 - value}px`;
+            ageGroupProfileDiv.style.height = `${value}px`;
+            ageGroupProfileDiv.style.backgroundColor = '#444444';
+
+            const correctionValue = this.corrections[ageGroup.getName()];
+            if (correctionValue < 1) {
+                ageGroupProfileDiv.style.backgroundColor = '#884444';
+            } else if (correctionValue > 1) {
+                ageGroupProfileDiv.style.backgroundColor = '#448844';
             }
-
-            const value = this.contactCategoryConfig.getColumnValue(ageGroup.getIndex());
-            const xMin = ageGroup.getIndex() * xStp + xPad;
-            const xMax = (ageGroup.getIndex() + 1) * xStp - xPad;
-            const yMin = this.canvas.height;
-            const yMax = this.canvas.height - value * scale - 1;
-
-            context.beginPath();
-            context.moveTo(xMin, yMin); // UL
-            context.lineTo(xMin, yMax);
-            context.lineTo(xMax, yMax);
-            context.lineTo(xMax, yMin);
-            context.fill();
 
         });
 

@@ -97,6 +97,7 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
+* acceptModification is called 3 times
 * proper blending of corrections in ModificationResolverContact
 * consider corrections when calculating category ratio in ModificationContact
 * interpolated test rate gives above min and below max

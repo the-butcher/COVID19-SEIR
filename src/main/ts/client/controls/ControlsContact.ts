@@ -53,14 +53,18 @@ export class ControlsContact {
 
         // apply current slider settings to the slider-category filter on the modification
         const multipliers: { [K in string] : number } = {};
+        const corrections: { [K in string] : { [K in string] : number } } = {};
         this.slidersCategory.forEach(sliderCategory => {
             multipliers[sliderCategory.getName()] = sliderCategory.getValue();
+            corrections[sliderCategory.getName()] = sliderCategory.getCorrections();
         });
         const blendable = this.iconBlendable.getState();
         this.modification.acceptUpdate({
             multipliers,
+            corrections,
             blendable
         });
+        console.log('handleChange', corrections, this.modification);
 
         this.applyToChartContact();
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
@@ -72,6 +76,8 @@ export class ControlsContact {
     }
 
     acceptModification(modification: ModificationContact): void {
+
+        // console.warn('acceptModification', modification);
 
         Controls.acceptModification(modification);
         this.modification = modification;

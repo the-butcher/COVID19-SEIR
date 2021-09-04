@@ -100,7 +100,17 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return value;
     }
 
-    getCorrectionValue(categoryName: string, ageGroupIndex: number) {
+    setCorrectionValue(categoryName: string, ageGroupIndex: number, correctionValue: number): void {
+        if (!this.modificationValues.corrections) {
+            this.modificationValues.corrections = {};
+        }
+        if (!this.modificationValues.corrections[categoryName]) {
+            this.modificationValues.corrections[categoryName] = {};
+        }
+        this.modificationValues.corrections[categoryName][this.ageGroups[ageGroupIndex].getName()]
+    }
+
+    getCorrectionValue(categoryName: string, ageGroupIndex: number): number {
         if (this.modificationValues.corrections) {
             const categoryCorrections = this.modificationValues.corrections[categoryName];
             if (categoryCorrections) {
