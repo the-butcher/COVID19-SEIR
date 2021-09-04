@@ -208,11 +208,7 @@ export class Demographics implements IContactCategories {
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
                 contactCategoryParamsTarget.data[indexContact] = [];
                 for (let indexParticipant = 0; indexParticipant < this.ageGroups.length; indexParticipant++) {
-                    let correction = corrections[indexContact];
-                    // if (indexContact !== indexParticipant) {
-                        correction *= corrections[indexParticipant]
-                    // }
-                    contactCategoryParamsTarget.data[indexContact][indexParticipant] = matrixConfig.data[indexContact][indexParticipant] * correction;
+                    contactCategoryParamsTarget.data[indexContact][indexParticipant] = matrixConfig.data[indexContact][indexParticipant] * corrections[indexContact] * corrections[indexParticipant];
                 }
             }
 

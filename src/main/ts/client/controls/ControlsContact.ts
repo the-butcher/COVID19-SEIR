@@ -78,6 +78,7 @@ export class ControlsContact {
 
         this.slidersCategory.forEach(sliderCategory => {
             sliderCategory.setValue(modification.getCategoryValue(sliderCategory.getName()));
+            sliderCategory.acceptModification(this.modification);
         });
         this.iconBlendable.toggle(modification.isBlendable());
 

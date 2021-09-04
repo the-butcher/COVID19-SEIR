@@ -1251,18 +1251,19 @@ export class ChartAgeGroup {
                 if (QueryUtil.getInstance().isDiffDisplay() && ObjectUtil.isNotEmpty(dataItem00)) {
 
                     const baseIncidence = dataItem00.getIncidence(ageGroupHeat.getIndex());
-                    value -= baseIncidence;
+                    value /= baseIncidence;
+                    // console.log(value, baseIncidence);
 
                     let r = 0;
                     let g = 0;
                     let b = 0;
-                    if (value >= 0) {
-                        g = value / 20;
+                    if (value >= 1) {
+                        g = value - 1;
                     }
                     else {
-                        r = value / -20;
+                        r = 1 / value - 1;
                     }
-                    const rgb = [r, g, b];
+                    const rgb = [Math.min(1, r), Math.min(1, g), b];
                     const hsv = [0, 0, 0];
                     ColorUtil.rgbToHsv(rgb, hsv);
                     color = new Color(hsv[0], hsv[1], hsv[2]).getHex();

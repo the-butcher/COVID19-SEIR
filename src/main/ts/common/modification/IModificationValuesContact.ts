@@ -12,4 +12,9 @@ export interface IModificationValuesContact extends IModificationValues {
      */
     multipliers: { [K in string] : number };
 
+    /**
+     * optionally, additional multiplier that may increase weight of a given age-group in a specific modification
+     */
+    corrections?: { [K in string] : { [K in string] : number } };
+
 }

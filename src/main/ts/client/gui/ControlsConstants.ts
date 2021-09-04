@@ -1,39 +1,39 @@
-import { ModelInstants } from './../../model/ModelInstants';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModification } from '../../common/modification/IModification';
 import { IModificationValues } from '../../common/modification/IModificationValues';
 import { ModificationContact } from '../../common/modification/ModificationContact';
+import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ModificationResolverContact } from '../../common/modification/ModificationResolverContact';
+import { ModificationResolverDiscovery } from '../../common/modification/ModificationResolverDiscovery';
 import { ModificationResolverSettings } from '../../common/modification/ModificationResolverSettings';
 import { ModificationResolverVaccination } from '../../common/modification/ModificationResolverVaccination';
 import { ModificationSeasonality } from '../../common/modification/ModificationSeasonality';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
-import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
+import { BaseData } from '../../model/basedata/BaseData';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { Color } from '../../util/Color';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
+import { QueryUtil } from '../chart/QueryUtil';
 import { ControlsContact } from '../controls/ControlsContact';
+import { ControlsDiscovery } from '../controls/ControlsDiscovery';
 import { ControlsSeasonality } from '../controls/ControlsSeasonality';
 import { ControlsSettings } from '../controls/ControlsSettings';
 import { ControlsStrain } from '../controls/ControlsStrain';
-import { ControlsDiscovery } from '../controls/ControlsDiscovery';
 import { ControlsTime } from '../controls/ControlsTime';
 import { ControlsVaccination } from '../controls/ControlsVaccination';
 import { ModelTask } from '../ModelTask';
 import { IModificationResolver } from './../../common/modification/IModificationResolver';
 import { ModificationResolverSeasonality } from './../../common/modification/ModificationResolverSeasonality';
 import { ModificationResolverStrain } from './../../common/modification/ModificationResolverStrain';
-import { ModificationResolverDiscovery } from '../../common/modification/ModificationResolverDiscovery';
 import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
 import { Modifications } from './../../common/modification/Modifications';
 import { IWorkerInput } from './../../model/IWorkerInput';
+import { ModelInstants } from './../../model/ModelInstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
-import { SliderModification } from './SliderModification';
-import { BaseData } from '../../model/basedata/BaseData';
 
 export interface IControlsDefinitions {
     icon: string;
@@ -146,7 +146,7 @@ export class ControlsConstants {
         'INCIDENCE': {
             id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID___________ALL],
-            getHeatLabel: (value) => `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`,
+            getHeatLabel: (value) => QueryUtil.getInstance().isDiffDisplay() ? `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}` : `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`,
             getHeatColor: (value) => new Color(0.00, 0.00, Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {

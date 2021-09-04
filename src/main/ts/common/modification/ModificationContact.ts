@@ -42,6 +42,13 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return this.contactCategories;
     }
 
+    /**
+     * corrections introduced with 04.09.2021 may alter a modification and therefore the ratios -- ModificationTime may therefore have an error in its ratio calculations
+     * TODO :: consider corrections for ratios in a yet to be defined way
+     *
+     * @param contactCategoryName
+     * @returns
+     */
     getCategoryValue(contactCategoryName: string): number {
         if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
             this.modificationValues.multipliers[contactCategoryName] = 1.0;
@@ -86,9 +93,24 @@ export class ModificationContact extends AModification<IModificationValuesContac
     getCellValue(indexContact: number, indexParticipant: number): number {
         let value = 0;
         this.contactCategories.forEach(contactCategory => {
-            value += contactCategory.getCellValue(indexContact, indexParticipant) * this.getCategoryValue(contactCategory.getName());
+            let correctionContact = this.getCorrectionValue(contactCategory.getName(), indexContact);
+            let correctionParticipant = this.getCorrectionValue(contactCategory.getName(), indexParticipant);
+            value += contactCategory.getCellValue(indexContact, indexParticipant) * this.getCategoryValue(contactCategory.getName()) * correctionContact * correctionParticipant;
         });
         return value;
+    }
+
+    getCorrectionValue(categoryName: string, ageGroupIndex: number) {
+        if (this.modificationValues.corrections) {
+            const categoryCorrections = this.modificationValues.corrections[categoryName];
+            if (categoryCorrections) {
+                const correctionValue = categoryCorrections[this.ageGroups[ageGroupIndex].getName()];
+                if (correctionValue) {
+                    return correctionValue;
+                }
+            }
+        }
+        return 1;
     }
 
     getColumnValue(indexAgeGroup: number): number {

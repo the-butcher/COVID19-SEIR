@@ -1,5 +1,6 @@
 import { ContactCategory } from '../../common/demographics/ContactCategory';
 import { Demographics } from '../../common/demographics/Demographics';
+import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ControlsContact } from '../controls/ControlsContact';
 import { ControlsConstants } from './ControlsConstants';
@@ -9,12 +10,14 @@ import { Slider } from './Slider';
 export class SliderContactCategory extends Slider {
 
     private readonly contactCategoryConfig: ContactCategory;
+    private readonly canvas: HTMLCanvasElement;
+
+    private modification: ModificationContact;
 
     constructor(contactCategoryConfig: ContactCategory) {
 
         const container = document.createElement('div');
         container.classList.add('slider-modification');
-
         document.getElementById('slidersCategoryDiv').appendChild(container);
 
         const canvasContainer = document.createElement('div');
@@ -24,37 +27,9 @@ export class SliderContactCategory extends Slider {
         canvasContainer.style.left = '20px';
         canvasContainer.style.top = '0px';
 
-        // <canvas id="weibullCanvas" style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
-        const canvas = document.createElement('canvas');
-        canvas.style.position = 'absolute';
-        canvas.style.left = '0px';
-        canvas.style.top = '0px';
-        canvas.width = 240;
-        canvas.height = 28;
-
-        const context = canvas.getContext("2d");
-        context.fillStyle = 'rgba(131, 202, 13, 0.75)';
-        // context.fillRect(0, 0, canvas.width, canvas.height);
-
-        const columnValues: number[] = [];
-        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            columnValues[ageGroup.getIndex()] = contactCategoryConfig.getColumnValue(ageGroup.getIndex());
-        });
-        // const maxColumnValue = columnValues.reduce((prev, curr) => Math.max(prev, curr), 0);
-        const scale = 0.5;
-        const xStep = 240 / (columnValues.length - 1);
-
-        context.beginPath();
-        context.moveTo(0, 28);
-        for (let i=0; i<columnValues.length; i++) {
-            context.lineTo(i * xStep, 28 - columnValues[i] * scale);
-        }
-        context.lineTo(240, 28);
-        context.lineTo(0, 28);
-        context.fill();
-
         container.appendChild(canvasContainer);
-        canvasContainer.append(canvas);
+
+        const ticks = ModelConstants.RANGE____PERCENTAGE_100.slice(0, -1);
 
         super({
             container,
@@ -62,7 +37,7 @@ export class SliderContactCategory extends Slider {
             max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
             step: 0.01, // 100
             values: [1.0],
-            ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
+            ticks,
             label: contactCategoryConfig.getName(),
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
@@ -92,7 +67,67 @@ export class SliderContactCategory extends Slider {
             }
         });
 
+        // <canvas id="weibullCanvas" style="position: absolute; left: 0px; bottom: 0px; width: 100%; height: 100%" />
+        this.canvas = document.createElement('canvas');
+        this.canvas.style.position = 'absolute';
+        this.canvas.style.left = '0px';
+        this.canvas.style.top = '0px';
+        this.canvas.width = 240;
+        this.canvas.height = 27;
+        canvasContainer.append(this.canvas);
+
+        this.setLabelPosition(13);
         this.contactCategoryConfig = contactCategoryConfig;
+
+        // this.redrawCanvas();
+
+    }
+
+    setValueAndRedraw(index: number, value: number, animated: boolean): void {
+        super.setValueAndRedraw(index, value, animated);
+        this.redrawCanvas();
+    }
+
+    acceptModification(modification: ModificationContact): void {
+        this.modification = modification;
+        this.redrawCanvas();
+    }
+
+    redrawCanvas(): void {
+
+        const context = this.canvas.getContext("2d");
+        context.fillStyle = 'rgba(63, 63, 63, 1.00)'; // ControlsConstants.COLORS.CONTACT
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        const ageGroups = Demographics.getInstance().getAgeGroups();
+        const scale = 0.75 * this.getValue();
+
+        const xStp = 240 / ageGroups.length;
+        const xPad = 2;
+
+
+
+        ageGroups.forEach(ageGroup => {
+
+            context.fillStyle = 'rgba(63, 63, 63, 1.00)';
+            if (this.modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex()) !== 1) {
+                context.fillStyle = 'rgba(255, 63, 63, 1.00)';
+            }
+
+            const value = this.contactCategoryConfig.getColumnValue(ageGroup.getIndex());
+            const xMin = ageGroup.getIndex() * xStp + xPad;
+            const xMax = (ageGroup.getIndex() + 1) * xStp - xPad;
+            const yMin = this.canvas.height;
+            const yMax = this.canvas.height - value * scale - 1;
+
+            context.beginPath();
+            context.moveTo(xMin, yMin); // UL
+            context.lineTo(xMin, yMax);
+            context.lineTo(xMax, yMax);
+            context.lineTo(xMax, yMin);
+            context.fill();
+
+        });
 
     }
 

@@ -1,3 +1,4 @@
+import { Demographics } from './../demographics/Demographics';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from './../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';
@@ -38,37 +39,45 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
             const modificationValuesA = modificationA.getModificationValues();
             const modificationValuesB = modificationB.getModificationValues();
 
-            const mergedKeys: Set<string> = new Set();
-            Object.keys(modificationValuesA.multipliers).forEach(key => {
-                mergedKeys.add(key);
-            });
-            Object.keys(modificationValuesB.multipliers).forEach(key => {
-                mergedKeys.add(key);
-            });
+            const categoryNames = Demographics.getInstance().getCategories().map(c => c.getName());
 
             const fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
             const multipliers: { [K: string]: number} = {};
-            mergedKeys.forEach(key => {
-                const multiplierA = modificationValuesA.multipliers[key];
-                const multiplierB = modificationValuesB.multipliers[key];
-                const multiplier = multiplierA + (multiplierB - multiplierA) * fraction;
-                multipliers[key] = multiplier;
+            const corrections: { [K: string]: { [K: string]: number}} = {};
+            const ageGroups = Demographics.getInstance().getAgeGroups();
+
+            categoryNames.forEach(categoryName => {
+
+                corrections[categoryName] = {};
+
+                const multiplierA = modificationValuesA.multipliers[categoryName];
+                const multiplierB = modificationValuesB.multipliers[categoryName];
+                multipliers[categoryName] = multiplierA + (multiplierB - multiplierA) * fraction;
+
+                ageGroups.forEach(ageGroup => {
+                    const correctionA = (modificationValuesA.corrections && modificationValuesA.corrections[categoryName] && modificationValuesA.corrections[categoryName][ageGroup.getName()]) || 1;
+                    const correctionB = (modificationValuesB.corrections && modificationValuesB.corrections[categoryName] && modificationValuesB.corrections[categoryName][ageGroup.getName()]) || 1;
+                    corrections[categoryName][ageGroup.getName()] = correctionA + (correctionB - correctionA) * fraction;
+                });
+
             });
 
-            if (instant % TimeUtil.MILLISECONDS_PER___WEEK === 0) {
-                Math.random();
-            }
 
             const interpolatedModification = new ModificationContact({
                 id: ObjectUtil.createId(),
                 key: 'CONTACT',
-                name: 'interpolation',
+                name: `interpolation (${modificationValuesA.name})`,
                 instant,
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),
-                multipliers
+                multipliers,
+                corrections
             });
+            if (instant === modificationValuesA.instant) {
+                console.log(interpolatedModification)
+            }
+
             return interpolatedModification;
 
         } else {
