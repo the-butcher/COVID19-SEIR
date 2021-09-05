@@ -56,7 +56,10 @@ export class ControlsContact {
         const corrections: { [K in string] : { [K in string] : number } } = {};
         this.slidersCategory.forEach(sliderCategory => {
             multipliers[sliderCategory.getName()] = sliderCategory.getValue();
-            corrections[sliderCategory.getName()] = sliderCategory.getCorrections();
+            const categoryCorrections = sliderCategory.getCorrections();
+            if (categoryCorrections) {
+                corrections[sliderCategory.getName()] = categoryCorrections;
+            }
         });
         const blendable = this.iconBlendable.getState();
         this.modification.acceptUpdate({

@@ -74,9 +74,10 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 multipliers,
                 corrections
             });
-            if (instant === modificationValuesA.instant) {
-                console.log(interpolatedModification)
-            }
+
+            // if (instant === modificationValuesA.instant) {
+            //     console.log(interpolatedModification)
+            // }
 
             return interpolatedModification;
 

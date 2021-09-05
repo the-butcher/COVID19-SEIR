@@ -74,7 +74,6 @@ export class Modifications {
     }
 
     deleteModification(id: string): void {
-        // const modification = this.findModificationById(id);
         this.modifications = this.modifications.filter(m => m.getId() !== id);
         this.sortModifications();
     }

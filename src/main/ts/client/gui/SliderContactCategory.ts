@@ -175,17 +175,35 @@ export class SliderContactCategory extends Slider {
     }
 
     getCorrections(): { [K in string] : number } {
-        return this.corrections;
+        const corrections = {};
+        let isCorrected = false;
+        for (const k in this.corrections) {
+            if (this.corrections[k] !== 1) {
+                corrections[k] = this.corrections[k];
+                isCorrected = true;
+            }
+        }
+        if (isCorrected) {
+            return corrections;
+        } else {
+            return undefined;
+        }
     }
 
     lessCorrection(ageGroupName: string): void {
-        this.corrections[ageGroupName] = this.corrections[ageGroupName] * 0.99;
+        if (!this.corrections[ageGroupName]) {
+            this.corrections[ageGroupName] = 1;
+        }
+        this.corrections[ageGroupName] = this.corrections[ageGroupName] - 0.01;
         ControlsContact.getInstance().handleChange();
         this.redrawCanvas();
     }
 
     moreCorrection(ageGroupName: string): void {
-        this.corrections[ageGroupName] = this.corrections[ageGroupName] / 0.99;
+        if (!this.corrections[ageGroupName]) {
+            this.corrections[ageGroupName] = 1;
+        }
+        this.corrections[ageGroupName] = this.corrections[ageGroupName] + 0.01;
         ControlsContact.getInstance().handleChange();
         this.redrawCanvas();
     }
@@ -196,12 +214,22 @@ export class SliderContactCategory extends Slider {
     }
 
     acceptModification(modification: ModificationContact): void {
+
+        // reset, so none of the previous values remains
+        this.corrections = {};
+
         const ageGroups = Demographics.getInstance().getAgeGroups();
         ageGroups.forEach(ageGroup => {
-            this.corrections[ageGroup.getName()] = modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex());
+            const correction = modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex());;
+            if (correction !== 1) {
+                this.corrections[ageGroup.getName()] = correction;
+            }
+            // this.corrections[ageGroup.getName()] = modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex());
         });
-        // console.log('this.corrections', this.corrections);
+
+        console.warn('this.corrections', this.contactCategoryConfig.getName(), this.corrections);
         this.redrawCanvas();
+
     }
 
     redrawCanvas(): void {
@@ -218,11 +246,17 @@ export class SliderContactCategory extends Slider {
             ageGroupProfileDiv.style.height = `${value}px`;
             ageGroupProfileDiv.style.backgroundColor = '#444444';
 
-            const correctionValue = this.corrections[ageGroup.getName()];
-            if (correctionValue < 1) {
-                ageGroupProfileDiv.style.backgroundColor = '#884444';
-            } else if (correctionValue > 1) {
-                ageGroupProfileDiv.style.backgroundColor = '#448844';
+            const correction = this.corrections[ageGroup.getName()];
+            if (correction) {
+                if (correction < 1) {
+                    ageGroupProfileDiv.style.backgroundColor = '#884444';
+                } else if (correction > 1) {
+                    ageGroupProfileDiv.style.backgroundColor = '#448844';
+                } else {
+                    ageGroupProfileDiv.style.backgroundColor = '#444444';
+                }
+            } else {
+                ageGroupProfileDiv.style.backgroundColor = '#444444';
             }
 
         });
