@@ -97,8 +97,11 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
-* acceptModification is called 3 times
-* proper blending of corrections in ModificationResolverContact
+* acceptModification is called multiple times -> check for performance and streamline
+* checkpoints in the model for faster processing (could have some points where there is a calibrated set of strains and a continuable model state)
+  * processing must reach back to the previous unchanged modification
+
+* ~~proper blending of corrections in ModificationResolverContact~~
 * consider corrections when calculating category ratio in ModificationContact
 * interpolated test rate gives above min and below max
 * wiki on github

@@ -40,17 +40,6 @@ export interface IDataValues {
     TOTAL: number;
 }
 
-// export interface ICompartmentFilters {
-//     SUSCEPTIBLE: ICompartmentFilter;
-//     EXPOSED: ICompartmentFilter;
-//     INFECTIOUS: ICompartmentFilter;
-//     REMOVED_D: ICompartmentFilter;
-//     REMOVED_U: ICompartmentFilter;
-//     REMOVED_V: ICompartmentFilter;
-//     CASES: ICompartmentFilter;
-//     INCIDENCE: ICompartmentFilter;
-// }
-
 /**
  * performs an euler-integration in 1 hour steps on a model-state
  *

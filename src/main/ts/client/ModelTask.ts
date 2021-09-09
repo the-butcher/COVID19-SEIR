@@ -47,9 +47,6 @@ export class ModelTask {
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
                 await ChartAgeGroup.getInstance().renderModelData();
 
-                // await ChartAgeGroupFlow.getInstance().acceptModelData(modelProgress.data);
-                // await ChartAgeGroupFlow.getInstance().renderModelData();
-
                 /**
                  * primary strain has a "floating value", update the value on the gui instance of that modification
                  */
@@ -64,7 +61,7 @@ export class ModelTask {
 
                 SliderModification.getInstance().setProgress(0);
                 // ModelTask.worker.terminate();
-                ModelTask.worker = null;
+                // ModelTask.worker = null;
 
             } else {
                 SliderModification.getInstance().setProgress(modelProgress.ratio);

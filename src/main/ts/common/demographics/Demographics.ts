@@ -112,24 +112,24 @@ export class Demographics implements IContactCategories {
                 ].map(v => v * 1.2)
             }
 
-            // if (matrixConfig.name === 'nursing') {
-            //     corrections = [
-            //         1, // <= 04
-            //         1, // 05-14
-            //         1, // 15-24
-            //         1, // 25-34
-            //         1, // 35-44
-            //         1, // 45-54
-            //         1, // 55-64
-            //         1, // 65-74
-            //         1, // 75-84
-            //         1  // >= 85
-            //     ]
-            // }
+            if (matrixConfig.name === 'nursing') {
+                corrections = [
+                    1, // <= 04
+                    1, // 05-14
+                    1, // 15-24
+                    1, // 25-34
+                    1, // 35-44
+                    1, // 45-54
+                    1, // 55-64
+                    1, // 65-74
+                    1.20, // 75-84
+                    1  // >= 85
+                ]
+            }
 
             if (matrixConfig.name === 'family') {
                 corrections = [
-                    0.75, // <= 04
+                    0.70, // <= 04
                     1, // 05-14
                     1, // 15-24
                     1, // 25-34

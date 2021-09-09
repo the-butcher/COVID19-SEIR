@@ -227,7 +227,7 @@ export class SliderContactCategory extends Slider {
             // this.corrections[ageGroup.getName()] = modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex());
         });
 
-        console.warn('this.corrections', this.contactCategoryConfig.getName(), this.corrections);
+        // console.warn('this.corrections', this.contactCategoryConfig.getName(), this.corrections);
         this.redrawCanvas();
 
     }
