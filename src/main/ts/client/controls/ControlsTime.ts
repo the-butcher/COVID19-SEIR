@@ -28,11 +28,11 @@ export class ControlsTime {
     private static instance: ControlsTime;
 
     private readonly chartContactMatrix: ChartContactMatrix;
-    private readonly chartDiffIncidences: ChartDiscovery;
+    // private readonly chartDiffIncidences: ChartDiscovery;
 
     constructor() {
         this.chartContactMatrix = new ChartContactMatrix('chartTimeDiv', false);
-        this.chartDiffIncidences = new ChartDiscovery('chartDiffIncidenceDiv', -20, 20, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2);
+        // this.chartDiffIncidences = new ChartDiscovery('chartDiffIncidenceDiv', -20, 20, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2);
     }
 
     getChartContactMatrix(): ChartContactMatrix {
@@ -51,7 +51,7 @@ export class ControlsTime {
         const modificationResolver = ModificationResolverTime.getInstance();
         const contactMatrix = modificationResolver.findContactMatrix(modification.getInstantA());
 
-        // ChartAgeGroupFlow.getInstance().setInstant(modification.getInstant());
+        ChartAgeGroupFlow.getInstance().setInstant(modification.getInstant());
 
         // const ageGroups = Demographics.getInstance().getAgeGroups();
         // const dataItem = ChartAgeGroup.getInstance().findDataItemByInstant(modification.getInstant());
