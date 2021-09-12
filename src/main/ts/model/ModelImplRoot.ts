@@ -39,7 +39,6 @@ export class ModelImplRoot implements IModelSeir {
      */
     static async setupInstance(demographics: Demographics, modifications: Modifications, baseData: BaseData, progressCallback: (progress: IModelProgress) => void): Promise<ModelStateIntegrator> {
 
-        //const approximator = new StrainApproximatorCalibrate(demographics, modifications);
         const approximator = new StrainApproximatorBaseData(demographics, modifications, baseData);
         await approximator.approximate(progressCallback);
 

@@ -189,13 +189,16 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
             // iterate lut until lut value is equal or greater than cur instant
             while (curInstant > lut1[lutIndex].x) {
-                lutIndex++;
-                if (lutIndex >= lut1.length) {
+                if (lutIndex >= lut1.length - 1) {
                     break;
+                } else {
+                    lutIndex++;
                 }
             }
 
-            if (lutIndex > 0) {
+            if (lutIndex >= lut1.length - 1) {
+                lutVacc1[curInstant] = lut1[lut1.length - 1].y;
+            } else if (lutIndex > 0) {
                 const diffCurX = curInstant - lut1[lutIndex - 1].x;
                 const diffLutX = lut1[lutIndex].x - lut1[lutIndex - 1].x;
                 const diffLutY = lut1[lutIndex].y - lut1[lutIndex - 1].y;
@@ -227,13 +230,16 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
 
             // iterate lut until lut value is equal or greater than cur instant
             while (curInstant > lut2[lutIndex].x) {
-                lutIndex++;
-                if (lutIndex >= lut2.length) {
+                if (lutIndex >= lut2.length - 1) {
                     break;
+                } else {
+                    lutIndex++;
                 }
             }
 
-            if (lutIndex > 0) {
+            if (lutIndex >= lut2.length - 1) {
+                lutVacc2[curInstant] = lut2[lut2.length - 1].y;
+            } else if (lutIndex > 0) {
                 const diffCurX = curInstant - lut2[lutIndex - 1].x;
                 const diffLutX = lut2[lutIndex].x - lut2[lutIndex - 1].x;
                 const diffLutY = lut2[lutIndex].y - lut2[lutIndex - 1].y;
