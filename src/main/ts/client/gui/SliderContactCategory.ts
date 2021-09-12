@@ -9,8 +9,12 @@ import { Slider } from './Slider';
 
 export class SliderContactCategory extends Slider {
 
+    static readonly CLASS_CORRECTION_LABEL = 'correction-label';
+
     private readonly contactCategoryConfig: ContactCategory;
-    private readonly ageGroupProfilesDivs: HTMLDivElement[];
+    private readonly ageGroupProfileDivs: HTMLDivElement[];
+    private readonly ageGroupLabelDivs: HTMLDivElement[];
+
 
     private corrections: { [K in string] : number };
 
@@ -70,7 +74,9 @@ export class SliderContactCategory extends Slider {
         this.corrections = {};
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
-        this.ageGroupProfilesDivs = [];
+        this.ageGroupProfileDivs = [];
+        this.ageGroupLabelDivs = [];
+
         const xStp = 240 / ageGroups.length;
 
         ageGroups.forEach(ageGroup => {
@@ -81,20 +87,26 @@ export class SliderContactCategory extends Slider {
             ageGroupProfileContainer.style.left = `${xStp * ageGroup.getIndex()}px`;
             ageGroupProfileContainer.style.top = `0px`;
             ageGroupProfileContainer.style.width = `${xStp}px`;
-            ageGroupProfileContainer.style.height = '27px';
+            ageGroupProfileContainer.style.height = '40px';
 
             const ageGroupProfileDiv = document.createElement('div');
             ageGroupProfileDiv.style.position = 'absolute';
             ageGroupProfileDiv.style.left = '1px';
-            ageGroupProfileDiv.style.bottom = '0px';
+            ageGroupProfileDiv.style.bottom = '13px';
             ageGroupProfileDiv.style.width = 'calc(100% - 2px)';
             ageGroupProfileDiv.style.height = '27px';
             ageGroupProfileDiv.style.backgroundColor = '#444444';
             ageGroupProfileDiv.style.transition = 'top 250ms ease-in-out, height 250ms ease-in-out';
-
-            this.ageGroupProfilesDivs.push(ageGroupProfileDiv);
-
+            this.ageGroupProfileDivs.push(ageGroupProfileDiv);
             ageGroupProfileContainer.appendChild(ageGroupProfileDiv);
+
+            const ageGroupLabelDiv = document.createElement('div');
+            ageGroupLabelDiv.classList.add('correction-label');
+            ageGroupLabelDiv.style.width = 'calc(100% - 2px)';
+            ageGroupLabelDiv.innerHTML = '10%';
+            ageGroupLabelDiv.style.display = 'none';
+            this.ageGroupLabelDivs.push(ageGroupLabelDiv);
+            ageGroupProfileContainer.appendChild(ageGroupLabelDiv);
             canvasContainer.appendChild(ageGroupProfileContainer);
 
             const svgElementMore = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -112,7 +124,7 @@ export class SliderContactCategory extends Slider {
             });
             svgElementMore.addEventListener('pointerup', e => {
                 this.moreCorrection(ageGroup.getName());
-            })
+            });
 
             const pathMore = document.createElementNS("http://www.w3.org/2000/svg", "path");
             pathMore.setAttributeNS(null, 'fill', '#444444');
@@ -160,10 +172,14 @@ export class SliderContactCategory extends Slider {
             };
 
             ageGroupProfileContainer.addEventListener('pointermove', lessMore);
-            ageGroupProfileContainer.addEventListener('pointerover', lessMore);
+            ageGroupProfileContainer.addEventListener('pointerover', e => {
+                lessMore(e);
+                this.ageGroupLabelDivs[ageGroup.getIndex()].style.display = 'block';
+            });
             ageGroupProfileContainer.addEventListener('pointerout', e => {
                 svgElementLess.style.display = 'none';
                 svgElementMore.style.display = 'none';
+                this.ageGroupLabelDivs[ageGroup.getIndex()].style.display = 'none';
             });
 
 
@@ -239,7 +255,7 @@ export class SliderContactCategory extends Slider {
 
         ageGroups.forEach(ageGroup => {
 
-            const ageGroupProfileDiv = this.ageGroupProfilesDivs[ageGroup.getIndex()];
+            const ageGroupProfileDiv = this.ageGroupProfileDivs[ageGroup.getIndex()];
             const value = this.contactCategoryConfig.getColumnValue(ageGroup.getIndex()) * scale + 1;
 
             // ageGroupProfileDiv.style.top = `${27 - value}px`;
@@ -248,6 +264,9 @@ export class SliderContactCategory extends Slider {
 
             const correction = this.corrections[ageGroup.getName()];
             if (correction) {
+
+                this.ageGroupLabelDivs[ageGroup.getIndex()].innerHTML = ControlsConstants.LABEL_PERCENT___FIXED.format(Math.abs(correction - 1));
+
                 if (correction < 1) {
                     ageGroupProfileDiv.style.backgroundColor = '#884444';
                 } else if (correction > 1) {
@@ -255,7 +274,9 @@ export class SliderContactCategory extends Slider {
                 } else {
                     ageGroupProfileDiv.style.backgroundColor = '#444444';
                 }
+
             } else {
+                this.ageGroupLabelDivs[ageGroup.getIndex()].innerHTML = ControlsConstants.LABEL_PERCENT___FIXED.format(0);
                 ageGroupProfileDiv.style.backgroundColor = '#444444';
             }
 

@@ -8,6 +8,8 @@ import { Demographics } from './../../common/demographics/Demographics';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { QueryUtil } from './QueryUtil';
+import { min } from '@amcharts/amcharts4/.internal/core/utils/Math';
+import { groupEnd } from 'console';
 
 export interface IChartData {
     contact: string;
@@ -83,16 +85,22 @@ export class ChartAgeGroupFlow {
             // console.log(relativeX, this.chart.pixelWidth);
 
             if (relativeX > this.chart.pixelWidth / 2) {
+                const fromName = e.target.dataItem.fromName;
                 const toName = e.target.dataItem.toName;
                 this.chart.links.each((link) => {
-                    if (link.dataItem.toName === toName) {
+                    if (link.dataItem.fromName === fromName && link.dataItem.toName === toName) {
+                        link.fillOpacity = 0.7;
+                    } else if (link.dataItem.toName === toName) {
                         link.fillOpacity = 0.5;
                     }
                 });
             } else {
                 const fromName = e.target.dataItem.fromName;
+                const toName = e.target.dataItem.toName;
                 this.chart.links.each((link) => {
-                    if (link.dataItem.fromName === fromName) {
+                    if (link.dataItem.fromName === fromName && link.dataItem.toName === toName) {
+                        link.fillOpacity = 0.7;
+                    } else if (link.dataItem.fromName === fromName) {
                         link.fillOpacity = 0.5;
                     }
                 });
@@ -165,50 +173,59 @@ export class ChartAgeGroupFlow {
         clearTimeout(this.renderTimeout);
 
         let chartData: IChartData[] = [];
-
+        const groupNames: Set<string> = new Set();
 
         for (const dataItem of this.modelData) {
 
             if (dataItem.instant > this.instant) {
 
-                // const ageGroupContact = Demographics.getInstance().getAgeGroups()[2];
+                let values: number[] = [];
+                Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
+                    Demographics.getInstance().getAgeGroups().forEach(ageGroupParticipant => {
+                        values.push(dataItem.exposure[ageGroupContact.getIndex()][ageGroupParticipant.getIndex()]);
+                    });
+                });
+                values = values.sort((a,b) => b - a);
+                const minValue = values[25];
+
                 Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupParticipant => {
 
                         const value = dataItem.exposure[ageGroupContact.getIndex()][ageGroupParticipant.getIndex()];
-                        chartData.push({
-                            contact: `${ageGroupContact.getName()}`,
-                            participant: `p${ageGroupParticipant.getName()}`,
-                            contactLabel: `${ageGroupContact.getName()}`,
-                            participantLabel: `${ageGroupParticipant.getName()}`,
-                            value,
-                            color: ControlsConstants.COLOR____FONT
-                        });
-
+                        if (value >= minValue) {
+                            // console.log('adding', value, minValue);
+                            chartData.push({
+                                contact: `${ageGroupContact.getName()}`,
+                                participant: `p${ageGroupParticipant.getName()}`,
+                                contactLabel: `${ageGroupContact.getName()}`,
+                                participantLabel: `${ageGroupParticipant.getName()}`,
+                                value,
+                                color: ControlsConstants.COLOR____FONT
+                            });
+                            groupNames.add(ageGroupContact.getName());
+                            groupNames.add(ageGroupParticipant.getName());
+                        } else {
+                            chartData.push({
+                                contact: `${ageGroupContact.getName()}`,
+                                participant: `p${ageGroupParticipant.getName()}`,
+                                contactLabel: `${ageGroupContact.getName()}`,
+                                participantLabel: `${ageGroupParticipant.getName()}`,
+                                value: 0,
+                                color: ControlsConstants.COLOR____FONT
+                            });
+                        }
 
                     });
                 });
-
-
                 break;
 
             }
 
         }
 
-        chartData.sort((a,b) => {
-            return b.value - a.value;
+        chartData = chartData.filter(c => {
+            return groupNames.has(c.contactLabel) && groupNames.has(c.participantLabel);
         });
-        // chartData = chartData.slice(0, 20);
-        chartData = chartData.filter(d => d.value * this.absTotal > 100);
-        chartData.sort((a,b) => {
-            return a.participant.localeCompare(b.participant);
-        });
-        chartData.sort((a,b) => {
-            return a.contact.localeCompare(b.contact);
-        });
-
-        // console.log(chartData);
 
         if (this.chart.data.length === chartData.length) {
             for (let i = 0; i < chartData.length; i++) {

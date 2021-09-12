@@ -172,6 +172,18 @@ input {
   user-select: none;
 }
 
+.correction-label {
+  position: absolute;
+  left: 1px;
+  bottom: 0px;
+  width: calc(100%-2px);
+  text-align: center;
+  height: 10px;
+  font-size: 10px;
+  user-select: none;
+  /* background-color: red; */
+}
+
 .thumb-container {
   display: flex;
   flex-direction: column;

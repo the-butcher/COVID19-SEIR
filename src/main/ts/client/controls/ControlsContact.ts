@@ -67,7 +67,7 @@ export class ControlsContact {
             corrections,
             blendable
         });
-        console.log('handleChange', corrections, this.modification);
+        // console.log('handleChange', corrections, this.modification);
 
         this.applyToChartContact();
         SliderModification.getInstance().indicateUpdate(this.modification.getId());

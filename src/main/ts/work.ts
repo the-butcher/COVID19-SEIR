@@ -11,15 +11,11 @@ import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
 
 const ctx: Worker = self as any;
-let counter = 0;
 
 // We send a message back to the main thread
 ctx.addEventListener("message", async (event: MessageEvent) => {
 
     Logger.setInstance(self.console.log);
-    counter++;
-
-    Logger.getInstance().log("run", counter);
 
     try {
 
@@ -27,7 +23,6 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
 
         const minInstant = workerInput.minInstant;
         const maxInstant = workerInput.maxInstant;
-        // Logger.getInstance().log('minInstant', minInstant, 'maxInstant', maxInstant);
 
         const demographicsConfig = workerInput.demographicsConfig;
         const modificationValues = workerInput.modificationValues;

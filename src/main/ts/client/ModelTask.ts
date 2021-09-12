@@ -33,6 +33,7 @@ export class ModelTask {
          */
         if (ModelTask.worker) {
             ModelTask.worker.terminate();
+            ModelTask.worker = null;
         }
 
         /**
