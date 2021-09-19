@@ -8,6 +8,7 @@ import { SliderModification } from '../gui/SliderModification';
 import { SliderTestingCategory } from '../gui/SliderTestingCategory';
 import { Controls } from './Controls';
 import { ModificationTime } from '../../common/modification/ModificationTime';
+import { ModificationResolverDiscovery } from '../../common/modification/ModificationResolverDiscovery';
 
 /**
  * controller for editing testing modifications
@@ -26,7 +27,7 @@ export class ControlsDiscovery {
     private static instance: ControlsDiscovery;
 
     private readonly chartTesting: ChartDiscovery;
-    private readonly slidersTesting: SliderTestingCategory[];
+    private readonly slidersDiscovery: SliderTestingCategory[];
     private readonly iconBlendable: IconToggle;
 
     private modification: ModificationDiscovery;
@@ -34,7 +35,7 @@ export class ControlsDiscovery {
     constructor() {
 
         this.chartTesting = new ChartDiscovery('chartTestingDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
-        this.slidersTesting = [];
+        this.slidersDiscovery = [];
 
         this.iconBlendable = new IconToggle({
             container: 'slidersTestingDiv',
@@ -46,24 +47,36 @@ export class ControlsDiscovery {
         });
 
         Demographics.getInstance().getCategories().forEach(contactCategory => {
-            this.slidersTesting.push(new SliderTestingCategory(contactCategory.getName()));
+            this.slidersDiscovery.push(new SliderTestingCategory(contactCategory.getName()));
         });
 
     }
 
     handleChange(): void {
 
+        console.log('handleChange (discovery)');
+
         const multipliers: { [K in string] : number } = {};
-        this.slidersTesting.forEach(sliderTesting => {
-            multipliers[sliderTesting.getName()] = sliderTesting.getValue();
+        this.slidersDiscovery.forEach(sliderDiscovery => {
+            multipliers[sliderDiscovery.getName()] = sliderDiscovery.getValue();
         });
         const blendable = this.iconBlendable.getState();
-        this.modification.acceptUpdate({
-            multipliers,
-            blendable
-        });
+
+        const namedModifications = new ModificationResolverDiscovery().getModifications().filter(m => m.getName() === this.modification.getName());
+        console.log('namedModifications', namedModifications)
+        namedModifications.forEach(namedModification => {
+            namedModification.acceptUpdate({
+                multipliers,
+                blendable
+            });
+            SliderModification.getInstance().indicateUpdate(namedModification.getId());
+        })
+        // this.modification.acceptUpdate({
+        //     multipliers,
+        //     blendable
+        // });
+
         this.updateChart(this.modification.getInstantA());
-        SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
     }
 
@@ -72,7 +85,7 @@ export class ControlsDiscovery {
         Controls.acceptModification(modification);
         this.modification = modification;
 
-        this.slidersTesting.forEach(sliderTesting => {
+        this.slidersDiscovery.forEach(sliderTesting => {
             sliderTesting.setValue(modification.getCategoryValue(sliderTesting.getName()));
         });
         this.iconBlendable.toggle(modification.isBlendable());
@@ -96,7 +109,7 @@ export class ControlsDiscovery {
 
         requestAnimationFrame(() => {
             this.chartTesting.acceptModificationTime(modificationTime);
-            this.slidersTesting.forEach(sliderTesting => {
+            this.slidersDiscovery.forEach(sliderTesting => {
                 sliderTesting.handleResize();
             });
         });

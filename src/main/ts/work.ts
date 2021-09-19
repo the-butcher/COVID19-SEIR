@@ -42,10 +42,11 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
 
         /**
          * calibrate strain values to have transmission risk set properly (in an SEIS model the strain would then hold equilibrium at R0=1 and the strain's initial incidence)
+         * any change in strain and first testing value would require re-calibration
          */
-        const modificationValuesTesting = modificationValues.find(m => m.key === 'TESTING') as IModificationValuesDiscovery;
+        const modificationValuesDiscovery = modificationValues.find(m => m.key === 'TESTING') as IModificationValuesDiscovery;
         modificationValues.filter(m => m.key === 'STRAIN').forEach((modificationValuesStrain: IModificationValuesStrain) => {
-            StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain, modificationValuesTesting, BaseData.getInstance());
+            StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain, modificationValuesDiscovery, BaseData.getInstance());
         });
 
         // recreate singleton, since the calibrator changes things

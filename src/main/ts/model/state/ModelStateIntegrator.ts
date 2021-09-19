@@ -16,6 +16,7 @@ import { IModelState } from './IModelState';
  */
 export interface IModelProgress {
     ratio: number;
+    calibratedStrains?: IModificationValuesStrain[];
     data?: IDataItem[];
 }
 
