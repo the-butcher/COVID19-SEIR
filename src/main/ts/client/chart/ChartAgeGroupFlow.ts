@@ -186,7 +186,7 @@ export class ChartAgeGroupFlow {
                     });
                 });
                 values = values.sort((a,b) => b - a);
-                const minValue = values[25];
+                const minValue = values[20];
 
                 Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupParticipant => {

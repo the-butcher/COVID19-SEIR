@@ -238,7 +238,7 @@ export class ChartAgeGroup {
             colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.30,
+            locationOnPath: 0.40,
             labelled: true,
             stacked: false,
             legend: true,
@@ -249,7 +249,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
-            title: 'cases (as reported)',
+            title: 'cases (reported)',
             baseLabel: 'cases',
             valueField: 'ageGroupCasesR',
             colorKey: 'CASES',
@@ -266,14 +266,14 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
-            title: 'cases (+daily offset)',
+            title: 'cases (predicted)',
             baseLabel: 'predicted cases',
             valueField: 'ageGroupCasesN',
             colorKey: 'SEASONALITY',
             strokeWidth: 0.5,
             dashed: false,
             locationOnPath: 1.10,
-            labelled: false,
+            labelled: true,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
@@ -291,7 +291,7 @@ export class ChartAgeGroup {
             colorKey: 'INCIDENCE',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.20,
+            locationOnPath: 0.10,
             labelled: true,
             stacked: false,
             legend: true,
@@ -607,7 +607,7 @@ export class ChartAgeGroup {
         this.seriesHeat.yAxis = this.yAxisHeat;
         this.seriesHeat.dataFields.categoryX = ChartAgeGroup.FIELD_CATEGORY_X;
         this.seriesHeat.dataFields.categoryY = ChartAgeGroup.FIELD_CATEGORY_Y;
-        this.seriesHeat.dataFields.value = 'value';
+        this.seriesHeat.dataFields.value = 'gamma';
         this.seriesHeat.interpolationDuration = 0;
         this.seriesHeat.tooltip.disabled = false;
         this.seriesHeat.cursorTooltipEnabled = false; // be sure the contact chart tooltip is hidden from the cursor
@@ -1173,7 +1173,7 @@ export class ChartAgeGroup {
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
 
-        let maxValue = 0;
+        let maxGamma = 0;
         const randomVd = Math.random() * 0.00001;
 
         const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
@@ -1280,15 +1280,17 @@ export class ChartAgeGroup {
                 }
 
                 const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
+                const gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
                 heatData.push({
                     categoryX: dataItem.categoryX,
                     categoryY: ageGroupHeat.getName(),
                     index: ageGroupHeat.getIndex(),
                     value: value + randomVd,
                     label,
-                    color
+                    color,
+                    gamma
                 });
-                maxValue = Math.max(maxValue, value);
+                maxGamma = Math.max(maxGamma, gamma);
 
             });
 
@@ -1297,7 +1299,7 @@ export class ChartAgeGroup {
 
         const chartData = [...plotData, ...heatData];
 
-        this.applyMaxHeat(maxValue);
+        this.applyMaxHeat(maxGamma);
 
         // console.log('heatData', heatData);
 

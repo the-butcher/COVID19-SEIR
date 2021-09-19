@@ -20,8 +20,6 @@ export interface IChartData {
     plotY?: number;
 }
 
-// export type AXIS_DIRECTION = 'CONTACT_PARTICIPANT' | 'PARTICIPANT_CONTACT';
-
 /**
  * contact-matrix chart
  *
@@ -40,14 +38,11 @@ export class ChartContactMatrix {
     private readonly seriesPlot: LineSeries;
 
     private fullDataUpdate: boolean;
-    // private axisDirection: AXIS_DIRECTION;
     private contactMatrix: IContactMatrix;
 
     private readonly valueTotalLabel: Label;
 
     private readonly showToggleAndPercentage: boolean;
-
-    // private axisIcon: IconMatrixAxis;
 
     constructor(container: string, showToggleAndPercentage: boolean) {
 
@@ -56,7 +51,6 @@ export class ChartContactMatrix {
 
         this.fullDataUpdate = true;
         this.showToggleAndPercentage = showToggleAndPercentage;
-        // this.axisDirection = 'CONTACT_PARTICIPANT';
 
         this.chart = create(container, XYChart);
         this.chart.leftAxesContainer.layout = 'absolute';
@@ -146,8 +140,8 @@ export class ChartContactMatrix {
         this.seriesPlot.fontSize = ControlsConstants.FONT_SIZE;
         this.seriesPlot.dataFields.categoryX = 'plotX';
         this.seriesPlot.dataFields.valueY = 'plotY';
-        this.seriesPlot.fillOpacity = 0;
-        this.seriesPlot.strokeWidth = 3;
+        this.seriesPlot.fillOpacity = 0.2;
+        this.seriesPlot.strokeWidth = 1;
         this.seriesPlot.strokeLinecap = 'round';
         this.seriesPlot.strokeOpacity = 1.0;
 
@@ -213,7 +207,6 @@ export class ChartContactMatrix {
         this.valueTotalLabel.x = 50;
         this.valueTotalLabel.y = 287;
         this.valueTotalLabel.horizontalCenter = 'right';
-        // this.valueTotalLabel.visible = this.showToggleAndPercentage;
 
         this.chart.leftAxesContainer.events.on('sizechanged', e => {
 

@@ -60,8 +60,6 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
             }
         });
 
-        // console.log('this.maxCellValue', this.maxCellValue, this.maxColumnValue);
-
     }
 
     getMinValue(): number {

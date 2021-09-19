@@ -45,32 +45,11 @@ export class ControlsTime {
 
     acceptModification(modification: ModificationTime): void {
 
-        // console.log('time update');
-
         Controls.acceptModification(modification);
         const modificationResolver = ModificationResolverTime.getInstance();
         const contactMatrix = modificationResolver.findContactMatrix(modification.getInstantA());
 
         ChartAgeGroupFlow.getInstance().setInstant(modification.getInstant());
-
-        // const ageGroups = Demographics.getInstance().getAgeGroups();
-        // const dataItem = ChartAgeGroup.getInstance().findDataItemByInstant(modification.getInstant());
-        // const baseIncidences = BaseData.getInstance().findIncidences(modification.getInstant(), ageGroups);
-        // if (ObjectUtil.isNotEmpty(baseIncidences)) {
-
-        //     // build a difference for each age group
-        //     const diffIncidences = ageGroups.map(g => dataItem.valueset[g.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL] - baseIncidences[g.getIndex()]);
-        //     const columnSum = diffIncidences.reduce((prev, curr) => prev + curr, 0);
-        //     const maxColumnSum = ageGroups.length * 10;
-
-        //     // this.chartDiffIncidences.acceptContactColumns({
-        //     //     getColumnValue: i => diffIncidences[i],
-        //     //     getMaxColumnValue: () => 0,
-        //     //     getColumnSum: () => columnSum,
-        //     //     getMaxColumnSum: () => maxColumnSum,
-        //     // });
-        //     // console.log('diffIncidences', diffIncidences);
-        // };
 
         requestAnimationFrame(() => {
             this.chartContactMatrix.acceptContactMatrix(contactMatrix);

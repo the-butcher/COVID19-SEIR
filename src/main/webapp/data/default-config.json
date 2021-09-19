@@ -1,5 +1,5 @@
 {
-  "model_______version": "AT_0_00_04",
+  "model_______version": "AT_0_00_05",
   "model______basedata": "data/heatmap-data-at.json",
   "model__demographics": "data/demographics-at.json",
   "model_____daterange": [
@@ -32,7 +32,7 @@
       "r0": 4.4,
       "serialInterval": 4.8,
       "intervalScale": 1,
-      "dstIncidence": 152.13444889891096,
+      "dstIncidence": 152.13554272096684,
       "deletable": false,
       "draggable": false,
       "primary": true,
@@ -54,17 +54,16 @@
       "deletable": false,
       "draggable": false,
       "corrections": {
-        "family": {},
-        "school": {},
-        "nursing": {},
-        "work": {},
+        "nursing": {
+          "75-84": 0.7499999999999998
+        },
         "other": {
-          "15-24": 0.7623427143471035,
-          "25-34": 1.094670081768662,
+          "15-24": 0.7123427143471035,
+          "25-34": 1.2346700817686622,
           "45-54": 0.9642316849968764,
           "55-64": 1.2600579659539182,
-          "65-74": 0.8600583546412883,
-          "75-84": 0.8514577710948754
+          "65-74": 0.8100583546412883,
+          "75-84": 0.7614577710948753
         }
       }
     },
@@ -93,7 +92,7 @@
         "75-84": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.7596162919200917
+            "y": 0.7615914481333574
           },
           "cA1": {
             "x": 1621036800000,
@@ -105,7 +104,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.39175904053788224
+            "y": 0.39260347979343224
           },
           "cA2": {
             "x": 1624838400000,
@@ -125,7 +124,7 @@
         ">= 85": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.8165293272948194
+            "y": 0.8194057218601568
           },
           "cA1": {
             "x": 1622073600000,
@@ -137,7 +136,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.7081939688501049
+            "y": 0.7098552965867668
           },
           "cA2": {
             "x": 1622073600000,
@@ -157,7 +156,7 @@
         "65-74": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.5536824478792449
+            "y": 0.5550945031976106
           },
           "cA1": {
             "x": 1620864000000,
@@ -169,7 +168,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.10644688166168864
+            "y": 0.10677940940697239
           },
           "cA2": {
             "x": 1627516800000,
@@ -189,7 +188,7 @@
         "55-64": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.2615112858878445
+            "y": 0.26239449453289854
           },
           "cA1": {
             "x": 1623110400000,
@@ -201,7 +200,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.07805965854594284
+            "y": 0.07829624656307949
           },
           "cA2": {
             "x": 1628726400000,
@@ -221,7 +220,7 @@
         "45-54": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.1834094659322551
+            "y": 0.1840159777247486
           },
           "cA1": {
             "x": 1623628800000,
@@ -233,7 +232,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.0646666021919891
+            "y": 0.06487202151355055
           },
           "cA2": {
             "x": 1627862400000,
@@ -253,7 +252,7 @@
         "35-44": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.15096212369492953
+            "y": 0.1514541453677181
           },
           "cA1": {
             "x": 1626048000000,
@@ -265,7 +264,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.05265568272263342
+            "y": 0.052808056216455485
           },
           "cA2": {
             "x": 1628208000000,
@@ -285,7 +284,7 @@
         "25-34": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.11875883973102404
+            "y": 0.11906983284120327
           },
           "cA1": {
             "x": 1626739200000,
@@ -297,7 +296,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.038966775017989626
+            "y": 0.03906933657560193
           },
           "cA2": {
             "x": 1629158400000,
@@ -317,7 +316,7 @@
         "15-24": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.06349038587311968
+            "y": 0.06368293001962066
           },
           "cA1": {
             "x": 1627603200000,
@@ -329,7 +328,7 @@
           },
           "pA2": {
             "x": 1619222400000,
-            "y": 0.02093289731850883
+            "y": 0.021015565729234794
           },
           "cA2": {
             "x": 1629849600000,
@@ -349,7 +348,7 @@
         "05-14": {
           "pA1": {
             "x": 1619222400000,
-            "y": 0.00012275369588952167
+            "y": 0.00012983563988314793
           },
           "cA1": {
             "x": 1631232000000,
@@ -415,6 +414,14 @@
       "draggable": false
     },
     {
+      "id": "b3f4d",
+      "key": "TIME",
+      "name": "effective contact",
+      "instant": 1619827200000,
+      "deletable": false,
+      "draggable": true
+    },
+    {
       "id": "6fedb",
       "key": "STRAIN",
       "instant": 1620691200000,
@@ -432,13 +439,13 @@
       "id": "e2be1",
       "key": "CONTACT",
       "name": "lift class split",
-      "instant": 1621296000000,
+      "instant": 1621209600000,
       "multipliers": {
         "family": 0.9500000000000001,
-        "school": 0.4,
+        "school": 0.35000000000000003,
         "nursing": 0.75,
         "work": 0.37,
-        "other": 0.18
+        "other": 0.17
       },
       "deletable": true,
       "draggable": true,
@@ -446,11 +453,12 @@
       "blendable": false,
       "corrections": {
         "other": {
-          "25-34": 1.11,
+          "15-24": 1.05,
+          "25-34": 1.2600000000000002,
           "35-44": 0.97,
           "45-54": 0.8499999999999999,
           "55-64": 0.98,
-          "65-74": 0.98,
+          "65-74": 0.8299999999999998,
           "75-84": 0.97
         }
       }
@@ -459,14 +467,13 @@
       "id": "25fd0",
       "key": "TESTING",
       "name": "more tests in school",
-      "instant": 1621296000000,
+      "instant": 1621209600000,
       "multipliers": {
         "family": 0.6,
         "school": 0.35000000000000003,
         "nursing": 0.8,
         "work": 0.3,
-        "other": 0.15,
-        "risk": 0.15
+        "other": 0.1
       },
       "deletable": true,
       "draggable": true,
@@ -476,7 +483,7 @@
     {
       "id": "63491",
       "key": "TESTING",
-      "name": "adjustments",
+      "name": "adjustments (1)",
       "instant": 1622419200000,
       "deletable": true,
       "draggable": true,
@@ -486,32 +493,40 @@
         "school": 0.4,
         "nursing": 0.8,
         "work": 0.3,
-        "other": 0.25
+        "other": 0.1
       },
       "primary": false
     },
     {
-      "id": "f2c23",
-      "key": "TESTING",
-      "name": "adjustments",
-      "instant": 1623110400000,
+      "id": "ddf22",
+      "key": "CONTACT",
+      "name": "lift school mask mandate",
+      "instant": 1622937600000,
+      "multipliers": {
+        "family": 0.91,
+        "school": 0.45,
+        "nursing": 0.53,
+        "work": 0.3,
+        "other": 0.03
+      },
       "deletable": true,
       "draggable": true,
+      "primary": false,
       "blendable": false,
-      "multipliers": {
-        "family": 0.6,
-        "school": 0.4,
-        "nursing": 0.7000000000000001,
-        "work": 0.3,
-        "other": 0.25
-      },
-      "primary": false
+      "corrections": {
+        "other": {
+          "15-24": 0.6899999999999997,
+          "25-34": 1.3900000000000003,
+          "35-44": 0.9099999999999999,
+          "45-54": 0.5699999999999996
+        }
+      }
     },
     {
-      "id": "32183",
+      "id": "686f2",
       "key": "TESTING",
-      "name": "adjustments",
-      "instant": 1623369600000,
+      "name": "adjustments (2)",
+      "instant": 1623974400000,
       "deletable": true,
       "draggable": true,
       "blendable": false,
@@ -520,35 +535,9 @@
         "school": 0.4,
         "nursing": 0.8,
         "work": 0.3,
-        "other": 0.2,
-        "risk": 0.1
+        "other": 0.2
       },
       "primary": false
-    },
-    {
-      "id": "ddf22",
-      "key": "CONTACT",
-      "name": "lift school mask mandate",
-      "instant": 1623369600000,
-      "multipliers": {
-        "family": 0.91,
-        "school": 0.5,
-        "nursing": 0.53,
-        "work": 0.3,
-        "other": 0.09
-      },
-      "deletable": true,
-      "draggable": true,
-      "primary": false,
-      "blendable": false,
-      "corrections": {
-        "other": {
-          "15-24": 0.8099999999999998,
-          "25-34": 1.12,
-          "35-44": 0.9099999999999999,
-          "45-54": 0.5699999999999996
-        }
-      }
     },
     {
       "id": "ea37",
@@ -560,38 +549,28 @@
       "draggable": true
     },
     {
-      "id": "21ce7",
-      "key": "TESTING",
+      "id": "dc051",
+      "key": "CONTACT",
       "name": "adjustments",
-      "instant": 1624233600000,
+      "instant": 1625097600000,
       "deletable": true,
       "draggable": true,
-      "blendable": false,
+      "blendable": true,
       "multipliers": {
-        "family": 0.6,
-        "school": 0.4,
-        "nursing": 0.8,
-        "work": 0.3,
-        "other": 0.2,
-        "risk": 0.1
+        "family": 0.7459375,
+        "school": 0.35000000000000003,
+        "nursing": 0.31125,
+        "work": 0.28437500000000004,
+        "other": 0.37
       },
-      "primary": false
-    },
-    {
-      "id": "686f2",
-      "key": "TESTING",
-      "name": "adjustments",
-      "instant": 1624838400000,
-      "deletable": true,
-      "draggable": true,
-      "blendable": false,
-      "multipliers": {
-        "family": 0.6,
-        "school": 0.4,
-        "nursing": 0.8,
-        "work": 0.3,
-        "other": 0.2,
-        "risk": 0.1
+      "corrections": {
+        "other": {
+          "15-24": 1.3178125,
+          "25-34": 1.1715625,
+          "35-44": 0.7815624999999998,
+          "45-54": 0.6168749999999996,
+          "55-64": 0.9765625
+        }
       },
       "primary": false
     },
@@ -599,21 +578,21 @@
       "id": "1d519",
       "key": "CONTACT",
       "name": "begin of holidays",
-      "instant": 1625529600000,
+      "instant": 1625702400000,
       "multipliers": {
-        "family": 0.73,
-        "school": 0,
+        "family": 0.7000000000000001,
+        "school": 0.01,
         "nursing": 0.25,
         "work": 0.28,
         "other": 0.53
       },
       "corrections": {
         "other": {
-          "15-24": 1.35,
-          "25-34": 1.07,
+          "15-24": 1.3800000000000001,
+          "25-34": 1.2800000000000002,
           "35-44": 0.7199999999999998,
           "45-54": 0.6299999999999997,
-          "55-64": 0.97
+          "55-64": 0.96
         }
       },
       "deletable": true,
@@ -622,10 +601,55 @@
       "blendable": true
     },
     {
-      "id": "4e01e",
-      "key": "TESTING",
+      "id": "f35bf",
+      "key": "CONTACT",
       "name": "adjustments",
-      "instant": 1626220800000,
+      "instant": 1626307200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.7000000000000001,
+        "school": 0.02,
+        "nursing": 0.3,
+        "work": 0.28,
+        "other": 0.43
+      },
+      "primary": false,
+      "corrections": {
+        "other": {
+          "15-24": 0.8899999999999999,
+          "25-34": 0.94,
+          "35-44": 0.47999999999999954,
+          "45-54": 0.6599999999999997,
+          "55-64": 0.8699999999999999,
+          "65-74": 0.8099999999999998,
+          "75-84": 1.02
+        }
+      }
+    },
+    {
+      "id": "b5cec",
+      "key": "TESTING",
+      "name": "adjustments (3)",
+      "instant": 1626307200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.6,
+        "school": 0.4,
+        "nursing": 0.8,
+        "work": 0.3,
+        "other": 0.37
+      },
+      "primary": false
+    },
+    {
+      "id": "8c9bc",
+      "key": "TESTING",
+      "name": "adjustments (4)",
+      "instant": 1626480000000,
       "deletable": true,
       "draggable": true,
       "blendable": false,
@@ -634,43 +658,32 @@
         "school": 0.2,
         "nursing": 0.5,
         "work": 0.3,
-        "other": 0.3
+        "other": 0.17
       },
       "primary": false
     },
     {
-      "id": "f35bf",
-      "key": "CONTACT",
-      "name": "adjustments",
-      "instant": 1626220800000,
+      "id": "4d0f6",
+      "key": "TESTING",
+      "name": "adjustments (5)",
+      "instant": 1626825600000,
       "deletable": true,
       "draggable": true,
       "blendable": true,
       "multipliers": {
-        "family": 0.6985714285714286,
-        "school": 0,
-        "nursing": 0.2892857142857143,
-        "work": 0.28,
-        "other": 0.44
+        "family": 0.6,
+        "school": 0.2,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.35000000000000003
       },
-      "primary": false,
-      "corrections": {
-        "other": {
-          "15-24": 1.01,
-          "25-34": 1.12,
-          "35-44": 0.5199999999999996,
-          "45-54": 0.6599999999999997,
-          "55-64": 0.8999999999999999,
-          "65-74": 0.8099999999999998,
-          "75-84": 1.02
-        }
-      }
+      "primary": false
     },
     {
       "id": "c420c",
       "key": "TESTING",
-      "name": "copy of copy of copy of copy of copy of minor adjustments",
-      "instant": 1626825600000,
+      "name": "adjustments (6)",
+      "instant": 1626912000000,
       "deletable": true,
       "draggable": true,
       "blendable": false,
@@ -679,32 +692,7 @@
         "school": 0.2,
         "nursing": 0.2,
         "work": 0.3,
-        "other": 0.2
-      },
-      "primary": false
-    },
-    {
-      "id": "d901e",
-      "key": "CONTACT",
-      "name": "adjustments",
-      "instant": 1626825600000,
-      "deletable": true,
-      "draggable": true,
-      "blendable": true,
-      "multipliers": {
-        "family": 0.6785714285714286,
-        "school": 0,
-        "nursing": 0.31428571428571433,
-        "work": 0.28,
-        "other": 0.38
-      },
-      "corrections": {
-        "other": {
-          "15-24": 1.1004411764705884,
-          "25-34": 1.2159313725490197,
-          "35-44": 0.5957843137254899,
-          "45-54": 0.6602450980392154
-        }
+        "other": 0.13
       },
       "primary": false
     },
@@ -712,31 +700,31 @@
       "id": "d83bf",
       "key": "CONTACT",
       "name": "adjustments",
-      "instant": 1627171200000,
+      "instant": 1626998400000,
       "deletable": true,
       "draggable": true,
       "blendable": true,
       "multipliers": {
         "family": 0.6642857142857144,
-        "school": 0,
+        "school": 0.07,
         "nursing": 0.3321428571428572,
         "work": 0.28,
-        "other": 0.42
+        "other": 0.35000000000000003
       },
       "corrections": {
         "other": {
-          "15-24": 1.3264705882352943,
-          "25-34": 1.4958823529411769,
-          "35-44": 0.5570588235294114,
+          "15-24": 1.3564705882352943,
+          "25-34": 1.555882352941177,
+          "35-44": 0.9770588235294118,
           "45-54": 0.6247058823529409
         }
       },
       "primary": false
     },
     {
-      "id": "56d83",
+      "id": "31a29",
       "key": "TESTING",
-      "name": "adjustments",
+      "name": "adjustments (7)",
       "instant": 1627171200000,
       "deletable": true,
       "draggable": true,
@@ -746,14 +734,57 @@
         "school": 0.2,
         "nursing": 0.2,
         "work": 0.3,
-        "other": 0.25
+        "other": 0.24
+      },
+      "primary": false
+    },
+    {
+      "id": "ba1c3",
+      "key": "CONTACT",
+      "name": "adjustments",
+      "instant": 1627171200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.6607142857142858,
+        "school": 0.0325,
+        "nursing": 0.3366071428571429,
+        "work": 0.28,
+        "other": 0.36500000000000005
+      },
+      "corrections": {
+        "other": {
+          "05-14": 0.9924999999999999,
+          "15-24": 1.1598529411764706,
+          "25-34": 1.4344117647058827,
+          "35-44": 0.24779411764705817,
+          "45-54": 0.6710294117647057
+        }
+      },
+      "primary": false
+    },
+    {
+      "id": "8074c",
+      "key": "TESTING",
+      "name": "adjustments (8)",
+      "instant": 1627344000000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.6,
+        "school": 0.2,
+        "nursing": 0.2,
+        "work": 0.3,
+        "other": 0.24
       },
       "primary": false
     },
     {
       "id": "64011",
       "key": "TESTING",
-      "name": "adjustments",
+      "name": "adjustments (9)",
       "instant": 1627689600000,
       "deletable": true,
       "draggable": true,
@@ -763,7 +794,7 @@
         "school": 0.3,
         "nursing": 0.5,
         "work": 0.3,
-        "other": 0.15
+        "other": 0.16
       },
       "primary": false
     },
@@ -787,7 +818,7 @@
         "other": {
           "05-14": 0.97,
           "15-24": 0.97,
-          "25-34": 1.1900000000000002,
+          "25-34": 1.1700000000000002,
           "35-44": 0.94,
           "45-54": 0.8099999999999998
         }
@@ -800,7 +831,7 @@
       "instant": 1628208000000,
       "multipliers": {
         "family": 0.65,
-        "school": 0.3,
+        "school": 0.35000000000000003,
         "nursing": 0.35000000000000003,
         "work": 0.28,
         "other": 0.47000000000000003
@@ -811,12 +842,12 @@
       "blendable": true,
       "corrections": {
         "other": {
-          "05-14": 1.02,
-          "15-24": 1.01,
-          "25-34": 1.3500000000000003,
+          "05-14": 1.01,
+          "15-24": 1.02,
+          "25-34": 1.3600000000000003,
           "35-44": 0.9099999999999999,
           "45-54": 0.9199999999999999,
-          "55-64": 1.1500000000000001,
+          "55-64": 1.11,
           "65-74": 0.97
         }
       }
@@ -824,7 +855,7 @@
     {
       "id": "9476c",
       "key": "TESTING",
-      "name": "adjustments",
+      "name": "adjustments (10)",
       "instant": 1628985600000,
       "deletable": true,
       "draggable": true,
@@ -848,19 +879,23 @@
       "blendable": true,
       "multipliers": {
         "family": 0.75,
-        "school": 0.18,
-        "nursing": 0.4,
-        "work": 0.32,
-        "other": 0.48
+        "school": 0.2,
+        "nursing": 0.38,
+        "work": 0.31,
+        "other": 0.5
       },
       "corrections": {
+        "family": {
+          "<= 04": 0.95
+        },
         "other": {
-          "15-24": 0.992142857142857,
-          "25-34": 1.1707142857142858,
+          "15-24": 0.972142857142857,
+          "25-34": 1.1807142857142858,
           "35-44": 0.9535714285714285,
           "45-54": 0.8942857142857142,
           "55-64": 1.1250000000000002,
-          "65-74": 0.9192857142857143
+          "65-74": 0.8992857142857142,
+          "75-84": 0.95
         }
       },
       "primary": false
@@ -872,24 +907,27 @@
       "instant": 1629417600000,
       "multipliers": {
         "family": 0.75,
-        "school": 0.13,
+        "school": 0.15,
         "nursing": 0.45,
-        "work": 0.35000000000000003,
-        "other": 0.48
+        "work": 0.31,
+        "other": 0.5
       },
       "deletable": true,
       "draggable": true,
       "primary": false,
       "blendable": true,
       "corrections": {
+        "family": {
+          "<= 04": 0.95
+        },
         "other": {
-          "15-24": 0.8399999999999999,
+          "15-24": 0.8299999999999998,
           "25-34": 1.03,
-          "35-44": 0.95,
-          "45-54": 0.95,
+          "35-44": 0.94,
+          "45-54": 0.94,
           "55-64": 1.12,
-          "65-74": 0.95,
-          "75-84": 0.98
+          "65-74": 0.9199999999999999,
+          "75-84": 0.96
         }
       }
     },
@@ -900,26 +938,46 @@
       "instant": 1629763200000,
       "multipliers": {
         "family": 0.7000000000000001,
-        "school": 0.12,
+        "school": 0.19,
         "nursing": 0.45,
-        "work": 0.37,
-        "other": 0.45
+        "work": 0.31,
+        "other": 0.47000000000000003
       },
       "deletable": true,
       "draggable": true,
       "primary": false,
       "blendable": false,
       "corrections": {
+        "family": {
+          "<= 04": 0.95
+        },
         "other": {
-          "15-24": 0.7699999999999998,
+          "15-24": 0.7599999999999998,
           "25-34": 0.8999999999999999,
           "35-44": 1.03,
-          "45-54": 0.8299999999999998,
+          "45-54": 0.99,
           "55-64": 1.3000000000000003,
           "65-74": 0.8399999999999999,
-          "75-84": 0.94
+          "75-84": 0.9199999999999999
         }
       }
+    },
+    {
+      "id": "870a6",
+      "key": "TESTING",
+      "name": "adjustments (11)",
+      "instant": 1629763200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.55,
+        "school": 0.2,
+        "nursing": 0.1,
+        "work": 0.3,
+        "other": 0.15
+      },
+      "primary": false
     },
     {
       "id": "81e24",
@@ -927,37 +985,79 @@
       "name": "adjustments",
       "instant": 1630022400000,
       "multipliers": {
-        "family": 0.91,
-        "school": 0.12,
-        "nursing": 0.75,
-        "work": 0.37,
-        "other": 0.45
+        "family": 0.88,
+        "school": 0.19,
+        "nursing": 0.6,
+        "work": 0.32,
+        "other": 0.42
       },
       "deletable": true,
       "draggable": true,
       "primary": false,
       "blendable": true,
       "corrections": {
+        "family": {
+          "<= 04": 0.95
+        },
+        "nursing": {
+          "75-84": 0.97
+        },
         "other": {
-          "15-24": 0.94,
-          "25-34": 1.09,
-          "35-44": 0.99,
-          "45-54": 0.8999999999999999,
-          "55-64": 1.12
+          "15-24": 0.9299999999999999,
+          "25-34": 1.1400000000000001,
+          "35-44": 1.01,
+          "45-54": 0.8399999999999999,
+          "55-64": 1.09,
+          "65-74": 0.97,
+          "75-84": 1.09
         }
       }
     },
     {
-      "id": "ddab0",
-      "key": "TESTING",
+      "id": "18f82",
+      "key": "CONTACT",
       "name": "adjustments",
+      "instant": 1630281600000,
+      "multipliers": {
+        "family": 0.89,
+        "school": 0.19,
+        "nursing": 0.6,
+        "work": 0.32,
+        "other": 0.52
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true,
+      "corrections": {
+        "family": {
+          "<= 04": 0.8499999999999999
+        },
+        "nursing": {
+          "75-84": 2.1999999999999966
+        },
+        "other": {
+          "25-34": 1.1700000000000002,
+          "35-44": 1.11,
+          "45-54": 0.8699999999999999,
+          "55-64": 1.1400000000000001,
+          "65-74": 1.01,
+          "75-84": 1.1500000000000001,
+          "15-24": 1.01
+        }
+      }
+    },
+    {
+      "id": "99b6c",
+      "key": "TESTING",
+      "name": "adjustments (12)",
       "instant": 1630368000000,
       "deletable": true,
       "draggable": true,
       "blendable": false,
       "multipliers": {
-        "family": 0.6,
-        "school": 0.26,
+        "family": 0.55,
+        "school": 0.1,
         "nursing": 0.55,
         "work": 0.3,
         "other": 0.15
@@ -965,112 +1065,360 @@
       "primary": false
     },
     {
-      "id": "18f82",
-      "key": "CONTACT",
-      "name": "copy of adjustments",
-      "instant": 1630368000000,
-      "multipliers": {
-        "family": 0.91,
-        "school": 0.25,
-        "nursing": 0.7000000000000001,
-        "work": 0.37,
-        "other": 0.49
-      },
-      "deletable": true,
-      "draggable": true,
-      "primary": false,
-      "blendable": false,
-      "corrections": {
-        "nursing": {
-          "75-84": 1.3900000000000003
-        },
-        "other": {
-          "15-24": 0.9199999999999999,
-          "25-34": 1.09,
-          "35-44": 0.96,
-          "45-54": 0.8799999999999999,
-          "55-64": 1.1400000000000001,
-          "65-74": 1.04,
-          "75-84": 1.05
-        }
-      }
-    },
-    {
-      "id": "75c30",
+      "id": "ddab0",
       "key": "TESTING",
-      "name": "copy of adjustments",
+      "name": "adjustments (13)",
       "instant": 1630540800000,
       "deletable": true,
       "draggable": true,
       "blendable": false,
       "multipliers": {
-        "family": 0.6,
-        "school": 0.4,
-        "nursing": 0.75,
-        "work": 0.3,
-        "other": 0.23
-      },
-      "primary": false
-    },
-    {
-      "id": "77590",
-      "key": "TESTING",
-      "name": "copy of adjustments",
-      "instant": 1630627200000,
-      "deletable": true,
-      "draggable": true,
-      "blendable": false,
-      "multipliers": {
-        "family": 0.6,
-        "school": 0.45,
-        "nursing": 0.63,
-        "work": 0.5,
-        "other": 0.1
-      },
-      "primary": false
-    },
-    {
-      "id": "e3baa",
-      "key": "TESTING",
-      "name": "adjustments",
-      "instant": 1630886400000,
-      "deletable": true,
-      "draggable": true,
-      "blendable": false,
-      "multipliers": {
-        "family": 0.6,
-        "school": 0.45,
+        "family": 0.5700000000000001,
+        "school": 0.28,
         "nursing": 0.65,
         "work": 0.3,
-        "other": 0.1
+        "other": 0.15
       },
       "primary": false
     },
     {
-      "id": "d247e",
+      "id": "b7988",
       "key": "CONTACT",
-      "name": "end of holidays",
+      "name": "adjustments",
+      "instant": 1630540800000,
+      "multipliers": {
+        "family": 0.88,
+        "school": 0.26,
+        "nursing": 0.6,
+        "work": 0.33,
+        "other": 0.58
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true,
+      "corrections": {
+        "family": {
+          "<= 04": 0.8499999999999999
+        },
+        "nursing": {
+          "75-84": 2.1999999999999966
+        },
+        "other": {
+          "15-24": 0.7399999999999998,
+          "25-34": 0.8299999999999998,
+          "35-44": 0.8499999999999999,
+          "45-54": 0.8899999999999999,
+          "55-64": 1.3000000000000003,
+          "65-74": 1.03,
+          "75-84": 1.01
+        }
+      }
+    },
+    {
+      "id": "81420",
+      "key": "CONTACT",
+      "name": "adjustments",
+      "instant": 1630713600000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.26,
+        "nursing": 0.6,
+        "work": 0.37,
+        "other": 0.66
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true,
+      "corrections": {
+        "family": {
+          "<= 04": 0.8499999999999999
+        },
+        "nursing": {
+          "75-84": 2.1999999999999966
+        },
+        "other": {
+          "15-24": 0.8799999999999999,
+          "25-34": 0.9299999999999999,
+          "35-44": 0.9199999999999999,
+          "45-54": 0.9299999999999999,
+          "55-64": 1.1500000000000001,
+          "65-74": 0.96
+        }
+      }
+    },
+    {
+      "id": "70b97",
+      "key": "TESTING",
+      "name": "antigen monday (v)",
       "instant": 1630886400000,
       "deletable": true,
       "draggable": true,
       "blendable": false,
       "multipliers": {
-        "family": 0.91,
-        "school": 0.5,
-        "nursing": 0.8,
-        "work": 0.36,
-        "other": 0.48
+        "family": 0.52,
+        "school": 0.45,
+        "nursing": 0.45,
+        "work": 0.3,
+        "other": 0.15
       },
-      "primary": false,
-      "corrections": {}
+      "primary": false
     },
     {
-      "id": "b3f4d",
-      "key": "TIME",
-      "name": "effective settings",
-      "instant": 1630972800000,
-      "deletable": false,
-      "draggable": true
+      "id": "92abd",
+      "key": "CONTACT",
+      "name": "adjustments",
+      "instant": 1630886400000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.4,
+        "nursing": 0.6,
+        "work": 0.37,
+        "other": 0.6
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true,
+      "corrections": {
+        "family": {
+          "<= 04": 0.8999999999999999
+        },
+        "nursing": {
+          "75-84": 2.4999999999999902
+        },
+        "other": {
+          "15-24": 0.6699999999999997,
+          "25-34": 0.9099999999999999,
+          "35-44": 0.8699999999999999,
+          "45-54": 0.7899999999999998,
+          "55-64": 1.09,
+          "65-74": 0.97,
+          "75-84": 1.1
+        }
+      }
+    },
+    {
+      "id": "f0a92",
+      "key": "TESTING",
+      "name": "low test thursday (v)",
+      "instant": 1631145600000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.35000000000000003,
+        "school": 0.35000000000000003,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.18
+      },
+      "primary": false
+    },
+    {
+      "id": "d2e7d",
+      "key": "TESTING",
+      "name": "low test friday",
+      "instant": 1631232000000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.3,
+        "school": 0.22,
+        "nursing": 0.32,
+        "work": 0.3,
+        "other": 0.18
+      },
+      "primary": false
+    },
+    {
+      "id": "9693e",
+      "key": "TESTING",
+      "name": "antigen monday",
+      "instant": 1631491200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.52,
+        "school": 0.41000000000000003,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.11
+      },
+      "primary": false
+    },
+    {
+      "id": "e3e44",
+      "key": "CONTACT",
+      "name": "adjustments",
+      "instant": 1631491200000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.45,
+        "nursing": 0.6,
+        "work": 0.37,
+        "other": 0.6
+      },
+      "deletable": true,
+      "draggable": true,
+      "primary": false,
+      "blendable": true,
+      "corrections": {
+        "family": {
+          "<= 04": 0.8999999999999999
+        },
+        "nursing": {
+          "75-84": 2.4999999999999902
+        },
+        "other": {
+          "15-24": 0.7399999999999998,
+          "25-34": 0.9099999999999999,
+          "35-44": 0.9299999999999999,
+          "45-54": 0.8699999999999999,
+          "55-64": 1.2200000000000002,
+          "65-74": 0.98,
+          "75-84": 1.08
+        }
+      }
+    },
+    {
+      "id": "a8027",
+      "key": "TESTING",
+      "name": "low test tuesday",
+      "instant": 1631577600000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.18,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.11
+      },
+      "primary": false
+    },
+    {
+      "id": "7abfb",
+      "key": "TESTING",
+      "name": "low test thursday",
+      "instant": 1631750400000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.3,
+        "school": 0.1,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "primary": false
+    },
+    {
+      "id": "cf0b7",
+      "key": "TESTING",
+      "name": "antigen monday",
+      "instant": 1632096000000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.52,
+        "school": 0.41000000000000003,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.11
+      },
+      "primary": false
+    },
+    {
+      "id": "c8906",
+      "key": "TESTING",
+      "name": "low test tuesday",
+      "instant": 1632182400000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.18,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.11
+      },
+      "primary": false
+    },
+    {
+      "id": "d444e",
+      "key": "TESTING",
+      "name": "low test thursday",
+      "instant": 1632355200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.3,
+        "school": 0.1,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "primary": false
+    },
+    {
+      "id": "cac40",
+      "key": "TESTING",
+      "name": "antigen monday",
+      "instant": 1632700800000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.52,
+        "school": 0.41000000000000003,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.11
+      },
+      "primary": false
+    },
+    {
+      "id": "87cf9",
+      "key": "TESTING",
+      "name": "low test tuesday",
+      "instant": 1632787200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.18,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.11
+      },
+      "primary": false
+    },
+    {
+      "id": "1c380",
+      "key": "TESTING",
+      "name": "low test thursday",
+      "instant": 1632960000000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": false,
+      "multipliers": {
+        "family": 0.3,
+        "school": 0.1,
+        "nursing": 0.3,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "primary": false
     }
   ]
 }

@@ -69,10 +69,11 @@ export class ContactMatrixExposure implements IContactMatrix {
     }
 
     getMaxColumnValue(): number {
-        if (this.maxColumnValue < 0) {
-            this.maxColumnValue = ContactCellsUtil.findMaxColumnValue(this);
-        }
-        return this.maxColumnValue;
+        // if (this.maxColumnValue < 0) {
+        //     this.maxColumnValue = ContactCellsUtil.findMaxColumnValue(this);
+        // }
+        // return this.maxColumnValue;
+        return 0.0005;
     }
 
     getCellSum(): number {
