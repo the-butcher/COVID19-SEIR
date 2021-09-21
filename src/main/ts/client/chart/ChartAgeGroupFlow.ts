@@ -77,7 +77,7 @@ export class ChartAgeGroupFlow {
             };
         });
 
-        this.chart.links.template.colorMode = "gradient";
+        // this.chart.links.template.colorMode = "gradient";
         this.chart.links.template.events.on("over", e => {
 
             const relativeX = e.pointer.point.x - document.getElementById('chartDivAgeGroupFlow').getBoundingClientRect().left;
@@ -186,7 +186,7 @@ export class ChartAgeGroupFlow {
                     });
                 });
                 values = values.sort((a,b) => b - a);
-                const minValue = values[20];
+                const minValue = values[Math.min(20, values.length - 1)]; // show the 20 largest connections
 
                 Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupParticipant => {

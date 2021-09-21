@@ -1,6 +1,3 @@
-import { TimeUtil } from './util/TimeUtil';
-import { StrainUtil } from './util/StrainUtil';
-import { IconBezierHandle } from './client/gui/IconBezierHandle';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
@@ -10,6 +7,18 @@ import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
+
+
+export interface Something {
+    foo: string;
+    bar: string;
+}
+
+const prop = {
+    baz: "cup"
+}
+
+console.log((prop as any as Something) === undefined);
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {

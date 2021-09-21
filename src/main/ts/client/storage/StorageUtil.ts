@@ -158,6 +158,7 @@ export class StorageUtil {
 
     async loadDefaultConfig(): Promise<IStoredConfig> {
         return await new JsonLoader().load(`data/default-config.json?cb=${ObjectUtil.createId()}`);
+        // return await new JsonLoader().load(`data/twogroup-config.json?cb=${ObjectUtil.createId()}`);
     }
 
     isStorageEnabled(): boolean {

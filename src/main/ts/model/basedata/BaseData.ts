@@ -78,6 +78,7 @@ export class BaseData {
         const instantPre = ModelInstants.getInstance().getPreInstant();
         const instantMax = ModelInstants.getInstance().getMaxInstant();
 
+        // setup containers for daily offsets
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
             this.dailyOffsets[ageGroup.getIndex()] = [];
             for (let i=0; i<7; i++) {
@@ -85,7 +86,8 @@ export class BaseData {
             }
         });
 
-        for (let instant = instantPre; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        const instantMin = instantPre; // - TimeUtil.MILLISECONDS_PER___WEEK * 5;
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
 
             const dataItem = this.findBaseDataItem(instant);
             if (dataItem) {
