@@ -9,17 +9,6 @@ import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 
 
-export interface Something {
-    foo: string;
-    bar: string;
-}
-
-const prop = {
-    baz: "cup"
-}
-
-console.log((prop as any as Something) === undefined);
-
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
         Demographics.setInstanceFromPath(modelConfig.model__demographics).then(() => {

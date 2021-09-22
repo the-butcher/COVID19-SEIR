@@ -1,3 +1,4 @@
+import { Demographics } from './../demographics/Demographics';
 import { IModificationValuesSettings } from './IModificationValuesSettings';
 import { AModification } from './AModification';
 
@@ -18,8 +19,12 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         return this.modificationValues.undetected;
     }
 
-    getQuarantine(): number {
-        return this.modificationValues.quarantine;
+    getQuarantine(ageGroupIndex: number): number {
+        // if (ageGroupIndex === 1) {
+        //     return 1;
+        // } else {
+            return this.modificationValues.quarantine;
+        // }
     }
 
     getReexposure(): number {

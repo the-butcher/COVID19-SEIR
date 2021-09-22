@@ -167,7 +167,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     getQuarantineMultiplier(ageGroupIndex: number): number {
         const shareOfInfectionBeforeIncubation = CompartmentChain.getInstance().getShareOfPresymptomaticInfection();
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
-        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getRatios(ageGroupIndex).discovery * this.modificationSettings.getQuarantine());
+        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getRatios(ageGroupIndex).discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
     }
 
     getCellValue(indexContact: number, indexParticipant: number): number {
