@@ -256,7 +256,7 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.90,
-            labelled: false,
+            labelled: true,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,

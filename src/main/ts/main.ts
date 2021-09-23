@@ -8,6 +8,16 @@ import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 
+interface iOrI {
+    itemId?: string;
+    serviceItemId?: string;
+}
+
+const testJo: iOrI = {
+}
+const itemIdOrServiceItemId = testJo.itemId || testJo.serviceItemId;
+console.log('itemIdOrServiceItemId', itemIdOrServiceItemId);
+
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
