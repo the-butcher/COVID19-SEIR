@@ -1,4 +1,3 @@
-import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';

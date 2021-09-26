@@ -1,5 +1,4 @@
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
-import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
@@ -8,16 +7,12 @@ import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 
-interface iOrI {
-    itemId?: string;
-    serviceItemId?: string;
-}
-
-const testJo: iOrI = {
-}
-const itemIdOrServiceItemId = testJo.itemId || testJo.serviceItemId;
-console.log('itemIdOrServiceItemId', itemIdOrServiceItemId);
-
+/*
+console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.01));
+console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.05));
+console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.10));
+console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.50));
+*/
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
@@ -39,8 +34,15 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 ModelActions.getInstance().toggleChartMode('INCIDENCE');
                 ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
                 requestAnimationFrame(() => {
-                    ChartAgeGroup.getInstance();
-                    ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
+
+                    // ChartAgeGroup.getInstance();
+                    //
+
+                    ChartAgeGroup.getInstance().setSeriesAgeGroup(Demographics.getInstance().getAgeGroups().length); // effectively set it to TOTAL
+                    ChartAgeGroup.getInstance().renderBaseData();
+
+                    // ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
+
                 });
             }, 250);
 
@@ -55,3 +57,26 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 });
 
 
+/**
+ *
+ * positivity rate?
+ * -- high positivity rate may mean high unknown number of cases
+ *    -- lets assume that over the full pandemic for every positive test there were n undiscovered cases
+ *
+ *    -- a low positivity rate would mean a high percentage of cases are found
+ *    -- a high positivity rate would mean a low percentage of cases is found (even though there are likely many overall cases at that time)
+ *    -- should - tests per capita also play a role?
+ *
+ *
+ *    -- example B: 1000 persons get a test, all positive --> discovery rate 100%
+ *    -- example C: 1000 persons get a test, none positive --> likely discovery rate 100% (all of none)
+ *    -- example D: 1000 persons get a test, 500 positive
+ *
+ *    -- what if a given positivity rate of
+ *       -- 5% would be mapped to the base discovery rate 33% in the model
+ *       -- 0% would be mapped to 100% discovery (but 0 cases actually)
+ *
+ *
+ *
+ *
+ */

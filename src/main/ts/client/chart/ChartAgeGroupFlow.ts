@@ -7,7 +7,7 @@ import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from './../../common/demographics/Demographics';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
-import { QueryUtil } from './QueryUtil';
+import { QueryUtil } from '../../util/QueryUtil';
 import { min } from '@amcharts/amcharts4/.internal/core/utils/Math';
 import { groupEnd } from 'console';
 

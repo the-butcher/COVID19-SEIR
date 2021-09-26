@@ -2,7 +2,7 @@ import { Color } from "./Color";
 import { ObjectUtil } from './ObjectUtil';
 
 /**
- * utility type for parsing / providing / converting colors<br>
+ * utility type for parsing / providing / converting colors between rgb and hsv
  *
  * @author h.fleischer
  * @since 10.10.2019

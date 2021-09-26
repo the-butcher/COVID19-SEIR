@@ -1,3 +1,11 @@
+
+/**
+ * simple statistics implementation that will calculate average, standard deviation and variance for a set of number values
+ *
+ * @author h.fleischer
+ * @since 25.09.2021
+ *
+ */
 export class Statistics {
 
     private readonly values: number[];

@@ -2,6 +2,12 @@ import { IContactMatrix } from './../common/modification/IContactMatrix';
 import { Demographics } from '../common/demographics/Demographics';
 import { IContactCells } from './../common/modification/IContactCells';
 
+/**
+ * helper type for calculating contact matrix value sums, column sum, ...
+ *
+ * @author h.fleischer
+ * @since 25.09.2021
+ */
 export class ContactCellsUtil {
 
     private constructor() {

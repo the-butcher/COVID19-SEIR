@@ -4,6 +4,20 @@ import { Weibull } from './Weibull';
 
 export class StrainUtil {
 
+    /**
+     * calculate a discovery rate for a given day
+     * assumptions / simplifications made:
+     * -- base discovery rate (i.e. 30% matches a given positivity rate, i.e. 0.05)
+     * -- an exponent is calculated that produce 100
+     * @param baseDiscoveryRate
+     * @param basePositivityRate
+     * @param positivityRate
+     * @returns
+     */
+    static calculateDiscoveryRate(baseDiscoveryRate: number, basePositivityRate: number, positivityRate: number): number {
+        return  Math.pow(1 - positivityRate, Math.log(baseDiscoveryRate) / Math.log(1 - basePositivityRate));
+    }
+
     static calculateLatency(serialInterval: number, intervalScale: number) {
         return serialInterval - serialInterval * intervalScale * Weibull.getInstance().getNormalizedMean();
     }

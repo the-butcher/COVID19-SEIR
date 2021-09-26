@@ -1,4 +1,4 @@
-import { ObjectUtil } from '../../util/ObjectUtil';
+import { ObjectUtil } from './ObjectUtil';
 
 export class QueryUtil {
 

@@ -16,7 +16,7 @@ import { BaseData } from '../../model/basedata/BaseData';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { Color } from '../../util/Color';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
-import { QueryUtil } from '../chart/QueryUtil';
+import { QueryUtil } from '../../util/QueryUtil';
 import { ControlsContact } from '../controls/ControlsContact';
 import { ControlsDiscovery } from '../controls/ControlsDiscovery';
 import { ControlsSeasonality } from '../controls/ControlsSeasonality';

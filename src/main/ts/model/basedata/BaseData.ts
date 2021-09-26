@@ -1,10 +1,10 @@
-import { Statistics } from './../../util/Statistics';
-import { ModelInstants } from './../ModelInstants';
+import { DouglasPeucker } from './../../util/DouglasPeucker';
 import { JsonLoader } from '../../util/JsonLoader';
-import { AgeGroup } from './../../common/demographics/AgeGroup';
+import { Demographics } from './../../common/demographics/Demographics';
+import { Statistics } from './../../util/Statistics';
 import { TimeUtil } from './../../util/TimeUtil';
+import { ModelInstants } from './../ModelInstants';
 import { BaseDataItem, IBaseDataItem } from './BaseDataItem';
-import { Demographics } from '../../common/demographics/Demographics';
 
 export interface IBaseDataConfig {
     [K: string]: IBaseDataItemConfig;
@@ -48,6 +48,9 @@ export class BaseData {
     private readonly baseDataset: {[K: string]: IBaseDataItemConfig};
     private readonly baseDataItems: {[K: string]: IBaseDataItem};
 
+    private readonly reproduceInstants: number[];
+    private readonly discoveryInstants: number[];
+
     /**
      * a set of averages by age-group and week day
      */
@@ -58,6 +61,8 @@ export class BaseData {
         this.baseDataset = baseDataset;
         this.baseDataItems = {};
         this.dailyOffsets = [];
+        this.reproduceInstants = [];
+        this.discoveryInstants = [];
     }
 
     getPath(): string {
@@ -71,6 +76,14 @@ export class BaseData {
     findBaseDataItem(instant: number): IBaseDataItem {
         const normalizedInstant = instant - instant % TimeUtil.MILLISECONDS_PER____DAY;
         return this.baseDataItems[normalizedInstant] || this.buildBaseDataItem(normalizedInstant);
+    }
+
+    isReproduceInstant(instant: number): boolean {
+        return this.reproduceInstants.includes(instant);
+    }
+
+    isDiscoveryInstant(instant: number): boolean {
+        return this.discoveryInstants.includes(instant);
     }
 
     calculateDailyStats(): void {
@@ -88,6 +101,64 @@ export class BaseData {
 
         const instantMin = instantPre; // - TimeUtil.MILLISECONDS_PER___WEEK * 5;
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            const dataItem = this.findBaseDataItem(instant);
+            if (dataItem) {
+                (dataItem as BaseDataItem).calculatePrimaryValues();
+            }
+        }
+
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            const dataItem = this.findBaseDataItem(instant);
+            if (dataItem) {
+                (dataItem as BaseDataItem).calculateAverageValues();
+            }
+        }
+
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            const dataItem = this.findBaseDataItem(instant);
+            if (dataItem) {
+                (dataItem as BaseDataItem).calculateReproduceRatios();
+            }
+        }
+
+        const reproduceValues: number[] = [];
+        const reproduceInstants: number[] = [];
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            const dataItem = this.findBaseDataItem(instant);
+            if (dataItem) {
+                const reproduceValue = dataItem.getReproduceRate(Demographics.getInstance().getAgeGroups().length);
+                if (reproduceValue && !Number.isNaN(reproduceValue)) {
+                    reproduceInstants.push(instant);
+                    reproduceValues.push(reproduceValue);
+                }
+            }
+        }
+        const reproduceIndices = new DouglasPeucker(reproduceValues).findIndices();
+        reproduceIndices.forEach(reproduceIndex => {
+            this.reproduceInstants.push(reproduceInstants[reproduceIndex]);
+        });
+        console.log('reproduceInstants', this.reproduceInstants);
+
+        const discoveryValues: number[] = [];
+        const discoveryInstants: number[] = [];
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            const dataItem = this.findBaseDataItem(instant);
+            if (dataItem) {
+                const discoveryValue = dataItem.getPositivityRate();
+                if (discoveryValue && !Number.isNaN(discoveryValue)) {
+                    discoveryInstants.push(instant);
+                    discoveryValues.push(discoveryValue);
+                }
+            }
+        }
+        const discoveryIndices = new DouglasPeucker(discoveryValues).findIndices();
+        discoveryIndices.forEach(discoveryIndex => {
+            this.discoveryInstants.push(discoveryInstants[discoveryIndex]);
+        });
+        console.log('discoveryInstants', this.reproduceInstants);
+
+
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
 
             const dataItem = this.findBaseDataItem(instant);
             if (dataItem) {
@@ -99,7 +170,7 @@ export class BaseData {
                     // incidence * pop = cases * 100000
                     // cases = incidence * pop / 100000
 
-                    const average = dataItem.getAverage(ageGroup.getIndex()) * ageGroup.getAbsValue() / 700000;
+                    const average = dataItem.getAverageCases(ageGroup.getIndex()) * ageGroup.getAbsValue() / 700000;
                     const cases = dataItem.getCasesM1(ageGroup.getIndex());
 
                     // add to proper age-group / day stats instance

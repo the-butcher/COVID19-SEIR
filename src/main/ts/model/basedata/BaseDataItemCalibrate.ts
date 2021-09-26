@@ -17,7 +17,7 @@ export class BaseDataItemCalibrate implements IBaseDataItem {
         return 0;
     }
 
-    getAverage(ageGroupIndex: number): number {
+    getAverageCases(ageGroupIndex: number): number {
         return 0;
     }
 
@@ -38,6 +38,10 @@ export class BaseDataItemCalibrate implements IBaseDataItem {
     }
 
     getTests(): number {
+        return 0;
+    }
+
+    getPositivityRate() {
         return 0;
     }
 

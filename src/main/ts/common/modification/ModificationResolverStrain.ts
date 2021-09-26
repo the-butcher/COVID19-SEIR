@@ -1,8 +1,6 @@
-import { StrainUtil } from './../../util/StrainUtil';
-import { ObjectUtil } from './../../util/ObjectUtil';
-import { IModificationData } from '../../client/chart/ChartAgeGroup';
 import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { ModelConstants } from './../../model/ModelConstants';
+import { StrainUtil } from './../../util/StrainUtil';
 import { TimeUtil } from './../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesStrain } from './IModificationValuesStrain';

@@ -37,6 +37,10 @@ export class ControlsStrain {
     private readonly weibullCanvasContainer = 'weibullCanvas';
 
     private r0: number;
+
+    /**
+     * reproduction rate for breakthrough cases
+     */
     private rB: number;
     private breakthroughRisk: number;
     private serialInterval: number;

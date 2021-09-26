@@ -1,6 +1,9 @@
 import { ColorUtil } from "./ColorUtil";
 import { ObjectUtil } from './ObjectUtil';
 
+/**
+ * implementation of hsv color
+ */
 export class Color {
 
     static readonly INDEX_H: number = 0;
@@ -45,17 +48,19 @@ export class Color {
         return this.rgb;
     }
 
-
+    /**
+     * get an html compatible hex string from an rgb number array
+     * i.e. '#FFCC00'
+     * @param rgb
+     * @returns
+     */
     getHexRgb(rgb: number[]): string {
-        return '#' + this.getHexChannel(rgb[Color.INDEX_R]) + this.getHexChannel(rgb[Color.INDEX_G]) + this.getHexChannel(rgb[Color.INDEX_B]);
-        /*
-        let hex = ((rgb[Color.INDEX_R] * 255) << 16 | (rgb[Color.INDEX_G] * 255) << 8 | (rgb[Color.INDEX_B] * 255)).toString(16);
-        return '#000000'.substr(7-hex.length) + hex;
-        */
+        return "#" + this.getHexChannel(rgb[Color.INDEX_R]) + this.getHexChannel(rgb[Color.INDEX_G]) + this.getHexChannel(rgb[Color.INDEX_B]);
     }
 
     /**
      * get a hex string from a normalized (0-1) channel value
+     * i.e. 'FF'
      * @param channel
      */
     getHexChannel(channel: number): string {
