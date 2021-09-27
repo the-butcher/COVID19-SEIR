@@ -1,6 +1,14 @@
 import { IBaseDataItem } from './BaseDataItem';
 export class BaseDataItemCalibrate implements IBaseDataItem {
 
+    getDerivedPositivity(): number {
+        return 0;
+    }
+
+    getReproductionNumber(ageGroupIndex: number): number {
+        return 0;
+    }
+
     getInstant(): number {
         return -1;
     }
@@ -41,7 +49,7 @@ export class BaseDataItemCalibrate implements IBaseDataItem {
         return 0;
     }
 
-    getPositivityRate() {
+    getAveragePositivity() {
         return 0;
     }
 

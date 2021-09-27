@@ -1,17 +1,16 @@
-import { BaseDataItemCalibrate } from './../basedata/BaseDataItemCalibrate';
-import { IVaccinationConfig } from './../../common/demographics/IVaccinationConfig';
 import { Demographics } from '../../common/demographics/Demographics';
-import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { IModificationValuesDiscovery } from '../../common/modification/IModificationValueDiscovery';
+import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModificationTime } from '../../common/modification/ModificationTime';
+import { BaseData } from '../basedata/BaseData';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
 import { ECompartmentType } from '../compartment/ECompartmentType';
 import { ModelConstants } from '../ModelConstants';
 import { ModelImplRoot } from '../ModelImplRoot';
 import { ModelInstants } from '../ModelInstants';
 import { ModelStateIntegrator } from '../state/ModelStateIntegrator';
-import { BaseData } from '../basedata/BaseData';
+import { BaseDataItemCalibrate } from './../basedata/BaseDataItemCalibrate';
 
 /**
  * utility type that takes care of calibrating a strain with respect to current age groups and testing (discovery) rates

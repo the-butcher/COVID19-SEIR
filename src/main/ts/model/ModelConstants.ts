@@ -73,8 +73,8 @@ export class ModelConstants {
                 name: 'contact',
                 multipliers: {},
                 deletable: true,
-                blendable: false,
-                draggable: true
+                draggable: true,
+                blendable: true
             }),
         },
         'TESTING': {
@@ -84,10 +84,11 @@ export class ModelConstants {
                 key: 'TESTING',
                 name: 'testing',
                 instant,
+                destination: 0.1,
                 multipliers: {},
                 deletable: true,
                 draggable: true,
-                blendable: false
+                blendable: true
             }),
         },
         'VACCINATION': {

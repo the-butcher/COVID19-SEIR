@@ -911,23 +911,28 @@ export class ChartAgeGroup {
 
             const range = this.xAxis.axisRanges.create();
             range.category = TimeUtil.formatCategoryDate(instant);
-            range.axisFill.fillOpacity = 0.00;
-            range.axisFill.strokeOpacity = 0.75;
-            range.axisFill.strokeWidth = 0.50;
             range.label.visible = false;
 
-            if (BaseData.getInstance().isDiscoveryInstant(instant)) {
-                range.grid.stroke  = color('#FF0000');
-                range.grid.strokeOpacity = 1;
-                range.grid.strokeWidth = 1;
-                // console.log('testing at', instant, TimeUtil.formatCategoryDate(instant));
-            } else {
+            // if (BaseData.getInstance().isPositivityInstant(instant)) {
+            //     range.grid.stroke  = color('#FFFF00');
+            //     range.grid.strokeOpacity = 0.7;
+            //     range.grid.strokeWidth = 1;
+            //     // console.log('testing at', instant, TimeUtil.formatCategoryDate(instant));
+            // } if (BaseData.getInstance().isReproductionInstant(instant)) {
+            //     range.grid.stroke  = color('#FF0000');
+            //     range.grid.strokeOpacity = 1;
+            //     range.grid.strokeWidth = 1;
+            //     // console.log('testing at', instant, TimeUtil.formatCategoryDate(instant));
+            // } else {
+                range.axisFill.fillOpacity = 0.00;
+                range.axisFill.strokeOpacity = 0.75;
+                range.axisFill.strokeWidth = 0.50;
                 if (new Date(instant).getDay() === 0) {
                     range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.20);
                 } else {
                     range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
                 }
-            }
+            // }
 
         }
 
@@ -1401,13 +1406,16 @@ export class ChartAgeGroup {
                 }
 
                 ageGroupAverageCasesR = dataItem00.getAverageCases(ageGroupPlot.getIndex());
-                ageGroupReproductionR = dataItem00.getReproduceRate(ageGroupPlot.getIndex());
+                ageGroupReproductionR = dataItem00.getReproductionNumber(ageGroupPlot.getIndex());
                 if (ageGroupReproductionR && !Number.isNaN(ageGroupReproductionR)) {
                     ageGroupReproductionR -= 1;
                 }
 
                 ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
-                positivityRateR = dataItem00.getPositivityRate(); // (dataItem00.getTests() - dataItemM7.getTests());
+                positivityRateR = dataItem00.getAveragePositivity();
+                if (positivityRateR && !Number.isNaN(positivityRateR)) {
+                    positivityRateR *= 10;
+                }
 
             } else {
                 // console.log('no data found', categoryX);

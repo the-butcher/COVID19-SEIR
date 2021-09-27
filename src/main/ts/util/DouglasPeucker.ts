@@ -1,19 +1,19 @@
-import { height } from '@amcharts/amcharts4/.internal/core/utils/Utils';
+import { IBaseDataMarker } from '../model/basedata/BaseData';
 import { CoordinateUtil } from './CoordinateUtil';
 import { ICoordinate } from './ICoordinate';
 export class DouglasPeucker {
 
-    private readonly values: number[];
+    private readonly dataMarkers: IBaseDataMarker[];
 
-    constructor(values: number[]) {
-        this.values = values;
+    constructor(dataMarkers: IBaseDataMarker[]) {
+        this.dataMarkers = dataMarkers;
     }
 
     findIndices(): number[] {
 
         let indices: number[] = [
             0,
-            this.values.length-1
+            this.dataMarkers.length-1
         ];
 
         /**
@@ -21,7 +21,7 @@ export class DouglasPeucker {
          */
         // const tolerance = 2;
         // const yStretch = 50;
-        const tolerance = 1;
+        const tolerance = 2;
         const yStretch = 50;
 
         // TODO while tolerance not reached (or not reachable)
@@ -35,11 +35,11 @@ export class DouglasPeucker {
 
                 let coordA: ICoordinate = {
                     x: indexA,
-                    y: this.values[indexA] * yStretch
+                    y: this.dataMarkers[indexA].derived * yStretch
                 };
                 let coordB: ICoordinate = {
                     x: indexB,
-                    y: this.values[indexB] * yStretch
+                    y: this.dataMarkers[indexB].derived * yStretch
                 };
 
                 // console.log('testing range', coordA, coordB);
@@ -51,7 +51,7 @@ export class DouglasPeucker {
                     // coordinate being tested
                     let coordT: ICoordinate = {
                         x: indexT,
-                        y: this.values[indexT] * yStretch
+                        y: this.dataMarkers[indexT].derived * yStretch
                     };
 
                     // project AT onto unit vector of AB, will yield the projected length on AB
@@ -79,7 +79,7 @@ export class DouglasPeucker {
                 }
 
                 if (maxIndexT >= 0) {
-                    console.log('maxIndexT', maxIndexT, maxTolerance);
+                    // console.log('maxIndexT', maxIndexT, maxTolerance);
                     maxIndices.push(maxIndexT);
                 }
 
@@ -87,12 +87,12 @@ export class DouglasPeucker {
             }
 
             if (maxIndices.length === 0) {
-                console.log('break @', iteration)
+                // console.log('break @', iteration)
                 break;
             }
             indices.push(...maxIndices);
             indices = indices.sort((a, b) => a - b);
-            console.log('indices', indices);
+            // console.log('indices', indices);
 
         }
 

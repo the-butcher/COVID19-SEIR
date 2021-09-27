@@ -1,3 +1,4 @@
+import { StrainUtil } from './util/StrainUtil';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
@@ -7,12 +8,7 @@ import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 
-/*
-console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.01));
-console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.05));
-console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.10));
-console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.50));
-*/
+console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.12));
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {

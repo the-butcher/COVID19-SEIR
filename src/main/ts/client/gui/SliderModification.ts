@@ -178,10 +178,11 @@ export class SliderModification extends Slider {
                 /**
                  * create new modification with copy of previous modification, but change id, name, instant
                  */
+                const id = ObjectUtil.createId();
                 const modificationValuesCopy: IModificationValues = {
                     ...previousModification.getModificationValues(),
-                    id: ObjectUtil.createId(),
-                    name: `copy of ${previousModification.getName()}`,
+                    id,
+                    name: `adjustments (${id})`,
                     instant,
                     deletable: true,
                     draggable: true,

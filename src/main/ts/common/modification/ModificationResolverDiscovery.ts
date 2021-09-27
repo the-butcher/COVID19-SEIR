@@ -62,6 +62,7 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                 key: 'TESTING',
                 name: 'interpolation',
                 instant,
+                destination: 0.1,
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),

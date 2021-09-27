@@ -15,7 +15,8 @@ export class StrainUtil {
      * @returns
      */
     static calculateDiscoveryRate(baseDiscoveryRate: number, basePositivityRate: number, positivityRate: number): number {
-        return  Math.pow(1 - positivityRate, Math.log(baseDiscoveryRate) / Math.log(1 - basePositivityRate));
+        return 0.01 / (positivityRate + 0.01) - 0.01;
+        // return  Math.pow(1 - positivityRate, Math.log(baseDiscoveryRate) / Math.log(1 - basePositivityRate));
     }
 
     static calculateLatency(serialInterval: number, intervalScale: number) {

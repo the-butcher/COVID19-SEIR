@@ -5,19 +5,25 @@ import { ModelConstants } from '../ModelConstants';
 import { BaseData, IBaseDataItemConfig } from './BaseData';
 
 export interface IBaseDataItem {
+
     getInstant(): number;
+
     getExposed(ageGroupName: string): number;
     getRemoved(ageGroupName: string): number;
     getVacc1(ageGroupName: string): number;
     getVacc2(ageGroupName: string): number;
     getTests(): number;
+
     getIncidence(ageGroupIndex: number): number;
+
     getTestsM7(): number;
-    getPositivityRate(): number;
+    getAveragePositivity(): number;
+    getDerivedPositivity(): number;
+
     getCasesM1(ageGroupIndex: number): number;
     getAverageCases(ageGroupIndex: number): number;
-    getReproduceRate(ageGroupIndex: number): number;
-    // getReproductionDerivate(ageGroupIndex: number): number;
+    getReproductionNumber(ageGroupIndex: number): number;
+
 }
 
 export class BaseDataItem implements IBaseDataItem {
@@ -26,14 +32,14 @@ export class BaseDataItem implements IBaseDataItem {
     private readonly itemConfig: IBaseDataItemConfig;
 
     private readonly incidences: number[];
-    private readonly averageCases: number[];
 
     private testsM7: number;
-    private positivityRate: number;
+    private averagePositivity: number;
+    private derivedPositivity: number;
 
-    private casesM1: number[];
-    private reproductionRates: number[];
-    // private reproductionDerivates: number[];
+    private readonly casesM1: number[];
+    private readonly averageCases: number[];
+    private readonly reproductionNumbers: number[];
 
     constructor(instant: number, itemConfig: IBaseDataItemConfig) {
         this.instant = instant;
@@ -41,8 +47,7 @@ export class BaseDataItem implements IBaseDataItem {
         this.incidences = [];
         this.averageCases = [];
         this.casesM1 = [];
-        this.reproductionRates = [];
-        // this.reproductionDerivates = [];
+        this.reproductionNumbers = [];
     }
 
     getInstant(): number {
@@ -89,67 +94,62 @@ export class BaseDataItem implements IBaseDataItem {
         const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 2);
         const dataItemP3 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 3);
         const dataItemP4 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 4);
+        if (dataItemP2 && dataItemP3 && dataItemP4) {
 
-        const ageGroupIndexTotal = Demographics.getInstance().getAgeGroups().length;
-        Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-            if (dataItemP2 && dataItemP3 && dataItemP4) {
+            const ageGroupIndexTotal = Demographics.getInstance().getAgeGroups().length;
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                 const incidenceP2 = dataItemP2.getIncidence(ageGroup.getIndex());
                 const incidenceP3 = dataItemP3.getIncidence(ageGroup.getIndex());
                 const incidenceP4 = dataItemP4.getIncidence(ageGroup.getIndex());
                 if (incidenceP2 && incidenceP3 && incidenceP4) {
                     this.averageCases[ageGroup.getIndex()] = (incidenceP2 * 0.25 + incidenceP3 * 0.50 + incidenceP4 * 0.25) * ageGroup.getAbsValue() / 700000; // absolute number;
                 }
-            }
+            });
 
-        });
-
-        if (dataItemP2 && dataItemP3 && dataItemP4) {
             const testsP2 = dataItemP2.getTestsM7();
             const testsP3 = dataItemP3.getTestsM7();
             const testsP4 = dataItemP4.getTestsM7();
             if (testsP2 && testsP3 && testsP4) {
                 const averageCases = this.averageCases[ageGroupIndexTotal];
-                this.positivityRate =  (testsP2 * 0.25 + testsP3 * 0.50 + testsP4 * 0.25) / 7;
-                this.positivityRate = averageCases * 10 / this.positivityRate;
+                let _averagePositivity =  (testsP2 * 0.25 + testsP3 * 0.50 + testsP4 * 0.25) / 7;
+                _averagePositivity = averageCases / _averagePositivity;
+                if (!Number.isNaN(_averagePositivity)) {
+                    this.averagePositivity = _averagePositivity;
+                }
             }
+
         }
 
     }
 
-    calculateReproduceRatios(): void {
+    calculateAverageDerivates(): void {
 
         const dataItemM2 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 2);
         const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 2);
         if (dataItemM2 && dataItemP2) {
+
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                 const averageCasesM2 = dataItemM2.getAverageCases(ageGroup.getIndex());
                 const averageCasesP2 = dataItemP2.getAverageCases(ageGroup.getIndex());
                 if (averageCasesM2 && averageCasesP2) {
-                    this.reproductionRates[ageGroup.getIndex()] = StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.getInstant(), dataItemP2.getInstant(), 4);
+                    this.reproductionNumbers[ageGroup.getIndex()] = StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.getInstant(), dataItemP2.getInstant(), 4);
                 }
             });
+
+            const averagePositivityM2 = dataItemM2.getAveragePositivity();
+            const averagePositivityP2 = dataItemP2.getAveragePositivity();
+            if (averagePositivityM2 && averagePositivityP2) {
+                const _derivedPositivity = StrainUtil.calculateR0(averagePositivityM2, averagePositivityP2, dataItemM2.getInstant(), dataItemP2.getInstant(), 4);
+                if (!Number.isNaN(_derivedPositivity)) {
+                    this.derivedPositivity = _derivedPositivity;
+                }
+            }
+            // console.log('this.derivedPositivity', this.derivedPositivity);
+
         }
 
     }
 
-    // calculateReproductionDerivates(): void {
-
-    //     const dataItemM1 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 1);
-    //     if (dataItemM1) {
-    //         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-    //             this.reproductionDerivates[ageGroup.getIndex()] = this.getReproductionRate(ageGroup.getIndex()) - dataItemM1.getReproductionRate(ageGroup.getIndex());
-    //         });
-    //     }
-
-    // }
-
-    // getReproductionDerivate(ageGroupIndex: number) {
-    //     return this.reproductionDerivates[ageGroupIndex];
-    // }
-
-    getReproduceRate(ageGroupIndex: number) {
-        return this.reproductionRates[ageGroupIndex];
-    }
 
     getIncidence(ageGroupIndex: number): number {
         return this.incidences[ageGroupIndex];
@@ -159,8 +159,12 @@ export class BaseDataItem implements IBaseDataItem {
         return this.testsM7;
     }
 
-    getPositivityRate(): number {
-        return this.positivityRate;
+    getAveragePositivity(): number {
+        return this.averagePositivity;
+    }
+
+    getDerivedPositivity(): number {
+        return this.derivedPositivity;
     }
 
     getCasesM1(ageGroupIndex: number): number {
@@ -170,5 +174,10 @@ export class BaseDataItem implements IBaseDataItem {
     getAverageCases(ageGroupIndex: number): number {
         return this.averageCases[ageGroupIndex];
     }
+
+    getReproductionNumber(ageGroupIndex: number) {
+        return this.reproductionNumbers[ageGroupIndex];
+    }
+
 
 }
