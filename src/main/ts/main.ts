@@ -7,8 +7,7 @@ import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
-
-console.log('dr', StrainUtil.calculateDiscoveryRate(0.33, 0.05, 0.12));
+import { ControlsConstants } from './client/gui/ControlsConstants';
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
@@ -31,13 +30,8 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
                 requestAnimationFrame(() => {
 
-                    // ChartAgeGroup.getInstance();
-                    //
-
-                    ChartAgeGroup.getInstance().setSeriesAgeGroup(Demographics.getInstance().getAgeGroups().length); // effectively set it to TOTAL
-                    ChartAgeGroup.getInstance().renderBaseData();
-
-                    // ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
+                    ChartAgeGroup.getInstance().setAgeGroupIndex(Demographics.getInstance().getAgeGroups().length); // effectively set it to TOTAL
+                    ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
 
                 });
             }, 250);
@@ -72,7 +66,19 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
  *       -- 5% would be mapped to the base discovery rate 33% in the model
  *       -- 0% would be mapped to 100% discovery (but 0 cases actually)
  *
- *
- *
+ * -- in "non-overall" mode
+ *    -- N-percent of the cases that originated from category infection are discovered
+ *       -- at the time of discovery it is not known from which categories the infections originated
+ *    -- for the time of testing a contact-matrix built from seasonality/contact/susceptibility is known (susceptibility has yet to be added)
+ *       -- therefore moving a testing modification to another instant will change category shares (but with which ruleset?)
+ *       -- assume overall discovery is 60% (of whatever underlying contact there is)
+ *          -- scs family 20000 contacts
+ *          -- scs school 10000 contacts
+ *          -- scs other 30000 contacts
+ *          -- scs total 60% -> 36000 contacts
+ *          -- tst family 80% -> 16000
+ *          -- tst school 20% -> 2000
+ *          -- tst other 50% -> 15000 -> now there is 3000 missing
+ *          -- let category sliders be weights in this setting
  *
  */

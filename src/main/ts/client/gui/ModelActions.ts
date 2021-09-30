@@ -142,7 +142,7 @@ export class ModelActions {
         this.ageGroupIcons.forEach(ageGroupIcon => {
             ageGroupIcon.setActive(ageGroupIcon.getIconKey() === index);
         });
-        ChartAgeGroup.getInstance().setSeriesAgeGroup(index);
+        ChartAgeGroup.getInstance().setAgeGroupIndex(index);
     }
 
     toggleChartMode(chartMode: CHART_MODE______KEY): void {

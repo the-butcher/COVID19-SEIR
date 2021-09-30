@@ -1,14 +1,15 @@
-import { ControlsConstants } from '../gui/ControlsConstants';
-import { Demographics } from '../../common/demographics/Demographics';
+import { TimeUtil } from './../../util/TimeUtil';
+import { timingSafeEqual } from 'crypto';
 import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
+import { ModificationTime } from '../../common/modification/ModificationTime';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartDiscovery } from '../chart/ChartDiscovery';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { IconToggle } from '../gui/IconToggle';
-import { SliderModification } from '../gui/SliderModification';
-import { SliderTestingCategory } from '../gui/SliderTestingCategory';
+import { SliderDiscoveryCategory } from '../gui/SliderDiscoveryCategory';
+import { Demographics } from './../../common/demographics/Demographics';
 import { Controls } from './Controls';
-import { ModificationTime } from '../../common/modification/ModificationTime';
-import { ModificationResolverDiscovery } from '../../common/modification/ModificationResolverDiscovery';
+import { SliderModification } from '../gui/SliderModification';
 
 /**
  * controller for editing testing modifications
@@ -27,8 +28,10 @@ export class ControlsDiscovery {
     private static instance: ControlsDiscovery;
 
     private readonly chartTesting: ChartDiscovery;
-    private readonly slidersDiscovery: SliderTestingCategory[];
+    private readonly sliderOverall: SliderDiscoveryCategory;
+    private readonly slidersDiscovery: SliderDiscoveryCategory[];
     private readonly iconBlendable: IconToggle;
+    private readonly iconBoundToTotal: IconToggle;
 
     private modification: ModificationDiscovery;
 
@@ -46,37 +49,48 @@ export class ControlsDiscovery {
             label: 'smooth transition'
         });
 
+        this.sliderOverall = new SliderDiscoveryCategory('total');
+
+        this.iconBoundToTotal = new IconToggle({
+            container: 'slidersTestingDiv',
+            state: false,
+            handleToggle: state => {
+                this.handleChange();
+            },
+            label: 'bind to total'
+        });
+
         Demographics.getInstance().getCategories().forEach(contactCategory => {
-            this.slidersDiscovery.push(new SliderTestingCategory(contactCategory.getName()));
+            this.slidersDiscovery.push(new SliderDiscoveryCategory(contactCategory.getName()));
         });
 
     }
 
     handleChange(): void {
 
-        console.log('handleChange (discovery)');
+        const blendable = this.iconBlendable.getState();
+        const overall = this.sliderOverall.getValue();
+        const bindToOverall = this.iconBoundToTotal.getState();
+        this.sliderOverall.setDisabled(!bindToOverall);
 
         const multipliers: { [K in string] : number } = {};
+        let updatedCategories: string[] = [];
         this.slidersDiscovery.forEach(sliderDiscovery => {
+            if (sliderDiscovery.getValue() !== this.modification.getCategoryValue(sliderDiscovery.getName())) {
+                updatedCategories.push(sliderDiscovery.getName());
+            }
             multipliers[sliderDiscovery.getName()] = sliderDiscovery.getValue();
         });
-        const blendable = this.iconBlendable.getState();
 
-        const namedModifications = new ModificationResolverDiscovery().getModifications().filter(m => m.getName() === this.modification.getName());
-        console.log('namedModifications', namedModifications)
-        namedModifications.forEach(namedModification => {
-            namedModification.acceptUpdate({
-                multipliers,
-                blendable
-            });
-            SliderModification.getInstance().indicateUpdate(namedModification.getId());
-        })
-        // this.modification.acceptUpdate({
-        //     multipliers,
-        //     blendable
-        // });
+        this.modification.acceptUpdate({
+            multipliers,
+            blendable,
+            overall,
+            bindToOverall
+        });
 
-        this.updateChart(this.modification.getInstantA());
+        this.updateChart();
+        SliderModification.getInstance().indicateUpdate(this.modification.getId());
 
     }
 
@@ -85,17 +99,25 @@ export class ControlsDiscovery {
         Controls.acceptModification(modification);
         this.modification = modification;
 
+        this.iconBlendable.toggle(modification.isBlendable());
+        this.iconBoundToTotal.toggle(modification.isBoundToTotal());
+
+        this.sliderOverall.setDisabled(!modification.isBoundToTotal());
+        this.sliderOverall.setValue(modification.getOverall());
+
         this.slidersDiscovery.forEach(sliderTesting => {
             sliderTesting.setValue(modification.getCategoryValue(sliderTesting.getName()));
         });
         this.iconBlendable.toggle(modification.isBlendable());
 
-        this.updateChart(modification.getInstantA());
+        this.updateChart();
 
     }
 
-    updateChart(instant: number): void {
+    updateChart(): void {
 
+        const instant = this.modification.getInstantA();
+        console.log('updating instant', TimeUtil.formatCategoryDate(instant));
         const modificationTime = new ModificationTime({
             id: ObjectUtil.createId(),
             key: 'TIME',

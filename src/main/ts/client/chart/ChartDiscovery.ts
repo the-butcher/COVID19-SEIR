@@ -25,7 +25,6 @@ export class ChartDiscovery {
     private readonly chart: XYChart;
     private readonly xAxis: CategoryAxis;
     private readonly yAxisDiscovery: ValueAxis;
-    private readonly seriesContact: LineSeries;
     private readonly seriesDiscovery: LineSeries;
     private readonly valueTotalLabel: Label;
 
@@ -75,23 +74,6 @@ export class ChartDiscovery {
         this.yAxisDiscovery.max = yMax;
         this.yAxisDiscovery.strictMinMax = true;
 
-        this.seriesContact = this.chart.series.push(new LineSeries());
-        this.seriesContact.xAxis = this.xAxis;
-        this.seriesContact.yAxis = this.yAxisDiscovery;
-        this.seriesContact.fontFamily = ControlsConstants.FONT_FAMILY;
-        this.seriesContact.fontSize = ControlsConstants.FONT_SIZE;
-        this.seriesContact.dataFields.categoryX = 'contactX';
-        this.seriesContact.dataFields.valueY = 'contactRatio';
-        this.seriesContact.fillOpacity = 0;
-        this.seriesContact.strokeWidth = 3;
-        this.seriesContact.strokeLinecap = 'round';
-        this.seriesContact.strokeOpacity = 1.0;
-        this.seriesContact.tooltip.disabled = false;
-        this.seriesContact.tooltipText = 'contact:\u00A0{categoryX}\npercent:\u00A0{label}';
-
-        ChartUtil.getInstance().configureSeries(this.seriesContact, ControlsConstants.COLOR____FONT, false);
-
-
         this.seriesDiscovery = this.chart.series.push(new LineSeries());
         this.seriesDiscovery.xAxis = this.xAxis;
         this.seriesDiscovery.yAxis = this.yAxisDiscovery;
@@ -99,8 +81,8 @@ export class ChartDiscovery {
         this.seriesDiscovery.fontSize = ControlsConstants.FONT_SIZE;
         this.seriesDiscovery.dataFields.categoryX = 'contactX';
         this.seriesDiscovery.dataFields.valueY = 'discoveryRatio';
-        this.seriesDiscovery.fillOpacity = 0;
-        this.seriesDiscovery.strokeWidth = 3;
+        this.seriesDiscovery.fillOpacity = 0.2;
+        this.seriesDiscovery.strokeWidth = 1;
         this.seriesDiscovery.strokeLinecap = 'round';
         this.seriesDiscovery.strokeOpacity = 1.0;
         this.seriesDiscovery.tooltip.disabled = false;
@@ -143,7 +125,7 @@ export class ChartDiscovery {
         const ageGroups = demographics.getAgeGroups();
 
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
-            const ratios = modificationTime.getRatios(indexContact);
+            const ratios = modificationTime.getDiscoveryRatios(indexContact);
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
                 contactRatio: ratios.contact,
@@ -153,6 +135,7 @@ export class ChartDiscovery {
         }
 
         const discoveryRatioTotal = modificationTime.getDiscoveryRatioTotal(); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
+        console.log('discoveryRatioTotal', discoveryRatioTotal);
         // this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
         this.valueTotalLabel.text = this.labellingDefinitionTooltip.format(discoveryRatioTotal); // ControlsConstants.LOCALE_FORMAT_FIXED (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 

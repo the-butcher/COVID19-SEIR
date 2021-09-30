@@ -7,6 +7,7 @@ import { ModelInstants } from './../ModelInstants';
 import { IModelProgress } from './../state/ModelStateIntegrator';
 import { IBaseDataItemConfig } from '../basedata/BaseData';
 import { IStrainApproximator } from './IStrainApproximator';
+import { BaseDataItem, IBaseDataItem } from '../basedata/BaseDataItem';
 
 /**
  * strain approximator for the calibration case
@@ -27,9 +28,9 @@ export class StrainApproximatorCalibrate implements IStrainApproximator {
         this.modifications = modifications;
     }
 
-    getReferenceDataRemoved(): IBaseDataItemConfig {
+    getReferenceDataRemoved(): IBaseDataItem {
         // TODO build dynamically from age groups (do not hard code groups)
-        return {
+        return new BaseDataItem(ModelInstants.getInstance().getMinInstant(), {
             "<= 04": [0, 0, 0, 0],
             "05-14": [0, 0, 0, 0],
             "15-24": [0, 0, 0, 0],
@@ -41,7 +42,7 @@ export class StrainApproximatorCalibrate implements IStrainApproximator {
             "75-84": [0, 0, 0, 0],
             ">= 85": [0, 0, 0, 0],
             "TOTAL": [0, 0, 0, 0]
-        };
+        });
     }
 
     async approximate(progressCallback: (progress: IModelProgress) => void): Promise<void> {

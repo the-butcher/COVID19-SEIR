@@ -8,9 +8,14 @@ import { IModificationValues } from './IModificationValues';
 export interface IModificationValuesDiscovery extends IModificationValues {
 
     /**
+     * should the category sliders be bound to the overall value
+     */
+    bindToOverall: boolean;
+
+    /**
      * expected total discovery
      */
-    destination: number;
+    overall: number;
 
     /**
      * category multipliers, normalized values between 0 and 1

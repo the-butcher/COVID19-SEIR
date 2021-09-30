@@ -56,13 +56,17 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                 const multiplier = multiplierA + (multiplierB - multiplierA) * fraction;
                 multipliers[key] = multiplier;
             });
+            const overallA = modificationValuesA.overall;
+            const overallB = modificationValuesB.overall;
+            const overall = overallA + (overallB - overallA) * fraction;
 
             const interpolatedModification = new ModificationDiscovery({
                 id: ObjectUtil.createId(),
                 key: 'TESTING',
                 name: 'interpolation',
                 instant,
-                destination: 0.1,
+                overall,
+                bindToOverall: false,
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),

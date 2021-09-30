@@ -1,3 +1,6 @@
+import { ModificationContact } from './../../common/modification/ModificationContact';
+import { ObjectUtil } from './../../util/ObjectUtil';
+import { ModificationDiscovery } from './../../common/modification/ModificationDiscovery';
 import { StrainUtil } from './../../util/StrainUtil';
 import { DouglasPeucker } from './../../util/DouglasPeucker';
 import { JsonLoader } from '../../util/JsonLoader';
@@ -6,6 +9,7 @@ import { Statistics } from './../../util/Statistics';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelInstants } from './../ModelInstants';
 import { BaseDataItem, IBaseDataItem } from './BaseDataItem';
+import { Modifications } from '../../common/modification/Modifications';
 
 export interface IBaseDataMarker {
     instant: number,
@@ -84,13 +88,6 @@ export class BaseData {
         return this.baseDataItems[normalizedInstant] || this.buildBaseDataItem(normalizedInstant);
     }
 
-    // isReproductionInstant(instant: number): boolean {
-    //     return this.reproductionInstants.includes(instant);
-    // }
-
-    // isPositivityInstant(instant: number): boolean {
-    //     return this.positivityInstants.includes(instant);
-    // }
 
     calculateDailyStats(): void {
 
@@ -143,7 +140,37 @@ export class BaseData {
         }
         const reproductionIndices = new DouglasPeucker(reproductionMarkers).findIndices();
         reproductionIndices.forEach(reproductionIndex => {
+
             const reproductionMarker = reproductionMarkers[reproductionIndex];
+            const id = ObjectUtil.createId();
+            const contactCategories = Demographics.getInstance().getCategories();
+            const multipliers: { [k: string]: number} = {}
+            contactCategories.forEach(contactCategory => {
+                multipliers[contactCategory.getName()] = 0.1;
+            });
+            multipliers['school'] = 0.4;
+            multipliers['nursing'] = 0.5;
+            multipliers['family'] = 0.9;
+            multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityWork() * 0.3;
+            multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityOther() * 0.60;
+
+            if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+
+                Modifications.getInstance().addModification(new ModificationContact({
+                    id,
+                    key: 'CONTACT',
+                    name: `adjustments (${id})`,
+                    instant: reproductionMarker.instant,
+                    multipliers,
+                    deletable: true,
+                    draggable: true,
+                    blendable: true
+                }));
+
+            }
+
+
+
             // console.log('reproductionMarker', TimeUtil.formatCategoryDate(reproductionMarker.instant), reproductionMarker.derived);
         });
 
@@ -164,9 +191,38 @@ export class BaseData {
         }
         const positivityIndices = new DouglasPeucker(positivityMarkers).findIndices();
         positivityIndices.forEach(positivityIndex => {
+
             const positivityMarker = positivityMarkers[positivityIndex];
-            // TODO use some base settings here to map 0.33 to 0.05
-            console.log('positivityMarker', TimeUtil.formatCategoryDate(positivityMarker.instant), StrainUtil.calculateDiscoveryRate(0.33, 0.10, positivityMarker.display));
+            const overall = StrainUtil.calculateDiscoveryRate(0.33, 0.10, positivityMarker.display);
+            const id = ObjectUtil.createId();
+            const contactCategories = Demographics.getInstance().getCategories();
+            const multipliers: { [k: string]: number} = {}
+            contactCategories.forEach(contactCategory => {
+                multipliers[contactCategory.getName()] = overall;
+            });
+            multipliers['school'] = 0.5;
+            multipliers['nursing'] = 0.5;
+            multipliers['family'] = 0.5;
+            multipliers['work'] = 0.2;
+            multipliers['other'] = 0.2;
+
+            if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+
+                Modifications.getInstance().addModification(new ModificationDiscovery({
+                    id,
+                    key: 'TESTING',
+                    name: `adjustments (${id})`,
+                    instant: positivityMarker.instant,
+                    bindToOverall: true,
+                    overall,
+                    multipliers,
+                    deletable: true,
+                    draggable: true,
+                    blendable: true
+                }));
+
+            }
+
         });
 
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {

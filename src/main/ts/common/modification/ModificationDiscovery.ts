@@ -36,6 +36,14 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
         super.acceptUpdate(update);
     }
 
+    getOverall(): number {
+        return this.modificationValues.overall;
+    }
+
+    isBoundToTotal(): boolean {
+        return this.modificationValues.bindToOverall;
+    }
+
     getCategoryValue(contactCategoryName: string): number {
         if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
             this.modificationValues.multipliers[contactCategoryName] = 0.1;

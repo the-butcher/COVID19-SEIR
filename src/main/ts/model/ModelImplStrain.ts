@@ -226,7 +226,7 @@ export class ModelImplStrain implements IModelSeir {
             const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
 
             // based upon age-group testing ratios move from infectious to known recovery / unknown recovery
-            const ratioD = modificationTime.getRatios(ageGroupIndex).discovery;
+            const ratioD = modificationTime.getDiscoveryRatios(ageGroupIndex).discovery;
             const ratioU = 1 - ratioD;
 
             // removal from last infectious happens in infectious model (TODO find a more readable version)

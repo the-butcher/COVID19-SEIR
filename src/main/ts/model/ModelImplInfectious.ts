@@ -96,7 +96,7 @@ export class ModelImplInfectious implements IModelSeir {
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
 
             }
-            const dailyActual = dailyTested / modificationTime.getRatios(ageGroup.getIndex()).discovery;
+            const dailyActual = dailyTested / modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
             this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic));
             this.compartmentsInfectiousBreakthrough.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, 0, this.ageGroupIndex, strainValues.id, compartmentParam.rB, duration, compartmentParam.presymptomatic));
@@ -184,7 +184,7 @@ export class ModelImplInfectious implements IModelSeir {
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
-                        const discoveredNrmCases = continuationValue * modificationTime.getRatios(this.ageGroupIndex).discovery;
+                        const discoveredNrmCases = continuationValue * modificationTime.getDiscoveryRatios(this.ageGroupIndex).discovery;
                         increments.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
                     }
                     return increments;

@@ -4,9 +4,8 @@ import { ControlsConstants } from './ControlsConstants';
 import { IconSlider } from './IconSlider';
 import { Slider } from './Slider';
 
-export class SliderTestingCategory extends Slider {
+export class SliderDiscoveryCategory extends Slider {
 
-    private readonly slider: Slider;
     private readonly group: string;
 
     constructor(group: string) {

@@ -13,6 +13,8 @@ describe("test value", () => {
             key: 'TESTING',
             name: 'initial discovery',
             instant: new Date('2021-05-01').getTime(),
+            bindToOverall: false,
+            overall: 0.3,
             multipliers: {
                 'family': 0.30,
                 'school': 0.30,
@@ -37,6 +39,8 @@ describe("test value", () => {
             key: 'TESTING',
             name: 'initial discovery',
             instant: new Date('2021-05-01').getTime(),
+            bindToOverall: false,
+            overall: 0.5,
             multipliers: {
                 'family': 0.50,
                 'school': 0.50,
@@ -61,6 +65,8 @@ describe("test value", () => {
             key: 'TESTING',
             name: 'initial discovery',
             instant: new Date('2021-05-01').getTime(),
+            bindToOverall: false,
+            overall: 0.7,
             multipliers: {
                 'family': 0.70,
                 'school': 0.70,

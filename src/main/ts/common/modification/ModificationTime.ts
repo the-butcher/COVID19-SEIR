@@ -1,4 +1,7 @@
+import { ModelImplRoot } from './../../model/ModelImplRoot';
+import { deprecate } from 'util';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
+import { ModelImplStrain } from '../../model/ModelImplStrain';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
@@ -16,6 +19,7 @@ import { Modifications } from './Modifications';
 import { ModificationSeasonality } from './ModificationSeasonality';
 import { ModificationSettings } from './ModificationSettings';
 import { ModificationVaccination } from './ModificationVaccination';
+import { Dictionary } from '@amcharts/amcharts4/core';
 
 export interface IRatios {
     contact: number;
@@ -42,7 +46,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private valueSum: number;
     private columnValues: number[];
     private cellValues: number[][];
-    private ratiosByAgeGroup: IRatios[];
+    private discoveryRatiosByAgeGroup: IRatios[];
+    private discoveryRatioOverall: number;
 
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
@@ -108,10 +113,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.maxColumnValue = -1;
         this.valueSum = -1;
         this.columnValues = [];
-        this.ratiosByAgeGroup = [];
+        this.discoveryRatiosByAgeGroup = undefined;
         this.cellValues = [];
 
-        for (let indexContact = 0; indexContact < Demographics.getInstance().getAgeGroups().length; indexContact++) {
+        for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
             this.columnValues[indexContact] = -1;
         }
 
@@ -121,53 +126,77 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.modificationSeasonality.getSeasonality();
     }
 
-    getRatios(ageGroupIndex: number): IRatios {
+    getDiscoveryRatios(ageGroupIndex: number): IRatios {
+        if (!this.discoveryRatiosByAgeGroup) {
+            this.buildRatios();
+        }
+        return this.discoveryRatiosByAgeGroup[ageGroupIndex];
+    }
 
-        if (!this.ratiosByAgeGroup[ageGroupIndex]) {
+    buildRatios(): void {
 
+        this.discoveryRatiosByAgeGroup = [];
+        this.ageGroups.forEach(ageGroup => {
+
+            const ageGroupIndex = ageGroup.getIndex();
             let contactTotal = 0;
-            let discoveryTotal = 0;
+            let discoveryRatioAgeGroup = 0;
+
             this.contactCategories.forEach(contactCategory => {
 
-                // current contact ratio for contact category
+                // current contact ratio for contact category as set in modification (0 to 1 or 0% to 100%)
                 const contactRatioCategory = this.modificationContact.getCategoryValue(contactCategory.getName());
-                // total contact in the requested age group in contact category
+                // total contact in the requested age group in contact category (TODO - question this value)
                 const contactGroupCategory = contactCategory.getColumnValue(ageGroupIndex);
                 // current total contact as of base contact-rate and contact-ratio in contact category
                 const contactTotalCategory = contactRatioCategory * contactGroupCategory;
 
-                // current discovery ratio for category
+                // current discovery ratio for category as set in modification
                 const discoveryRatioCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName());
 
                 // current share of discovered in currentTotal
                 contactTotal += contactTotalCategory;
-                discoveryTotal += discoveryRatioCategory * contactTotalCategory;
+                discoveryRatioAgeGroup += discoveryRatioCategory * contactTotalCategory;
 
             });
 
-            this.ratiosByAgeGroup[ageGroupIndex] = {
+            this.discoveryRatiosByAgeGroup[ageGroupIndex] = {
                 contact: contactTotal,
-                discovery: discoveryTotal / contactTotal
+                discovery: discoveryRatioAgeGroup / contactTotal
             };
 
-        }
+        });
 
-        return this.ratiosByAgeGroup[ageGroupIndex];
+        let _discoveryRatioOverall = 0;
+        this.ageGroups.forEach(ageGroup => {
+            _discoveryRatioOverall += ageGroup.getAbsValue() * this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery;
+        });
+        this.discoveryRatioOverall = _discoveryRatioOverall / this.absTotal;
+
+        const correction = this.modificationDiscovery.getOverall() / this.discoveryRatioOverall;
+        this.ageGroups.forEach(ageGroup => {
+            let contact = this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].contact * correction;
+            let discovery = this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery * correction;
+            this.discoveryRatiosByAgeGroup[ageGroup.getIndex()] = {
+                contact,
+                discovery
+            };
+        });
+        this.discoveryRatioOverall = this.modificationDiscovery.getOverall();
 
     }
 
     getDiscoveryRatioTotal(): number {
-        let discoveryTotal = 0;
-        this.ageGroups.forEach(ageGroup => {
-            discoveryTotal += ageGroup.getAbsValue() * this.getRatios(ageGroup.getIndex()).discovery;
-        });
-        return discoveryTotal / this.absTotal;
+        if (!this.discoveryRatiosByAgeGroup) {
+            this.buildRatios();
+        }
+        return this.discoveryRatioOverall;
     }
 
     getQuarantineMultiplier(ageGroupIndex: number): number {
         const shareOfInfectionBeforeIncubation = CompartmentChain.getInstance().getShareOfPresymptomaticInfection();
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
-        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getRatios(ageGroupIndex).discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
+        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getDiscoveryRatios(ageGroupIndex).discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
     }
 
     getCellValue(indexContact: number, indexParticipant: number): number {

@@ -804,7 +804,7 @@ export class ChartAgeGroup {
     }
 
     getAgeGroupIndex(): number {
-        return this.ageGroupIndex >= 0 ? this.ageGroupIndex : -1;
+        return this.ageGroupIndex >= 0 ? this.ageGroupIndex : Demographics.getInstance().getAgeGroups().length;
     }
 
     getAbsValue(): number {
@@ -824,14 +824,18 @@ export class ChartAgeGroup {
         StorageUtil.getInstance().exportJson(this.modelData);
     }
 
-    async setSeriesAgeGroup(ageGroupIndex: number): Promise<void> {
+    async setAgeGroupIndex(ageGroupIndex: number): Promise<void> {
 
+        const requiresBaseDataRender = this.ageGroupIndex !== ageGroupIndex;
         this.ageGroupIndex = ageGroupIndex;
         const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
         this.absValue = ageGroup.getAbsValue();
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
 
+            if (requiresBaseDataRender) {
+                this.renderBaseData();
+            }
             this.requestRenderModelData();
 
             // wait for the series heat to be ready, then place marker
@@ -906,36 +910,22 @@ export class ChartAgeGroup {
         const minInstant = ModelInstants.getInstance().getMinInstant();
         const maxInstant = ModelInstants.getInstance().getMaxInstant();
 
-
         for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
 
             const range = this.xAxis.axisRanges.create();
             range.category = TimeUtil.formatCategoryDate(instant);
             range.label.visible = false;
 
-            // if (BaseData.getInstance().isPositivityInstant(instant)) {
-            //     range.grid.stroke  = color('#FFFF00');
-            //     range.grid.strokeOpacity = 0.7;
-            //     range.grid.strokeWidth = 1;
-            //     // console.log('testing at', instant, TimeUtil.formatCategoryDate(instant));
-            // } if (BaseData.getInstance().isReproductionInstant(instant)) {
-            //     range.grid.stroke  = color('#FF0000');
-            //     range.grid.strokeOpacity = 1;
-            //     range.grid.strokeWidth = 1;
-            //     // console.log('testing at', instant, TimeUtil.formatCategoryDate(instant));
-            // } else {
-                range.axisFill.fillOpacity = 0.00;
-                range.axisFill.strokeOpacity = 0.75;
-                range.axisFill.strokeWidth = 0.50;
-                if (new Date(instant).getDay() === 0) {
-                    range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.20);
-                } else {
-                    range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
-                }
-            // }
+            range.axisFill.fillOpacity = 0.00;
+            range.axisFill.strokeOpacity = 0.75;
+            range.axisFill.strokeWidth = 0.50;
+            if (new Date(instant).getDay() === 0) {
+                range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.20);
+            } else {
+                range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
+            }
 
         }
-
 
     }
 
@@ -1205,7 +1195,7 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = maxIncidence * 1.05;
+            this.yAxisPlotIncidence.max = maxIncidence * 1.50;
 
             this.yAxisPlotPercent_000_100.min = 0;
             this.yAxisPlotPercent_000_100.max = maxInfectious * 1.05;
@@ -1247,6 +1237,7 @@ export class ChartAgeGroup {
     async renderModelData(): Promise<void> {
 
         clearTimeout(this.renderTimeout);
+
 
         const plotData: any[] = [];
         const heatData: any[] = [];
@@ -1351,7 +1342,6 @@ export class ChartAgeGroup {
 
         }
 
-
         const chartData = [...plotData, ...heatData];
 
         this.applyMaxHeat(maxGamma);
@@ -1367,19 +1357,16 @@ export class ChartAgeGroup {
             this.chart.invalidateRawData();
         } else {
             this.chart.data = chartData;
+            this.renderBaseData();
         }
 
     }
 
     async renderBaseData(): Promise<void> {
 
-        clearTimeout(this.renderTimeout);
-
         const plotData: any[] = [];
-        const heatData: any[] = [];
 
-        const ageGroups = Demographics.getInstance().getAgeGroupsWithTotal();
-        const ageGroupPlot = ageGroups[ageGroups.length - 1];
+        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
 
         const instantMin = ModelInstants.getInstance().getMinInstant();
         const instantMax = ModelInstants.getInstance().getMaxInstant();
@@ -1406,7 +1393,7 @@ export class ChartAgeGroup {
                 }
 
                 ageGroupAverageCasesR = dataItem00.getAverageCases(ageGroupPlot.getIndex());
-                ageGroupReproductionR = dataItem00.getReproductionNumber(ageGroupPlot.getIndex());
+                ageGroupReproductionR = dataItem00.getAverageMobilityOther();// dataItem00.getReproductionNumber(ageGroupPlot.getIndex());
                 if (ageGroupReproductionR && !Number.isNaN(ageGroupReproductionR)) {
                     ageGroupReproductionR -= 1;
                 }
@@ -1433,40 +1420,18 @@ export class ChartAgeGroup {
             }
             plotData.push(item);
 
-            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {
-                const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(0);
-                const gamma = 0;
-                heatData.push({
-                    categoryX,
-                    categoryY: ageGroupHeat.getName(),
-                    index: ageGroupHeat.getIndex(),
-                    value: 0,
-                    label,
-                    color,
-                    gamma
-                });
-            });
-
         }
 
-        const chartData = [...plotData, ...heatData];
-
-        this.yAxisPlotIncidence.max = incidenceMax * 1.25;
-        this.applyMaxHeat(1);
-
-        // console.log('this.yAxisPlotIncidence.max', this.yAxisPlotIncidence.max);
-        console.log('plotData', plotData);
-
-        if (this.chart.data.length === chartData.length && !QueryUtil.getInstance().isDiffDisplay()) {
-            for (let i = 0; i < chartData.length; i++) {
-                for (const key of Object.keys(chartData[i])) { // const key in chartData[i]
-                    this.chart.data[i][key] = chartData[i][key];
-                }
+        /**
+         * chart data must have been set at least once, or this will fail
+         */
+        for (let i = 0; i < plotData.length; i++) {
+            for (const key of Object.keys(plotData[i])) { // const key in chartData[i]
+                this.chart.data[i][key] = plotData[i][key];
             }
-            this.chart.invalidateRawData();
-        } else {
-            this.chart.data = chartData;
         }
+        this.chart.invalidateRawData();
+
 
     }
 

@@ -84,7 +84,8 @@ export class ModelConstants {
                 key: 'TESTING',
                 name: 'testing',
                 instant,
-                destination: 0.1,
+                bindToOverall: false,
+                overall: 0.1,
                 multipliers: {},
                 deletable: true,
                 draggable: true,
@@ -117,6 +118,8 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_VACC1ST = 2;
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
     static readonly BASE_DATA_INDEX___TESTS = 4;
+    static readonly BASE_DATA_INDEX__MOBI_O = 5;
+    static readonly BASE_DATA_INDEX__MOBI_W = 6;
 
     // static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00];
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
