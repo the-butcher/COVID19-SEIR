@@ -182,6 +182,10 @@ export class SliderContactCategory extends Slider {
                 this.ageGroupLabelDivs[ageGroup.getIndex()].style.display = 'none';
             });
 
+            ageGroupProfileDiv.addEventListener('dblclick', e => {
+                this.resetCorrections();
+            });
+
 
         });
 
@@ -204,6 +208,12 @@ export class SliderContactCategory extends Slider {
         } else {
             return undefined;
         }
+    }
+
+    resetCorrections(): void {
+        this.corrections = {};
+        ControlsContact.getInstance().handleChange();
+        this.redrawCanvas();
     }
 
     lessCorrection(ageGroupName: string): void {

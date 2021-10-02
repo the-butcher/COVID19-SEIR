@@ -142,20 +142,20 @@ export class Demographics implements IContactCategories {
                 ]
             }
 
-            // if (matrixConfig.name === 'work') {
-            //     corrections = [
-            //         1, // <= 04
-            //         1, // 05-14
-            //         1, // 15-24
-            //         1, // 25-34
-            //         1, // 35-44
-            //         1, // 45-54
-            //         1, // 55-64
-            //         1, // 65-74
-            //         1, // 75-84
-            //         1  // >= 85
-            //     ]
-            // }
+            if (matrixConfig.name === 'work') {
+                corrections = [
+                    1, // <= 04
+                    1, // 05-14
+                    1, // 15-24
+                    1, // 25-34
+                    1, // 35-44
+                    1, // 45-54
+                    1, // 55-64
+                    1, // 65-74
+                    1, // 75-84
+                    1  // >= 85
+                ].map(v => v * Math.sqrt(0.5))
+            }
 
             if (matrixConfig.name === 'other') {
                 corrections = [

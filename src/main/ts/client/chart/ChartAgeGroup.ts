@@ -1264,6 +1264,8 @@ export class ChartAgeGroup {
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
             let ageGroupCasesN = ageGroupCasesP * BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay());
 
+            console.log('off', new Date(dataItem.instant).getDay(), BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay()));
+
             const item = {
                 categoryX: dataItem.categoryX,
                 ageGroupSusceptible,
@@ -1393,7 +1395,7 @@ export class ChartAgeGroup {
                 }
 
                 ageGroupAverageCasesR = dataItem00.getAverageCases(ageGroupPlot.getIndex());
-                ageGroupReproductionR = dataItem00.getAverageMobilityOther();// dataItem00.getReproductionNumber(ageGroupPlot.getIndex());
+                ageGroupReproductionR = dataItem00.getReproductionNumber(ageGroupPlot.getIndex()); // dataItem00.getAverageMobilityOther();//
                 if (ageGroupReproductionR && !Number.isNaN(ageGroupReproductionR)) {
                     ageGroupReproductionR -= 1;
                 }

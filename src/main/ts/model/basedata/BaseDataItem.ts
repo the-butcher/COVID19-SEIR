@@ -146,10 +146,10 @@ export class BaseDataItem implements IBaseDataItem {
             mobilityOtherValues.sort((a, b) => a - b);
             mobilityWorkValues.sort((a, b) => a - b);
 
-            console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
+            // console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
             mobilityOtherValues = mobilityOtherValues.slice(2, mobilityOtherValues.length - 2);
             mobilityWorkValues = mobilityWorkValues.slice(2, mobilityWorkValues.length - 2);
-            console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
+            // console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
 
             this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) /  mobilityOtherValues.length;
             this.averageMobilityWork = mobilityWorkValues.reduce((a, b) => a + b, 0) / mobilityWorkValues.length;

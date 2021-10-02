@@ -151,21 +151,21 @@ export class BaseData {
             multipliers['school'] = 0.4;
             multipliers['nursing'] = 0.5;
             multipliers['family'] = 0.9;
-            multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityWork() * 0.3;
+            multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityWork() * 0.60;
             multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityOther() * 0.60;
 
             if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
-                Modifications.getInstance().addModification(new ModificationContact({
-                    id,
-                    key: 'CONTACT',
-                    name: `adjustments (${id})`,
-                    instant: reproductionMarker.instant,
-                    multipliers,
-                    deletable: true,
-                    draggable: true,
-                    blendable: true
-                }));
+                // Modifications.getInstance().addModification(new ModificationContact({
+                //     id,
+                //     key: 'CONTACT',
+                //     name: `adjustments (${id})`,
+                //     instant: reproductionMarker.instant,
+                //     multipliers,
+                //     deletable: true,
+                //     draggable: true,
+                //     blendable: true
+                // }));
 
             }
 
@@ -208,18 +208,18 @@ export class BaseData {
 
             if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
-                Modifications.getInstance().addModification(new ModificationDiscovery({
-                    id,
-                    key: 'TESTING',
-                    name: `adjustments (${id})`,
-                    instant: positivityMarker.instant,
-                    bindToOverall: true,
-                    overall,
-                    multipliers,
-                    deletable: true,
-                    draggable: true,
-                    blendable: true
-                }));
+                // Modifications.getInstance().addModification(new ModificationDiscovery({
+                //     id,
+                //     key: 'TESTING',
+                //     name: `adjustments (${id})`,
+                //     instant: positivityMarker.instant,
+                //     bindToOverall: true,
+                //     overall,
+                //     multipliers,
+                //     deletable: true,
+                //     draggable: true,
+                //     blendable: true
+                // }));
 
             }
 
@@ -233,7 +233,7 @@ export class BaseData {
                 const day = new Date(dataItem.getInstant()).getDay();
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
 
-                    const average = dataItem.getAverageCases(ageGroup.getIndex()) * ageGroup.getAbsValue() / 700000;
+                    const average = dataItem.getAverageCases(ageGroup.getIndex());
                     const cases = dataItem.getCasesM1(ageGroup.getIndex());
 
                     // add to proper age-group / day stats instance

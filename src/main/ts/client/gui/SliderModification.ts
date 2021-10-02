@@ -92,6 +92,7 @@ export class SliderModification extends Slider {
         modificationIcon.getBulletGroupElement().style.transform = 'rotate(45deg) scale(0.95)';
 
         ControlsConstants.MODIFICATION_PARAMS[modificationIcon.getKey()].handleModificationUpdate(); // update after a modification was edited
+        this.findThumbById(id).getThumbContentContainer().focus()
 
         StorageUtil.getInstance().setSaveRequired(true);
 
