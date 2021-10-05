@@ -61,8 +61,10 @@ export class SliderModification extends Slider {
                 // }
             },
             handleThumbPicked: (index) => {
-                const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
-                ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
+                if (index >= 0) {
+                    const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
+                    ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
+                }
             }
         });
         this.ticks = ticks;
@@ -174,14 +176,14 @@ export class SliderModification extends Slider {
                  * find previous modification
                  */
                 const modificationResolver = ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver();
-                const previousModification = modificationResolver.getModification(instant);
+                const copyableModification = modificationResolver.getModification(instant, 'CREATE');
 
                 /**
                  * create new modification with copy of previous modification, but change id, name, instant
                  */
                 const id = ObjectUtil.createId();
                 const modificationValuesCopy: IModificationValues = {
-                    ...previousModification.getModificationValues(),
+                    ...copyableModification.getModificationValues(),
                     id,
                     name: `adjustments (${id})`,
                     instant,
@@ -189,10 +191,10 @@ export class SliderModification extends Slider {
                     draggable: true,
                     blendable: false,
                     primary: false
-                } as IModificationValues; // copy previous values
+                } as IModificationValues;
 
                 const modification = ModelConstants.MODIFICATION_PARAMS[key].createValuesModification(modificationValuesCopy);
-                console.log('modification', modification);
+                // console.log('modification', modification);
 
                 /**
                  * add modification and update modification chart

@@ -212,7 +212,7 @@ export class SliderContactCategory extends Slider {
 
     resetCorrections(): void {
         this.corrections = {};
-        ControlsContact.getInstance().handleChange();
+        ControlsContact.getInstance().handleCorrections(this.corrections);
         this.redrawCanvas();
     }
 
@@ -221,7 +221,7 @@ export class SliderContactCategory extends Slider {
             this.corrections[ageGroupName] = 1;
         }
         this.corrections[ageGroupName] = this.corrections[ageGroupName] - 0.01;
-        ControlsContact.getInstance().handleChange();
+        ControlsContact.getInstance().handleCorrections(this.corrections);
         this.redrawCanvas();
     }
 
@@ -230,7 +230,7 @@ export class SliderContactCategory extends Slider {
             this.corrections[ageGroupName] = 1;
         }
         this.corrections[ageGroupName] = this.corrections[ageGroupName] + 0.01;
-        ControlsContact.getInstance().handleChange();
+        ControlsContact.getInstance().handleCorrections(this.corrections);
         this.redrawCanvas();
     }
 

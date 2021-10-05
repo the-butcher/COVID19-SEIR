@@ -1,6 +1,7 @@
-import { Demographics } from './../demographics/Demographics';
+import { BaseData } from './../../model/basedata/BaseData';
+import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { TimeUtil } from './../../util/TimeUtil';
+import { Demographics } from './../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesContact } from './IModificationValuesContact';
 import { ModificationContact } from './ModificationContact';
@@ -29,11 +30,12 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         return 'contact rate';
     }
 
-    getModification(instant: number): ModificationContact {
+    getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationContact {
 
-        const modificationA = super.getModification(instant);
+        const modificationA = super.getModification(instant, fetchType);
         const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1));
 
+        let modificationValues: IModificationValuesContact;
         if (modificationA && modificationB && modificationB.isBlendable() && modificationA.getInstantA() < modificationB.getInstantA()) {
 
             const modificationValuesA = modificationA.getModificationValues();
@@ -62,8 +64,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
             });
 
-
-            const interpolatedModification = new ModificationContact({
+            modificationValues = {
                 id: ObjectUtil.createId(),
                 key: 'CONTACT',
                 name: `interpolation (${modificationValuesA.name})`,
@@ -73,22 +74,33 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 blendable: modificationB.isBlendable(),
                 multipliers,
                 corrections
-            });
-
-            // if (instant === modificationValuesA.instant) {
-            //     console.log(interpolatedModification)
-            // }
-
-            return interpolatedModification;
+            };
 
         } else {
-            return modificationA;
+
+            const id = ObjectUtil.createId();
+            modificationValues = {
+                ...modificationA.getModificationValues(),
+                id,
+                name: `interpolation (${id})`,
+                deletable: true,
+                draggable: true,
+                blendable: false,
+            };
+
         }
+
+        const modification = new ModificationContact(modificationValues);
+        if (fetchType === 'CREATE') {
+            modification.setInstants(instant, instant); // will trigger update of 'work' multiplier
+        }
+
+        return new ModificationContact(modificationValues);
 
     }
 
     getValue(instant: number): number {
-        const modification = this.getModification(instant);
+        const modification = this.getModification(instant, 'INTERPOLATE');
         return modification.getMatrixSum() / modification.getMaxMatrixSum();
     }
 

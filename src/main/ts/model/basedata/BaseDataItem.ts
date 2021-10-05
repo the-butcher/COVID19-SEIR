@@ -184,7 +184,6 @@ export class BaseDataItem implements IBaseDataItem {
 
     }
 
-
     getIncidence(ageGroupIndex: number): number {
         return this.incidences[ageGroupIndex];
     }
@@ -220,6 +219,5 @@ export class BaseDataItem implements IBaseDataItem {
     getReproductionNumber(ageGroupIndex: number) {
         return this.reproductionNumbers[ageGroupIndex];
     }
-
 
 }

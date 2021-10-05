@@ -1,3 +1,4 @@
+import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { ModificationTime } from './ModificationTime';
 import { Modifications } from './Modifications';
 import { ModificationResolverTime } from './ModificationResolverTime';
@@ -30,9 +31,9 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
         return 'discovery rate';
     }
 
-    getModification(instant: number): ModificationDiscovery {
+    getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationDiscovery {
 
-        const modificationA = super.getModification(instant);
+        const modificationA = super.getModification(instant, fetchType);
         const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1));
 
         if (modificationA && modificationB && modificationB.isBlendable() && modificationA.getInstantA() < modificationB.getInstantA()) {

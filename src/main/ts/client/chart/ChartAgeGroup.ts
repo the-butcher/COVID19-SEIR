@@ -229,6 +229,8 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent_m75_p75.strictMinMax = true;
         this.yAxisPlotPercent_m75_p75.min = -0.75;
         this.yAxisPlotPercent_m75_p75.max =  0.75; // some extra required, or 100% label will not show
+        this.yAxisPlotPercent_m75_p75.tooltip.disabled = true;
+
 
         this.yAxisPlotPercent_m75_p75.renderer.labels.template.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent_m75_p75.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
@@ -373,7 +375,7 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.35,
-            labelled: true,
+            labelled: false,
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -1027,7 +1029,8 @@ export class ChartAgeGroup {
 
         const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
-        seriesAgeGroup.setVisible(this.chartMode === 'INCIDENCE');
+        // seriesAgeGroup.setVisible(this.chartMode === 'INCIDENCE');
+        seriesAgeGroup.setVisible(false);
         return seriesAgeGroup;
 
     }
@@ -1071,13 +1074,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(visible);
-        this.seriesAgeGroupIncidenceR.setVisible(visible);
+        this.seriesAgeGroupIncidence.setVisible(visible); // visible
+        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
         this.seriesAgeGroupReproductionR.setVisible(visible);
+
         this.seriesAgeGroupCasesP.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(visible);
-        this.seriesAgeGroupCasesR.setVisible(visible);
+        this.seriesAgeGroupCasesN.setVisible(visible); // visible
+        this.seriesAgeGroupCasesR.setVisible(visible); // visible
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1089,7 +1093,7 @@ export class ChartAgeGroup {
         if (visible && modificationValuesStrain.length > 1) {
             // turn all active strain back on
             modificationValuesStrain.forEach(strainValues => {
-                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setVisible(true);
+                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setVisible(false);
             });
         }
 
@@ -1195,7 +1199,7 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = maxIncidence * 1.50;
+            this.yAxisPlotIncidence.max = maxIncidence * 1.05;
 
             this.yAxisPlotPercent_000_100.min = 0;
             this.yAxisPlotPercent_000_100.max = maxInfectious * 1.05;
@@ -1264,7 +1268,7 @@ export class ChartAgeGroup {
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
             let ageGroupCasesN = ageGroupCasesP * BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay());
 
-            console.log('off', new Date(dataItem.instant).getDay(), BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay()));
+            // console.log('off', new Date(dataItem.instant).getDay(), BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay()));
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1279,7 +1283,7 @@ export class ChartAgeGroup {
                 ageGroupRemovedVRC,
                 ageGroupIncidence,
                 ageGroupCasesP,
-                ageGroupCasesN,
+                // ageGroupCasesN,
             }
 
             modificationValuesStrain.forEach(modificationValueStrain => {
@@ -1294,30 +1298,31 @@ export class ChartAgeGroup {
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
+                let label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
+                let gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
 
                 let color: string;
                 if (QueryUtil.getInstance().isDiffDisplay() && ObjectUtil.isNotEmpty(dataItem00)) {
 
-                    const baseIncidence = dataItem00.getIncidence(ageGroupHeat.getIndex());
-                    // value /= baseIncidence;
-                    value -= baseIncidence;
-                    // console.log(value, baseIncidence);
+                    // console.log(dataItem.valueset[ageGroupHeat.getName()].CASES, dataItem00.getAverageCases(ageGroupHeat.getIndex()))
+
+                    const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex());
 
                     let r = 0;
                     let g = 0;
                     let b = 0;
-                    // if (value >= 1) {
-                    //     g = value - 1;
-                    // }
-                    // else {
-                    //     r = 1 / value - 1;
-                    // }
-                    if (value > 0) {
-                        g = value / 20;
+                    if (caseValue >= 1) {
+                        g = (caseValue - 1) * 5;
                     }
                     else {
-                        r = value / -20;
+                        r = (1 / caseValue - 1) * 5;
                     }
+                    // if (value > 0) {
+                    //     g = value / 20;
+                    // }
+                    // else {
+                    //     r = value / -20;
+                    // }
 
                     const rgb = [Math.min(1, r), Math.min(1, g), b];
 
@@ -1325,10 +1330,16 @@ export class ChartAgeGroup {
                     ColorUtil.rgbToHsv(rgb, hsv);
                     color = new Color(hsv[0], hsv[1], hsv[2]).getHex();
 
+                    label = caseValue.toLocaleString();
+                    // gamma = caseValue;
+                    gamma = Math.pow(caseValue + randomVd, 1 / 0.9); // apply some gamma for better value perception
+                    // gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
+
                 }
 
-                const label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
-                const gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
+
+
+
                 heatData.push({
                     categoryX: dataItem.categoryX,
                     categoryY: ageGroupHeat.getName(),
@@ -1410,6 +1421,8 @@ export class ChartAgeGroup {
                 // console.log('no data found', categoryX);
             }
 
+            let ageGroupCasesN = ageGroupAverageCasesR * BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(instant).getDay());
+
             const item = {
                 categoryX,
                 ageGroupRemovedVR1,
@@ -1418,7 +1431,8 @@ export class ChartAgeGroup {
                 ageGroupAverageCasesR,
                 ageGroupReproductionR,
                 positivityRateR,
-                ageGroupCasesR
+                ageGroupCasesR,
+                ageGroupCasesN
             }
             plotData.push(item);
 

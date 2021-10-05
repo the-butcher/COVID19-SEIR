@@ -1,3 +1,4 @@
+import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { ModelInstants } from './../../model/ModelInstants';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
@@ -52,7 +53,7 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
 
     }
 
-    getModification(instant: number): M {
+    getModification(instant: number, fetchType: MODIFICATION__FETCH): M {
 
         const minChartInstant = ModelInstants.getInstance().getMinInstant();
         const maxChartInstant = ModelInstants.getInstance().getMaxInstant();

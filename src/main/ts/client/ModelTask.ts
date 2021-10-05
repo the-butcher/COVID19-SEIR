@@ -19,7 +19,7 @@ import { SliderModification } from './gui/SliderModification';
 export class ModelTask {
 
     /**
-     * static worker instance, terminated each time the model is rebuilt
+     * static worker instance, terminated and restarted each time the model is rebuilt
      */
     private static worker: ModelWorker;
 

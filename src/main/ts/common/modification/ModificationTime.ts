@@ -98,10 +98,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     setInstants(instantA: number, instantB: number): void {
 
         super.setInstants(instantA, instantB);
-        this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA());
-        this.modificationDiscovery = new ModificationResolverDiscovery().getModification(this.getInstantA());
+        this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA(), 'INTERPOLATE');
+        this.modificationDiscovery = new ModificationResolverDiscovery().getModification(this.getInstantA(), 'INTERPOLATE');
         this.modificationVaccination = Modifications.getInstance().findModificationsByType('VACCINATION')[0] as ModificationVaccination; // not mutable, thus reusable
-        this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA());
+        this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA(), 'INTERPOLATE');
         this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
         this.resetValues();
 

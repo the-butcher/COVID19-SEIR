@@ -18,6 +18,7 @@ import { IModificationValuesVaccination } from './../common/modification/IModifi
 
 export type MODIFICATION_NATURE = 'INSTANT' | 'RANGE';
 export type MODIFICATION____KEY = 'TIME' | 'STRAIN' | 'CONTACT' | 'TESTING' | 'VACCINATION' | 'SEASONALITY' | 'SETTINGS';
+export type MODIFICATION__FETCH = 'INTERPOLATE' | 'CREATE';
 
 /**
  * enumeration of infectious type

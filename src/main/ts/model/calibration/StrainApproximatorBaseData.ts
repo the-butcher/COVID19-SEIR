@@ -143,31 +143,34 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
                 heatmapDstIncidencesB[ageGroup.getIndex()] += casesToIncidence(heatmapCasesDeltaDstAB, ageGroup.getAbsValue());
 
                 if (ageGroup.getName() === '<= 04') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 0;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 3;
                 }
                 if (ageGroup.getName() === '05-14') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 5;
                 }
                 if (ageGroup.getName() === '15-24') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 1;
-                }
-                if (ageGroup.getName() === '25-34') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 1;
-                }
-                if (ageGroup.getName() === '35-44') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 1;
-                }
-                if (ageGroup.getName() === '45-54') {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 0;
                 }
+                if (ageGroup.getName() === '25-34') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 4;
+                }
+                if (ageGroup.getName() === '35-44') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
+                }
+                if (ageGroup.getName() === '45-54') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 2;
+                }
                 if (ageGroup.getName() === '55-64') {
+                    heatmapDstIncidencesB[ageGroup.getIndex()] += 1;
+                }
+                if (ageGroup.getName() === '65-74') {
                     heatmapDstIncidencesB[ageGroup.getIndex()] += 0;
                 }
                 if (ageGroup.getName() === '75-84') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] += 0;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 2;
                 }
                 if (ageGroup.getName() === '>= 85') {
-                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 1;
+                    heatmapDstIncidencesB[ageGroup.getIndex()] -= 3;
                 }
 
             });

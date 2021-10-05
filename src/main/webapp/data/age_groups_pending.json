@@ -1,0 +1,1350 @@
+{
+  "model_______version": "AT_0_00_05",
+  "model______basedata": "data/heatmap-data-at.json",
+  "model__demographics": "data/demographics-at.json",
+  "model_____daterange": [
+    "2021-05-01",
+    "2021-06-01",
+    "2021-07-01",
+    "2021-08-01",
+    "2021-09-01",
+    "2021-10-01"
+  ],
+  "model_modifications": [
+    {
+      "id": "b5e8",
+      "key": "TIME",
+      "name": "initial state",
+      "instant": 1619827200000,
+      "deletable": false,
+      "draggable": false
+    },
+    {
+      "id": "b5e7",
+      "key": "SETTINGS",
+      "name": "initial state",
+      "instant": 1619827200000,
+      "undetected": 1.5,
+      "vaccinated": 0.09,
+      "quarantine": 0.67,
+      "dead": 0,
+      "deletable": false,
+      "draggable": false,
+      "reexposure": 18
+    },
+    {
+      "id": "71e2e",
+      "key": "STRAIN",
+      "instant": 1619827200000,
+      "name": "alpha",
+      "r0": 4.4,
+      "serialInterval": 4.8,
+      "intervalScale": 1,
+      "dstIncidence": 149.15131599140702,
+      "deletable": false,
+      "draggable": false,
+      "primary": true,
+      "rB": 0,
+      "breakthroughRisk": 0
+    },
+    {
+      "id": "6c3d0",
+      "key": "CONTACT",
+      "name": "initial NPIs",
+      "instant": 1619827200000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.21,
+        "nursing": 0.7000000000000001,
+        "work": 0.25,
+        "other": 0.12
+      },
+      "deletable": false,
+      "draggable": false,
+      "corrections": {}
+    },
+    {
+      "id": "5971a",
+      "key": "TESTING",
+      "name": "initial testing",
+      "instant": 1619827200000,
+      "overall": 0.3,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.3,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "deletable": false,
+      "draggable": false,
+      "bindToOverall": true,
+      "blendable": true
+    },
+    {
+      "id": "f072",
+      "key": "VACCINATION",
+      "name": "vaccinations",
+      "instant": 1619827200000,
+      "vaccinationCurves": {
+        "75-84": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.7591924729755448
+          },
+          "cA1": {
+            "x": 1621036800000,
+            "y": 0.8485414
+          },
+          "cB1": {
+            "x": 1625961600000,
+            "y": 0.9000716
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.3916806740160603
+          },
+          "cA2": {
+            "x": 1624838400000,
+            "y": 0.7317349000000001
+          },
+          "cB2": {
+            "x": 1622073600000,
+            "y": 0.9000716
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.9000716
+          },
+          "sD": 1.75,
+          "sC": 1
+        },
+        ">= 85": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.8159416767922236
+          },
+          "cA1": {
+            "x": 1622073600000,
+            "y": 0.8728622
+          },
+          "cB1": {
+            "x": 1630454400000,
+            "y": 0.9099292
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.7089362642218049
+          },
+          "cA2": {
+            "x": 1622073600000,
+            "y": 0.728311
+          },
+          "cB2": {
+            "x": 1626480000000,
+            "y": 0.9099292
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.9099292
+          },
+          "sD": 1.15,
+          "sC": 0.95
+        },
+        "65-74": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.5535007452184292
+          },
+          "cA1": {
+            "x": 1620864000000,
+            "y": 0.8543287
+          },
+          "cB1": {
+            "x": 1623801600000,
+            "y": 0.8728622
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.10614998188911387
+          },
+          "cA2": {
+            "x": 1627516800000,
+            "y": 0.6356535999999999
+          },
+          "cB2": {
+            "x": 1619827200000,
+            "y": 0.8728622
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.8728622
+          },
+          "sD": 1.25,
+          "sC": 0.01
+        },
+        "55-64": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.26139379116311784
+          },
+          "cA1": {
+            "x": 1623110400000,
+            "y": 0.8005866
+          },
+          "cB1": {
+            "x": 1621814400000,
+            "y": 0.808
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.07786783042394015
+          },
+          "cA2": {
+            "x": 1628726400000,
+            "y": 0.3836182000000001
+          },
+          "cB2": {
+            "x": 1618963200000,
+            "y": 0.808
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.808
+          },
+          "sD": 0.95,
+          "sC": 1e-12
+        },
+        "45-54": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.18332999714362183
+          },
+          "cA1": {
+            "x": 1623628800000,
+            "y": 0.3836182000000001
+          },
+          "cB1": {
+            "x": 1619049600000,
+            "y": 0.7301694000000001
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.0645661416478678
+          },
+          "cA2": {
+            "x": 1627862400000,
+            "y": 0.14455120000000002
+          },
+          "cB2": {
+            "x": 1620950400000,
+            "y": 0.7301694000000001
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.7301694000000001
+          },
+          "sD": 0.9,
+          "sC": 1e-12
+        },
+        "35-44": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.15088040383232107
+          },
+          "cA1": {
+            "x": 1626048000000,
+            "y": 0.4243818
+          },
+          "cB1": {
+            "x": 1619827200000,
+            "y": 0.691244
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.05262163277987989
+          },
+          "cA2": {
+            "x": 1628208000000,
+            "y": 0.14825789999999997
+          },
+          "cB2": {
+            "x": 1622678400000,
+            "y": 0.691244
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.691244
+          },
+          "sD": 0.9,
+          "sC": 0.000001
+        },
+        "25-34": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.11871086738956023
+          },
+          "cA1": {
+            "x": 1626739200000,
+            "y": 0.35210620000000004
+          },
+          "cB1": {
+            "x": 1620000000000,
+            "y": 0.6208268
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.038984971423372455
+          },
+          "cA2": {
+            "x": 1629158400000,
+            "y": 0.13343109999999994
+          },
+          "cB2": {
+            "x": 1622937600000,
+            "y": 0.6208268
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.6208268
+          },
+          "sD": 0.9,
+          "sC": 0.0001
+        },
+        "15-24": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.06348724656638326
+          },
+          "cA1": {
+            "x": 1627603200000,
+            "y": 0.21496840000000003
+          },
+          "cB1": {
+            "x": 1620777600000,
+            "y": 0.5967382999999999
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.020951733158927403
+          },
+          "cA2": {
+            "x": 1629849600000,
+            "y": 0.04448039999999997
+          },
+          "cB2": {
+            "x": 1624320000000,
+            "y": 0.5967382999999999
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.5967382999999999
+          },
+          "sD": 0.95,
+          "sC": 0.0001
+        },
+        "05-14": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0.00012039304789164625
+          },
+          "cA1": {
+            "x": 1631232000000,
+            "y": 0
+          },
+          "cB1": {
+            "x": 1619740800000,
+            "y": 0.07968899999999997
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0.000027147451975567293
+          },
+          "cA2": {
+            "x": 1633478400000,
+            "y": 0
+          },
+          "cB2": {
+            "x": 1635120000000,
+            "y": 0.07968899999999997
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0.07968899999999997
+          },
+          "sD": 1.1,
+          "sC": 0.002
+        },
+        "<= 04": {
+          "pA1": {
+            "x": 1619222400000,
+            "y": 0
+          },
+          "cA1": {
+            "x": 1624406400000,
+            "y": 0
+          },
+          "cB1": {
+            "x": 1628380800000,
+            "y": 0
+          },
+          "pA2": {
+            "x": 1619222400000,
+            "y": 0
+          },
+          "cA2": {
+            "x": 1624406400000,
+            "y": 0
+          },
+          "cB2": {
+            "x": 1629072000000,
+            "y": 0
+          },
+          "pBN": {
+            "x": 1638316800000,
+            "y": 0
+          },
+          "sD": 1,
+          "sC": 1
+        }
+      },
+      "deletable": false,
+      "draggable": false
+    },
+    {
+      "id": "db5b9",
+      "key": "TESTING",
+      "name": "adjustments (db5b9)",
+      "instant": 1620345600000,
+      "bindToOverall": true,
+      "overall": 0.36608518965740355,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "f2997",
+      "key": "CONTACT",
+      "name": "adjustments (f2997)",
+      "instant": 1620432000000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.18,
+        "nursing": 0.6,
+        "work": 0.36148148148148146,
+        "other": 0.1088888888888889
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "60dfe",
+      "key": "CONTACT",
+      "name": "adjustments (60dfe)",
+      "instant": 1620604800000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.16,
+        "nursing": 0.27,
+        "work": 0.3933333333333333,
+        "other": 0.08
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "6fedb",
+      "key": "STRAIN",
+      "instant": 1620691200000,
+      "name": "delta",
+      "r0": 6.6000000000000005,
+      "serialInterval": 3.5,
+      "intervalScale": 1.7719163549651558,
+      "dstIncidence": 2,
+      "deletable": true,
+      "draggable": true,
+      "rB": 2,
+      "breakthroughRisk": 0.12
+    },
+    {
+      "id": "387a",
+      "key": "TESTING",
+      "name": "adjustments (387a)",
+      "instant": 1620691200000,
+      "bindToOverall": true,
+      "overall": 0.3992673602015311,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.3,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "9ee66",
+      "key": "CONTACT",
+      "name": "adjustments (9ee66)",
+      "instant": 1621036800000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.19,
+        "nursing": 0.3,
+        "work": 0.3933333333333333,
+        "other": 0.2
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "767aa",
+      "key": "CONTACT",
+      "name": "adjustments (767aa)",
+      "instant": 1621296000000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.35000000000000003,
+        "nursing": 0.85,
+        "work": 0.4199999999999999,
+        "other": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "1b84b",
+      "key": "TESTING",
+      "name": "adjustments (1b84b)",
+      "instant": 1621296000000,
+      "bindToOverall": true,
+      "overall": 0.5179562509067691,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.6,
+        "nursing": 0.6,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "a7d7f",
+      "key": "CONTACT",
+      "name": "adjustments (a7d7f)",
+      "instant": 1621555200000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.35000000000000003,
+        "nursing": 1,
+        "work": 0.4216666666666667,
+        "other": 0.22
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "f0e21",
+      "key": "TESTING",
+      "name": "adjustments (f0e21)",
+      "instant": 1621641600000,
+      "overall": 0.5780392135222624,
+      "bindToOverall": true,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.7000000000000001,
+        "nursing": 0.6,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "primary": false
+    },
+    {
+      "id": "34016",
+      "key": "TESTING",
+      "name": "adjustments (34016)",
+      "instant": 1621814400000,
+      "bindToOverall": true,
+      "overall": 0.608080694830009,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.65,
+        "work": 0.3,
+        "other": 0.1
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "6957c",
+      "key": "CONTACT",
+      "name": "adjustments (6957c)",
+      "instant": 1622073600000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.6,
+        "nursing": 1,
+        "work": 0.435,
+        "other": 0.22
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "88f40",
+      "key": "TESTING",
+      "name": "adjustments (88f40)",
+      "instant": 1622332800000,
+      "bindToOverall": true,
+      "overall": 0.6698203200899072,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.61,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "7d966",
+      "key": "CONTACT",
+      "name": "adjustments (7d966)",
+      "instant": 1622419200000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.55,
+        "nursing": 1,
+        "work": 0.44,
+        "other": 0.22
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "1e241",
+      "key": "TESTING",
+      "name": "adjustments (1e241)",
+      "instant": 1622592000000,
+      "bindToOverall": true,
+      "overall": 0.6831921910979719,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.55,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "3cba9",
+      "key": "CONTACT",
+      "name": "adjustments (3cba9)",
+      "instant": 1622764800000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.6,
+        "nursing": 1,
+        "work": 0.435,
+        "other": 0.22
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "a1cad",
+      "key": "TESTING",
+      "name": "adjustments (a1cad)",
+      "instant": 1623369600000,
+      "bindToOverall": true,
+      "overall": 0.7426017298757517,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.55,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "e2cb",
+      "key": "CONTACT",
+      "name": "adjustments (e2cb)",
+      "instant": 1623369600000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.3,
+        "nursing": 1,
+        "work": 0.445,
+        "other": 0.09
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "2e918",
+      "key": "TESTING",
+      "name": "adjustments (2e918)",
+      "instant": 1623628800000,
+      "bindToOverall": true,
+      "overall": 0.7841756272401433,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.42,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "b18e7",
+      "key": "CONTACT",
+      "name": "adjustments (b18e7)",
+      "instant": 1623801600000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.7000000000000001,
+        "nursing": 1,
+        "work": 0.4383333333333333,
+        "other": 0.28
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "e21fb",
+      "key": "CONTACT",
+      "name": "adjustments (e21fb)",
+      "instant": 1623801600000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.9,
+        "nursing": 1,
+        "work": 0.4383333333333333,
+        "other": 0.28
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "ea37",
+      "key": "SEASONALITY",
+      "name": "seasonality",
+      "instant": 1624233600000,
+      "seasonality": 0.6,
+      "deletable": false,
+      "draggable": true
+    },
+    {
+      "id": "ec908",
+      "key": "CONTACT",
+      "name": "adjustments (ec908)",
+      "instant": 1624406400000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.6,
+        "nursing": 1,
+        "work": 0.4333333333333333,
+        "other": 0.37
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "ec53d",
+      "key": "TESTING",
+      "name": "adjustments (ec53d)",
+      "instant": 1624406400000,
+      "bindToOverall": true,
+      "overall": 0.8457299088068596,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.3,
+        "nursing": 0.4,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "585f4",
+      "key": "TESTING",
+      "name": "adjustments (585f4)",
+      "instant": 1625011200000,
+      "bindToOverall": true,
+      "overall": 0.864321542810033,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.3,
+        "nursing": 0.4,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "126ef",
+      "key": "CONTACT",
+      "name": "adjustments (126ef)",
+      "instant": 1625011200000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.5,
+        "nursing": 1,
+        "work": 0.431025641025641,
+        "other": 0.5
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "b1a65",
+      "key": "CONTACT",
+      "name": "adjustments (b1a65)",
+      "instant": 1625356800000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.5,
+        "nursing": 1,
+        "work": 0.43,
+        "other": 0.92
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {
+        "school": {
+          "55-64": 0.99
+        }
+      }
+    },
+    {
+      "id": "193bb",
+      "key": "TESTING",
+      "name": "adjustments (193bb)",
+      "instant": 1625788800000,
+      "bindToOverall": true,
+      "overall": 0.736974818296892,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.3,
+        "nursing": 0.4,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "84e93",
+      "key": "CONTACT",
+      "name": "adjustments (84e93)",
+      "instant": 1625875200000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.02,
+        "nursing": 0.9,
+        "work": 0.39666666666666667,
+        "other": 0.89
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "43974",
+      "key": "CONTACT",
+      "name": "adjustments (43974)",
+      "instant": 1626220800000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.02,
+        "nursing": 0.02,
+        "work": 0.38416666666666666,
+        "other": 0.61
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "68c3c",
+      "key": "CONTACT",
+      "name": "adjustments (68c3c)",
+      "instant": 1626739200000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.02,
+        "nursing": 0.02,
+        "work": 0.355,
+        "other": 0.38
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "c45d3",
+      "key": "TESTING",
+      "name": "adjustments (c45d3)",
+      "instant": 1626739200000,
+      "bindToOverall": true,
+      "overall": 0.6195814655873476,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.63,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "c6b5e",
+      "key": "CONTACT",
+      "name": "adjustments (c6b5e)",
+      "instant": 1627171200000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.02,
+        "nursing": 0.02,
+        "work": 0.35000000000000003,
+        "other": 0.74
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "41cc9",
+      "key": "TESTING",
+      "name": "adjustments (41cc9)",
+      "instant": 1627171200000,
+      "bindToOverall": true,
+      "overall": 0.5960736534104112,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.68,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "eceec",
+      "key": "CONTACT",
+      "name": "adjustments (eceec)",
+      "instant": 1627603200000,
+      "multipliers": {
+        "family": 0.75,
+        "school": 0.05,
+        "nursing": 0.4,
+        "work": 0.3333333333333333,
+        "other": 0.38
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {
+        "nursing": {
+          "35-44": 0.99
+        }
+      }
+    },
+    {
+      "id": "d997b",
+      "key": "TESTING",
+      "name": "adjustments (d997b)",
+      "instant": 1627948800000,
+      "bindToOverall": true,
+      "overall": 0.5328456248988048,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "e418e",
+      "key": "CONTACT",
+      "name": "adjustments (e418e)",
+      "instant": 1628294400000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.48,
+        "nursing": 0.8,
+        "work": 0.33,
+        "other": 0.66
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {}
+    },
+    {
+      "id": "e116b",
+      "key": "TESTING",
+      "name": "adjustments (e116b)",
+      "instant": 1628553600000,
+      "bindToOverall": true,
+      "overall": 0.444644572192395,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "81c4f",
+      "key": "CONTACT",
+      "name": "adjustments (81c4f)",
+      "instant": 1628812800000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.29,
+        "nursing": 0.1,
+        "work": 0.33,
+        "other": 0.54
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "784c4",
+      "key": "TESTING",
+      "name": "adjustments (784c4)",
+      "instant": 1629244800000,
+      "bindToOverall": true,
+      "overall": 0.3421946660601275,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "baf77",
+      "key": "CONTACT",
+      "name": "adjustments (baf77)",
+      "instant": 1629676800000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.14,
+        "nursing": 0.3,
+        "work": 0.35666666666666663,
+        "other": 0.39
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "7046",
+      "key": "TESTING",
+      "name": "adjustments (7046)",
+      "instant": 1630022400000,
+      "bindToOverall": true,
+      "overall": 0.31968282570283935,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "97f50",
+      "key": "CONTACT",
+      "name": "adjustments (97f50)",
+      "instant": 1630454400000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.19,
+        "nursing": 0.8,
+        "work": 0.3674358974358974,
+        "other": 0.45
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "134a",
+      "key": "TESTING",
+      "name": "adjustments (134a)",
+      "instant": 1630627200000,
+      "bindToOverall": true,
+      "overall": 0.32055818617466025,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "aa102",
+      "key": "CONTACT",
+      "name": "adjustments (aa102)",
+      "instant": 1630713600000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.47000000000000003,
+        "nursing": 0.8,
+        "work": 0.374044289044289,
+        "other": 0.47000000000000003
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "52230",
+      "key": "TESTING",
+      "name": "adjustments (52230)",
+      "instant": 1630886400000,
+      "bindToOverall": true,
+      "overall": 0.3222122816663479,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "219cc",
+      "key": "CONTACT",
+      "name": "adjustments (219cc)",
+      "instant": 1631145600000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0,
+        "nursing": 0.9,
+        "work": 0.39166666666666666,
+        "other": 0.22
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "80c8f",
+      "key": "CONTACT",
+      "name": "adjustments (80c8f)",
+      "instant": 1631404800000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.65,
+        "nursing": 0.9,
+        "work": 0.39166666666666666,
+        "other": 0.5
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "c322f",
+      "key": "CONTACT",
+      "name": "adjustments (c322f)",
+      "instant": 1631577600000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.08,
+        "nursing": 0.9,
+        "work": 0.39166666666666666,
+        "other": 0.12
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "ccece",
+      "key": "TESTING",
+      "name": "adjustments (ccece)",
+      "instant": 1632009600000,
+      "bindToOverall": true,
+      "overall": 0.4245966366773266,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "9eda8",
+      "key": "CONTACT",
+      "name": "adjustments (9eda8)",
+      "instant": 1632009600000,
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.16,
+        "nursing": 0.9,
+        "work": 0.39166666666666666,
+        "other": 0.47000000000000003
+      },
+      "corrections": {},
+      "primary": false
+    },
+    {
+      "id": "33d8",
+      "key": "TESTING",
+      "name": "adjustments (33d8)",
+      "instant": 1632355200000,
+      "bindToOverall": true,
+      "overall": 0.4441458855741439,
+      "multipliers": {
+        "family": 0.5,
+        "school": 0.5,
+        "nursing": 0.5,
+        "work": 0.3,
+        "other": 0.25
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true
+    },
+    {
+      "id": "cda02",
+      "key": "CONTACT",
+      "name": "adjustments (cda02)",
+      "instant": 1632614400000,
+      "multipliers": {
+        "family": 0.9,
+        "school": 0.62,
+        "nursing": 0.9,
+        "work": 0.39166666666666666,
+        "other": 0.4
+      },
+      "deletable": true,
+      "draggable": true,
+      "blendable": true,
+      "corrections": {},
+      "primary": false
+    }
+  ]
+}

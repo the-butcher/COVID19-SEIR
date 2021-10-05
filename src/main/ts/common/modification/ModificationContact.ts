@@ -1,3 +1,4 @@
+import { BaseData } from '../../model/basedata/BaseData';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
@@ -36,6 +37,17 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
         this.resetValues();
 
+    }
+
+    setInstants(instantA: number, instantB: number): void {
+        super.setInstants(instantA, instantB);
+        const baseDataItem = BaseData.getInstance().findBaseDataItem(instantA);
+        if (baseDataItem) {
+            const multiplierWork = baseDataItem.getAverageMobilityWork();
+            if (multiplierWork) {
+                this.modificationValues.multipliers['work'] = multiplierWork * 0.60; // TODO magic number
+            }
+        }
     }
 
     getCategories(): ContactCategory[] {

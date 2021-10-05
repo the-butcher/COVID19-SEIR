@@ -1,3 +1,4 @@
+import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { AModificationResolver } from './AModificationResolver';
@@ -33,7 +34,7 @@ export class ModificationResolverSeasonality extends AModificationResolver<IModi
      * @param instant
      * @returns
      */
-    getModification(instant: number): ModificationSeasonality {
+    getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationSeasonality {
         const seasonality = this.getValue(instant);
         const seasonalityValues: IModificationValuesSeasonality = {
             id: ObjectUtil.createId(),

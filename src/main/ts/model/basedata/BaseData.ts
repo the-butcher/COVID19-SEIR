@@ -1,15 +1,15 @@
 import { ModificationContact } from './../../common/modification/ModificationContact';
-import { ObjectUtil } from './../../util/ObjectUtil';
-import { ModificationDiscovery } from './../../common/modification/ModificationDiscovery';
-import { StrainUtil } from './../../util/StrainUtil';
-import { DouglasPeucker } from './../../util/DouglasPeucker';
+import { Modifications } from '../../common/modification/Modifications';
 import { JsonLoader } from '../../util/JsonLoader';
 import { Demographics } from './../../common/demographics/Demographics';
+import { DouglasPeucker } from './../../util/DouglasPeucker';
+import { ObjectUtil } from './../../util/ObjectUtil';
 import { Statistics } from './../../util/Statistics';
+import { StrainUtil } from './../../util/StrainUtil';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelInstants } from './../ModelInstants';
 import { BaseDataItem, IBaseDataItem } from './BaseDataItem';
-import { Modifications } from '../../common/modification/Modifications';
+import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 
 export interface IBaseDataMarker {
     instant: number,
@@ -124,6 +124,37 @@ export class BaseData {
             }
         }
 
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+
+            const dataItem = this.findBaseDataItem(instant);
+            if (dataItem) {
+
+                const day = new Date(dataItem.getInstant()).getDay();
+                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+
+                    const average = dataItem.getAverageCases(ageGroup.getIndex());
+                    const cases = dataItem.getCasesM1(ageGroup.getIndex());
+
+                    // add to proper age-group / day stats instance
+                    if (average) {
+                        const avgToCaseRatio = cases / average;
+                        this.dailyOffsets[ageGroup.getIndex()][day].addValue(avgToCaseRatio);
+                    }
+
+                });
+
+            }
+
+        }
+
+        // let avgError = 0;
+        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        //     const dataItem = this.findBaseDataItem(instant);
+        //     const ageGroupIndex = Demographics.getInstance().getAgeGroups().length;
+        //     avgError += dataItem.getCasesM1(ageGroupIndex) - dataItem.getAverageCases(ageGroupIndex);
+        //     console.log('avgError', TimeUtil.formatCategoryDate(instant), avgError);
+        // }
+
         const reproductionMarkers: IBaseDataMarker[] = [];
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
             const dataItem = this.findBaseDataItem(instant);
@@ -164,7 +195,7 @@ export class BaseData {
                 //     multipliers,
                 //     deletable: true,
                 //     draggable: true,
-                //     blendable: true
+                //     blendable: false
                 // }));
 
             }
@@ -208,45 +239,24 @@ export class BaseData {
 
             if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
-                // Modifications.getInstance().addModification(new ModificationDiscovery({
-                //     id,
-                //     key: 'TESTING',
-                //     name: `adjustments (${id})`,
-                //     instant: positivityMarker.instant,
-                //     bindToOverall: true,
-                //     overall,
-                //     multipliers,
-                //     deletable: true,
-                //     draggable: true,
-                //     blendable: true
-                // }));
+                Modifications.getInstance().addModification(new ModificationDiscovery({
+                    id,
+                    key: 'TESTING',
+                    name: `adjustments (${id})`,
+                    instant: positivityMarker.instant,
+                    bindToOverall: true,
+                    overall,
+                    multipliers,
+                    deletable: true,
+                    draggable: false,
+                    blendable: true
+                }));
 
             }
 
         });
 
-        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
 
-            const dataItem = this.findBaseDataItem(instant);
-            if (dataItem) {
-
-                const day = new Date(dataItem.getInstant()).getDay();
-                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-
-                    const average = dataItem.getAverageCases(ageGroup.getIndex());
-                    const cases = dataItem.getCasesM1(ageGroup.getIndex());
-
-                    // add to proper age-group / day stats instance
-                    if (average) {
-                        const avgToCaseRatio = cases / average;
-                        this.dailyOffsets[ageGroup.getIndex()][day].addValue(avgToCaseRatio);
-                    }
-
-                });
-
-            }
-
-        }
 
     }
 

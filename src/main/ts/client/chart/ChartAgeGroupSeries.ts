@@ -119,7 +119,7 @@ export class ChartAgeGroupSeries {
         });
 
         this.series.events.on('ready', () => {
-            // do nothing
+            // do nothing, but keep handler to know where to find it
         });
 
         this.series.name = params.title;
@@ -130,7 +130,6 @@ export class ChartAgeGroupSeries {
         this.series.segments.template.events.on('out', () => {
             this.series.tooltip.disabled = true;
         });
-
 
     }
 

@@ -485,10 +485,12 @@ export class Slider {
      */
     handlePointerDown(index: number, e: PointerEvent): void {
 
-        this.clickableThumbIndex = index;
-        if (this.sliderThumbs[index].isDraggable()) {
-            this.draggableThumbIndex = index;
-            this.dragOffset =  e.clientX - this.sliderThumbs[index].getContainer().getBoundingClientRect().left - this.sliderThumbs[index].getContainer().getBoundingClientRect().width / 2;
+        if (index >= 0) {
+            this.clickableThumbIndex = index;
+            if (this.sliderThumbs[index].isDraggable()) {
+                this.draggableThumbIndex = index;
+                this.dragOffset =  e.clientX - this.sliderThumbs[index].getContainer().getBoundingClientRect().left - this.sliderThumbs[index].getContainer().getBoundingClientRect().width / 2;
+            }
         }
         // this.handleThumbPicked(index);
 
