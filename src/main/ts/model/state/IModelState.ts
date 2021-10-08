@@ -10,6 +10,11 @@ import { ICompartmentFilter } from '../compartment/ICompartmentFilter';
 export interface IModelState {
 
     /**
+     * serialize this instance to a writable json structure
+     */
+    toJSON(): { [K: string]: number };
+
+    /**
      * adds another state to this state (modifies this state)
      * @param state
      */
@@ -28,12 +33,10 @@ export interface IModelState {
      */
     getNrmValue(compartment: ICompartment): number;
 
-    // /**
-    //  * get all compartments contained in this state that satisfy the given filter
-    //  */
-    // getCompartments(): ICompartment[];
-
-    getValuesByCompartments(): Map<ICompartment, number>;
+    /**
+     * get all compartment values
+     */
+    getNrmValuesByCompartment(): Map<ICompartment, number>;
 
     /**
      * get the normalized value of all compartments satisfying the given filter

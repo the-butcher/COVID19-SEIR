@@ -1,3 +1,4 @@
+import { ECompartmentType } from './../model/compartment/ECompartmentType';
 /**
  * utility for checking object state
  *
@@ -18,11 +19,19 @@ export class ObjectUtil {
     }
 
     static createDownloadName(): string {
-        return 'timeline_' + Date.now();
+        return `timeline_${Date.now()}`;
     }
 
     static createId(): string {
         return Math.round(Math.random() * 1000000).toString(16);
+    }
+
+    static padZero(value: number): string {
+        return String(value).padStart(2, '0');
+    }
+
+    static createCompartmentId(compartmentType: ECompartmentType, strainId: string, ageGroupIndex: number, chainId: string): string {
+        return `${compartmentType}_${strainId}_${ObjectUtil.padZero(ageGroupIndex)}${chainId ?? ''}`;
     }
 
     /**

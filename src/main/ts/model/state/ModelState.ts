@@ -15,16 +15,24 @@ export class ModelState implements IModelState {
     }
 
     static empty(): IModelState {
-        return new ModelState();
+        return new ModelState(new Map());
     }
 
     protected readonly valuesByCompartments: Map<ICompartment, number>;
 
-    private constructor() {
-        this.valuesByCompartments = new Map();
+    private constructor(valuesByCompartments: Map<ICompartment, number>) {
+        this.valuesByCompartments = valuesByCompartments;
     }
 
-    getValuesByCompartments(): Map<ICompartment, number> {
+    toJSON(): { [K: string]: number } {
+        const json: { [K: string]: number } = {};
+        this.valuesByCompartments.forEach((value, compartment) => {
+            json[compartment.getId()] = value;
+        });
+        return json;
+    }
+
+    getNrmValuesByCompartment(): Map<ICompartment, number> {
         return this.valuesByCompartments;
     }
 
@@ -37,7 +45,7 @@ export class ModelState implements IModelState {
     }
 
     add(other: IModelState): IModelState {
-        other.getValuesByCompartments().forEach((value, compartment) => {
+        other.getNrmValuesByCompartment().forEach((value, compartment) => {
             this.addNrmValue(value, compartment);
         });
         return this;
@@ -45,6 +53,7 @@ export class ModelState implements IModelState {
 
     getNrmValueSum(compartmentFilter: ICompartmentFilter): number {
         let normalizedValueSum = 0;
+        // find all compartment id's satisfying the given filter (the ids found for a given filter could be associated, and reused, with a filter to speed up repeated filtering)
         this.valuesByCompartments.forEach((value, compartment) => {
             if (compartmentFilter.test(compartment)) {
                 normalizedValueSum += value;

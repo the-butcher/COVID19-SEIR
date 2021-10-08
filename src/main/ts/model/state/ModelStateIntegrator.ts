@@ -61,7 +61,7 @@ export class ModelStateIntegrator {
         this.model = model;
         this.curInstant = curInstant;
         this.modelState = model.getInitialState();
-        this.resetExposure();
+        this.resetExposure(); // be sure the exposure matrix is in a clean state upon init
     }
 
     integrate(dT: number, tT: number): void {
@@ -79,6 +79,10 @@ export class ModelStateIntegrator {
 
         this.modelState.add(this.model.apply(this.modelState, dT, tT, modificationTime));
 
+    }
+
+    getInstant(): number {
+        return this.curInstant;
     }
 
     getModelState(): IModelState {
@@ -252,14 +256,13 @@ export class ModelStateIntegrator {
 
             }
 
-            // if (this.curInstant % TimeUtil.MILLISECONDS_PER___WEEK === 0) {
-                progressCallback({
-                    ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant)
-                });
-            // }
+            progressCallback({
+                ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant)
+            });
 
         }
 
+        // console.log('model-state', this.modelState.toJSON());
         progressCallback({
             ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant),
             data: dataSet

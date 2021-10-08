@@ -10,6 +10,17 @@ import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 import { ControlsConstants } from './client/gui/ControlsConstants';
 
+/**
+ *
+ * go modification by modification
+ *
+ *
+ * iterate until some criteria is met (i.e. a case offset rate lower than )
+ *   adjust other to best fit (up to next modification)
+ *   adjust school and nursing to best fit 05-14 and >= 85 respectively
+ *
+ */
+
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
         Demographics.setInstanceFromPath(modelConfig.model__demographics).then(() => {

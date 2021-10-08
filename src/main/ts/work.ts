@@ -1,3 +1,5 @@
+import { ModelState } from './model/state/ModelState';
+import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
@@ -56,6 +58,22 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
+        const modelState = ModelState.copy(modelStateIntegrator.getModelState());
+        const modificationsContact = new ModificationResolverContact().getModifications().slice(3);
+        modificationsContact.forEach(modificationContact => {
+
+            // console.log('modificationContact', modificationContact, TimeUtil.formatCategoryDate(modificationContact.getInstant()));
+            // modelStateIntegrator.buildModelData(modificationContact.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            //     ctx.postMessage(modelProgress);
+            // });
+            // console.log('integrator instant', TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant()));
+
+        });
+
+
+        /**
+         * build the model up to maxInstance
+         */
         modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             ctx.postMessage(modelProgress);
         });

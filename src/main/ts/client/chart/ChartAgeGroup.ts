@@ -1074,14 +1074,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(visible); // visible
-        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
+        this.seriesAgeGroupIncidence.setVisible(false); // visible
+        this.seriesAgeGroupIncidenceR.setVisible(false); // visible
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
         this.seriesAgeGroupReproductionR.setVisible(visible);
 
         this.seriesAgeGroupCasesP.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(visible); // visible
-        this.seriesAgeGroupCasesR.setVisible(visible); // visible
+        this.seriesAgeGroupCasesN.setVisible(false); // visible
+        this.seriesAgeGroupCasesR.setVisible(false); // visible
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {

@@ -22,14 +22,14 @@ export class CompartmentBase implements ICompartment {
 
     private readonly continuationRatio: IRational;
 
-    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, continuationRatio: IRational) {
-        this.id = ObjectUtil.createId();
+    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, continuationRatio: IRational, chainId: string) {
+        this.id = ObjectUtil.createCompartmentId(compartmentType, strainId, ageGroupIndex, chainId);
         this.compartmentType = compartmentType;
         this.absTotal = absTotal;
         this.nrmValue = absValue * 1.0 / this.absTotal;
         this.ageGroupIndex = ageGroupIndex;
         this.strainId = strainId;
-        this.continuationRatio = continuationRatio; // new RationalDuration(continuationDuration);
+        this.continuationRatio = continuationRatio;
     }
 
     getId(): string {

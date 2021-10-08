@@ -15,8 +15,8 @@ export class CompartmentInfectious extends CompartmentBase {
     private readonly reproductionRatio: RationalReproduction;
     private readonly preSymptomatic: boolean
 
-    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, r0: number, duration: number, preSymptomatic: boolean) {
-        super(compartmentType, absTotal, absValue, ageGroupIndex, strainId, new RationalDurationFixed(duration));
+    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, r0: number, duration: number, preSymptomatic: boolean, chainId: string) {
+        super(compartmentType, absTotal, absValue, ageGroupIndex, strainId, new RationalDurationFixed(duration), chainId);
         this.reproductionRatio = new RationalReproduction(r0, duration);
         this.preSymptomatic = preSymptomatic;
     }

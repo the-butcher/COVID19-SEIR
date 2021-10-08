@@ -48,7 +48,7 @@ export class ModelImplStrain implements IModelSeir {
 
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
-            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime, baseData);
+            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime);
             this.infectiousModels.push(groupModel);
             nrmValue1 += groupModel.getNrmValue();
         });

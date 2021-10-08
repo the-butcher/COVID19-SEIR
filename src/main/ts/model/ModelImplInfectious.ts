@@ -1,3 +1,4 @@
+import { ObjectUtil } from './../util/ObjectUtil';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
@@ -38,7 +39,7 @@ export class ModelImplInfectious implements IModelSeir {
 
     private integrationSteps: IModelIntegrationStep[];
 
-    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, baseData: BaseData) {
+    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime) {
 
         this.parentModel = parentModel;
         this.compartmentsInfectiousPrimary = [];
@@ -84,9 +85,9 @@ export class ModelImplInfectious implements IModelSeir {
         let absCompartmentInfectiousSum = 0;
         const incubationOffset = (compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantA + compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantB) / 2;
 
-        for (let compartmentIndex = 0; compartmentIndex < compartmentParams.length; compartmentIndex++) {
+        for (let chainIndex = 0; chainIndex < compartmentParams.length; chainIndex++) {
 
-            const compartmentParam = compartmentParams[compartmentIndex];
+            const compartmentParam = compartmentParams[chainIndex];
             const duration = compartmentParam.instantB - compartmentParam.instantA;
 
             const instantC = incubationOffset - (compartmentParam.instantA + compartmentParam.instantB) / 2;
@@ -98,22 +99,22 @@ export class ModelImplInfectious implements IModelSeir {
             }
             const dailyActual = dailyTested / modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
-            this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic));
-            this.compartmentsInfectiousBreakthrough.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, 0, this.ageGroupIndex, strainValues.id, compartmentParam.rB, duration, compartmentParam.presymptomatic));
+            this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic, `_INF_${ObjectUtil.padZero(chainIndex)}`));
+            this.compartmentsInfectiousBreakthrough.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, 0, this.ageGroupIndex, strainValues.id, compartmentParam.rB, duration, compartmentParam.presymptomatic, `_BRK_${ObjectUtil.padZero(chainIndex)}`));
 
             absCompartmentInfectiousSum += absCompartment;
 
         };
 
         this.nrmValue = absCompartmentInfectiousSum / this.absTotal;
-        for (let i = 0; i < 7; i++) {
-            const instantB = TimeUtil.MILLISECONDS_PER____DAY * - (i + 1.5);
+        for (let incidenceIndex = 0; incidenceIndex < 7; incidenceIndex++) {
+            const instantB = TimeUtil.MILLISECONDS_PER____DAY * - (incidenceIndex + 1.5);
             if (strainValues.preGrowthRate) {
                 const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantB, strainValues.serialInterval * strainValues.intervalScale);
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
             }
-            const compartmentType = i == 0 ? ECompartmentType.X__INCUBATE_0 : ECompartmentType.X__INCUBATE_N;
-            this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER____DAY)));
+            const compartmentType = incidenceIndex == 0 ? ECompartmentType.X__INCUBATE_0 : ECompartmentType.X__INCUBATE_N;
+            this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER____DAY), `_7DI_${ObjectUtil.padZero(incidenceIndex)}`));
         }
         // console.log('incidenceSum', incidenceSum / 7);
 

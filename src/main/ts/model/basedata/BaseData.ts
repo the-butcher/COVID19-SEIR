@@ -239,18 +239,18 @@ export class BaseData {
 
             if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
-                Modifications.getInstance().addModification(new ModificationDiscovery({
-                    id,
-                    key: 'TESTING',
-                    name: `adjustments (${id})`,
-                    instant: positivityMarker.instant,
-                    bindToOverall: true,
-                    overall,
-                    multipliers,
-                    deletable: true,
-                    draggable: false,
-                    blendable: true
-                }));
+                // Modifications.getInstance().addModification(new ModificationDiscovery({
+                //     id,
+                //     key: 'TESTING',
+                //     name: `adjustments (${id})`,
+                //     instant: positivityMarker.instant,
+                //     bindToOverall: true,
+                //     overall,
+                //     multipliers,
+                //     deletable: true,
+                //     draggable: true,
+                //     blendable: true
+                // }));
 
             }
 
