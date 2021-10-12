@@ -1,3 +1,5 @@
+import { ControlsContact } from './controls/ControlsContact';
+import { ModificationContact } from './../common/modification/ModificationContact';
 import { ChartAgeGroupFlow } from './chart/ChartAgeGroupFlow';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
@@ -9,6 +11,8 @@ import { ModelConstants } from './../model/ModelConstants';
 import { ChartAgeGroup } from './chart/ChartAgeGroup';
 import { ControlsConstants } from './gui/ControlsConstants';
 import { SliderModification } from './gui/SliderModification';
+import { Modifications } from '../common/modification/Modifications';
+import { TimeUtil } from '../util/TimeUtil';
 
 /**
  * utility type that will pass rebuilding of the model to a web-worker
@@ -60,8 +64,22 @@ export class ModelTask {
                     dstIncidence
                 });
 
+                modelProgress.modificationValuesContact.forEach(modificationValuesContact => {
+                    const modificationContact = Modifications.getInstance().findModificationById(modificationValuesContact.id) as ModificationContact;
+                    // console.log(modificationContact.getId(), TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationValuesContact.multipliers);
+                    modificationContact.acceptUpdate({
+                        multipliers: modificationValuesContact.multipliers,
+                        corrections: modificationValuesContact.corrections,
+                        adaptCorrections: modificationValuesContact.adaptCorrections,
+                        adaptMultipliers: modificationValuesContact.adaptMultipliers
+                    });
+                });
+
                 // 2. update to be sure that modification chart shows on initial load
                 ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
+
+                // show any contact updates
+                ControlsContact.getInstance().acceptModification(ControlsContact.getInstance().getModification());
 
                 SliderModification.getInstance().setProgress(0);
                 // ModelTask.worker.terminate();

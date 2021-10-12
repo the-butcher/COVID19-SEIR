@@ -1,16 +1,15 @@
-import { ModelState } from './model/state/ModelState';
-import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { Demographics } from './common/demographics/Demographics';
-import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
+import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
+import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
+import { StrainCalibrator } from './model/calibration/StrainCalibrator';
 import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
-import { StrainCalibrator } from './model/calibration/StrainCalibrator';
+import { ModelStateBuilder } from './model/state/ModelStateBuilder';
 import { Logger } from './util/Logger';
-import { TimeUtil } from './util/TimeUtil';
 
 const ctx: Worker = self as any;
 
@@ -41,6 +40,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
          * create a base-data singleton (in worker scope, this does not interfere with main scope)
          */
         BaseData.setInstanceFromConfig('worker', baseDataConfig);
+        BaseData.getInstance().calculateDailyStats();
 
         /**
          * calibrate strain values to have transmission risk set properly (in an SEIS model the strain would then hold equilibrium at R0=1 and the strain's initial incidence)
@@ -58,25 +58,23 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        const modelState = ModelState.copy(modelStateIntegrator.getModelState());
-        const modificationsContact = new ModificationResolverContact().getModifications().slice(3);
-        modificationsContact.forEach(modificationContact => {
-
-            // console.log('modificationContact', modificationContact, TimeUtil.formatCategoryDate(modificationContact.getInstant()));
-            // modelStateIntegrator.buildModelData(modificationContact.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-            //     ctx.postMessage(modelProgress);
-            // });
-            // console.log('integrator instant', TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant()));
-
-        });
-
-
-        /**
-         * build the model up to maxInstance
-         */
-        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        new ModelStateBuilder().adapt(modelStateIntegrator, maxInstant, modelProgress => {
             ctx.postMessage(modelProgress);
+        }).then(data => {
+            const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+            ctx.postMessage({
+                ratio: 1,
+                data,
+                modificationValuesContact
+            });
         });
+
+        // /**
+        //  * complete model build (add more sophisticated logic here)
+        //  */
+        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        //     ctx.postMessage(modelProgress);
+        // });
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

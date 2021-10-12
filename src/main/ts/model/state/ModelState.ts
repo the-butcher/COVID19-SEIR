@@ -11,7 +11,7 @@ import { IModelState } from './IModelState';
 export class ModelState implements IModelState {
 
     static copy(other: IModelState): IModelState {
-        return ModelState.empty().add(other);
+        return new ModelState(other.getNrmValuesByCompartment());
     }
 
     static empty(): IModelState {
@@ -21,7 +21,10 @@ export class ModelState implements IModelState {
     protected readonly valuesByCompartments: Map<ICompartment, number>;
 
     private constructor(valuesByCompartments: Map<ICompartment, number>) {
-        this.valuesByCompartments = valuesByCompartments;
+        this.valuesByCompartments = new Map(valuesByCompartments);
+        // valuesByCompartments.forEach((value, key) => {
+        //     this.valuesByCompartments.set(key, value);
+        // })
     }
 
     toJSON(): { [K: string]: number } {

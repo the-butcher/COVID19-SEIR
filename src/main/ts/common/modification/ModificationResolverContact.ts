@@ -73,7 +73,9 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 draggable: true,
                 blendable: modificationB.isBlendable(),
                 multipliers,
-                corrections
+                corrections,
+                adaptMultipliers: false,
+                adaptCorrections: false
             };
 
         } else {
@@ -85,11 +87,18 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 name: `interpolation (${id})`,
                 deletable: true,
                 draggable: true,
-                blendable: false,
+                blendable: true,
+                corrections: {},
+                adaptMultipliers: true,
+                adaptCorrections: true
             };
+            // console.log('creating with', modificationValues);
 
         }
 
+        if (fetchType === 'CREATE') {
+            modificationValues.corrections = {}
+        }
         const modification = new ModificationContact(modificationValues);
         if (fetchType === 'CREATE') {
             modification.setInstants(instant, instant); // will trigger update of 'work' multiplier

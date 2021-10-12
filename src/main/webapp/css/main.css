@@ -62,7 +62,7 @@ input {
   width: inherit;
   display: flex;
   flex-direction: row;
-  padding: 12px 0px 12px 16px;
+  padding: 0px 0px 0px 16px;
   cursor: pointer;
   font-size: 12px;
 }

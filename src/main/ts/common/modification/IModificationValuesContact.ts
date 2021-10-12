@@ -17,4 +17,8 @@ export interface IModificationValuesContact extends IModificationValues {
      */
     corrections?: { [K in string] : { [K in string] : number } };
 
+    adaptMultipliers: boolean;
+
+    adaptCorrections: boolean;
+
 }

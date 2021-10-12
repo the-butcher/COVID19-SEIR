@@ -63,6 +63,7 @@ export class SliderModification extends Slider {
             handleThumbPicked: (index) => {
                 if (index >= 0) {
                     const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
+                    // console.log('picked modification', modification);
                     ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
                 }
             }
@@ -189,7 +190,7 @@ export class SliderModification extends Slider {
                     instant,
                     deletable: true,
                     draggable: true,
-                    blendable: false,
+                    blendable: copyableModification.isBlendable(),
                     primary: false
                 } as IModificationValues;
 

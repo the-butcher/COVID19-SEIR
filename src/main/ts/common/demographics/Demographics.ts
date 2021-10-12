@@ -286,6 +286,18 @@ export class Demographics implements IContactCategories {
         return this.ageGroups;
     }
 
+    getAgeGroupSchool(): AgeGroup {
+        return this.ageGroups[1];
+    }
+
+    getAgeGroupTotal(): AgeGroup {
+        return this.ageGroupTotal;
+    }
+
+    getAgeGroupNursing(): AgeGroup {
+        return this.ageGroups[this.ageGroups.length - 1];
+    }
+
     getAgeGroupsWithTotal(): AgeGroup[] {
         return [...this.ageGroups, this.ageGroupTotal];
     }

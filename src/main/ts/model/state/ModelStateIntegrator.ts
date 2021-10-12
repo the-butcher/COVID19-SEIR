@@ -1,5 +1,6 @@
+import { IModificationValuesContact } from './../../common/modification/IModificationValuesContact';
+import { ModelState } from './ModelState';
 import { Modifications } from '../../common/modification/Modifications';
-import { Logger } from '../../util/Logger';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
@@ -10,6 +11,7 @@ import { IModificationValuesStrain } from './../../common/modification/IModifica
 import { ModificationTime } from './../../common/modification/ModificationTime';
 import { ModelInstants } from './../ModelInstants';
 import { IModelState } from './IModelState';
+import { IModificationValues } from '../../common/modification/IModificationValues';
 
 /**
  * definition for a type that hold model progress and, if complete, model data
@@ -18,6 +20,7 @@ export interface IModelProgress {
     ratio: number;
     calibratedStrains?: IModificationValuesStrain[];
     data?: IDataItem[];
+    modificationValuesContact?: IModificationValuesContact[];
 }
 
 export interface IDataItem {
@@ -52,14 +55,20 @@ export class ModelStateIntegrator {
     static readonly DT = TimeUtil.MILLISECONDS_PER____DAY / 24;
 
     private readonly model: ModelImplRoot;
+    private logInstant: number;
     private curInstant: number;
 
-    private readonly modelState: IModelState;
+    private modelState: IModelState;
     private exposure: number[][];
+
+    private rollbackInstant: number;
+    private rollbackState: IModelState;
+
 
     constructor(model: ModelImplRoot, curInstant: number) {
         this.model = model;
         this.curInstant = curInstant;
+        this.logInstant = curInstant;
         this.modelState = model.getInitialState();
         this.resetExposure(); // be sure the exposure matrix is in a clean state upon init
     }
@@ -99,7 +108,15 @@ export class ModelStateIntegrator {
         }
     }
 
+    rollback(): void {
+        this.curInstant = this.rollbackInstant;
+        this.modelState = this.rollbackState;
+    }
+
     async buildModelData(dstInstant: number, dataFilter: (curInstant: number) => boolean, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
+
+        this.rollbackInstant = this.curInstant;
+        this.rollbackState = ModelState.copy(this.modelState);
 
         const dataSet: IDataItem[] = [];
         const absTotal = this.model.getDemographics().getAbsTotal();

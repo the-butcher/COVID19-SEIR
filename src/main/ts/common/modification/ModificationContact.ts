@@ -45,7 +45,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
         if (baseDataItem) {
             const multiplierWork = baseDataItem.getAverageMobilityWork();
             if (multiplierWork) {
-                this.modificationValues.multipliers['work'] = multiplierWork * 0.60; // TODO magic number
+                this.modificationValues.multipliers['work'] = multiplierWork * 0.60; // TODO magic multiplier, magic number
             }
         }
     }
@@ -69,6 +69,10 @@ export class ModificationContact extends AModification<IModificationValuesContac
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
+        // console.warn('update.corrections 1', update.corrections);
+        update.multipliers = {...this.modificationValues.multipliers, ...update.multipliers};
+        update.corrections = {...this.modificationValues.corrections, ...update.corrections};
+        // console.warn('update.corrections 2', update.corrections);
         super.acceptUpdate(update);
         this.resetValues();
     }
@@ -173,5 +177,12 @@ export class ModificationContact extends AModification<IModificationValuesContac
         return Demographics.getInstance().getMatrixValue();
     }
 
+    isAdaptMultipliers(): boolean {
+        return this.modificationValues.adaptMultipliers;
+    }
+
+    isAdaptCorrections(): boolean {
+        return this.modificationValues.adaptCorrections;
+    }
 
 }

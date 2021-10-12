@@ -1,6 +1,13 @@
+import { AgeGroup } from './../common/demographics/AgeGroup';
+import { BaseData } from './../model/basedata/BaseData';
+import { IDataItem } from './../model/state/ModelStateIntegrator';
 import { TimeUtil } from './TimeUtil';
-import { valueToRelative } from '@amcharts/amcharts4/.internal/core/utils/Utils';
 import { Weibull } from './Weibull';
+
+export interface IDataCompare {
+    base: number,
+    data: number
+}
 
 export class StrainUtil {
 
@@ -59,5 +66,67 @@ export class StrainUtil {
         return Math.exp(Math.log(valueR) / instantR);
 
     }
+
+    // /**
+    //  * find the error ration (by which ratio cases in the given item are off from the base data cases)
+    //  * @param dataItem
+    //  * @param ageGroup
+    //  * @returns
+    //  */
+    //  static findMultiplierRatio(dataItem: IDataItem, ageGroup: AgeGroup): number {
+    //     const baseItem = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+    //     if (baseItem) {
+    //         const ratio = dataItem.valueset[ageGroup.getName()].CASES / baseItem.getAverageCases(ageGroup.getIndex());
+    //         return (ratio - 1) * 0.25 + 1;
+    //     } else {
+    //         return Number.NaN;
+    //     }
+    // }
+
+    // static findCorrectionRatio(dataItem: IDataItem, ageGroup: AgeGroup): number {
+    //     const baseItem = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+    //     if (baseItem) {
+    //         const ratio = dataItem.valueset[ageGroup.getName()].CASES / baseItem.getAverageCases(ageGroup.getIndex());
+    //         return (ratio - 1) * 0.5 + 1;
+    //     } else {
+    //         return Number.NaN;
+    //     }
+    // }
+
+
+    static findCases(dataItem: IDataItem, ageGroup: AgeGroup): IDataCompare {
+
+        const instant = dataItem.instant;
+
+        const baseItem = BaseData.getInstance().findBaseDataItem(instant);
+        const baseCases = baseItem.getAverageCases(ageGroup.getIndex());
+        const dataCases = dataItem.valueset[ageGroup.getName()].CASES;
+
+        return {
+            base: baseCases,
+            data: dataCases
+        }
+
+    }
+
+    static findSlope(dataItemA: IDataItem, dataItemB: IDataItem, ageGroup: AgeGroup): IDataCompare {
+
+        const instantA = dataItemA.instant;
+        const instantB = dataItemB.instant;
+        const days = (instantB - instantA) / TimeUtil.MILLISECONDS_PER____DAY;
+
+        const casesA = StrainUtil.findCases(dataItemA, ageGroup);
+        const casesB = StrainUtil.findCases(dataItemB, ageGroup);
+
+        const baseSlope = (casesB.base - casesA.base) / days;
+        const dataSlope = (casesB.data - casesA.data) / days;
+
+        return {
+            base: baseSlope,
+            data: dataSlope
+        }
+
+    }
+
 
 }
