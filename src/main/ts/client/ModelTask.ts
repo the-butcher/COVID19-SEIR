@@ -79,11 +79,26 @@ export class ModelTask {
                 ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
 
                 // show any contact updates
-                ControlsContact.getInstance().acceptModification(ControlsContact.getInstance().getModification());
+                const displayableModification = ControlsContact.getInstance().getModification();
+                // that modification is being adapted
+                if (displayableModification.isAdaptCorrections()) {
+
+                    displayableModification.acceptUpdate({
+                        adaptMultipliers: !displayableModification.isAdaptMultipliers()
+                    });
+
+                    setTimeout(() => {
+                        ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                    }, 3000);
+
+                }
+                ControlsContact.getInstance().acceptModification(displayableModification);
+
 
                 SliderModification.getInstance().setProgress(0);
                 // ModelTask.worker.terminate();
                 // ModelTask.worker = null;
+
 
             } else {
                 SliderModification.getInstance().setProgress(modelProgress.ratio);

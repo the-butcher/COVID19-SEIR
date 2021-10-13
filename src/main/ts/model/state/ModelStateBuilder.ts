@@ -6,7 +6,8 @@ import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateInt
 
 export class ModelStateBuilder {
 
-    private static readonly MAX_TOLERANCE = 0.005;
+    private static readonly MAX_MULTIPLIER_TOLERANCE = 0.005;
+    private static readonly MAX_CORRECTION_TOLERANCE = 0.015;
 
     static getMaxError(...values: number[]): number {
         return Math.max(...values.map(v => Math.abs(v - 1)));
@@ -38,10 +39,6 @@ export class ModelStateBuilder {
             let maxMultiplierError: number;
             let maxCorrectionError: number;
 
-            // let lastCasesRatioSchool: number;
-            // let lastCasesRatioNursing: number;
-            // let lastCasesRatioOther: number;
-
             while (true) {
 
                 // console.log('integrating from', TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant()), ' >> ', TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant()));
@@ -53,8 +50,6 @@ export class ModelStateBuilder {
                 });
 
                 if (stepData && stepData.length > 0 && dataset.length > 0) { //  && modificationIndex == modificationsContact.length - 2
-
-                    // console.log('building from', TimeUtil.formatCategoryDate(modificationContactA.getInstant()));
 
                     const dataItemA0 = dataset[dataset.length - 1];
                     const slopeData = [...dataset, ...stepData];
@@ -68,18 +63,18 @@ export class ModelStateBuilder {
 
                     if (curIterations < maxIterations) {
 
-                        if (maxMultiplierError > ModelStateBuilder.MAX_TOLERANCE && modificationContactA.isAdaptMultipliers()) { // do multipliers
+                        if (maxMultiplierError > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE && modificationContactA.isAdaptMultipliers()) { // do multipliers
 
                             // console.log(TimeUtil.formatCategoryDate(modificationContactA.getInstant()), 'nursing', multiplierNursing);
 
                             const multipliers: { [K: string]: number } = {};
-                            if (Math.abs(multiplierSchool.casesRatioB - 1) > ModelStateBuilder.MAX_TOLERANCE) {
+                            if (Math.abs(multiplierSchool.casesRatioB - 1) > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE) {
                                 multipliers['school'] = multiplierSchool.currMultA;
                             }
-                            if (Math.abs(multiplierNursing.casesRatioB - 1) > ModelStateBuilder.MAX_TOLERANCE) {
+                            if (Math.abs(multiplierNursing.casesRatioB - 1) > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE) {
                                 multipliers['nursing'] = multiplierNursing.currMultA;
                             }
-                            if (Math.abs(multiplierOther.casesRatioB - 1) > ModelStateBuilder.MAX_TOLERANCE) {
+                            if (Math.abs(multiplierOther.casesRatioB - 1) > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE) {
                                 multipliers['other'] = multiplierOther.currMultA;
                             }
 
@@ -114,7 +109,7 @@ export class ModelStateBuilder {
 
                             maxCorrectionError = ModelStateBuilder.getMaxError(...correctionErrors);
                             // console.log('maxCorrectionError', maxCorrectionError);
-                            if (maxCorrectionError > ModelStateBuilder.MAX_TOLERANCE && modificationContactA.isAdaptCorrections()) {
+                            if (maxCorrectionError > ModelStateBuilder.MAX_CORRECTION_TOLERANCE && modificationContactA.isAdaptCorrections()) {
 
                                 // console.log(TimeUtil.formatCategoryDate(modificationContactA.getInstant()), correctionsOther);
                                 const corrections = {
