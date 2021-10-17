@@ -52,9 +52,14 @@ export class SliderModification extends Slider {
                 const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
                 ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].handleModificationDrag(value);
                 if (type === 'stop') {
+
                     this.updateModificationInstants();
-                    this.indicateUpdate(this.modificationIcons[index].getId());
                     this.handleThumbPicked(index);
+
+                    this.indicateUpdate(this.modificationIcons[index].getId());
+                    StorageUtil.getInstance().setSaveRequired(true);
+                    ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].handleModificationUpdate(); // update model after modification update
+
                 }
                 // if (type === 'cursor') {
                 //     ControlsTime.getInstance().getChartContactMatrix().exportToPng();
@@ -91,16 +96,18 @@ export class SliderModification extends Slider {
      */
     indicateUpdate(id: string): void {
 
-        const modificationIcon = this.modificationIcons.find(m => m.getId() === id);
-        modificationIcon.getBulletGroupElement().style.transform = 'rotate(45deg) scale(0.95)';
 
-        ControlsConstants.MODIFICATION_PARAMS[modificationIcon.getKey()].handleModificationUpdate(); // update after a modification was edited
+        const modificationIcon = this.modificationIcons.find(m => m.getId() === id);
+
+        // const previousTransform = modificationIcon.getBulletGroupElement().style.transform;
+        modificationIcon.getBulletGroupElement().style.transform = IconModification.TRANSFORM_OUT;
+
         this.findThumbById(id).getThumbContentContainer().focus()
 
         StorageUtil.getInstance().setSaveRequired(true);
 
         setTimeout(() => {
-            modificationIcon.getBulletGroupElement().style.transform = 'rotate(0deg) scale(0.75)';
+            modificationIcon.getBulletGroupElement().style.transform = IconModification.TRANSFORM__IN;
         }, 300);
 
     }
@@ -115,7 +122,6 @@ export class SliderModification extends Slider {
         const instantA = value;
         const instantB = (index < this.getSliderThumbs().length - 1) ? this.getSliderThumbs()[index + 1].getValue() : this.getMaxValue();
         modification.setInstants(instantA, instantB);
-
     }
 
     /**
@@ -217,7 +223,7 @@ export class SliderModification extends Slider {
             const modificationThumb = this.createThumb(typedModifications[index].getInstantA(), index, modificationIcon.getId(), typedModifications[index].isDraggable(), {
                 thumbCreateFunction: (index: number) => modificationIcon,
                 labelFormatFunction: (index, value, type) => {
-                    return `${TimeUtil.formatCategoryDate(value)}`;
+                    return `${TimeUtil.formatCategoryDayOfMonth(value)}`;
                 }
             });
             this.addThumb(modificationThumb);
@@ -249,7 +255,7 @@ export class SliderModification extends Slider {
             modificationIcon.getHandleGroupElement().addEventListener('pointerout', () => {
                 clearTimeout(handleOpacityTimeout);
                 handleOpacityTimeout = window.setTimeout(() => {
-                    modificationIcon.setHandleOpacity(0.6);
+                    modificationIcon.setHandleOpacity(0.3);
                 }, 25);
             });
 

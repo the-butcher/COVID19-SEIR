@@ -5,6 +5,8 @@ import { ObjectUtil } from '../../util/ObjectUtil';
 import { SliderModification } from '../gui/SliderModification';
 import { SliderSetting } from '../gui/SliderSetting';
 import { Controls } from './Controls';
+import { ControlsConstants } from '../gui/ControlsConstants';
+import { StorageUtil } from '../storage/StorageUtil';
 
 /**
  * controller for editing settings modifications
@@ -54,6 +56,8 @@ export class ControlsSettings {
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
+        StorageUtil.getInstance().setSaveRequired(true);
+        ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
 
     }
 

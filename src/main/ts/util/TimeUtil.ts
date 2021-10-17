@@ -15,11 +15,13 @@ export class TimeUtil {
     static formatCategoryDate(instant: number): string {
         const date = new Date(instant);
         // @ts-ignore
-        const day = String(date.getDate()).padStart(2, '0');
-        // @ts-ignore
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        return day + '.' + month + '.';
+        return `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.`;
     }
+
+    static formatCategoryDayOfMonth(instant: number): string {
+        // @ts-ignore
+        return String(new Date(instant).getDate()).padStart(2, '0');
+    }    
 
     static formatConfigDate(instant: number): string {
         const date = new Date(instant);

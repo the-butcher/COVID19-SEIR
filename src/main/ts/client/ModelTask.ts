@@ -13,6 +13,7 @@ import { ControlsConstants } from './gui/ControlsConstants';
 import { SliderModification } from './gui/SliderModification';
 import { Modifications } from '../common/modification/Modifications';
 import { TimeUtil } from '../util/TimeUtil';
+import { StorageUtil } from './storage/StorageUtil';
 
 /**
  * utility type that will pass rebuilding of the model to a web-worker
@@ -73,6 +74,11 @@ export class ModelTask {
                         adaptCorrections: modificationValuesContact.adaptCorrections,
                         adaptMultipliers: modificationValuesContact.adaptMultipliers
                     });
+                    StorageUtil.getInstance().setSaveRequired(true);
+                    setTimeout(() => {
+                        ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                    }, 1000);
+                    // SliderModification.getInstance().indicateUpdate(modificationContact.getId());
                 });
 
                 // 2. update to be sure that modification chart shows on initial load
@@ -80,20 +86,50 @@ export class ModelTask {
 
                 // show any contact updates
                 const displayableModification = ControlsContact.getInstance().getModification();
-                // that modification is being adapted
-                if (displayableModification.isAdaptCorrections()) {
-
-                    displayableModification.acceptUpdate({
-                        adaptMultipliers: !displayableModification.isAdaptMultipliers()
-                    });
-
-                    setTimeout(() => {
-                        ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                    }, 3000);
-
-                }
                 ControlsContact.getInstance().acceptModification(displayableModification);
 
+                if (modelProgress.modificationValuesContact.length > 5) {
+
+                    // const modificationValuesA = modelProgress.modificationValuesContact[modelProgress.modificationValuesContact.length - 3];
+                    // const modificationValuesB = modelProgress.modificationValuesContact[modelProgress.modificationValuesContact.length - 2];
+
+                    // const modificationContactA = Modifications.getInstance().findModificationById(modificationValuesA.id) as ModificationContact;
+                    // const modificationContactB = Modifications.getInstance().findModificationById(modificationValuesB.id) as ModificationContact;
+
+                    // console.log(modificationContactB);
+
+                    // still some corrections pending
+                    // if (modificationContactB.isAdaptCorrections()) {
+
+                    //     // toggle on both A and B depending on B's state
+                    //     // modificationContactA.acceptUpdate({
+                    //     //     adaptMultipliers: !modificationContactB.isAdaptMultipliers(),
+                    //     //     adaptCorrections: true
+                    //     // });
+                    //     modificationContactB.acceptUpdate({
+                    //         adaptMultipliers: !modificationContactB.isAdaptMultipliers(),
+                    //         adaptCorrections: true
+                    //     });
+                    //     StorageUtil.getInstance().setSaveRequired(true);
+
+                    //     setTimeout(() => {
+                    //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                    //     }, 3000);
+
+                    // } else {
+
+                    //     // modificationContactA.acceptUpdate({
+                    //     //     adaptMultipliers: false,
+                    //     //     adaptCorrections: false
+                    //     // });
+                    //     modificationContactB.acceptUpdate({
+                    //         adaptMultipliers: false,
+                    //         adaptCorrections: false
+                    //     });
+
+                    // }
+
+                }
 
                 SliderModification.getInstance().setProgress(0);
                 // ModelTask.worker.terminate();

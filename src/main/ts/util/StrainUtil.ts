@@ -109,24 +109,31 @@ export class StrainUtil {
 
     }
 
-    static findSlope(dataItemA: IDataItem, dataItemB: IDataItem, ageGroup: AgeGroup): IDataCompare {
+    static findSlope(dataItemPrev: IDataItem, dataItemCurr: IDataItem, ageGroup: AgeGroup): IDataCompare {
 
-        const instantA = dataItemA.instant;
-        const instantB = dataItemB.instant;
-        const days = (instantB - instantA) / TimeUtil.MILLISECONDS_PER____DAY;
-
-        const casesA = StrainUtil.findCases(dataItemA, ageGroup);
-        const casesB = StrainUtil.findCases(dataItemB, ageGroup);
-
-        const baseSlope = (casesB.base - casesA.base) / days;
-        const dataSlope = (casesB.data - casesA.data) / days;
+        const days = (dataItemCurr.instant - dataItemPrev.instant) / TimeUtil.MILLISECONDS_PER____DAY;
+        const casesPrev = StrainUtil.findCases(dataItemPrev, ageGroup);
+        const casesCurr = StrainUtil.findCases(dataItemCurr, ageGroup);
 
         return {
-            base: baseSlope,
-            data: dataSlope
+            base: (casesCurr.base * 100000 / ageGroup.getAbsValue() - casesPrev.base * 100000 / ageGroup.getAbsValue()) / days,
+            data: (casesCurr.data * 100000 / ageGroup.getAbsValue() - casesPrev.data * 100000 / ageGroup.getAbsValue()) / days,
         }
 
     }
+
+    // static findSlope(instantA: number, instantB: number, ageGroup: AgeGroup): number {
+
+    //     const days = (instantB - instantA) / TimeUtil.MILLISECONDS_PER____DAY;
+    //     const baseItemA = BaseData.getInstance().findBaseDataItem(instantA);
+    //     const baseItemB = BaseData.getInstance().findBaseDataItem(instantB);
+
+    //     const casesA = baseItemA.getAverageCases(ageGroup.getIndex());
+    //     const casesB = baseItemB.getAverageCases(ageGroup.getIndex());
+
+    //     return (casesB - casesA) / days;
+
+    // }
 
 
 }

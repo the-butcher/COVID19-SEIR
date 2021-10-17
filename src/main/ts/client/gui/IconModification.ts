@@ -11,6 +11,8 @@ import { ControlsConstants } from './ControlsConstants';
 export class IconModification implements IIconSlider {
 
     static Z_INDEX = 100;
+    static readonly TRANSFORM_OUT = 'scale(0.75)';
+    static readonly TRANSFORM__IN = 'scale(0.55)';
 
     private readonly id: string;
     private readonly key: MODIFICATION____KEY;
@@ -49,7 +51,7 @@ export class IconModification implements IIconSlider {
         this.handleGroupElement.style.opacity = `${this.lastHandleOpacity}`;
         this.handleGroupElement.style.display = 'none';
         this.handleGroupElement.style.transition = 'opacity 250ms ease-in-out';
-        this.handleGroupElement.style.transform = 'scale(0.75)';
+        this.handleGroupElement.style.transform = IconModification.TRANSFORM__IN;
         svgElement.appendChild(this.handleGroupElement);
 
         if (handleText) {
@@ -82,8 +84,9 @@ export class IconModification implements IIconSlider {
          */
         this.bulletGroupElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
         this.bulletGroupElement.style.pointerEvents = 'visible';
+        this.bulletGroupElement.style.opacity = '0.8';
         this.bulletGroupElement.style.transition = 'transform 250ms ease-in-out';
-        this.bulletGroupElement.style.transform = 'scale(0.75)';
+        this.bulletGroupElement.style.transform = IconModification.TRANSFORM__IN;
         svgElement.appendChild(this.bulletGroupElement);
 
         /**

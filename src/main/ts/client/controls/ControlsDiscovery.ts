@@ -10,6 +10,7 @@ import { SliderDiscoveryCategory } from '../gui/SliderDiscoveryCategory';
 import { Demographics } from './../../common/demographics/Demographics';
 import { Controls } from './Controls';
 import { SliderModification } from '../gui/SliderModification';
+import { StorageUtil } from '../storage/StorageUtil';
 
 /**
  * controller for editing testing modifications
@@ -90,7 +91,10 @@ export class ControlsDiscovery {
         });
 
         this.updateChart();
+
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
+        StorageUtil.getInstance().setSaveRequired(true);
+        ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
 
     }
 

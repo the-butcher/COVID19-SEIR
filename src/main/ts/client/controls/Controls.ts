@@ -84,6 +84,8 @@ export class Controls {
         Controls.textElement.style.display = 'block';
 
         SliderModification.getInstance().indicateUpdate(Controls.modification.getId());
+        StorageUtil.getInstance().setSaveRequired(true);
+        ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
 
     }
 

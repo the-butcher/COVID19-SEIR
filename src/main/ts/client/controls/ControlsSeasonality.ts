@@ -1,7 +1,9 @@
 import { ModificationSeasonality } from '../../common/modification/ModificationSeasonality';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
 import { SliderSeasonality } from '../gui/SliderSeasonality';
+import { StorageUtil } from '../storage/StorageUtil';
 import { Controls } from './Controls';
 
 /**
@@ -28,10 +30,15 @@ export class ControlsSeasonality {
     }
 
     handleChange(): void {
+
         this.modification.acceptUpdate({
             seasonality: this.sliderAmount.getValue()
         });
+
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
+        StorageUtil.getInstance().setSaveRequired(true);
+        ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
+
     }
 
     acceptModification(modification: ModificationSeasonality): void {

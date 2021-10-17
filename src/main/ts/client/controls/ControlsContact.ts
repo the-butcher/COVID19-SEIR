@@ -1,7 +1,9 @@
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
+import { ControlsConstants } from '../gui/ControlsConstants';
 import { SliderContactCategory } from '../gui/SliderContactCategory';
 import { SliderModification } from '../gui/SliderModification';
+import { StorageUtil } from '../storage/StorageUtil';
 import { Demographics } from './../../common/demographics/Demographics';
 import { ModificationContact } from './../../common/modification/ModificationContact';
 import { IconToggle } from './../gui/IconToggle';
@@ -30,7 +32,6 @@ export class ControlsContact {
     private readonly iconCorrections: IconToggle;
 
     private modification: ModificationContact;
-
 
 
     constructor() {
@@ -86,7 +87,10 @@ export class ControlsContact {
         // console.log('handleChange', corrections, this.modification);
 
         this.applyToChartContact();
+
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
+        StorageUtil.getInstance().setSaveRequired(true);
+        ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
 
     }
 
@@ -111,7 +115,10 @@ export class ControlsContact {
         // console.log('handleChange', corrections, this.modification);
 
         this.applyToChartContact();
+
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
+        StorageUtil.getInstance().setSaveRequired(true);
+        ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
 
     }
 

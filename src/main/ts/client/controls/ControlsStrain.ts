@@ -9,6 +9,7 @@ import { TimeUtil } from '../../util/TimeUtil';
 import { ControlsConstants } from '../gui/ControlsConstants';
 import { IconSlider } from '../gui/IconSlider';
 import { SliderModification } from '../gui/SliderModification';
+import { StorageUtil } from '../storage/StorageUtil';
 import { Slider } from './../gui/Slider';
 import { SliderSerialInterval } from './../gui/SliderSerialInterval';
 import { Controls } from './Controls';
@@ -269,7 +270,10 @@ export class ControlsStrain {
             intervalScale: this.intervalScale,
             dstIncidence: this.incidence
         });
+
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
+        StorageUtil.getInstance().setSaveRequired(true);
+        ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
 
     }
 
