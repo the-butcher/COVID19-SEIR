@@ -1,3 +1,4 @@
+import { ContactAdapterMultiplier } from '../../model/state/ContactAdapterMultiplier';
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -133,7 +134,17 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedVRC: ChartAgeGroupSeries; // control curve (maybe possible to replace with stacked curves)
     protected readonly seriesAgeGroupIncidenceR: ChartAgeGroupSeries; // real incidence
     protected readonly seriesPositivityRateR: ChartAgeGroupSeries; // real test numbers
-    protected readonly seriesAgeGroupAverageCasesR: ChartAgeGroupSeries; // real average cases
+
+    /**
+     * real average cases
+     */
+    protected readonly seriesAgeGroupAverageCasesR: ChartAgeGroupSeries;
+    // protected readonly seriesAgeGroupAverageCasesRU: ChartAgeGroupSeries;
+    // protected readonly seriesAgeGroupAverageCasesRL: ChartAgeGroupSeries;
+
+    /**
+     * real calculated reproduction rate
+     */
     protected readonly seriesAgeGroupReproductionR: ChartAgeGroupSeries; // reproduction rate based on real cases
 
 
@@ -365,6 +376,41 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        // this.seriesAgeGroupAverageCasesRU = new ChartAgeGroupSeries({
+        //     chart: this.chart,
+        //     yAxis: this.yAxisPlotAbsolute,
+        //     title: 'average cases (actual upper)',
+        //     baseLabel: 'average cases upper',
+        //     valueField: 'ageGroupAverageCasesRU',
+        //     colorKey: 'CASES',
+        //     strokeWidth: 1,
+        //     dashed: false,
+        //     locationOnPath: 0.35,
+        //     labelled: false,
+        //     stacked: false,
+        //     legend: false,
+        //     labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+        //     seriesConstructor: () => new LineSeries()
+        // });
+        // this.seriesAgeGroupAverageCasesRL = new ChartAgeGroupSeries({
+        //     chart: this.chart,
+        //     yAxis: this.yAxisPlotAbsolute,
+        //     title: 'average cases (actual lower)',
+        //     baseLabel: 'average cases lower',
+        //     valueField: 'ageGroupAverageCasesRL',
+        //     colorKey: 'CASES',
+        //     strokeWidth: 1,
+        //     dashed: false,
+        //     locationOnPath: 0.35,
+        //     labelled: false,
+        //     stacked: false,
+        //     legend: false,
+        //     labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+        //     seriesConstructor: () => new LineSeries()
+        // });
+        // this.seriesAgeGroupAverageCasesRU.bindToLegend(this.seriesAgeGroupAverageCasesR);
+        // this.seriesAgeGroupAverageCasesRL.bindToLegend(this.seriesAgeGroupAverageCasesR);
+
         this.seriesAgeGroupReproductionR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent_m75_p75,
@@ -884,7 +930,11 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupIncidenceR.setSeriesNote(ageGroup.getName());
+
         this.seriesAgeGroupAverageCasesR.setSeriesNote(ageGroup.getName());
+        // this.seriesAgeGroupAverageCasesRU.setSeriesNote(ageGroup.getName());
+        // this.seriesAgeGroupAverageCasesRL.setSeriesNote(ageGroup.getName());
+
         this.seriesAgeGroupReproductionR.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesP.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesN.setSeriesNote(ageGroup.getName());
@@ -1076,8 +1126,12 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupIncidence.setVisible(false); // visible
         this.seriesAgeGroupIncidenceR.setVisible(false); // visible
+
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
-        this.seriesAgeGroupReproductionR.setVisible(visible);
+        // this.seriesAgeGroupAverageCasesRU.setVisible(visible);
+        // this.seriesAgeGroupAverageCasesRL.setVisible(visible);
+
+        this.seriesAgeGroupReproductionR.setVisible(false);
 
         this.seriesAgeGroupCasesP.setVisible(visible);
         this.seriesAgeGroupCasesN.setVisible(false); // visible
@@ -1406,6 +1460,10 @@ export class ChartAgeGroup {
                 }
 
                 ageGroupAverageCasesR = dataItem00.getAverageCases(ageGroupPlot.getIndex());
+                // const casesBoundary = ContactAdapter.calculateBoundary(ageGroupAverageCasesR);
+                // ageGroupAverageCasesRU = casesBoundary.upper;
+                // ageGroupAverageCasesRL = casesBoundary.lower;
+
                 ageGroupReproductionR = dataItem00.getReproductionNumber(ageGroupPlot.getIndex()); // dataItem00.getAverageMobilityOther();//
                 if (ageGroupReproductionR && !Number.isNaN(ageGroupReproductionR)) {
                     ageGroupReproductionR -= 1;

@@ -119,7 +119,7 @@ export class BaseDataItem implements IBaseDataItem {
                 const incidenceP3 = dataItemP3.getIncidence(ageGroup.getIndex());
                 const incidenceP4 = dataItemP4.getIncidence(ageGroup.getIndex());
                 if (incidenceP2 && incidenceP3 && incidenceP4) {
-                    this.averageCases[ageGroup.getIndex()] = (incidenceP2 * 0.25 + incidenceP3 * 0.50 + incidenceP4 * 0.25) * ageGroup.getAbsValue() / 700000; // absolute number;
+                    this.averageCases[ageGroup.getIndex()] = (incidenceP2 * 0.25 + incidenceP3 * 0.50 + incidenceP4 * 0.25) * ageGroup.getAbsValue() / 700000;
                 }
             });
 

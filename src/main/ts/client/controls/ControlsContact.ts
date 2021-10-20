@@ -28,8 +28,6 @@ export class ControlsContact {
     private readonly chartContact: ChartContactMatrix;
     private readonly slidersCategory: SliderContactCategory[];
     private readonly iconBlendable: IconToggle;
-    private readonly iconMultipliers: IconToggle;
-    private readonly iconCorrections: IconToggle;
 
     private modification: ModificationContact;
 
@@ -46,22 +44,6 @@ export class ControlsContact {
                 this.handleChange();
             },
             label: 'smooth transition'
-        });
-        this.iconMultipliers = new IconToggle({
-            container: 'slidersCategoryDiv',
-            state: false,
-            handleToggle: state => {
-                this.handleChange();
-            },
-            label: 'allow category adaption'
-        });
-        this.iconCorrections = new IconToggle({
-            container: 'slidersCategoryDiv',
-            state: false,
-            handleToggle: state => {
-                this.handleChange();
-            },
-            label: 'allow age-group adaption'
         });
 
         Demographics.getInstance().getCategories().forEach(contactCategory => {
@@ -104,13 +86,9 @@ export class ControlsContact {
         });
 
         const blendable = this.iconBlendable.getState();
-        const adaptMultipliers = this.iconMultipliers.getState();
-        const adaptCorrections = this.iconCorrections.getState();
         this.modification.acceptUpdate({
             multipliers,
-            blendable,
-            adaptMultipliers,
-            adaptCorrections
+            blendable
         });
         // console.log('handleChange', corrections, this.modification);
 
@@ -138,8 +116,6 @@ export class ControlsContact {
             sliderCategory.acceptModification(this.modification);
         });
         this.iconBlendable.toggle(modification.isBlendable());
-        this.iconMultipliers.toggle(modification.isAdaptMultipliers());
-        this.iconCorrections.toggle(modification.isAdaptCorrections());
 
         requestAnimationFrame(() => {
             this.applyToChartContact();

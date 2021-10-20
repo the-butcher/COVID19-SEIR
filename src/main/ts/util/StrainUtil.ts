@@ -5,8 +5,8 @@ import { TimeUtil } from './TimeUtil';
 import { Weibull } from './Weibull';
 
 export interface IDataCompare {
-    base: number,
-    data: number
+    base: number;
+    data: number;
 }
 
 export class StrainUtil {
@@ -109,18 +109,18 @@ export class StrainUtil {
 
     }
 
-    static findSlope(dataItemPrev: IDataItem, dataItemCurr: IDataItem, ageGroup: AgeGroup): IDataCompare {
+    // static findSlope(dataItemPrev: IDataItem, dataItemCurr: IDataItem, ageGroup: AgeGroup): IDataCompare {
 
-        const days = (dataItemCurr.instant - dataItemPrev.instant) / TimeUtil.MILLISECONDS_PER____DAY;
-        const casesPrev = StrainUtil.findCases(dataItemPrev, ageGroup);
-        const casesCurr = StrainUtil.findCases(dataItemCurr, ageGroup);
+    //     const days = (dataItemCurr.instant - dataItemPrev.instant) / TimeUtil.MILLISECONDS_PER____DAY;
+    //     const casesPrev = StrainUtil.findCases(dataItemPrev, ageGroup);
+    //     const casesCurr = StrainUtil.findCases(dataItemCurr, ageGroup);
 
-        return {
-            base: (casesCurr.base * 100000 / ageGroup.getAbsValue() - casesPrev.base * 100000 / ageGroup.getAbsValue()) / days,
-            data: (casesCurr.data * 100000 / ageGroup.getAbsValue() - casesPrev.data * 100000 / ageGroup.getAbsValue()) / days,
-        }
+    //     return {
+    //         base: (casesCurr.base * 100000 / ageGroup.getAbsValue() - casesPrev.base * 100000 / ageGroup.getAbsValue()) / days,
+    //         data: (casesCurr.data * 100000 / ageGroup.getAbsValue() - casesPrev.data * 100000 / ageGroup.getAbsValue()) / days,
+    //     }
 
-    }
+    // }
 
     // static findSlope(instantA: number, instantB: number, ageGroup: AgeGroup): number {
 

@@ -1,18 +1,17 @@
-import { ControlsContact } from './controls/ControlsContact';
-import { ModificationContact } from './../common/modification/ModificationContact';
-import { ChartAgeGroupFlow } from './chart/ChartAgeGroupFlow';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
+import { Modifications } from '../common/modification/Modifications';
 import { IWorkerInput } from '../model/IWorkerInput';
 import { MODIFICATION____KEY } from '../model/ModelConstants';
 import { IModelProgress } from '../model/state/ModelStateIntegrator';
+import { ModificationContact } from './../common/modification/ModificationContact';
 import { ModificationResolverStrain } from './../common/modification/ModificationResolverStrain';
 import { ModelConstants } from './../model/ModelConstants';
 import { ChartAgeGroup } from './chart/ChartAgeGroup';
+import { ChartAgeGroupFlow } from './chart/ChartAgeGroupFlow';
+import { ControlsContact } from './controls/ControlsContact';
 import { ControlsConstants } from './gui/ControlsConstants';
 import { SliderModification } from './gui/SliderModification';
-import { Modifications } from '../common/modification/Modifications';
-import { TimeUtil } from '../util/TimeUtil';
 import { StorageUtil } from './storage/StorageUtil';
 
 /**
@@ -71,15 +70,13 @@ export class ModelTask {
                     modificationContact.acceptUpdate({
                         multipliers: modificationValuesContact.multipliers,
                         corrections: modificationValuesContact.corrections,
-                        adaptCorrections: modificationValuesContact.adaptCorrections,
-                        adaptMultipliers: modificationValuesContact.adaptMultipliers
+                        mult___pids: modificationValuesContact.mult___pids
                     });
-                    StorageUtil.getInstance().setSaveRequired(true);
-                    setTimeout(() => {
-                        ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                    }, 1000);
-                    // SliderModification.getInstance().indicateUpdate(modificationContact.getId());
                 });
+                StorageUtil.getInstance().setSaveRequired(true);
+                setTimeout(() => {
+                    ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                }, 1000);
 
                 // 2. update to be sure that modification chart shows on initial load
                 ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
@@ -87,49 +84,6 @@ export class ModelTask {
                 // show any contact updates
                 const displayableModification = ControlsContact.getInstance().getModification();
                 ControlsContact.getInstance().acceptModification(displayableModification);
-
-                if (modelProgress.modificationValuesContact.length > 5) {
-
-                    // const modificationValuesA = modelProgress.modificationValuesContact[modelProgress.modificationValuesContact.length - 3];
-                    // const modificationValuesB = modelProgress.modificationValuesContact[modelProgress.modificationValuesContact.length - 2];
-
-                    // const modificationContactA = Modifications.getInstance().findModificationById(modificationValuesA.id) as ModificationContact;
-                    // const modificationContactB = Modifications.getInstance().findModificationById(modificationValuesB.id) as ModificationContact;
-
-                    // console.log(modificationContactB);
-
-                    // still some corrections pending
-                    // if (modificationContactB.isAdaptCorrections()) {
-
-                    //     // toggle on both A and B depending on B's state
-                    //     // modificationContactA.acceptUpdate({
-                    //     //     adaptMultipliers: !modificationContactB.isAdaptMultipliers(),
-                    //     //     adaptCorrections: true
-                    //     // });
-                    //     modificationContactB.acceptUpdate({
-                    //         adaptMultipliers: !modificationContactB.isAdaptMultipliers(),
-                    //         adaptCorrections: true
-                    //     });
-                    //     StorageUtil.getInstance().setSaveRequired(true);
-
-                    //     setTimeout(() => {
-                    //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                    //     }, 3000);
-
-                    // } else {
-
-                    //     // modificationContactA.acceptUpdate({
-                    //     //     adaptMultipliers: false,
-                    //     //     adaptCorrections: false
-                    //     // });
-                    //     modificationContactB.acceptUpdate({
-                    //         adaptMultipliers: false,
-                    //         adaptCorrections: false
-                    //     });
-
-                    // }
-
-                }
 
                 SliderModification.getInstance().setProgress(0);
                 // ModelTask.worker.terminate();

@@ -1,16 +1,13 @@
+import { ModelStateBuilderMultipliers } from './ModelStateBuilderMultipliers';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../common/modification/ModificationResolverContact';
-import { IDataCompare, StrainUtil } from '../../util/StrainUtil';
 import { TimeUtil } from '../../util/TimeUtil';
-import { ContactAdapter } from './ContactAdapter';
+import { IPidValues } from './../../common/modification/IModificationValuesContact';
+import { ContactAdapterMultiplier } from './ContactAdapterMultiplier';
+import { ModelStateBuilderCorrections } from './ModelStateBuilderCorrections';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
 
 export class ModelStateBuilder {
-
-    private static readonly MAX_MULTIPLIER_TOLERANCE = 0.005;
-    private static readonly MAX_CORRECTION_TOLERANCE = 0.010;
-
-    private static readonly MIN_______BASE_ITERATION = 5;
 
     static getMaxError(...values: number[]): number {
         return Math.max(...values.map(v => Math.abs(v - 1)));
@@ -18,278 +15,123 @@ export class ModelStateBuilder {
 
     async adapt(modelStateIntegrator: ModelStateIntegrator, maxInstant: number, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
 
+        // console.clear();
+
         const dataset: IDataItem[] = [];
-        // let stepData: IDataItem[] = [];
+        const modificationsContact = new ModificationResolverContact().getModifications();
 
         // const modelState = ModelState.copy(modelStateIntegrator.getModelState());
         const ageGroupSchool = Demographics.getInstance().getAgeGroupSchool();
         const ageGroupNursing = Demographics.getInstance().getAgeGroupNursing();
         const ageGroupTotal = Demographics.getInstance().getAgeGroupTotal();
 
-        const modificationsContact = new ModificationResolverContact().getModifications();
+        const modelStateBuilderCorrections = new ModelStateBuilderCorrections();
+        const modelStateBuilderMultipliersA = new ModelStateBuilderMultipliers({
+            ageGroup: ageGroupTotal,
+            contactCategory: 'other'
+        });
+        const modelStateBuilderMultipliersB = new ModelStateBuilderMultipliers({
+            ageGroup: ageGroupSchool,
+            contactCategory: 'school'
+        }, {
+            ageGroup: ageGroupNursing,
+            contactCategory: 'nursing'
+        });
 
-        // let maxMultiplierErrorTotal = 0;
+        let stepDataI: IDataItem[];
+        let stepDataN: IDataItem[];
 
-        // const offsetsTotal: number[] = [];
+        /**
+         * data up to first adaptable modification
+         */
+        let modificationIndexOuter = 3;
+        const modificationContactOuterB = modificationsContact[modificationIndexOuter];
+        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
+        stepDataI = await modelStateIntegrator.buildModelData(modificationContactOuterB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            // drop data from callback
+            progressCallback({
+                ratio: modelProgress.ratio
+            });
+        });
+        console.log(loggableRange, '++', stepDataI.length);
+        dataset.push(...stepDataI);
+        console.log('------------------------------------------------------------------------------------------');
 
-        let solvablePrev: IDataCompare;
-        let solvableCurr: IDataCompare;
-        // let solvableDiff = Number.NaN;
+        modificationIndexOuter++;
+        for (; modificationIndexOuter < 10 /* modificationsContact.length - 1 */; modificationIndexOuter++) {
 
-        for (let modificationIndex = 2; modificationIndex < modificationsContact.length - 1; modificationIndex++) {
+            const modificationContactA = modificationsContact[modificationIndexOuter - 1];
+            const multPids: IPidValues = {
+                kp: 0.10,
+                ki: 0.00,
+                kd: 0.00,
+                ei: 0.00,
+                ep: 0.00,
+            };
+            const corrPids: { [K in string]: IPidValues} = {};
+            Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+                corrPids[ageGroup.getName()] = {...multPids};
+            });
+            modificationContactA.acceptUpdate({
+                mult___pids: {
+                    'school': {...multPids},
+                    'nursing': {...multPids},
+                    'other': {...multPids}
+                },
+                corr___pids: {
+                    'other': {...corrPids}
+                }
+            });
 
-            const modificationContactA = modificationsContact[modificationIndex - 1];
-            const modificationContactB = modificationsContact[modificationIndex];
-            const contactAdapter = new ContactAdapter(modificationContactA, modificationContactB);
-            const loggableRange = `${TimeUtil.formatCategoryDate(modificationContactA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+            const modificationContactB = modificationsContact[modificationIndexOuter];
 
-            const stepData = await modelStateIntegrator.buildModelData(modificationContactB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            /**
+             * TODO skip modification that are within tolerance, break on modifications that are not improvable or have invalid entry tolerance
+             */
+            for (let baseIterationIndex = 0; baseIterationIndex < 20; baseIterationIndex++) {
+                await modelStateBuilderMultipliersA.adaptValues(modelStateIntegrator, modificationContactA, modificationContactB, dataset[dataset.length - 1], progressCallback);
+            }
+            for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
+                await modelStateBuilderMultipliersB.adaptValues(modelStateIntegrator, modificationContactA, modificationContactB, dataset[dataset.length - 1], progressCallback);
+            }
+            for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
+                await modelStateBuilderCorrections.adaptValues(modelStateIntegrator, modificationContactA, modificationContactB, dataset[dataset.length - 1], progressCallback);
+            }
+
+            loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+
+            /**
+             * final build and add to data
+             */
+            stepDataI = await modelStateIntegrator.buildModelData(modificationContactB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
                 // drop data from callback
                 progressCallback({
                     ratio: modelProgress.ratio
                 });
             });
-
-            if (stepData && stepData.length > 0 && dataset.length > 0) {
-
-                const referenceData = dataset[dataset.length - 1];
-                const stepDataset = [referenceData, ...stepData];
-
-                const solvableCurr = contactAdapter.calculateSolvable(ageGroupTotal, stepDataset, 50);
-
-                if (solvablePrev) {
-
-                    // difference between base data and actual data
-                    const solvableDiffCurr = solvableCurr.base - solvableCurr.data;
-                    const solvableDiffPrev = solvablePrev.base - solvablePrev.data;
-
-                    const solvableRatioSlope = solvableDiffCurr - solvableDiffPrev;
-                    const solvableRatioCases = ((solvableCurr.base + 10000) / (solvableCurr.data + 10000));
-
-                    const prevMultA = modificationContactA.getCategoryValue('other');
-                    const currMultA = Math.max(0, Math.min(1, prevMultA + solvableRatioSlope * solvableRatioCases / 1000)));
-
-                    console.log(loggableRange, prevMultA.toFixed(4), currMultA.toFixed(4), solvableRatioSlope.toFixed(4), solvableRatioCases.toFixed(4));
-
-
-                    modificationContactA.acceptUpdate({
-                        multipliers: {
-                            'other': currMultA
-                        }
-                    });
-
-                }
-
-                // solvableCurr = contactAdapter.calculateSolvable(ageGroupTotal, stepDataset, 35);
-                // solvableDiff = solvableCurr - solvablePrev;
-
-                // if (!Number.isNaN(solvableDiff)) {
-                //     const prevMultA = modificationContactA.getCategoryValue('other');
-                //     modificationContactA.acceptUpdate({
-                //         multipliers: {
-                //             'other': prevMultA + solvableDiff / 1000
-                //         }
-                //     });
-                //
-                // }
-
-
-
-                solvablePrev = solvableCurr;
-
-            }
-
-
-            // const modificationContactB = modificationsContact[modificationIndex + 1];
-            // const contactAdapter = new ContactAdapter(modificationContactA, modificationContactB);
-            // // console.log('building from', TimeUtil.formatCategoryDate(modificationContactA.getInstant()));
-
-
-
-            // let maxIterations = 50;
-            // let curIterations = 0;
-
-            // let maxMultiplierError: number;
-            // let maxCorrectionError: number;
-
-            // while (true) {
-
-            //     // console.log('integrating from', TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant()), ' >> ', TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant()));
-            //     stepData = await modelStateIntegrator.buildModelData(modificationContactB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-            //         // drop data from callback
-            //         progressCallback({
-            //             ratio: modelProgress.ratio
-            //         });
-            //     });
-
-            //     if (stepData && stepData.length > 0 && dataset.length > 0) { //  && modificationIndex == modificationsContact.length - 2
-
-            //         // first (reference) data-item
-            //         const referenceData = dataset[dataset.length - 1];
-            //         const stepDataset = [referenceData, ...stepData]
-
-            //         // const slopeData = [...dataset, ...stepData];
-            //         // const dataItemB0 = slopeData[slopeData.length - 1];
-
-            //         const multiplierSchool = contactAdapter.calculateMultiplier('school', ageGroupSchool, stepDataset, 35);
-            //         const multiplierNursing = contactAdapter.calculateMultiplier('nursing', ageGroupNursing, stepDataset, 35);
-            //         const multiplierOther = contactAdapter.calculateMultiplier('other', ageGroupTotal, stepDataset, 15);
-
-            //         // console.log('multiplierSchool', multiplierSchool);
-
-            //         maxMultiplierError = ModelStateBuilder.getMaxError(multiplierSchool.totalRatio, multiplierNursing.totalRatio, multiplierOther.totalRatio);
-            //         maxMultiplierErrorTotal += maxMultiplierError;
-
-            //         if (curIterations < maxIterations) {
-
-            //             const adaptMultipliers = modificationContactA.isAdaptMultipliers() || curIterations < ModelStateBuilder.MIN_______BASE_ITERATION;
-            //             if (maxMultiplierError > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE && adaptMultipliers) { // do multipliers
-
-            //                 // console.log(TimeUtil.formatCategoryDate(modificationContactA.getInstant()), 'nursing', multiplierNursing);
-
-            //                 const multipliersA: { [K: string]: number } = {};
-            //                 const multipliersB: { [K: string]: number } = {};
-            //                 if (Math.abs(multiplierSchool.totalRatio - 1) > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE) {
-            //                     multipliersA['school'] = multiplierSchool.currMultA;
-            //                     multipliersB['school'] = multiplierSchool.currMultB;
-            //                 }
-            //                 if (Math.abs(multiplierNursing.totalRatio - 1) > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE) {
-            //                     multipliersA['nursing'] = multiplierNursing.currMultA;
-            //                     multipliersB['nursing'] = multiplierNursing.currMultB;
-            //                 }
-            //                 if (Math.abs(multiplierOther.totalRatio - 1) > ModelStateBuilder.MAX_MULTIPLIER_TOLERANCE) {
-            //                     multipliersA['other'] = multiplierOther.currMultA;
-            //                     multipliersB['other'] = multiplierOther.currMultB;
-            //                 }
-
-            //                 modificationContactA.acceptUpdate({
-            //                     multipliers: multipliersA
-            //                 });
-            //                 // if (modificationIndex >= modificationsContact.length - 2) {
-            //                     modificationContactB.acceptUpdate({
-            //                         multipliers: multipliersB
-            //                     });
-            //                 // }
-
-            //                 modelStateIntegrator.rollback();
-
-            //             } else { // do corrections
-
-            //                 // console.log('within error tolerance (multipliers) or not adaptable', TimeUtil.formatCategoryDate(modificationContactA.getInstant()), ' >> ', TimeUtil.formatCategoryDate(modificationContactB.getInstant()));
-            //                 modificationContactA.acceptUpdate({
-            //                     adaptMultipliers: false
-            //                 });
-
-            //                 const correctionsOtherA: { [K: string]: number } = {};
-            //                 const correctionsOtherB: { [K: string]: number } = {};
-            //                 const correctionErrors: number[] = [];
-            //                 Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-
-            //                     const ageGroupCorrections = contactAdapter.calculateCorrection(ageGroup, stepDataset);
-            //                     correctionsOtherA[ageGroup.getName()] = ageGroupCorrections.currMultA;
-            //                     correctionsOtherB[ageGroup.getName()] = ageGroupCorrections.currMultB;
-            //                     correctionErrors.push(ageGroupCorrections.totalRatio);
-
-            //                     // if (ageGroup.getName() === '05-14') {
-            //                     //     console.log('ageGroupCorrections', ageGroupCorrections);
-            //                     // }
-
-
-            //                     // console.log(TimeUtil.formatCategoryDate(modificationContactA.getInstant()), ageGroup.getName(), ageGroupCorrections);
-
-            //                 });
-
-            //                 maxCorrectionError = ModelStateBuilder.getMaxError(...correctionErrors);
-            //                 // console.log('maxCorrectionError', maxCorrectionError);
-
-            //                 const adaptCorrections = modificationContactA.isAdaptCorrections() || curIterations < ModelStateBuilder.MIN_______BASE_ITERATION;
-            //                 if (maxCorrectionError > ModelStateBuilder.MAX_CORRECTION_TOLERANCE && adaptCorrections) {
-
-            //                     // console.log(TimeUtil.formatCategoryDate(modificationContactA.getInstant()), correctionsOther);
-            //                     const correctionsA = {
-            //                         'family': correctionsOtherA,
-            //                         'school': correctionsOtherA,
-            //                         'nursing': correctionsOtherA,
-            //                         'work': correctionsOtherA,
-            //                         'other': correctionsOtherA
-            //                     };
-            //                     const correctionsB = {
-            //                         'family': correctionsOtherB,
-            //                         'school': correctionsOtherB,
-            //                         'nursing': correctionsOtherB,
-            //                         'work': correctionsOtherB,
-            //                         'other': correctionsOtherB
-            //                     };
-
-            //                     modificationContactA.acceptUpdate({
-            //                         corrections: correctionsA
-            //                     });
-            //                     // if (modificationIndex >= modificationsContact.length - 2) {
-            //                         modificationContactB.acceptUpdate({
-            //                             corrections: correctionsB
-            //                         });
-            //                     // }
-
-            //                     modelStateIntegrator.rollback();
-
-            //                 } else {
-
-            //                     modificationContactA.acceptUpdate({
-            //                         adaptCorrections: false
-            //                     });
-
-            //                     // within correction tolerance --> modification done --> add a flag so it is excluded from further adaption
-            //                     // console.log('within error tolerance (corrections) or not adaptable', TimeUtil.formatCategoryDate(modificationContactA.getInstant()), ' >> ', TimeUtil.formatCategoryDate(modificationContactB.getInstant()));
-            //                     curIterations = maxIterations;
-            //                     break;
-
-            //                 } // curCorrError > maxError
-
-            //             } // curMultiError > maxError
-
-            //         } else {
-
-            //             // console.clear();
-            //             // console.log('iterations exceeded', 'maxMultiplierError', maxMultiplierError.toFixed(4), 'maxCorrectionError', maxCorrectionError?.toFixed(4), TimeUtil.formatCategoryDate(modificationContactA.getInstant()), ' >> ', TimeUtil.formatCategoryDate(modificationContactB.getInstant()));
-            //             break;
-
-            //         }
-
-            //     } else {
-
-            //         // console.log('no step data', stepData, TimeUtil.formatCategoryDate(modificationContactA.getInstant()), ' >> ', TimeUtil.formatCategoryDate(modificationContactB.getInstant()));
-            //         break;
-
-            //     }
-
-            //     curIterations++;
-
-            // }
-
-            // const loggableMultiplierError = maxMultiplierError ? maxMultiplierError.toFixed(4) : '------';
-            // const loggableCorrectionError = maxCorrectionError ? maxCorrectionError.toFixed(4) : '------';
-            // console.log(loggableRange, 'multiplierError', loggableMultiplierError, 'maxCorrectionError', loggableCorrectionError);
-
-            // console.log('adding step data', stepData.length, TimeUtil.formatCategoryDate(modificationContactA.getInstant()), ' >> ', TimeUtil.formatCategoryDate(modificationContactB.getInstant()));
-
-
-            dataset.push(...stepData);
+            console.log(loggableRange, '++', stepDataI.length);
+            dataset.push(...stepDataI);
 
         }
 
-        // console.log('maxMultiplierErrorTotal', maxMultiplierErrorTotal?.toFixed(4));
         console.log('------------------------------------------------------------------------------------------');
 
+        /**
+         * fill rest of data
+         */
+        loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(maxInstant)}`;
         const fillData = await modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio
             });
         });
-        // console.log('adding step data', stepData.length);
+        console.log(loggableRange, '++', fillData.length);
         dataset.push(...fillData);
 
         return dataset;
 
     }
+
+
 
 }

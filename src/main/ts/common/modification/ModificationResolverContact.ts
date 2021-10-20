@@ -73,9 +73,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 draggable: true,
                 blendable: modificationB.isBlendable(),
                 multipliers,
-                corrections,
-                adaptMultipliers: false,
-                adaptCorrections: false
+                corrections
             };
 
         } else {
@@ -88,9 +86,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 deletable: true,
                 draggable: true,
                 blendable: true,
-                corrections: {},
-                adaptMultipliers: true,
-                adaptCorrections: true
+                corrections: {}
             };
             // console.log('creating with', modificationValues);
 

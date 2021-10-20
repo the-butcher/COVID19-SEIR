@@ -1,7 +1,6 @@
-import { ModelStateBuilder } from './model/state/ModelStateBuilder';
-import { Statistics } from './util/Statistics';
-import { StrainUtil } from './util/StrainUtil';
+import { ContactAdapterMultiplier } from './model/state/ContactAdapterMultiplier';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
+import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
@@ -9,8 +8,11 @@ import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
-import { ControlsConstants } from './client/gui/ControlsConstants';
 
+
+// for (let val = -0.5; val <= 0.5; val+= 0.01) {
+//     console.log(val.toFixed(4), ContactAdapter.calculateSolveRateM(val).toFixed(4));
+// }
 
 /**
  *

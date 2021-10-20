@@ -75,9 +75,7 @@ export class ModelConstants {
                 multipliers: {},
                 deletable: true,
                 draggable: true,
-                blendable: true,
-                adaptMultipliers: true,
-                adaptCorrections: true
+                blendable: true
             }),
         },
         'TESTING': {

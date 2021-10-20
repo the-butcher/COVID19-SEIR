@@ -108,6 +108,11 @@ export class ModelStateIntegrator {
         }
     }
 
+    checkpoint(): void {
+        this.rollbackInstant = this.curInstant;
+        this.rollbackState = ModelState.copy(this.modelState);
+    }
+
     rollback(): void {
         this.curInstant = this.rollbackInstant;
         this.modelState = this.rollbackState;
@@ -115,8 +120,8 @@ export class ModelStateIntegrator {
 
     async buildModelData(dstInstant: number, dataFilter: (curInstant: number) => boolean, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
 
-        this.rollbackInstant = this.curInstant;
-        this.rollbackState = ModelState.copy(this.modelState);
+        // this.rollbackInstant = this.curInstant;
+        // this.rollbackState = ModelState.copy(this.modelState);
 
         const dataSet: IDataItem[] = [];
         const absTotal = this.model.getDemographics().getAbsTotal();
