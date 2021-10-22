@@ -1,4 +1,4 @@
-import { ContactAdapterMultiplier } from './model/state/ContactAdapterMultiplier';
+import { ValueAdaptorMultiplier } from './model/state/ValueAdaptorMultiplier';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';

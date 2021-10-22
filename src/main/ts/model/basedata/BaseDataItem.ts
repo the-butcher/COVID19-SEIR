@@ -15,6 +15,7 @@ export interface IBaseDataItem {
     getTests(): number;
     getMobilityOther(): number;
     getMobilityWork(): number;
+    getMobilityHome(): number;
 
     getIncidence(ageGroupIndex: number): number;
 
@@ -28,6 +29,7 @@ export interface IBaseDataItem {
 
     getAverageMobilityOther(): number;
     getAverageMobilityWork(): number;
+    getAverageMobilityHome(): number;
 
 }
 
@@ -48,6 +50,7 @@ export class BaseDataItem implements IBaseDataItem {
 
     private averageMobilityOther: number;
     private averageMobilityWork: number;
+    private averageMobilityHome: number;
 
 
     constructor(instant: number, itemConfig: IBaseDataItemConfig) {
@@ -89,6 +92,10 @@ export class BaseDataItem implements IBaseDataItem {
 
     getMobilityWork(): number {
         return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_W] / 120;
+    }
+
+    getMobilityHome(): number {
+        return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_H] / 108;
     }
 
     calculatePrimaryValues(): void {
@@ -137,22 +144,28 @@ export class BaseDataItem implements IBaseDataItem {
 
             let mobilityOtherValues: number[] = [];
             let mobilityWorkValues: number[] = [];
+            let mobilityHomeValues: number[] = [];
             for (let i = -3; i < 4; i++) {
                 const dataItemMI = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * i);
                 mobilityOtherValues.push(dataItemMI.getMobilityOther());
                 mobilityWorkValues.push(dataItemMI.getMobilityWork());
+                mobilityHomeValues.push(dataItemMI.getMobilityHome());
             }
 
             mobilityOtherValues.sort((a, b) => a - b);
             mobilityWorkValues.sort((a, b) => a - b);
+            mobilityHomeValues.sort((a, b) => a - b);
 
             // console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
             mobilityOtherValues = mobilityOtherValues.slice(2, mobilityOtherValues.length - 2);
             mobilityWorkValues = mobilityWorkValues.slice(2, mobilityWorkValues.length - 2);
+            mobilityHomeValues = mobilityHomeValues.slice(2, mobilityHomeValues.length - 2);
             // console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
 
             this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) /  mobilityOtherValues.length;
             this.averageMobilityWork = mobilityWorkValues.reduce((a, b) => a + b, 0) / mobilityWorkValues.length;
+            this.averageMobilityHome = mobilityHomeValues.reduce((a, b) => a + b, 0) / mobilityHomeValues.length;
+
         }
 
     }
@@ -198,6 +211,10 @@ export class BaseDataItem implements IBaseDataItem {
 
     getAverageMobilityWork(): number {
         return this.averageMobilityWork;
+    }
+
+    getAverageMobilityHome(): number {
+        return this.averageMobilityHome;
     }
 
     getAveragePositivity(): number {

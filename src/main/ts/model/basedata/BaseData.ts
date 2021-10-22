@@ -181,7 +181,8 @@ export class BaseData {
             });
             multipliers['school'] = 0.4;
             multipliers['nursing'] = 0.5;
-            multipliers['family'] = 0.9;
+            // multipliers['family'] = 0.9;
+            multipliers['family'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityHome() * 0.60;
             multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityWork() * 0.60;
             multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityOther() * 0.60;
 

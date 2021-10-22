@@ -1,22 +1,23 @@
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { TimeUtil } from '../../util/TimeUtil';
-import { ContactAdapterCorrection } from './ContactAdapterCorrection';
+import { ValueAdaptorCorrection } from './ValueAdaptorCorrection';
+import { IModificationAdaptor } from './IModificationAdaptor';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
 
-export class ModelStateBuilderCorrections {
+export class ModificationAdaptorCorrections implements IModificationAdaptor {
 
-    private readonly correctionAdapters: ContactAdapterCorrection[];
+    private readonly correctionAdapters: ValueAdaptorCorrection[];
     constructor() {
         this.correctionAdapters = [];
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            this.correctionAdapters[ageGroup.getIndex()] = new ContactAdapterCorrection(ageGroup);
+            this.correctionAdapters[ageGroup.getIndex()] = new ValueAdaptorCorrection(ageGroup);
         });
     }
 
-    async adaptValues(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<void> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number> {
 
-        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+        // let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
 
         modelStateIntegrator.checkpoint();
 
@@ -58,6 +59,16 @@ export class ModelStateBuilderCorrections {
         });
 
         modelStateIntegrator.rollback();
+
+        let maxEp = 0;
+        let curEp: number;
+        this.correctionAdapters.forEach(correctionAdapter => {
+            curEp = correctionAdapter.getControlValues(modificationContactA).ep;
+            if (Math.abs(curEp) > Math.max(maxEp)) {
+                maxEp = curEp;
+            }
+        });
+        return maxEp;
 
     }
 

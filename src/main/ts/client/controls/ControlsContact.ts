@@ -48,7 +48,7 @@ export class ControlsContact {
 
         Demographics.getInstance().getCategories().forEach(contactCategory => {
             const slider = new SliderContactCategory(contactCategory);
-            if (contactCategory.getName() === 'work') {
+            if (contactCategory.getName() === 'work' || contactCategory.getName() === 'family') {
                 slider.setDisabled(true);
             }
             this.slidersCategory.push(slider);

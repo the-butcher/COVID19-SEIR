@@ -1,4 +1,4 @@
-import { ContactAdapterMultiplier } from '../../model/state/ContactAdapterMultiplier';
+import { ValueAdaptorMultiplier } from '../../model/state/ValueAdaptorMultiplier';
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';

@@ -47,6 +47,10 @@ export class ModificationContact extends AModification<IModificationValuesContac
             if (multiplierWork) {
                 this.modificationValues.multipliers['work'] = multiplierWork * 0.60; // TODO magic multiplier, magic number
             }
+            const multiplierHome = baseDataItem.getAverageMobilityHome();
+            if (multiplierHome) {
+                this.modificationValues.multipliers['family'] = multiplierHome * 0.90; // TODO magic multiplier, magic number
+            }
         }
     }
 
@@ -175,14 +179,6 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
     getMaxMatrixSum(): number {
         return Demographics.getInstance().getMatrixValue();
-    }
-
-    isAdaptMultipliers(): boolean {
-        return this.modificationValues.adaptMultipliers;
-    }
-
-    isAdaptCorrections(): boolean {
-        return this.modificationValues.adaptCorrections;
     }
 
 }

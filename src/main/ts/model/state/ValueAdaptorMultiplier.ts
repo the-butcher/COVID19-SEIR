@@ -1,35 +1,27 @@
-import { CategoryAxis } from '@amcharts/amcharts4/charts';
-import { StrainUtil } from '../../util/StrainUtil';
 import { AgeGroup } from '../../common/demographics/AgeGroup';
+import { IPidValues } from '../../common/modification/IModificationValuesContact';
 import { ModificationContact } from '../../common/modification/ModificationContact';
-import { TimeUtil } from '../../util/TimeUtil';
+import { StrainUtil } from '../../util/StrainUtil';
+import { IValueAdaption, IValueAdaptor } from './IValueAdaptor';
 import { IDataItem } from './ModelStateIntegrator';
 
-export interface IContactCorrection {
-    prevMultA: number;
-    currMultA: number;
-    prevMultB: number;
-    currMultB: number;
-}
-
-export interface IContactAdapterMultiplierParams {
+export interface IValueAdaptorMultiplierParams {
     ageGroup: AgeGroup;
     contactCategory: string;
 }
 
+export class ValueAdaptorMultiplier implements IValueAdaptor {
 
-export class ContactAdapterMultiplier {
-
-    static readonly BASELINE = 1000;
+    static readonly ERROR_WEIGHT_CASES = 0.999;
+    static readonly ERROR_WEIGHT_SLOPE = 1 - ValueAdaptorMultiplier.ERROR_WEIGHT_CASES;
 
     private readonly ageGroup: AgeGroup;
     private readonly contactCategory: string;
 
-    constructor(params: IContactAdapterMultiplierParams) {
+    constructor(params: IValueAdaptorMultiplierParams) {
         this.ageGroup = params.ageGroup;
         this.contactCategory = params.contactCategory;
     }
-
 
     getContactCategory(): string {
         return this.contactCategory;
@@ -41,23 +33,13 @@ export class ContactAdapterMultiplier {
         return (casesB.base / casesB.data) - 1;
     }
 
-    adaptValues(modificationContactA: ModificationContact, modificationContactB: ModificationContact, stepDataset: IDataItem[]): IContactCorrection {
+    getControlValues(modificationContact: ModificationContact): IPidValues {
+        return modificationContact.getModificationValues().mult___pids[this.contactCategory];
+    }
 
-        const loggableRange = `${TimeUtil.formatCategoryDate(modificationContactA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+    calculateEp(stepDataset: IDataItem[]): number {
 
-        const prevMultA = modificationContactA.getCategoryValue(this.contactCategory);
-        const prevMultB = modificationContactB.getCategoryValue(this.contactCategory);
-
-        // https://en.wikipedia.org/wiki/PID_controller#Industrial_control
-        const controlVals = modificationContactA.getModificationValues().mult___pids[this.contactCategory];
-
-        /**
-         * proportional error
-         */
-        const days = stepDataset.length - 1;
-
-        const ewc = 0.999;
-        const ews = 1 - ewc;
+        // const days = stepDataset.length - 1;
 
         let ep = 0;
         let totalBase = 0;
@@ -76,10 +58,22 @@ export class ContactAdapterMultiplier {
             deltaData += (casesA.data - casesB.data) * i;
 
         }
-        ep += ((totalData / totalBase) - 1) * ewc;
-        ep += ((deltaData / deltaBase) - 1) * ews;
+        ep += ((totalData / totalBase) - 1) * ValueAdaptorMultiplier.ERROR_WEIGHT_CASES;
+        ep += ((deltaData / deltaBase) - 1) * ValueAdaptorMultiplier.ERROR_WEIGHT_SLOPE;
 
-        ep = - ep; // 0 - measured
+        return - ep; // 0 - measured
+
+    }
+
+    adaptValues(modificationContactA: ModificationContact, modificationContactB: ModificationContact, stepDataset: IDataItem[]): IValueAdaption {
+
+        // const loggableRange = `${TimeUtil.formatCategoryDate(modificationContactA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+
+        // https://en.wikipedia.org/wiki/PID_controller#Industrial_control
+        const controlVals = this.getControlValues(modificationContactA); // modificationContactA.getModificationValues().mult___pids[this.contactCategory];
+
+        // proportional error
+        const ep = this.calculateEp(stepDataset);
 
         // integral error
         const ei = controlVals.ei + ep; // * days;
@@ -94,8 +88,10 @@ export class ContactAdapterMultiplier {
         controlVals.ep = ep;
         controlVals.ei = ei;
 
-        const currMultA = Math.max(0, Math.min(1, prevMultA + et * ewc));
-        const currMultB = Math.max(0, Math.min(1, prevMultB + et * ews));
+        const prevMultA = modificationContactA.getCategoryValue(this.contactCategory);
+        const prevMultB = modificationContactB.getCategoryValue(this.contactCategory);
+        const currMultA = Math.max(0, Math.min(1, prevMultA + et * ValueAdaptorMultiplier.ERROR_WEIGHT_CASES));
+        const currMultB = Math.max(0, Math.min(1, (prevMultB + prevMultA + et) / 2)); //  * ValueAdaptorMultiplier.ERROR_WEIGHT_SLOPE
 
         // console.log(loggableRange, 'correct', this.contactCategory, controlVals, 'et: ', et.toFixed(4), 'mult: ', prevMultA.toFixed(4), '>>', currMultA.toFixed(4));
 
