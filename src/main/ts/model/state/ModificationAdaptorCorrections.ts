@@ -15,7 +15,7 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
         });
     }
 
-    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, modificationContactRatio: number, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number> {
 
         // let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
 
@@ -60,15 +60,15 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
 
         modelStateIntegrator.rollback();
 
-        let maxEp = 0;
-        let curEp: number;
+        let maxError = 0;
+        let curError: number;
         this.correctionAdapters.forEach(correctionAdapter => {
-            curEp = correctionAdapter.getControlValues(modificationContactA).ep;
-            if (Math.abs(curEp) > Math.max(maxEp)) {
-                maxEp = curEp;
+            curError = correctionAdapter.getError(modificationContactA);
+            if (Math.abs(curError) > Math.max(maxError)) {
+                maxError = curError;
             }
         });
-        return maxEp;
+        return maxError;
 
     }
 

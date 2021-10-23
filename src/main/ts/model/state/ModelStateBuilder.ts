@@ -16,6 +16,8 @@ export interface IValueAdaption {
 
 export class ModelStateBuilder {
 
+    static readonly MAX_TOLERANCE = 0.005;
+
     static getMaxError(...values: number[]): number {
         return Math.max(...values.map(v => Math.abs(v - 1)));
     }
@@ -48,8 +50,7 @@ export class ModelStateBuilder {
         /**
          * data up to first adaptable modification
          */
-        let modificationIndex = Math.max(3, modificationsContact.length - 3);
-        // console.log(modificationIndex, modificationsContact.length);
+        let modificationIndex = 3; // Math.max(3, modificationsContact.length - 2); // -3 >> will adapt the last two modifications
 
         const modificationContactOuterB = modificationsContact[modificationIndex];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -59,7 +60,7 @@ export class ModelStateBuilder {
                 ratio: modelProgress.ratio
             });
         });
-        // console.log(loggableRange, '++', stepDataI.length);
+        console.log(loggableRange, '++', stepDataI.length);
         dataset.push(...stepDataI);
         console.log('------------------------------------------------------------------------------------------');
 
@@ -68,64 +69,78 @@ export class ModelStateBuilder {
 
             const modificationContactA = modificationsContact[modificationIndex - 1];
             const modificationContactB = modificationsContact[modificationIndex];
-            let loggableRange = `${TimeUtil.formatCategoryDate(modificationContactA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+            const modificationContactRatio = modificationIndex / (modificationsContact.length - 1);
+            let loggableRange = `>> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
 
-            const multPids: IPidValues = {
-                kp: 0.10,
-                ki: 0.00,
-                kd: 0.00,
-                ei: 0.00,
-                ep: 0.00,
-            };
-            const corrPids: { [K in string]: IPidValues} = {};
-            Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-                corrPids[ageGroup.getName()] = {...multPids};
-            });
-            modificationContactA.acceptUpdate({
-                mult___pids: {
-                    'school': {...multPids},
-                    'nursing': {...multPids},
-                    'other': {...multPids}
-                },
-                corr___pids: {
-                    'other': {...corrPids}
-                }
-            });
+            // console.log(loggableRange, 'A', modificationContactA.getModificationValues());
 
             let adaptResultA = Number.MAX_VALUE;
             let adaptResultB = Number.MAX_VALUE;
             let adaptResultC = Number.MAX_VALUE;
 
-            for (let baseIterationIndex = 0; baseIterationIndex < 20; baseIterationIndex++) {
-                adaptResultA = await modelStateBuilderMultipliersA.adapt(modelStateIntegrator, modificationContactA, modificationContactB, dataset[dataset.length - 1], progressCallback);
-                if (Math.abs(adaptResultA) <= 0.005) {
+            const corrErrs: { [K in string]: number} = {};
+            Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+                corrErrs[ageGroup.getName()] = 0;
+            });
+            modificationContactA.acceptUpdate({
+                mult___errs: {
+                    'school': 0,
+                    'nursing': 0,
+                    'other': 0
+                },
+                corr___errs: {
+                    'other': {...corrErrs}
+                }
+            });
+            modificationContactB.acceptUpdate({
+                mult___errs: {
+                    'school': 0,
+                    'nursing': 0,
+                    'other': 0
+                },
+                corr___errs: {
+                    'other': {...corrErrs}
+                }
+            });
+
+            for (let adaptIndex = 0; adaptIndex < 10; adaptIndex ++) {
+
+                adaptResultA = Number.MAX_VALUE;
+                adaptResultB = Number.MAX_VALUE;
+                adaptResultC = Number.MAX_VALUE;
+
+                for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
+                    adaptResultA = await modelStateBuilderMultipliersA.adapt(modelStateIntegrator, modificationContactA, modificationContactB, modificationContactRatio, dataset[dataset.length - 1], progressCallback);
+                    if (Math.abs(adaptResultA) <= ModelStateBuilder.MAX_TOLERANCE) {
+                        break;
+                    }
+                }
+                for (let baseIterationIndex = 0; baseIterationIndex < 20; baseIterationIndex++) {
+                    adaptResultB = await modelStateBuilderMultipliersB.adapt(modelStateIntegrator, modificationContactA, modificationContactB, modificationContactRatio, dataset[dataset.length - 1], progressCallback);
+                    if (Math.abs(adaptResultB) <= ModelStateBuilder.MAX_TOLERANCE) {
+                        break;
+                    }
+                }
+                // for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
+                //     adaptResultC = await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationContactA, modificationContactB, modificationContactRatio, dataset[dataset.length - 1], progressCallback);
+                //     adaptResultC /= 3; // allow a higher correction offset
+                //     if (Math.abs(adaptResultC) <= ModelStateBuilder.MAX_TOLERANCE) {
+                //         break;
+                //     }
+                // }
+
+                console.log(loggableRange, adaptIndex, '>>>>>', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4));
+                if (![adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > ModelStateBuilder.MAX_TOLERANCE)) {
+                    console.log(loggableRange, -1, '-----', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4))
                     break;
                 }
-            }
-            for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
-                adaptResultB = await modelStateBuilderMultipliersB.adapt(modelStateIntegrator, modificationContactA, modificationContactB, dataset[dataset.length - 1], progressCallback);
-                if (Math.abs(adaptResultB) <= 0.005) {
-                    break;
-                }
-            }
-            for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
-                adaptResultC = await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationContactA, modificationContactB, dataset[dataset.length - 1], progressCallback);
-                if (Math.abs(adaptResultC) <= 0.005) {
-                    break;
-                }
+
             }
 
-            console.log(loggableRange, -1, '>>>>>', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4));
-
-            // none larger than tolerance, no more optimization required
-            // if (![adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > 0.005)) {
-            //     console.log(loggableRange, -1, 'break', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4))
-            //     break;
-            // }
-
+            // console.log(loggableRange, 'B', modificationContactA.getModificationValues());
 
             /**
-             * final build and add to data
+             * final build of this step and add to data
              */
             const stepDataI = await modelStateIntegrator.buildModelData(modificationContactB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
                 // drop data from callback
@@ -136,11 +151,10 @@ export class ModelStateBuilder {
             // console.log(loggableRange, '++', stepDataI.length);
             dataset.push(...stepDataI);
 
-            // // no further optimization on any other mods, just integrate to the end and stop
-            // if ([adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > 0.005)) {
-            //     console.log(loggableRange, 'abort', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4))
-            //     break;
-            // }
+            if ([adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > ModelStateBuilder.MAX_TOLERANCE)) {
+                // dont bother with further adaption
+                // break;
+            }
 
         }
 

@@ -1,4 +1,3 @@
-import { IPidValues } from './../../common/modification/IModificationValuesContact';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { IDataItem } from './ModelStateIntegrator';
 
@@ -11,9 +10,9 @@ export interface IValueAdaption {
 
 export interface IValueAdaptor {
 
-    getControlValues(modificationContact: ModificationContact): IPidValues;
+    calculateSetpoint(modificationContactA: ModificationContact, modificationContactB: ModificationContact): number;
 
-    calculateEp(stepDataset: IDataItem[]): number;
+    getError(modificationContact: ModificationContact): number;
 
     adaptValues(modificationContactA: ModificationContact, modificationContactB: ModificationContact, stepDataset: IDataItem[]): IValueAdaption;
 

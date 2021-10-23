@@ -16,7 +16,7 @@ export class ModificationAdaptorMultipliers implements IModificationAdaptor {
         });
     }
 
-    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, modificationContactRatio: number, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number> {
 
         // let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
 
@@ -46,15 +46,20 @@ export class ModificationAdaptorMultipliers implements IModificationAdaptor {
 
         modelStateIntegrator.rollback();
 
-        let maxEp = 0;
-        let curEp: number;
+        let maxError = 0;
+        let errA: number;
+        let errB: number;
         this.multiplierAdapters.forEach(multiplierAdapter => {
-            curEp = multiplierAdapter.getControlValues(modificationContactA).ep;
-            if (Math.abs(curEp) > Math.max(maxEp)) {
-                maxEp = curEp;
+            errA = multiplierAdapter.getError(modificationContactA);
+            if (Math.abs(errA) > Math.max(maxError)) {
+                maxError = errA;
+            }
+            errB = multiplierAdapter.getError(modificationContactB);
+            if (Math.abs(errB) > Math.max(maxError)) {
+                maxError = errB;
             }
         });
-        return maxEp;
+        return maxError;
 
     }
 

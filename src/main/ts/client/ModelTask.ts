@@ -69,14 +69,13 @@ export class ModelTask {
                     // console.log(modificationContact.getId(), TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationValuesContact.multipliers);
                     modificationContact.acceptUpdate({
                         multipliers: modificationValuesContact.multipliers,
-                        corrections: modificationValuesContact.corrections,
-                        mult___pids: modificationValuesContact.mult___pids
+                        corrections: modificationValuesContact.corrections
                     });
                 });
                 StorageUtil.getInstance().setSaveRequired(true);
-                setTimeout(() => {
-                    ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                }, 1000);
+                // setTimeout(() => {
+                //     ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                // }, 1000);
 
                 // 2. update to be sure that modification chart shows on initial load
                 ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());

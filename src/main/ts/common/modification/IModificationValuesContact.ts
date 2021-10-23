@@ -1,36 +1,5 @@
 import { IModificationValues } from './IModificationValues';
 
-export interface IPidValues {
-
-    /**
-     * proportional control
-     */
-    kp: number;
-
-     /**
-     * integral control
-     */
-    ki: number;
-
-    /**
-     * derivative control
-     */
-    kd: number;
-
-    /**
-     * integral error
-     */
-     ei: number;
-
-    /**
-     * proportional error
-     */
-    ep: number;
-
-    // no derivative error on purpose
-
-}
-
 /**
  *
  * @author h.fleischer
@@ -48,8 +17,8 @@ export interface IModificationValuesContact extends IModificationValues {
      */
     corrections?: { [K in string] : { [K in string] : number } };
 
-    mult___pids?: { [K in string] : IPidValues };
+    mult___errs?: { [K in string] : number };
 
-    corr___pids?: { [K in string] :  { [K in string] : IPidValues } };
+    corr___errs?: { [K in string] :  { [K in string] : number } };
 
 }

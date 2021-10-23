@@ -3,6 +3,6 @@ import { ModelStateIntegrator, IDataItem, IModelProgress } from './ModelStateInt
 
 export interface IModificationAdaptor {
 
-    adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number>;
+    adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, modificationContactRatio: number, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number>;
 
 }

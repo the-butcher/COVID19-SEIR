@@ -1,5 +1,4 @@
 import { AgeGroup } from '../../common/demographics/AgeGroup';
-import { IPidValues } from '../../common/modification/IModificationValuesContact';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { StrainUtil } from '../../util/StrainUtil';
 import { IValueAdaption, IValueAdaptor } from './IValueAdaptor';
@@ -11,9 +10,6 @@ export interface IValueAdaptorMultiplierParams {
 }
 
 export class ValueAdaptorMultiplier implements IValueAdaptor {
-
-    static readonly ERROR_WEIGHT_CASES = 0.999;
-    static readonly ERROR_WEIGHT_SLOPE = 1 - ValueAdaptorMultiplier.ERROR_WEIGHT_CASES;
 
     private readonly ageGroup: AgeGroup;
     private readonly contactCategory: string;
@@ -33,15 +29,41 @@ export class ValueAdaptorMultiplier implements IValueAdaptor {
         return (casesB.base / casesB.data) - 1;
     }
 
-    getControlValues(modificationContact: ModificationContact): IPidValues {
-        return modificationContact.getModificationValues().mult___pids[this.contactCategory];
+    getError(modificationContact: ModificationContact): number {
+        return modificationContact.getModificationValues().mult___errs[this.contactCategory];
     }
 
-    calculateEp(stepDataset: IDataItem[]): number {
+    setError(modificationContact: ModificationContact, error: number): number {
+        return modificationContact.getModificationValues().mult___errs[this.contactCategory] = error;
+    }
 
-        // const days = stepDataset.length - 1;
+    calculateSetpoint(modificationContactA: ModificationContact, modificationContactB: ModificationContact): number {
 
-        let ep = 0;
+        return 0;
+        // const baseItemA = BaseData.getInstance().findBaseDataItem(modificationContactA.getInstant());
+        // const baseItemB = BaseData.getInstance().findBaseDataItem(modificationContactB.getInstant());
+        // const baseItemC = BaseData.getInstance().findBaseDataItem(modificationContactB.getInstant() * 2 - modificationContactA.getInstant());
+
+        // const deltaAB = baseItemA.getAverageCases(this.ageGroup.getIndex()) - baseItemA.getAverageCases(this.ageGroup.getIndex());
+        // const deltaBC = baseItemB.getAverageCases(this.ageGroup.getIndex()) - baseItemC.getAverageCases(this.ageGroup.getIndex());
+        // if (deltaAB < deltaBC) {
+        //     return ModelStateBuilder.MAX_TOLERANCE;;
+        // } else {
+        //     return -ModelStateBuilder.MAX_TOLERANCE;;
+        // }
+
+    }
+
+    adaptValues(modificationContactA: ModificationContact, modificationContactB: ModificationContact, stepDataset: IDataItem[]): IValueAdaption {
+
+        // const loggableRange = `${TimeUtil.formatCategoryDate(modificationContactA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+
+        // https://en.wikipedia.org/wiki/PID_controller#Industrial_control
+        // const controlVals = this.getControlValues(modificationContactA); // modificationContactA.getModificationValues().mult___pids[this.contactCategory];
+        // const setpoint = this.calculateSetpoint(modificationContactA, modificationContactB);
+
+        let errA = 0;
+        let errB = 0;
         let totalBase = 0;
         let totalData = 0;
         let deltaBase = 0;
@@ -58,40 +80,21 @@ export class ValueAdaptorMultiplier implements IValueAdaptor {
             deltaData += (casesA.data - casesB.data) * i;
 
         }
-        ep += ((totalData / totalBase) - 1) * ValueAdaptorMultiplier.ERROR_WEIGHT_CASES;
-        ep += ((deltaData / deltaBase) - 1) * ValueAdaptorMultiplier.ERROR_WEIGHT_SLOPE;
+        errA -= ((totalData / totalBase) - 1);
+        if (deltaBase !== 0) {
+            errB += ((deltaData / deltaBase) - 1);
+        }
 
-        return - ep; // 0 - measured
+        const incrA = 0.01 * errA;
+        const incrB = 0.10 * errB;
 
-    }
-
-    adaptValues(modificationContactA: ModificationContact, modificationContactB: ModificationContact, stepDataset: IDataItem[]): IValueAdaption {
-
-        // const loggableRange = `${TimeUtil.formatCategoryDate(modificationContactA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
-
-        // https://en.wikipedia.org/wiki/PID_controller#Industrial_control
-        const controlVals = this.getControlValues(modificationContactA); // modificationContactA.getModificationValues().mult___pids[this.contactCategory];
-
-        // proportional error
-        const ep = this.calculateEp(stepDataset);
-
-        // integral error
-        const ei = controlVals.ei + ep; // * days;
-
-        // derivative error
-        const ed = ep - controlVals.ep; // / days;
-
-        // overall error
-        const et = controlVals.kp * ep + controlVals.ki * ei + controlVals.kd * ed; // Math.max(-1, Math.min(1, controlVals.kp * ep + controlVals.ki * ei + controlVals.kd * ed));
-
-        // store error values for future use
-        controlVals.ep = ep;
-        controlVals.ei = ei;
+        this.setError(modificationContactA, errA);
+        this.setError(modificationContactB, errB);
 
         const prevMultA = modificationContactA.getCategoryValue(this.contactCategory);
         const prevMultB = modificationContactB.getCategoryValue(this.contactCategory);
-        const currMultA = Math.max(0, Math.min(1, prevMultA + et * ValueAdaptorMultiplier.ERROR_WEIGHT_CASES));
-        const currMultB = Math.max(0, Math.min(1, (prevMultB + prevMultA + et) / 2)); //  * ValueAdaptorMultiplier.ERROR_WEIGHT_SLOPE
+        const currMultA = Math.max(0, Math.min(1, prevMultA + incrA));
+        const currMultB = Math.max(0, Math.min(1, prevMultB + incrB));
 
         // console.log(loggableRange, 'correct', this.contactCategory, controlVals, 'et: ', et.toFixed(4), 'mult: ', prevMultA.toFixed(4), '>>', currMultA.toFixed(4));
 
