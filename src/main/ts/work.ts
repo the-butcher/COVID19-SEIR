@@ -9,7 +9,9 @@ import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
 import { ModelStateBuilder } from './model/state/ModelStateBuilder';
+import { ModelStateBuilder2 } from './model/state/ModelStateBuilder2';
 import { Logger } from './util/Logger';
+import { TimeUtil } from './util/TimeUtil';
 
 const ctx: Worker = self as any;
 
@@ -58,23 +60,23 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        new ModelStateBuilder().adapt(modelStateIntegrator, maxInstant, modelProgress => {
-            ctx.postMessage(modelProgress);
-        }).then(data => {
-            const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-            ctx.postMessage({
-                ratio: 1,
-                data,
-                modificationValuesContact
-            });
-        });
-
-        // /**
-        //  * complete model build (add more sophisticated logic here)
-        //  */
-        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        // new ModelStateBuilder().adapt(modelStateIntegrator, maxInstant, modelProgress => {
         //     ctx.postMessage(modelProgress);
+        // }).then(data => {
+        //     const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+        //     ctx.postMessage({
+        //         ratio: 1,
+        //         data,
+        //         modificationValuesContact
+        //     });
         // });
+
+        /**
+         * complete model build (add more sophisticated logic here)
+         */
+        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            ctx.postMessage(modelProgress);
+        });
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

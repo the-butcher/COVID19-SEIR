@@ -1,9 +1,9 @@
-import { ModificationContact } from '../../common/modification/ModificationContact';
 import { TimeUtil } from '../../util/TimeUtil';
-import { ValueAdaptorMultiplier, IValueAdaptorMultiplierParams } from './ValueAdaptorMultiplier';
 import { IModificationAdaptor } from './IModificationAdaptor';
+import { IValueErrors } from './IValueAdaptor';
+import { IModificationSet } from './ModelStateBuilder';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
-import { max } from '@amcharts/amcharts4/.internal/core/utils/Math';
+import { IValueAdaptorMultiplierParams, ValueAdaptorMultiplier } from './ValueAdaptorMultiplier';
 
 export class ModificationAdaptorMultipliers implements IModificationAdaptor {
 
@@ -16,13 +16,13 @@ export class ModificationAdaptorMultipliers implements IModificationAdaptor {
         });
     }
 
-    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, modificationContactRatio: number, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<IValueErrors> {
 
         // let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
 
         modelStateIntegrator.checkpoint();
 
-        const stepData = await modelStateIntegrator.buildModelData(modificationContactB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        const stepData = await modelStateIntegrator.buildModelData(modificationSet.modB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio // drop data from callback
             });
@@ -31,35 +31,33 @@ export class ModificationAdaptorMultipliers implements IModificationAdaptor {
 
         const multipliersA: { [K in string] : number } = {};
         const multipliersB: { [K in string] : number } = {};
+        let errA = 0;
+        let errB = 0;
         this.multiplierAdapters.forEach(multiplierAdapter => {
-            const valueAdaption = multiplierAdapter.adaptValues(modificationContactA, modificationContactB, stepDataset);
+            const valueAdaption = multiplierAdapter.adaptValues(modificationSet, stepDataset);
             multipliersA[multiplierAdapter.getContactCategory()] = valueAdaption.currMultA;
             multipliersB[multiplierAdapter.getContactCategory()] = valueAdaption.currMultB;
+            if (Math.abs(valueAdaption.errA) > Math.abs(errA)) {
+                errA = valueAdaption.errA;
+            }
+            if (Math.abs(valueAdaption.errB) > Math.abs(errB)) {
+                errB = valueAdaption.errB;
+            }
         });
 
-        modificationContactA.acceptUpdate({
+        modificationSet.mod0.acceptUpdate({
             multipliers: multipliersA
         });
-        modificationContactB.acceptUpdate({
+        modificationSet.modA.acceptUpdate({
             multipliers: multipliersB
         });
 
         modelStateIntegrator.rollback();
 
-        let maxError = 0;
-        let errA: number;
-        let errB: number;
-        this.multiplierAdapters.forEach(multiplierAdapter => {
-            errA = multiplierAdapter.getError(modificationContactA);
-            if (Math.abs(errA) > Math.max(maxError)) {
-                maxError = errA;
-            }
-            errB = multiplierAdapter.getError(modificationContactB);
-            if (Math.abs(errB) > Math.max(maxError)) {
-                maxError = errB;
-            }
-        });
-        return maxError;
+        return {
+            errA,
+            errB
+        }
 
     }
 

@@ -1,8 +1,9 @@
-import { ModificationContact } from '../../common/modification/ModificationContact';
-import { ModelStateIntegrator, IDataItem, IModelProgress } from './ModelStateIntegrator';
+import { IValueErrors } from './IValueAdaptor';
+import { IModificationSet } from './ModelStateBuilder';
+import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
 
 export interface IModificationAdaptor {
 
-    adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, modificationContactRatio: number, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number>;
+    adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<IValueErrors>;
 
 }

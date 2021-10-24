@@ -6,6 +6,8 @@ import { IPidValues } from './../../common/modification/IModificationValuesConta
 import { ValueAdaptorMultiplier } from './ValueAdaptorMultiplier';
 import { ModificationAdaptorCorrections } from './ModificationAdaptorCorrections';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
+import { ModificationContact } from '../../common/modification/ModificationContact';
+import { IValueErrors } from './IValueAdaptor';
 
 export interface IValueAdaption {
     prevMultA: number;
@@ -14,9 +16,17 @@ export interface IValueAdaption {
     currMultB: number;
 }
 
+export interface IModificationSet {
+    mod0: ModificationContact;
+    modA: ModificationContact;
+    modB: ModificationContact;
+}
+
 export class ModelStateBuilder {
 
-    static readonly MAX_TOLERANCE = 0.005;
+    static readonly MAX_TOLERANCE_A = 0.005;
+    static readonly MAX_TOLERANCE_B = 0.010;
+    static readonly MAX_TOLERANCE_C = 0.020;
 
     static getMaxError(...values: number[]): number {
         return Math.max(...values.map(v => Math.abs(v - 1)));
@@ -50,7 +60,7 @@ export class ModelStateBuilder {
         /**
          * data up to first adaptable modification
          */
-        let modificationIndex = 3; // Math.max(3, modificationsContact.length - 2); // -3 >> will adapt the last two modifications
+        let modificationIndex = Math.max(3, modificationsContact.length - 4); // -3 >> will adapt the last two modifications
 
         const modificationContactOuterB = modificationsContact[modificationIndex];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -65,24 +75,31 @@ export class ModelStateBuilder {
         console.log('------------------------------------------------------------------------------------------');
 
         modificationIndex++;
+        modificationIndex++;
         for (; modificationIndex < modificationsContact.length; modificationIndex++) {
 
-            const modificationContactA = modificationsContact[modificationIndex - 1];
-            const modificationContactB = modificationsContact[modificationIndex];
-            const modificationContactRatio = modificationIndex / (modificationsContact.length - 1);
-            let loggableRange = `>> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+            const modificationSet: IModificationSet = {
+                mod0: modificationsContact[modificationIndex - 2],
+                modA: modificationsContact[modificationIndex - 1],
+                modB: modificationsContact[modificationIndex]
+            }
+            // const modificationContactRatio = modificationIndex / (modificationsContact.length - 1);
+            let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.mod0.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
 
             // console.log(loggableRange, 'A', modificationContactA.getModificationValues());
 
-            let adaptResultA = Number.MAX_VALUE;
-            let adaptResultB = Number.MAX_VALUE;
-            let adaptResultC = Number.MAX_VALUE;
+            let adaptResultA: IValueErrors;
+            let adaptResultB: IValueErrors;
+            let adaptResultC: IValueErrors;
+            let isWithinToleranceA: boolean;
+            let isWithinToleranceB: boolean;
+            let isWithinToleranceC: boolean;
 
             const corrErrs: { [K in string]: number} = {};
             Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
                 corrErrs[ageGroup.getName()] = 0;
             });
-            modificationContactA.acceptUpdate({
+            modificationSet.mod0.acceptUpdate({
                 mult___errs: {
                     'school': 0,
                     'nursing': 0,
@@ -92,7 +109,7 @@ export class ModelStateBuilder {
                     'other': {...corrErrs}
                 }
             });
-            modificationContactB.acceptUpdate({
+            modificationSet.modA.acceptUpdate({
                 mult___errs: {
                     'school': 0,
                     'nursing': 0,
@@ -103,37 +120,47 @@ export class ModelStateBuilder {
                 }
             });
 
-            for (let adaptIndex = 0; adaptIndex < 10; adaptIndex ++) {
+            const adaptCount = modificationIndex === modificationsContact.length - 1 ? 5 : 1;
 
-                adaptResultA = Number.MAX_VALUE;
-                adaptResultB = Number.MAX_VALUE;
-                adaptResultC = Number.MAX_VALUE;
+            if (adaptCount > 1) {
+                console.log('------------------------------------------------------------------------------------------');
+            }
 
+            for (let adaptIndex = 0; adaptIndex < adaptCount; adaptIndex ++) {
+
+                for (let baseIterationIndex = 0; baseIterationIndex < 5; baseIterationIndex++) {
+                    adaptResultA = await modelStateBuilderMultipliersA.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
+                    isWithinToleranceA = this.isWithinTolerance(adaptResultA, ModelStateBuilder.MAX_TOLERANCE_A);
+                    if (isWithinToleranceA) {
+                        break;
+                    }
+                }
                 for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
-                    adaptResultA = await modelStateBuilderMultipliersA.adapt(modelStateIntegrator, modificationContactA, modificationContactB, modificationContactRatio, dataset[dataset.length - 1], progressCallback);
-                    if (Math.abs(adaptResultA) <= ModelStateBuilder.MAX_TOLERANCE) {
+                    adaptResultB = await modelStateBuilderMultipliersB.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
+                    isWithinToleranceB = this.isWithinTolerance(adaptResultB, ModelStateBuilder.MAX_TOLERANCE_B);
+                    if (isWithinToleranceB) {
                         break;
                     }
                 }
                 for (let baseIterationIndex = 0; baseIterationIndex < 20; baseIterationIndex++) {
-                    adaptResultB = await modelStateBuilderMultipliersB.adapt(modelStateIntegrator, modificationContactA, modificationContactB, modificationContactRatio, dataset[dataset.length - 1], progressCallback);
-                    if (Math.abs(adaptResultB) <= ModelStateBuilder.MAX_TOLERANCE) {
+                    adaptResultC = await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
+                    isWithinToleranceC = this.isWithinTolerance(adaptResultC, ModelStateBuilder.MAX_TOLERANCE_C);
+                    if (isWithinToleranceC) {
                         break;
                     }
                 }
-                // for (let baseIterationIndex = 0; baseIterationIndex < 10; baseIterationIndex++) {
-                //     adaptResultC = await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationContactA, modificationContactB, modificationContactRatio, dataset[dataset.length - 1], progressCallback);
-                //     adaptResultC /= 3; // allow a higher correction offset
-                //     if (Math.abs(adaptResultC) <= ModelStateBuilder.MAX_TOLERANCE) {
-                //         break;
-                //     }
-                // }
 
-                console.log(loggableRange, adaptIndex, '>>>>>', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4));
-                if (![adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > ModelStateBuilder.MAX_TOLERANCE)) {
-                    console.log(loggableRange, -1, '-----', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4))
-                    break;
-                }
+                let toleranceIndicator = '';
+                toleranceIndicator += isWithinToleranceA ? 'XX' : '--';
+                toleranceIndicator += isWithinToleranceB ? 'XX' : '--';
+                toleranceIndicator += isWithinToleranceC ? 'XX' : '--';
+
+                console.log(loggableRange, adaptIndex, '|', toleranceIndicator, '|', adaptResultA.errA.toFixed(4).padStart(7, ' '), adaptResultA.errB.toFixed(4).padStart(7, ' '), '|', adaptResultB.errA.toFixed(4).padStart(7, ' '), adaptResultB.errB.toFixed(4).padStart(7, ' '), '|', adaptResultC.errA.toFixed(4).padStart(7, ' '), adaptResultC.errB.toFixed(4).padStart(7, ' '));
+
+                // if (![adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > ModelStateBuilder.MAX_TOLERANCE)) {
+                //     console.log(loggableRange, adaptIndex, '-----', adaptResultA.toFixed(4), adaptResultB.toFixed(4), adaptResultC.toFixed(4))
+                //     break;
+                // }
 
             }
 
@@ -142,7 +169,7 @@ export class ModelStateBuilder {
             /**
              * final build of this step and add to data
              */
-            const stepDataI = await modelStateIntegrator.buildModelData(modificationContactB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            const stepDataI = await modelStateIntegrator.buildModelData(modificationSet.modA.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
                 // drop data from callback
                 progressCallback({
                     ratio: modelProgress.ratio
@@ -151,10 +178,10 @@ export class ModelStateBuilder {
             // console.log(loggableRange, '++', stepDataI.length);
             dataset.push(...stepDataI);
 
-            if ([adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > ModelStateBuilder.MAX_TOLERANCE)) {
-                // dont bother with further adaption
-                // break;
-            }
+            // if ([adaptResultA, adaptResultB, adaptResultC].find(a => Math.abs(a) > ModelStateBuilder.MAX_TOLERANCE)) {
+            //     // dont bother with further adaption
+            //     // break;
+            // }
 
         }
 
@@ -175,6 +202,11 @@ export class ModelStateBuilder {
         return dataset;
 
     }
+
+    isWithinTolerance(valueErrors: IValueErrors, tolerance: number): boolean {
+        return Math.abs(valueErrors.errA) <= tolerance && Math.abs(valueErrors.errB) <= tolerance;
+    }
+
 
 
 

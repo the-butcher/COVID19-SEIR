@@ -1,7 +1,12 @@
 import { ModificationContact } from '../../common/modification/ModificationContact';
+import { IModificationSet } from './ModelStateBuilder';
 import { IDataItem } from './ModelStateIntegrator';
 
-export interface IValueAdaption {
+export interface IValueErrors {
+    errA: number;
+    errB: number;
+}
+export interface IValueAdaption extends IValueErrors {
     prevMultA: number;
     currMultA: number;
     prevMultB: number;
@@ -10,10 +15,8 @@ export interface IValueAdaption {
 
 export interface IValueAdaptor {
 
-    calculateSetpoint(modificationContactA: ModificationContact, modificationContactB: ModificationContact): number;
-
     getError(modificationContact: ModificationContact): number;
 
-    adaptValues(modificationContactA: ModificationContact, modificationContactB: ModificationContact, stepDataset: IDataItem[]): IValueAdaption;
+    adaptValues(modificationSet: IModificationSet, stepDataset: IDataItem[]): IValueAdaption;
 
 }

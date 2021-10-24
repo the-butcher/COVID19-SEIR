@@ -238,7 +238,10 @@ export class BaseData {
             multipliers['work'] = 0.2;
             multipliers['other'] = 0.2;
 
-            if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+            // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+            if (positivityMarker.instant > new Date('2021-10-01').getTime()) {
+
+                // console.log('adding at', TimeUtil.formatCategoryDate(positivityMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationDiscovery({
                 //     id,

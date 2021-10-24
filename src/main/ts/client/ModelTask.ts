@@ -64,15 +64,16 @@ export class ModelTask {
                     dstIncidence
                 });
 
-                modelProgress.modificationValuesContact.forEach(modificationValuesContact => {
+                modelProgress.modificationValuesContact?.forEach(modificationValuesContact => {
                     const modificationContact = Modifications.getInstance().findModificationById(modificationValuesContact.id) as ModificationContact;
                     // console.log(modificationContact.getId(), TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationValuesContact.multipliers);
                     modificationContact.acceptUpdate({
                         multipliers: modificationValuesContact.multipliers,
                         corrections: modificationValuesContact.corrections
                     });
+                    StorageUtil.getInstance().setSaveRequired(true);
                 });
-                StorageUtil.getInstance().setSaveRequired(true);
+
                 // setTimeout(() => {
                 //     ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
                 // }, 1000);

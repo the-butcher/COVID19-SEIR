@@ -4,6 +4,8 @@ import { TimeUtil } from '../../util/TimeUtil';
 import { ValueAdaptorCorrection } from './ValueAdaptorCorrection';
 import { IModificationAdaptor } from './IModificationAdaptor';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
+import { IModificationSet } from './ModelStateBuilder';
+import { IValueErrors } from './IValueAdaptor';
 
 export class ModificationAdaptorCorrections implements IModificationAdaptor {
 
@@ -15,13 +17,13 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
         });
     }
 
-    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationContactA: ModificationContact, modificationContactB: ModificationContact, modificationContactRatio: number, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<number> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<IValueErrors> {
 
         // let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
 
         modelStateIntegrator.checkpoint();
 
-        const stepData = await modelStateIntegrator.buildModelData(modificationContactB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        const stepData = await modelStateIntegrator.buildModelData(modificationSet.modB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             // drop data from callback
             progressCallback({
                 ratio: modelProgress.ratio
@@ -31,15 +33,23 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
 
         const correctionsA: { [K in string] : number } = {};
         const correctionsB: { [K in string] : number } = {};
+        let errA = 0;
+        let errB = 0;
         this.correctionAdapters.forEach(correctionAdapter => {
-            const adaptedValues = correctionAdapter.adaptValues(modificationContactA, modificationContactB, stepDataset);
-            correctionsA[correctionAdapter.getName()] = adaptedValues.currMultA;
-            correctionsB[correctionAdapter.getName()] = adaptedValues.currMultB;
+            const valueAdaption = correctionAdapter.adaptValues(modificationSet, stepDataset);
+            correctionsA[correctionAdapter.getName()] = valueAdaption.currMultA;
+            correctionsB[correctionAdapter.getName()] = valueAdaption.currMultB;
+            if (Math.abs(valueAdaption.errA) > Math.abs(errA)) {
+                errA = valueAdaption.errA;
+            }
+            if (Math.abs(valueAdaption.errB) > Math.abs(errB)) {
+                errB = valueAdaption.errB;
+            }
         });
 
         // console.log(loggableRange, 'correctA', correctionsA);
 
-        modificationContactA.acceptUpdate({
+        modificationSet.mod0.acceptUpdate({
             corrections: {
                 'family': correctionsA,
                 'school': correctionsA,
@@ -48,7 +58,7 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
                 'other': correctionsA
             }
         });
-        modificationContactB.acceptUpdate({
+        modificationSet.modA.acceptUpdate({
             corrections: {
                 'family': correctionsB,
                 'school': correctionsB,
@@ -60,16 +70,10 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
 
         modelStateIntegrator.rollback();
 
-        let maxError = 0;
-        let curError: number;
-        this.correctionAdapters.forEach(correctionAdapter => {
-            curError = correctionAdapter.getError(modificationContactA);
-            if (Math.abs(curError) > Math.max(maxError)) {
-                maxError = curError;
-            }
-        });
-        return maxError;
-
+        return {
+            errA,
+            errB
+        }
     }
 
 }
