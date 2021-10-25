@@ -1,5 +1,5 @@
 import { ModificationContact } from '../../common/modification/ModificationContact';
-import { IModificationSet } from './ModelStateBuilder';
+import { IModificationSet } from './fitter1/ModelStateFitter1';
 import { IDataItem } from './ModelStateIntegrator';
 
 export interface IValueErrors {

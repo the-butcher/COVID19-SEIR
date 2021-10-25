@@ -1,6 +1,6 @@
-import { IValueErrors } from './IValueAdaptor';
-import { IModificationSet } from './ModelStateBuilder';
-import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
+import { IValueErrors } from '../IValueAdaptor';
+import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
+import { IModificationSet } from './IModificationSet';
 
 export interface IModificationAdaptor {
 

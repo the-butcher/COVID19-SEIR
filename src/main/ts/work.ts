@@ -8,8 +8,8 @@ import { StrainCalibrator } from './model/calibration/StrainCalibrator';
 import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
-import { ModelStateBuilder } from './model/state/ModelStateBuilder';
-import { ModelStateBuilder2 } from './model/state/ModelStateBuilder2';
+import { ModelStateFitter1 } from './model/state/fitter1/ModelStateFitter1';
+import { ModelStateFitter3 } from './model/state/fitter3/ModelStateFitter3';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
 
@@ -60,7 +60,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        // new ModelStateBuilder().adapt(modelStateIntegrator, maxInstant, modelProgress => {
+        // new ModelStateFitter1().adapt(modelStateIntegrator, maxInstant, modelProgress => {
         //     ctx.postMessage(modelProgress);
         // }).then(data => {
         //     const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
@@ -71,12 +71,23 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         //     });
         // });
 
-        /**
-         * complete model build (add more sophisticated logic here)
-         */
-        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        new ModelStateFitter3().adapt(modelStateIntegrator, maxInstant, modelProgress => {
             ctx.postMessage(modelProgress);
+        }).then(data => {
+            const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+            ctx.postMessage({
+                ratio: 1,
+                data,
+                modificationValuesContact
+            });
         });
+
+        // /**
+        //  * complete model build (add more sophisticated logic here)
+        //  */
+        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        //     ctx.postMessage(modelProgress);
+        // });
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

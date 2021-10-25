@@ -1,18 +1,26 @@
-import { TimeUtil } from '../../util/TimeUtil';
-import { IModificationAdaptor } from './IModificationAdaptor';
-import { IValueErrors } from './IValueAdaptor';
-import { IModificationSet } from './ModelStateBuilder';
-import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
-import { IValueAdaptorMultiplierParams, ValueAdaptorMultiplier } from './ValueAdaptorMultiplier';
+import { TimeUtil } from '../../../util/TimeUtil';
+import { IModificationAdaptor } from '../fitter/IModificationAdaptor';
+import { IModificationSet } from '../fitter/IModificationSet';
+import { IValueErrors } from '../IValueAdaptor';
+import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
+import { IValueAdaptorMultiplierParams, ValueAdaptorMultiplier3 } from './ValueAdaptorMultiplier3';
 
-export class ModificationAdaptorMultipliers implements IModificationAdaptor {
+/**
+ * modification adapter for curve multipliers
+ * @author h.fleischer
+ * @since 25.10.2021
+ *
+ * this type updates curve multipliers, from the errors produced by 1-n value-adaptors
+ * multipliers are applied to the first modification in a modification set assumed to exist from a starting modification and an ending modification
+ */
+export class ModificationAdaptorMultipliers3 implements IModificationAdaptor {
 
-    private readonly multiplierAdapters: ValueAdaptorMultiplier[];
+    private readonly multiplierAdapters: ValueAdaptorMultiplier3[];
 
     constructor(...paramset: IValueAdaptorMultiplierParams[]) {
         this.multiplierAdapters = [];
         paramset.forEach(params => {
-            this.multiplierAdapters.push(new ValueAdaptorMultiplier(params));
+            this.multiplierAdapters.push(new ValueAdaptorMultiplier3(params));
         });
     }
 
@@ -30,33 +38,24 @@ export class ModificationAdaptorMultipliers implements IModificationAdaptor {
         const stepDataset = [referenceData, ...stepData];
 
         const multipliersA: { [K in string] : number } = {};
-        const multipliersB: { [K in string] : number } = {};
         let errA = 0;
-        let errB = 0;
         this.multiplierAdapters.forEach(multiplierAdapter => {
             const valueAdaption = multiplierAdapter.adaptValues(modificationSet, stepDataset);
             multipliersA[multiplierAdapter.getContactCategory()] = valueAdaption.currMultA;
-            multipliersB[multiplierAdapter.getContactCategory()] = valueAdaption.currMultB;
             if (Math.abs(valueAdaption.errA) > Math.abs(errA)) {
                 errA = valueAdaption.errA;
             }
-            if (Math.abs(valueAdaption.errB) > Math.abs(errB)) {
-                errB = valueAdaption.errB;
-            }
         });
 
-        modificationSet.mod0.acceptUpdate({
-            multipliers: multipliersA
-        });
         modificationSet.modA.acceptUpdate({
-            multipliers: multipliersB
+            multipliers: multipliersA
         });
 
         modelStateIntegrator.rollback();
 
         return {
-            errA,
-            errB
+            errA: errA,
+            errB: 0
         }
 
     }

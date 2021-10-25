@@ -74,9 +74,9 @@ export class ModelTask {
                     StorageUtil.getInstance().setSaveRequired(true);
                 });
 
-                // setTimeout(() => {
-                //     ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                // }, 1000);
+                setTimeout(() => {
+                    ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                }, 1000);
 
                 // 2. update to be sure that modification chart shows on initial load
                 ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());

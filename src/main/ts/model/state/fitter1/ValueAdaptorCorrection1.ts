@@ -1,18 +1,22 @@
-import { AgeGroup } from '../../common/demographics/AgeGroup';
-import { ModificationContact } from '../../common/modification/ModificationContact';
-import { StrainUtil } from '../../util/StrainUtil';
-import { IValueAdaption, IValueAdaptor } from './IValueAdaptor';
-import { IModificationSet } from './ModelStateBuilder';
-import { IDataItem } from './ModelStateIntegrator';
-import { ValueAdaptorBase } from './ValueAdaptorBase';
+import { AgeGroup } from '../../../common/demographics/AgeGroup';
+import { ModificationContact } from '../../../common/modification/ModificationContact';
+import { IModificationSet } from '../fitter/IModificationSet';
+import { IValueAdaption } from '../IValueAdaptor';
+import { IDataItem } from '../ModelStateIntegrator';
+import { ValueAdaptorBase1 } from './ValueAdaptorBase1';
 
-
-export class ValueAdaptorCorrection extends ValueAdaptorBase {
+/**
+ * value adapter for curve multipliers
+ * @author h.fleischer
+ * @since 25.10.2021
+ *
+ * this type calculates an error, with respect to a given age-group, for two multiplications corrections
+ */
+export class ValueAdaptorCorrection1 extends ValueAdaptorBase1 {
 
     constructor(ageGroup: AgeGroup) {
         super(ageGroup);
     }
-
 
     getError(modificationContact: ModificationContact): number {
         return modificationContact.getModificationValues().corr___errs['other'][this.getAgeGroup().getName()];
@@ -21,7 +25,6 @@ export class ValueAdaptorCorrection extends ValueAdaptorBase {
     setError(modificationContact: ModificationContact, error: number): number {
         return modificationContact.getModificationValues().corr___errs['other'][this.getAgeGroup().getName()] = error;
     }
-
 
     adaptValues(modificationSet: IModificationSet, stepDataset: IDataItem[]): IValueAdaption {
 
@@ -33,11 +36,11 @@ export class ValueAdaptorCorrection extends ValueAdaptorBase {
         const incrA = 0.005 * errA;
         const incrB = 0.010 * errB;
 
-        this.setError(modificationSet.mod0, errA);
-        this.setError(modificationSet.modA, errB);
+        this.setError(modificationSet.modA, errA);
+        this.setError(modificationSet.modB, errB);
 
-        const prevMultA = modificationSet.mod0.getCorrectionValue('other', this.getAgeGroup().getIndex())
-        const prevMultB = modificationSet.modA.getCorrectionValue('other', this.getAgeGroup().getIndex())
+        const prevMultA = modificationSet.modA.getCorrectionValue('other', this.getAgeGroup().getIndex())
+        const prevMultB = modificationSet.modB.getCorrectionValue('other', this.getAgeGroup().getIndex())
         const currMultA = Math.max(0.20, Math.min(4, prevMultA + incrA));
         const currMultB = Math.max(0.20, Math.min(4, prevMultB + incrB));
 
@@ -51,6 +54,5 @@ export class ValueAdaptorCorrection extends ValueAdaptorBase {
         }
 
     }
-
 
 }

@@ -1,13 +1,19 @@
-import { TimeUtil } from './../../util/TimeUtil';
-import { AgeGroup } from '../../common/demographics/AgeGroup';
-import { ModificationContact } from '../../common/modification/ModificationContact';
-import { StrainUtil } from '../../util/StrainUtil';
-import { IValueAdaption, IValueAdaptor } from './IValueAdaptor';
-import { IModificationSet } from './ModelStateBuilder';
-import { IDataItem } from './ModelStateIntegrator';
+import { AgeGroup } from '../../../common/demographics/AgeGroup';
+import { ModificationContact } from '../../../common/modification/ModificationContact';
+import { StrainUtil } from '../../../util/StrainUtil';
+import { TimeUtil } from '../../../util/TimeUtil';
+import { IModificationSet } from '../fitter/IModificationSet';
+import { IValueAdaption, IValueAdaptor } from '../IValueAdaptor';
+import { IDataItem } from '../ModelStateIntegrator';
 
-
-export abstract class ValueAdaptorBase implements IValueAdaptor {
+/**
+ * value adapter for curve multipliers or corrections
+ * @author h.fleischer
+ * @since 25.10.2021
+ *
+ * this type calculates an error, with respect to a given age-group, from the errors taken two modifications along a set of three modifications in total
+ */
+export abstract class ValueAdaptorBase1 implements IValueAdaptor {
 
     private readonly ageGroup: AgeGroup;
 
@@ -36,12 +42,12 @@ export abstract class ValueAdaptorBase implements IValueAdaptor {
 
         let i = 1
         for (; i < stepDataset.length; i++) {
-            if (stepDataset[i].instant == modificationSet.modA.getInstant()) {
+            if (stepDataset[i].instant == modificationSet.modB.getInstant()) {
                 const casesA = StrainUtil.findCases(stepDataset[i], this.ageGroup);
                 return - ((casesA.data / casesA.base) - 1);
             }
         }
-        console.warn('failed to find casesA', TimeUtil.formatCategoryDate(stepDataset[i].instant));
+        console.log('failed to find casesA', TimeUtil.formatCategoryDate(modificationSet.modB.getInstant()), stepDataset.length);
         return 0;
 
     }
@@ -53,9 +59,6 @@ export abstract class ValueAdaptorBase implements IValueAdaptor {
 
     }
 
-
     abstract adaptValues(modificationSet: IModificationSet, stepDataset: IDataItem[]): IValueAdaption;
-
-
 
 }

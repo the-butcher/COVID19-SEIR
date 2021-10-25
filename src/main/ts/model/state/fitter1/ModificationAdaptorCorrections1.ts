@@ -1,19 +1,26 @@
-import { Demographics } from '../../common/demographics/Demographics';
-import { ModificationContact } from '../../common/modification/ModificationContact';
-import { TimeUtil } from '../../util/TimeUtil';
-import { ValueAdaptorCorrection } from './ValueAdaptorCorrection';
-import { IModificationAdaptor } from './IModificationAdaptor';
-import { IDataItem, IModelProgress, ModelStateIntegrator } from './ModelStateIntegrator';
-import { IModificationSet } from './ModelStateBuilder';
-import { IValueErrors } from './IValueAdaptor';
+import { Demographics } from '../../../common/demographics/Demographics';
+import { TimeUtil } from '../../../util/TimeUtil';
+import { IModificationAdaptor } from '../fitter/IModificationAdaptor';
+import { IModificationSet } from '../fitter/IModificationSet';
+import { IValueErrors } from '../IValueAdaptor';
+import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
+import { ValueAdaptorCorrection1 } from './ValueAdaptorCorrection1';
 
-export class ModificationAdaptorCorrections implements IModificationAdaptor {
+/**
+ * modification adapter for curve corrections
+ * @author h.fleischer
+ * @since 25.10.2021
+ *
+ * this type updates curve corrections, from the errors produced by correction adapters, one for each age-group
+ * corrections are applied to the first and second modification in a modification set assumed to exist from a starting modification, a middle, and an ending modification
+ */
+export class ModificationAdaptorCorrections1 implements IModificationAdaptor {
 
-    private readonly correctionAdapters: ValueAdaptorCorrection[];
+    private readonly correctionAdapters: ValueAdaptorCorrection1[];
     constructor() {
         this.correctionAdapters = [];
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            this.correctionAdapters[ageGroup.getIndex()] = new ValueAdaptorCorrection(ageGroup);
+            this.correctionAdapters[ageGroup.getIndex()] = new ValueAdaptorCorrection1(ageGroup);
         });
     }
 
@@ -23,7 +30,7 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
 
         modelStateIntegrator.checkpoint();
 
-        const stepData = await modelStateIntegrator.buildModelData(modificationSet.modB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        const stepData = await modelStateIntegrator.buildModelData(modificationSet.modC.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             // drop data from callback
             progressCallback({
                 ratio: modelProgress.ratio
@@ -49,7 +56,7 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
 
         // console.log(loggableRange, 'correctA', correctionsA);
 
-        modificationSet.mod0.acceptUpdate({
+        modificationSet.modA.acceptUpdate({
             corrections: {
                 'family': correctionsA,
                 'school': correctionsA,
@@ -58,7 +65,7 @@ export class ModificationAdaptorCorrections implements IModificationAdaptor {
                 'other': correctionsA
             }
         });
-        modificationSet.modA.acceptUpdate({
+        modificationSet.modB.acceptUpdate({
             corrections: {
                 'family': correctionsB,
                 'school': correctionsB,
