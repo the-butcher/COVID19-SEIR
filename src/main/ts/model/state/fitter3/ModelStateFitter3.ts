@@ -29,11 +29,11 @@ export class ModelStateFitter3 {
         const modelStateBuilderMultipliers = new ModificationAdaptorMultipliers3({
             ageGroup: ageGroupSchool,
             contactCategory: 'school',
-            weightA: 0.2
+            weightA: 0.1
         },{
             ageGroup: ageGroupNursing,
             contactCategory: 'nursing',
-            weightA: 0.2,
+            weightA: 0.1,
         },{
             ageGroup: ageGroupTotal,
             contactCategory: 'other',
@@ -54,6 +54,9 @@ export class ModelStateFitter3 {
         console.log(loggableRange, '++', stepDataI.length);
         dataset.push(...stepDataI);
         console.log('------------------------------------------------------------------------------------------');
+
+        let totalErrorMultipliers = 0;
+        let totalErrorCorrections = 0;
 
         modificationIndex++;
         for (; modificationIndex < modificationsContact.length - ModelStateFitter3.FIT_INTERVAL; modificationIndex++) {
@@ -83,8 +86,11 @@ export class ModelStateFitter3 {
             });
 
             // wiggle other, nursing and school
-            await modelStateBuilderMultipliers.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
-            await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
+            const errMultipliers = await modelStateBuilderMultipliers.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
+            const errCorrections = await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
+
+            totalErrorMultipliers += errMultipliers.errA;
+            totalErrorCorrections += errCorrections.errA;
 
             loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContact.getInstant())}`;
             const stepDataI = await modelStateIntegrator.buildModelData(modificationContact.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
@@ -94,7 +100,7 @@ export class ModelStateFitter3 {
                 });
             });
 
-            console.log(loggableRange, '++', stepDataI.length);
+            console.log(loggableRange, '++', stepDataI.length, totalErrorMultipliers.toFixed(4).padStart(7, ' '), totalErrorCorrections.toFixed(4).padStart(7, ' '));
             dataset.push(...stepDataI);
 
         }

@@ -31,7 +31,7 @@ export class ValueAdaptorMultiplier3 extends ValueAdaptorBase3 {
         super(params.ageGroup);
         this.contactCategory = params.contactCategory;
         this.accountedError = 0;
-        this.weightA = params.weightA ?? 0.01;
+        this.weightA = 0.01;
     }
 
     getContactCategory(): string {

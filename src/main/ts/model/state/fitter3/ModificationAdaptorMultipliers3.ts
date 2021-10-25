@@ -42,9 +42,7 @@ export class ModificationAdaptorMultipliers3 implements IModificationAdaptor {
         this.multiplierAdapters.forEach(multiplierAdapter => {
             const valueAdaption = multiplierAdapter.adaptValues(modificationSet, stepDataset);
             multipliersA[multiplierAdapter.getContactCategory()] = valueAdaption.currMultA;
-            if (Math.abs(valueAdaption.errA) > Math.abs(errA)) {
-                errA = valueAdaption.errA;
-            }
+            errA += valueAdaption.errA;
         });
 
         modificationSet.modA.acceptUpdate({

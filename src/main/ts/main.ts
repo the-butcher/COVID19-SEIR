@@ -3,6 +3,8 @@ import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
+import { IModificationValuesContact } from './common/modification/IModificationValuesContact';
+import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';

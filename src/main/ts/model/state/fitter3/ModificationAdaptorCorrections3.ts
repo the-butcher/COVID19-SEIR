@@ -42,9 +42,7 @@ export class ModificationAdaptorCorrections3 implements IModificationAdaptor {
         this.correctionAdapters.forEach(correctionAdapter => {
             const valueAdaption = correctionAdapter.adaptValues(modificationSet, stepDataset);
             correctionsA[correctionAdapter.getName()] = valueAdaption.currMultA;
-            if (Math.abs(valueAdaption.errA) > Math.abs(errA)) {
-                errA = valueAdaption.errA;
-            }
+            errA += valueAdaption.errA;
         });
 
         modificationSet.modA.acceptUpdate({
