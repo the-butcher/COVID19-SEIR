@@ -68,7 +68,7 @@ export interface ILabellingDefinition {
     format(value: number): string;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'EXPOSED' | 'TESTING';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'EXPOSED' | 'TESTING' | 'CONTACT';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
@@ -154,6 +154,7 @@ export class ControlsConstants {
                 chart.setSeriesEIVisible(false, true);
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(false);
+                chart.setSeriesContactVisible(false);
             }
         },
         'VACCINATED': {
@@ -167,6 +168,7 @@ export class ControlsConstants {
                 chart.setSeriesEIVisible(true, true);
                 chart.setSeriesSRVisible(true);
                 chart.setSeriesTestingVisible(false);
+                chart.setSeriesContactVisible(false);
                 chart.setAxisRelativeMax(1.01);
             }
         },
@@ -181,6 +183,7 @@ export class ControlsConstants {
                 chart.setSeriesEIVisible(true, false);
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(false);
+                chart.setSeriesContactVisible(false);
                 chart.setAxisRelativeMax(1.01);
             }
         },
@@ -195,6 +198,25 @@ export class ControlsConstants {
                 chart.setSeriesEIVisible(false, false);
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(true);
+                chart.setSeriesContactVisible(false);
+                chart.setAxisRelativeMax(1.01);
+            }
+        },
+        'CONTACT': {
+            id: ObjectUtil.createId(),
+            getHeatValue: (dataItem, ageGroupName) => {
+                //TODO find a way to construct a resolver each time this method is called, but rather have some lazy build cache that can serve the values
+                return 0
+            },
+            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
+            getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatMax: (maxValue) => maxValue,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(false);
+                chart.setSeriesEIVisible(false, false);
+                chart.setSeriesSRVisible(false);
+                chart.setSeriesTestingVisible(false);
+                chart.setSeriesContactVisible(true);
                 chart.setAxisRelativeMax(1.01);
             }
         }

@@ -3,6 +3,8 @@ import { Demographics } from './../../common/demographics/Demographics';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelConstants } from '../ModelConstants';
 import { BaseData, IBaseDataItemConfig } from './BaseData';
+import regression, { DataPoint } from 'regression';
+import { DataParser } from '@amcharts/amcharts4/core';
 
 export interface IBaseDataItem {
 
@@ -98,6 +100,9 @@ export class BaseDataItem implements IBaseDataItem {
         return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_H] / 108;
     }
 
+    /**
+     * calculate case-incidence and test-incidence
+     */
     calculatePrimaryValues(): void {
 
         // console.log('load-data', new Date(this.instant));
@@ -115,9 +120,30 @@ export class BaseDataItem implements IBaseDataItem {
 
     calculateAverageValues(): void {
 
+        // look ahead 2,3 and 4 items and from their respective incidence build average values
         const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 2);
         const dataItemP3 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 3);
         const dataItemP4 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 4);
+
+        // NO! - let base data be base data -- predictions to be made in the model
+        // // if there is no data item 4, substitute with an expected value for that day of week
+        // if (dataItemP2 && dataItemP3 && !dataItemP4) {
+        //     console.log('miss', TimeUtil.formatCategoryDate(this.instant));
+        //     Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+        //         const casesM1 = this.getCasesM1(ageGroup.getIndex());
+
+        //         var data:DataPoint[] = [
+        //             [0,1],
+        //             [32, 67],
+        //             [12, 79]
+        //         ];
+        //         var result = regression.polynomial(data, { order: 3 });
+        //         console.log('result', result);
+
+        //     });
+
+        // }
+
         if (dataItemP2 && dataItemP3 && dataItemP4) {
 
             const ageGroupIndexTotal = Demographics.getInstance().getAgeGroups().length;

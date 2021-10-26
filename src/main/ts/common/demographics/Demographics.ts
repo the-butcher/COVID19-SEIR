@@ -306,6 +306,10 @@ export class Demographics implements IContactCategories {
         return this.ageGroups.find(g => g.getName() === ageGroup);
     }
 
+    findContactCategoryByName(categoryName: string): ContactCategory {
+        return this.contactCategories.find(g => g.getName() === categoryName);
+    }
+
     getCategories(): ContactCategory[] {
         return this.contactCategories;
     }

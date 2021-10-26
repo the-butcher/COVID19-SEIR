@@ -16,7 +16,13 @@ import { ModificationAdaptorMultipliers3 } from './ModificationAdaptorMultiplier
  */
 export class ModelStateFitter3 {
 
+    // possibilities (TODO create profiles)
+    // -- global with a fit-interval of 2 and variable weights (until variance can not be reduced any further)
+    // -- local (at the end) with a fit-interval of 2 (until variance can not be reduced any further)
+    // -- local (at the end) with a fit-interval of 1 (for the very last step) length - 4
+
     static readonly FIT_INTERVAL = 1;
+    static readonly FIT___WEIGHT = 0.01;
 
     async adapt(modelStateIntegrator: ModelStateIntegrator, maxInstant: number, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
 
@@ -30,19 +36,19 @@ export class ModelStateFitter3 {
         const modelStateBuilderMultipliers = new ModificationAdaptorMultipliers3({
             ageGroup: ageGroupSchool,
             contactCategory: 'school',
-            weightA: 0.05
+            weightA: ModelStateFitter3.FIT___WEIGHT
         },{
             ageGroup: ageGroupNursing,
             contactCategory: 'nursing',
-            weightA: 0.05,
+            weightA: ModelStateFitter3.FIT___WEIGHT
         },{
             ageGroup: ageGroupTotal,
             contactCategory: 'other',
-            weightA: 0.02
+            weightA: ModelStateFitter3.FIT___WEIGHT / 2
         });
         // const modelStateBuilderCorrections = new ModificationAdaptorCorrections3();
 
-        let modificationIndex = 80; // Math.max(3, modificationsContact.length - 20);
+        let modificationIndex = modificationsContact.length - 6; // 3
 
         const modificationContactOuterB = modificationsContact[modificationIndex];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -64,14 +70,16 @@ export class ModelStateFitter3 {
         modificationIndex++;
         for (; modificationIndex < modificationsContact.length - ModelStateFitter3.FIT_INTERVAL; modificationIndex++) {
 
-            // let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
-
             const modificationContact = modificationsContact[modificationIndex];
 
             const modificationSet: IModificationSet = {
                 modA: modificationsContact[modificationIndex],
                 modB: modificationsContact[modificationIndex + ModelStateFitter3.FIT_INTERVAL]
             }
+
+            let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
+
+
 
             const corrErrs: { [K in string]: number} = {};
             Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
@@ -98,7 +106,7 @@ export class ModelStateFitter3 {
             // totalErrorMultipliers += errMultipliers.errA;
             // totalErrorCorrections += errCorrections.errA;
 
-            loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
+            // loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
             // const stepDataI = await modelStateIntegrator.buildModelData(modificationContact.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             //     // drop data from callback
             //     progressCallback({
@@ -110,6 +118,33 @@ export class ModelStateFitter3 {
             // dataset.push(...stepDataI);
 
         }
+
+        // const contactValuesM2 = modificationsContact[modificationsContact.length-3].getModificationValues();
+        const contactValuesM1 = modificationsContact[modificationsContact.length-2].getModificationValues();
+
+        // const multipliers: { [K: string]: number} = {};
+        // const corrections: { [K: string]: { [K: string]: number}} = {};
+        // Demographics.getInstance().getCategories().forEach(category => {
+
+        //     corrections[category.getName()] = {};
+
+        //     const multiplierM2 = contactValuesM2.multipliers[category.getName()];
+        //     const multiplierM1 = contactValuesM1.multipliers[category.getName()];
+        //     multipliers[category.getName()] = multiplierM1 + (multiplierM1 - multiplierM2);
+
+        //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+        //         const correctionM2 = contactValuesM2.corrections[category.getName()][ageGroup.getName()];
+        //         const correctionM1 = contactValuesM1.corrections[category.getName()][ageGroup.getName()];
+        //         corrections[category.getName()][ageGroup.getName()] = correctionM1 + (correctionM1 - correctionM2);
+        //     });
+
+        // })
+
+        // console.log('lastValidContactValues', lastValidContactValues);
+        modificationsContact[modificationsContact.length-1].acceptUpdate({
+            multipliers: {...contactValuesM1.multipliers},
+            corrections: {...contactValuesM1.corrections},
+        });
 
         console.log('------------------------------------------------------------------------------------------');
 

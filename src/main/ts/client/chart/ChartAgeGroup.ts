@@ -1,7 +1,9 @@
+import { ModificationResolverContact } from './../../common/modification/ModificationResolverContact';
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
+import { IModificationValuesContact } from '../../common/modification/IModificationValuesContact';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
@@ -86,6 +88,13 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupIncidenceByStrain: Map<string, ChartAgeGroupSeries>;
 
     /**
+     * visualize multipliers and corrections (for readability and plausibility)
+     */
+    protected readonly seriesContactMultiplier: ChartAgeGroupSeries;
+    protected readonly seriesContactCorrection: ChartAgeGroupSeries;
+
+
+    /**
      * cases as of model
      */
     protected readonly seriesAgeGroupCasesP: ChartAgeGroupSeries;
@@ -138,8 +147,6 @@ export class ChartAgeGroup {
      * real average cases
      */
     protected readonly seriesAgeGroupAverageCasesR: ChartAgeGroupSeries;
-    // protected readonly seriesAgeGroupAverageCasesRU: ChartAgeGroupSeries;
-    // protected readonly seriesAgeGroupAverageCasesRL: ChartAgeGroupSeries;
 
     /**
      * real calculated reproduction rate
@@ -153,6 +160,7 @@ export class ChartAgeGroup {
 
     private absValue: number; // the absolute value of the age-group currently displayed
     private ageGroupIndex: number;
+    private categoryName: string;
     private modelData: IDataItem[];
     private chartMode: CHART_MODE______KEY;
 
@@ -166,6 +174,7 @@ export class ChartAgeGroup {
 
         this.absValue = 0;
         this.ageGroupIndex = -1;
+        this.categoryName = 'other';
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
@@ -270,6 +279,39 @@ export class ChartAgeGroup {
         });
         this.yAxisModification.tooltip.label.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.getLabellingDefinition());
+        });
+
+        this.seriesContactMultiplier = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent_000_100,
+            title: 'multipliers',
+            baseLabel: 'multipliers',
+            valueField: 'contactMultiplier',
+            colorKey: 'CONTACT',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.40,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactCorrection = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent_m75_p75,
+            title: 'corrections',
+            baseLabel: 'corrections',
+            valueField: 'contactCorrection',
+            colorKey: 'CONTACT',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.40,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
         });
 
         this.seriesAgeGroupCasesP = new ChartAgeGroupSeries({
@@ -394,8 +436,6 @@ export class ChartAgeGroup {
         });
 
         this.seriesAgeGroupIncidenceByStrain = new Map();
-
-
 
         this.seriesAgeGroupRemovedVMV = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -918,6 +958,13 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVRC.setSeriesNote(ageGroup.getName());
 
+        this.seriesContactCorrection.setSeriesNote(ageGroup.getName());
+
+    }
+
+    async setContactCategory(categoryName: string): Promise<void> {
+        this.categoryName = categoryName;
+        this.seriesContactMultiplier.setSeriesNote(this.categoryName);
     }
 
     addWeekendRanges(): void {
@@ -1116,6 +1163,17 @@ export class ChartAgeGroup {
 
     }
 
+    setSeriesContactVisible(visible: boolean): void {
+
+        this.yAxisPlotPercent_000_100.visible = visible;
+        this.yAxisPlotPercent_000_100.renderer.grid.template.disabled = !visible;
+        this.yAxisPlotPercent_000_100.tooltip.disabled = !visible;
+
+        this.seriesContactMultiplier.setVisible(visible);
+        this.seriesContactCorrection.setVisible(visible);
+
+    }
+
     setSeriesTestingVisible(visible: boolean): void {
         this.seriesPositivityRateR.setVisible(visible);
     }
@@ -1264,6 +1322,9 @@ export class ChartAgeGroup {
         const heatData: any[] = [];
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        const modificationResolverContact = new ModificationResolverContact();
+
+
 
         let maxGamma = 0;
         const randomVd = Math.random() * 0.00001;
@@ -1283,7 +1344,13 @@ export class ChartAgeGroup {
             const ageGroupRemovedVRC = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VC;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
-            // let ageGroupCasesN = ageGroupCasesP * BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay());
+
+            const modificationContact = modificationResolverContact.getModification(dataItem.instant, 'INTERPOLATE');
+            const contactMultiplier = modificationContact.getCategoryValue(this.categoryName);
+            let contactCorrection: number;
+            if (this.ageGroupIndex >= 0 && this.ageGroupIndex < Demographics.getInstance().getAgeGroups.length) {
+                contactCorrection = modificationContact.getCorrectionValue(this.categoryName, this.ageGroupIndex);
+            }
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1298,9 +1365,12 @@ export class ChartAgeGroup {
                 ageGroupRemovedVRC,
                 ageGroupIncidence,
                 ageGroupCasesP,
+                contactMultiplier,
+                contactCorrection
                 // ageGroupCasesN,
             }
 
+            // add one strain value per modification
             modificationValuesStrain.forEach(modificationValueStrain => {
                 item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
                 item[`ageGroupExposed${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[modificationValueStrain.id];
@@ -1351,9 +1421,6 @@ export class ChartAgeGroup {
                     // gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
 
                 }
-
-
-
 
                 heatData.push({
                     categoryX: dataItem.categoryX,
@@ -1406,7 +1473,7 @@ export class ChartAgeGroup {
             let ageGroupRemovedVR1 = null;
             let ageGroupRemovedVR2 = null;
             let ageGroupIncidenceR = null;
-            let ageGroupAverageCasesR = null;
+            let ageGroupAverageCasesR: number;
             let ageGroupReproductionR = null;
             let positivityRateR = null;
             let ageGroupCasesR = null;
@@ -1440,7 +1507,12 @@ export class ChartAgeGroup {
                 // console.log('no data found', categoryX);
             }
 
-            let ageGroupCasesN = ageGroupAverageCasesR * BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(instant).getDay());
+
+            let ageGroupCasesN = ageGroupAverageCasesR && BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), instant);
+            if (ageGroupCasesN) {
+                ageGroupCasesN *= ageGroupAverageCasesR;
+            }
+            // console.log(TimeUtil.formatCategoryDate(instant), ageGroupCasesN, ageGroupAverageCasesR);
 
             const item = {
                 categoryX,

@@ -118,6 +118,12 @@ export class ModelActions {
             iconKey: 'TESTING',
             handleClick: () => ModelActions.getInstance().toggleChartMode('TESTING')
         }));
+        this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
+            label: 'CONTACT',
+            iconKey: 'CONTACT',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('CONTACT')
+        }));
 
         const ageGroups = [...Demographics.getInstance().getAgeGroups()].reverse();
         this.ageGroupIcons.push(new IconChartMode({

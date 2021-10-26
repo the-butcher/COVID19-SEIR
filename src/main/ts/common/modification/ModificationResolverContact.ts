@@ -92,16 +92,12 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
         }
 
-        if (fetchType === 'CREATE') {
-            modificationValues.corrections = {}
-        }
+        // if (fetchType === 'CREATE') {
+        //     modificationValues.corrections = {}
+        // }
         const modification = new ModificationContact(modificationValues);
         if (fetchType === 'CREATE') {
             modification.setInstants(instant, instant); // will trigger update of 'work' multiplier
-        }
-
-        if (instant > 1635240012000) {
-            console.log('mod-values', TimeUtil.formatCategoryDate(instant), modificationValues)
         }
 
         return new ModificationContact(modificationValues);

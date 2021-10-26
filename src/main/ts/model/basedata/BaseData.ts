@@ -57,9 +57,7 @@ export class BaseData {
     private readonly path: string;
     private readonly baseDataset: {[K: string]: IBaseDataItemConfig};
     private readonly baseDataItems: {[K: string]: IBaseDataItem};
-
-    // private readonly reproductionInstants: number[];
-    // private readonly positivityInstants: number[];
+    private dailyOffsetInstantMin: number;
 
     /**
      * a set of averages by age-group and week day
@@ -71,8 +69,7 @@ export class BaseData {
         this.baseDataset = baseDataset;
         this.baseDataItems = {};
         this.dailyOffsets = [];
-        // this.reproductionInstants = [];
-        // this.positivityInstants = [];
+        this.dailyOffsetInstantMin = -1;
     }
 
     getPath(): string {
@@ -94,7 +91,9 @@ export class BaseData {
         const instantPre = ModelInstants.getInstance().getPreInstant();
         const instantMax = ModelInstants.getInstance().getMaxInstant();
 
-        // setup containers for daily offsets
+        /**
+         * setup containers for daily offsets
+         */
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
             this.dailyOffsets[ageGroup.getIndex()] = [];
             for (let i=0; i<7; i++) {
@@ -124,36 +123,39 @@ export class BaseData {
             }
         }
 
-        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        /**
+         * fill daily stats
+         */
+        for (let instant = instantMax; instant > instantMin; instant -= TimeUtil.MILLISECONDS_PER____DAY) {
 
             const dataItem = this.findBaseDataItem(instant);
+
+            // keep setting offset limit until a data item is found
             if (dataItem) {
 
-                const day = new Date(dataItem.getInstant()).getDay();
-                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+                if (instant > this.dailyOffsetInstantMin) {
 
-                    const average = dataItem.getAverageCases(ageGroup.getIndex());
-                    const cases = dataItem.getCasesM1(ageGroup.getIndex());
+                    const day = new Date(dataItem.getInstant()).getDay();
+                    Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
 
-                    // add to proper age-group / day stats instance
-                    if (average) {
-                        const avgToCaseRatio = cases / average;
-                        this.dailyOffsets[ageGroup.getIndex()][day].addValue(avgToCaseRatio);
-                    }
+                        const average = dataItem.getAverageCases(ageGroup.getIndex());
+                        const cases = dataItem.getCasesM1(ageGroup.getIndex());
 
-                });
+                        // add to proper age-group / day stats instance
+                        if (average) {
+                            const avgToCaseRatio = cases / average;
+                            this.dailyOffsets[ageGroup.getIndex()][day].addValue(avgToCaseRatio);
+                        }
 
+                    });
+
+                }
+
+            } else {
+                this.dailyOffsetInstantMin = instant - TimeUtil.MILLISECONDS_PER___WEEK * 5;
             }
 
         }
-
-        // let avgError = 0;
-        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-        //     const dataItem = this.findBaseDataItem(instant);
-        //     const ageGroupIndex = Demographics.getInstance().getAgeGroups().length;
-        //     avgError += dataItem.getCasesM1(ageGroupIndex) - dataItem.getAverageCases(ageGroupIndex);
-        //     console.log('avgError', TimeUtil.formatCategoryDate(instant), avgError);
-        // }
 
         const reproductionMarkers: IBaseDataMarker[] = [];
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
@@ -181,7 +183,6 @@ export class BaseData {
             });
             multipliers['school'] = 0.4;
             multipliers['nursing'] = 0.5;
-            // multipliers['family'] = 0.9;
             multipliers['family'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityHome() * 0.60;
             multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityWork() * 0.60;
             multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityOther() * 0.60;
@@ -260,12 +261,12 @@ export class BaseData {
 
         });
 
-
-
     }
 
-    getAverageOffset(ageGroupIndex: number, day: number): number {
-        return this.dailyOffsets[ageGroupIndex][day].getAverage();
+    getAverageOffset(ageGroupIndex: number, instant: number): number | undefined {
+        if (instant > this.dailyOffsetInstantMin) {
+            return this.dailyOffsets[ageGroupIndex][new Date(instant).getDay()].getAverage();
+        }
     }
 
     private buildBaseDataItem(instant: number): IBaseDataItem {

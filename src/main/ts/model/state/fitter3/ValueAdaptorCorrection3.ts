@@ -3,6 +3,7 @@ import { ModificationContact } from '../../../common/modification/ModificationCo
 import { IModificationSet } from '../fitter/IModificationSet';
 import { IValueAdaption } from '../IValueAdaptor';
 import { IDataItem } from '../ModelStateIntegrator';
+import { ModelStateFitter3 } from './ModelStateFitter3';
 import { ValueAdaptorBase3 } from './ValueAdaptorBase3';
 
 /**
@@ -44,7 +45,7 @@ export class ValueAdaptorCorrection3 extends ValueAdaptorBase3 {
         // add the new error to the accounted for stack
         this.accountedError + errA;
 
-        const currMultA = Math.max(0.20, Math.min(4, prevMultA + remainingError * 0.005));
+        const currMultA = Math.max(0.20, Math.min(4, prevMultA + remainingError * ModelStateFitter3.FIT___WEIGHT / 5));
 
         return {
             prevMultA,

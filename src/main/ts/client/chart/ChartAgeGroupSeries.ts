@@ -133,6 +133,10 @@ export class ChartAgeGroupSeries {
 
     }
 
+    /**
+     * turns both legend and series on/or off
+     * @param visible
+     */
     setVisible(visible: boolean): void {
         this.series.hiddenInLegend = !visible || !this.hasLegend;
         this.series.visible = visible;
