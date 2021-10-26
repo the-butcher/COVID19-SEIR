@@ -1,10 +1,9 @@
-import { ModificationResolverContact } from './../../common/modification/ModificationResolverContact';
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
-import { IModificationValuesContact } from '../../common/modification/IModificationValuesContact';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { ModificationContact } from '../../common/modification/ModificationContact';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
@@ -24,6 +23,7 @@ import { ControlsVaccination } from './../controls/ControlsVaccination';
 import { ModelActions } from './../gui/ModelActions';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
+import regression, { DataPoint } from 'regression';
 
 export interface IModificationData {
     categoryX: string,
@@ -297,9 +297,10 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+
         this.seriesContactCorrection = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotPercent_m75_p75,
+            yAxis: this.yAxisPlotPercent_000_100,
             title: 'corrections',
             baseLabel: 'corrections',
             valueField: 'contactCorrection',
@@ -313,6 +314,7 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+
 
         this.seriesAgeGroupCasesP = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -963,8 +965,14 @@ export class ChartAgeGroup {
     }
 
     async setContactCategory(categoryName: string): Promise<void> {
+
         this.categoryName = categoryName;
         this.seriesContactMultiplier.setSeriesNote(this.categoryName);
+
+        if (ObjectUtil.isNotEmpty(this.modelData)) {
+            this.requestRenderModelData();
+        }
+
     }
 
     addWeekendRanges(): void {
@@ -1322,8 +1330,23 @@ export class ChartAgeGroup {
         const heatData: any[] = [];
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
-        const modificationResolverContact = new ModificationResolverContact();
+        const modificationsContact = Modifications.getInstance().findModificationsByType('CONTACT').map(m => m as ModificationContact);
 
+        const toRegressionX = (instant: number) => {
+            return (instant - ModelInstants.getInstance().getMinInstant()) / (ModelInstants.getInstance().getMaxInstant() - ModelInstants.getInstance().getMinInstant());
+        };
+
+        const regressionData :DataPoint[] = [];
+        for (let i=modificationsContact.length - 20; i<modificationsContact.length; i++) {
+            const modificationContact = modificationsContact[i];
+            regressionData.push([
+                toRegressionX(modificationContact.getInstant()),
+                modificationContact.getCategoryValue(this.categoryName)
+            ]);
+        }
+        var regressionResult = regression.polynomial(regressionData, { order: 3 });
+        console.log('regressionResult', regressionResult);
+        var regressionEquation = (x: number) => Math.pow(x, 3) * regressionResult.equation[0] + Math.pow(x, 2) * regressionResult.equation[1] + x * regressionResult.equation[2] + regressionResult.equation[3];
 
 
         let maxGamma = 0;
@@ -1345,12 +1368,13 @@ export class ChartAgeGroup {
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
-            const modificationContact = modificationResolverContact.getModification(dataItem.instant, 'INTERPOLATE');
-            const contactMultiplier = modificationContact.getCategoryValue(this.categoryName);
-            let contactCorrection: number;
-            if (this.ageGroupIndex >= 0 && this.ageGroupIndex < Demographics.getInstance().getAgeGroups.length) {
-                contactCorrection = modificationContact.getCorrectionValue(this.categoryName, this.ageGroupIndex);
-            }
+            const regressionX = toRegressionX(dataItem.instant);
+            const contactMultiplier = regressionEquation(regressionX); // regressionResult.points.find(p => p[0] > regressionX)?.[1];
+            const contactCorrection = modificationsContact.find(m => m.getInstant() === dataItem.instant)?.getCategoryValue(this.categoryName);
+            // contactMultiplier = modificationContact.getCategoryValue(this.categoryName);
+            // if (this.ageGroupIndex >= 0 && this.ageGroupIndex < Demographics.getInstance().getAgeGroups().length) {
+            //     contactCorrection = modificationContact.getCorrectionValue('other', this.ageGroupIndex) / 2;
+            // }
 
             const item = {
                 categoryX: dataItem.categoryX,

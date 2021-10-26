@@ -1,3 +1,4 @@
+import { ChartAgeGroup } from './../chart/ChartAgeGroup';
 import { ContactCategory } from '../../common/demographics/ContactCategory';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
@@ -32,6 +33,10 @@ export class SliderContactCategory extends Slider {
         canvasContainer.style.top = '0px';
 
         container.appendChild(canvasContainer);
+
+        container.addEventListener('pointerup', () => {
+            ChartAgeGroup.getInstance().setContactCategory(this.contactCategoryConfig.getName());
+        })
 
         const ticks = ModelConstants.RANGE____PERCENTAGE_100.slice(0, -1);
 
