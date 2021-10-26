@@ -1,8 +1,10 @@
+import { Demographics } from '../../../common/demographics/Demographics';
 import { TimeUtil } from '../../../util/TimeUtil';
 import { IModificationAdaptor } from '../fitter/IModificationAdaptor';
 import { IModificationSet } from '../fitter/IModificationSet';
 import { IValueErrors } from '../IValueAdaptor';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
+import { ValueAdaptorCorrection3 } from './ValueAdaptorCorrection3';
 import { IValueAdaptorMultiplierParams, ValueAdaptorMultiplier3 } from './ValueAdaptorMultiplier3';
 
 /**
@@ -16,17 +18,22 @@ import { IValueAdaptorMultiplierParams, ValueAdaptorMultiplier3 } from './ValueA
 export class ModificationAdaptorMultipliers3 implements IModificationAdaptor {
 
     private readonly multiplierAdapters: ValueAdaptorMultiplier3[];
+    private readonly correctionAdapters: ValueAdaptorCorrection3[];
 
     constructor(...paramset: IValueAdaptorMultiplierParams[]) {
         this.multiplierAdapters = [];
         paramset.forEach(params => {
             this.multiplierAdapters.push(new ValueAdaptorMultiplier3(params));
         });
+        this.correctionAdapters = [];
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            this.correctionAdapters[ageGroup.getIndex()] = new ValueAdaptorCorrection3(ageGroup);
+        });
     }
 
     async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, progressCallback: (progress: IModelProgress) => void): Promise<IValueErrors> {
 
-        // let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactB.getInstant())}`;
+        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())}`;
 
         modelStateIntegrator.checkpoint();
 
@@ -49,11 +56,30 @@ export class ModificationAdaptorMultipliers3 implements IModificationAdaptor {
             multipliers: multipliersA
         });
 
-        modelStateIntegrator.rollback();
+        const correctionsA: { [K in string] : number } = {};
+        // let errA = 0;
+        this.correctionAdapters.forEach(correctionAdapter => {
+            const valueAdaption = correctionAdapter.adaptValues(modificationSet, stepDataset);
+            correctionsA[correctionAdapter.getName()] = valueAdaption.currMultA;
+            errA += valueAdaption.errA;
+        });
+
+        modificationSet.modA.acceptUpdate({
+            corrections: {
+                'family': correctionsA,
+                'school': correctionsA,
+                'nursing': correctionsA,
+                'work': correctionsA,
+                'other': correctionsA
+            }
+        });
+
+        // modelStateIntegrator.rollback();
 
         return {
             errA: errA,
-            errB: 0
+            errB: 0,
+            data: stepData
         }
 
     }

@@ -1,4 +1,3 @@
-import { ValueAdaptorMultiplier } from '../../model/state/ValueAdaptorMultiplier';
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -276,8 +275,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesP = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
-            title: 'cases',
-            baseLabel: 'cases',
+            title: 'average cases (model)',
+            baseLabel: 'average cases (model)',
             valueField: 'ageGroupCasesP',
             colorKey: 'CASES',
             strokeWidth: 2,
@@ -293,7 +292,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
-            title: 'cases (reported)',
+            title: 'cases (ages)',
             baseLabel: 'cases',
             valueField: 'ageGroupCasesR',
             colorKey: 'CASES',
@@ -310,8 +309,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
-            title: 'cases (predicted)',
-            baseLabel: 'predicted cases',
+            title: 'cases (model)',
+            baseLabel: 'cases (model)',
             valueField: 'ageGroupCasesN',
             colorKey: 'SEASONALITY',
             strokeWidth: 0.5,
@@ -329,8 +328,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
-            title: 'incidence',
-            baseLabel: 'incidence',
+            title: 'incidence (model)',
+            baseLabel: 'incidence (model)',
             valueField: 'ageGroupIncidence',
             colorKey: 'INCIDENCE',
             strokeWidth: 2,
@@ -345,8 +344,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
-            title: 'incidence (actual)',
-            baseLabel: 'incidence',
+            title: 'incidence (ages)',
+            baseLabel: 'incidence (ages)',
             valueField: 'ageGroupIncidenceR',
             colorKey: 'STRAIN',
             strokeWidth: 2,
@@ -363,8 +362,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupAverageCasesR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
-            title: 'average cases (actual)',
-            baseLabel: 'average cases',
+            title: 'average cases (ages)',
+            baseLabel: 'average cases (ages)',
             valueField: 'ageGroupAverageCasesR',
             colorKey: 'CASES',
             strokeWidth: 1,
@@ -376,45 +375,11 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        // this.seriesAgeGroupAverageCasesRU = new ChartAgeGroupSeries({
-        //     chart: this.chart,
-        //     yAxis: this.yAxisPlotAbsolute,
-        //     title: 'average cases (actual upper)',
-        //     baseLabel: 'average cases upper',
-        //     valueField: 'ageGroupAverageCasesRU',
-        //     colorKey: 'CASES',
-        //     strokeWidth: 1,
-        //     dashed: false,
-        //     locationOnPath: 0.35,
-        //     labelled: false,
-        //     stacked: false,
-        //     legend: false,
-        //     labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
-        //     seriesConstructor: () => new LineSeries()
-        // });
-        // this.seriesAgeGroupAverageCasesRL = new ChartAgeGroupSeries({
-        //     chart: this.chart,
-        //     yAxis: this.yAxisPlotAbsolute,
-        //     title: 'average cases (actual lower)',
-        //     baseLabel: 'average cases lower',
-        //     valueField: 'ageGroupAverageCasesRL',
-        //     colorKey: 'CASES',
-        //     strokeWidth: 1,
-        //     dashed: false,
-        //     locationOnPath: 0.35,
-        //     labelled: false,
-        //     stacked: false,
-        //     legend: false,
-        //     labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
-        //     seriesConstructor: () => new LineSeries()
-        // });
-        // this.seriesAgeGroupAverageCasesRU.bindToLegend(this.seriesAgeGroupAverageCasesR);
-        // this.seriesAgeGroupAverageCasesRL.bindToLegend(this.seriesAgeGroupAverageCasesR);
 
         this.seriesAgeGroupReproductionR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent_m75_p75,
-            title: 'reproduction rate (actual)',
+            title: 'reproduction rate (ages)',
             baseLabel: 'reproduction',
             valueField: 'ageGroupReproductionR',
             colorKey: 'VACCINATION',
@@ -430,22 +395,7 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupIncidenceByStrain = new Map();
 
-        this.seriesPositivityRateR = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent_000_100,
-            title: 'positivity rate',
-            baseLabel: 'positivity',
-            valueField: 'positivityRateR',
-            colorKey: 'TESTING',
-            strokeWidth: 2,
-            dashed: false,
-            locationOnPath: 0.35,
-            labelled: true,
-            stacked: false,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
+
 
         this.seriesAgeGroupRemovedVMV = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -666,6 +616,23 @@ export class ChartAgeGroup {
             stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesPositivityRateR = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent_000_100,
+            title: 'positivity rate',
+            baseLabel: 'positivity',
+            valueField: 'positivityRateR',
+            colorKey: 'TESTING',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.35,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
 
@@ -932,8 +899,6 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidenceR.setSeriesNote(ageGroup.getName());
 
         this.seriesAgeGroupAverageCasesR.setSeriesNote(ageGroup.getName());
-        // this.seriesAgeGroupAverageCasesRU.setSeriesNote(ageGroup.getName());
-        // this.seriesAgeGroupAverageCasesRL.setSeriesNote(ageGroup.getName());
 
         this.seriesAgeGroupReproductionR.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesP.setSeriesNote(ageGroup.getName());
@@ -1052,8 +1017,8 @@ export class ChartAgeGroup {
             const seriesAgeGroupIncidenceStrain = new ChartAgeGroupSeries({
                 chart: this.chart,
                 yAxis: this.yAxisPlotIncidence,
-                title: 'incidence',
-                baseLabel: strainValues.name,
+                title: `incidence (${strainValues.name})`,
+                baseLabel: `incidence (${strainValues.name})`,
                 valueField: `ageGroupIncidence${strainValues.id}`,
                 colorKey: 'INCIDENCE',
                 strokeWidth: 1,
@@ -1124,18 +1089,16 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(false); // visible
-        this.seriesAgeGroupIncidenceR.setVisible(false); // visible
+        this.seriesAgeGroupIncidence.setVisible(visible); // visible
+        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
 
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
-        // this.seriesAgeGroupAverageCasesRU.setVisible(visible);
-        // this.seriesAgeGroupAverageCasesRL.setVisible(visible);
 
         this.seriesAgeGroupReproductionR.setVisible(false);
 
         this.seriesAgeGroupCasesP.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(false); // visible
-        this.seriesAgeGroupCasesR.setVisible(false); // visible
+        this.seriesAgeGroupCasesN.setVisible(visible); // visible
+        this.seriesAgeGroupCasesR.setVisible(visible); // visible
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1320,9 +1283,7 @@ export class ChartAgeGroup {
             const ageGroupRemovedVRC = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VC;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
-            let ageGroupCasesN = ageGroupCasesP * BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay());
-
-            // console.log('off', new Date(dataItem.instant).getDay(), BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay()));
+            // let ageGroupCasesN = ageGroupCasesP * BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), new Date(dataItem.instant).getDay());
 
             const item = {
                 categoryX: dataItem.categoryX,

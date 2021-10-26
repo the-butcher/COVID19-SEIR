@@ -1,3 +1,4 @@
+import { Statistics } from './../../../util/Statistics';
 import { Demographics } from '../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
 import { TimeUtil } from '../../../util/TimeUtil';
@@ -15,7 +16,7 @@ import { ModificationAdaptorMultipliers3 } from './ModificationAdaptorMultiplier
  */
 export class ModelStateFitter3 {
 
-    static readonly FIT_INTERVAL = 7;
+    static readonly FIT_INTERVAL = 1;
 
     async adapt(modelStateIntegrator: ModelStateIntegrator, maxInstant: number, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
 
@@ -29,19 +30,19 @@ export class ModelStateFitter3 {
         const modelStateBuilderMultipliers = new ModificationAdaptorMultipliers3({
             ageGroup: ageGroupSchool,
             contactCategory: 'school',
-            weightA: 0.1
+            weightA: 0.05
         },{
             ageGroup: ageGroupNursing,
             contactCategory: 'nursing',
-            weightA: 0.1,
+            weightA: 0.05,
         },{
             ageGroup: ageGroupTotal,
             contactCategory: 'other',
-            weightA: 0.1
+            weightA: 0.02
         });
-        const modelStateBuilderCorrections = new ModificationAdaptorCorrections3();
+        // const modelStateBuilderCorrections = new ModificationAdaptorCorrections3();
 
-        let modificationIndex = 3; // Math.max(3, modificationsContact.length - 20); // -3 >> will adapt the last two modifications
+        let modificationIndex = 80; // Math.max(3, modificationsContact.length - 20);
 
         const modificationContactOuterB = modificationsContact[modificationIndex];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -55,8 +56,10 @@ export class ModelStateFitter3 {
         dataset.push(...stepDataI);
         console.log('------------------------------------------------------------------------------------------');
 
-        let totalErrorMultipliers = 0;
-        let totalErrorCorrections = 0;
+        // let totalErrorMultipliers = 0;
+        // let totalErrorCorrections = 0;
+        let errorStatsMultipliers = new Statistics();
+        // let errorStatsCorrections = new Statistics();
 
         modificationIndex++;
         for (; modificationIndex < modificationsContact.length - ModelStateFitter3.FIT_INTERVAL; modificationIndex++) {
@@ -87,25 +90,32 @@ export class ModelStateFitter3 {
 
             // wiggle other, nursing and school
             const errMultipliers = await modelStateBuilderMultipliers.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
-            const errCorrections = await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
+            // const errCorrections = await modelStateBuilderCorrections.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], progressCallback);
 
-            totalErrorMultipliers += errMultipliers.errA;
-            totalErrorCorrections += errCorrections.errA;
+            errorStatsMultipliers.addValue(errMultipliers.errA);
+            dataset.push(...errMultipliers.data);
+            // errorStatsCorrections.addValue(errCorrections.errA);
+            // totalErrorMultipliers += errMultipliers.errA;
+            // totalErrorCorrections += errCorrections.errA;
 
-            loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContact.getInstant())}`;
-            const stepDataI = await modelStateIntegrator.buildModelData(modificationContact.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-                // drop data from callback
-                progressCallback({
-                    ratio: modelProgress.ratio
-                });
-            });
+            loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
+            // const stepDataI = await modelStateIntegrator.buildModelData(modificationContact.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            //     // drop data from callback
+            //     progressCallback({
+            //         ratio: modelProgress.ratio
+            //     });
+            // });
 
-            console.log(loggableRange, '++', stepDataI.length, totalErrorMultipliers.toFixed(4).padStart(7, ' '), totalErrorCorrections.toFixed(4).padStart(7, ' '));
-            dataset.push(...stepDataI);
+            console.log(loggableRange);
+            // dataset.push(...stepDataI);
 
         }
 
         console.log('------------------------------------------------------------------------------------------');
+
+        // modificationsContact[modificationsContact.length - 1].acceptUpdate({
+        //     ...modificationsContact[modificationsContact.length - 2].getModificationValues()
+        // });
 
         /**
          * fill rest of data
@@ -116,7 +126,7 @@ export class ModelStateFitter3 {
                 ratio: modelProgress.ratio
             });
         });
-        console.log(loggableRange, '++', fillData.length);
+        console.log(loggableRange, '++', fillData.length, errorStatsMultipliers.getVariance().toFixed(8).padStart(7, ' '));
         dataset.push(...fillData);
 
         return dataset;

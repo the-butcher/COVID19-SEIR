@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import { BaseData } from './../../model/basedata/BaseData';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -85,8 +86,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 name: `interpolation (${id})`,
                 deletable: true,
                 draggable: true,
-                blendable: true,
-                corrections: {}
+                blendable: true
             };
             // console.log('creating with', modificationValues);
 
@@ -98,6 +98,10 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         const modification = new ModificationContact(modificationValues);
         if (fetchType === 'CREATE') {
             modification.setInstants(instant, instant); // will trigger update of 'work' multiplier
+        }
+
+        if (instant > 1635240012000) {
+            console.log('mod-values', TimeUtil.formatCategoryDate(instant), modificationValues)
         }
 
         return new ModificationContact(modificationValues);

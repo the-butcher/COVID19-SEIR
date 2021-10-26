@@ -71,23 +71,23 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         //     });
         // });
 
-        new ModelStateFitter3().adapt(modelStateIntegrator, maxInstant, modelProgress => {
-            ctx.postMessage(modelProgress);
-        }).then(data => {
-            const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-            ctx.postMessage({
-                ratio: 1,
-                data,
-                modificationValuesContact
-            });
-        });
-
-        // /**
-        //  * complete model build (add more sophisticated logic here)
-        //  */
-        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        // new ModelStateFitter3().adapt(modelStateIntegrator, maxInstant, modelProgress => {
         //     ctx.postMessage(modelProgress);
+        // }).then(data => {
+        //     const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+        //     ctx.postMessage({
+        //         ratio: 1,
+        //         data,
+        //         modificationValuesContact
+        //     });
         // });
+
+        /**
+         * complete model build (add more sophisticated logic here)
+         */
+        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            ctx.postMessage(modelProgress);
+        });
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

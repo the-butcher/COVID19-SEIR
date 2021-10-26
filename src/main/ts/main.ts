@@ -123,8 +123,6 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             //     modificationsContact[i + 2].acceptUpdate(adaptedValues[modificationsContact[i + 2].getId()]);
             // }
 
-
-
             // needs model-instants to be ready
             BaseData.getInstance().calculateDailyStats();
 

@@ -1,10 +1,11 @@
 import { ModificationContact } from '../../common/modification/ModificationContact';
-import { IModificationSet } from './fitter1/ModelStateFitter1';
+import { IModificationSet } from './fitter/IModificationSet';
 import { IDataItem } from './ModelStateIntegrator';
 
 export interface IValueErrors {
     errA: number;
     errB: number;
+    data?: IDataItem[];
 }
 export interface IValueAdaption extends IValueErrors {
     prevMultA: number;
