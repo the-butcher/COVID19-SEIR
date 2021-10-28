@@ -1,3 +1,4 @@
+import { ChartAgeGroup } from './../chart/ChartAgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IModification } from '../../common/modification/IModification';
 import { IModificationValues } from '../../common/modification/IModificationValues';
@@ -15,7 +16,6 @@ import { ModificationVaccination } from '../../common/modification/ModificationV
 import { BaseData } from '../../model/basedata/BaseData';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { Color } from '../../util/Color';
-import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { QueryUtil } from '../../util/QueryUtil';
 import { ControlsContact } from '../controls/ControlsContact';
 import { ControlsDiscovery } from '../controls/ControlsDiscovery';
@@ -44,14 +44,15 @@ export interface IControlsDefinitions {
     showInEditor?: (modification: IModification<IModificationValues>) => void;
     labellingDefinition: ILabellingDefinition;
 }
-export interface IControlsChartDefinition {
-    min: number;
-    max: number;
-    labellingDefinition: ILabellingDefinition;
-    color: string;
-    text: string;
-    useObjectColors: boolean;
-}
+
+// export interface IControlsChartDefinition {
+//     min: number;
+//     max: number;
+//     labellingDefinition: ILabellingDefinition;
+//     color: string;
+//     text: string;
+//     useObjectColors: boolean;
+// }
 
 export interface IHeatmapColorDefinition {
     id: string,
@@ -189,12 +190,12 @@ export class ControlsConstants {
         },
         'TESTING': {
             id: ObjectUtil.createId(),
-            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID___________ALL], // TODO find a meaningful value
+            getHeatValue: (dataItem, ageGroupName) => Math.min(1, dataItem.valueset[ageGroupName].DISCOVERY),
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.35, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
-                chart.setSeriesIncidenceVisible(true);
+                chart.setSeriesIncidenceVisible(false);
                 chart.setSeriesEIVisible(false, false);
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(true);
@@ -205,7 +206,7 @@ export class ControlsConstants {
         'CONTACT': {
             id: ObjectUtil.createId(),
             getHeatValue: (dataItem, ageGroupName) => {
-                //TODO find a way to construct a resolver each time this method is called, but rather have some lazy build cache that can serve the values
+                // what would be visualized here ???
                 return 0
             },
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
@@ -279,7 +280,10 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverDiscovery();
             },
-            showInEditor: modification => ControlsDiscovery.getInstance().acceptModification(modification as ModificationDiscovery),
+            showInEditor: modification => {
+                ControlsDiscovery.getInstance().acceptModification(modification as ModificationDiscovery);
+                ChartAgeGroup.getInstance().setChartMode('TESTING');
+            },
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
         'VACCINATION': {
@@ -292,7 +296,10 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverVaccination();
             },
-            showInEditor: modification => ControlsVaccination.getInstance().acceptModification(modification as ModificationVaccination),
+            showInEditor: modification => {
+                ControlsVaccination.getInstance().acceptModification(modification as ModificationVaccination);
+                ChartAgeGroup.getInstance().setChartMode('VACCINATED');
+            },
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
         'SEASONALITY': {
@@ -305,7 +312,10 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverSeasonality();
             },
-            showInEditor: modification => ControlsSeasonality.getInstance().acceptModification(modification as ModificationSeasonality),
+            showInEditor: modification => {
+                ControlsSeasonality.getInstance().acceptModification(modification as ModificationSeasonality);
+                ChartAgeGroup.getInstance().setChartMode('CONTACT');
+            },
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
         'SETTINGS': {
@@ -332,20 +342,6 @@ export class ControlsConstants {
     static readonly FONT_SIZE: number = 14;
     static readonly COLOR____FONT: string = '#d1d1d1';
     static readonly COLOR______BG = '#121212';
-
-    static rebuildModificationChart(modificationResolver: IModificationResolver<IModificationValues, IModification<IModificationValues>>): void {
-
-        const key = modificationResolver.getKey();
-        ChartAgeGroup.getInstance().showModifications({
-            min: modificationResolver.getMinValue(),
-            max: modificationResolver.getMaxValue(),
-            labellingDefinition: ControlsConstants.MODIFICATION_PARAMS[modificationResolver.getKey()].labellingDefinition,
-            text: modificationResolver.getTitle(),
-            color: ControlsConstants.COLORS[key],
-            useObjectColors: true,
-        }, modificationResolver.getModificationData());
-
-    }
 
     static createWorkerInput(): IWorkerInput {
         return {

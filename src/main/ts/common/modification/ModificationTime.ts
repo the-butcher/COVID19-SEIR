@@ -20,6 +20,7 @@ import { ModificationSeasonality } from './ModificationSeasonality';
 import { ModificationSettings } from './ModificationSettings';
 import { ModificationVaccination } from './ModificationVaccination';
 import { Dictionary } from '@amcharts/amcharts4/core';
+import { ObjectUtil } from '../../util/ObjectUtil';
 
 export interface IRatios {
     contact: number;
@@ -34,6 +35,21 @@ export interface IRatios {
  * @since 18.04.2021
  */
 export class ModificationTime extends AModification<IModificationValuesTime> implements IContactMatrix, IContactCategories {
+
+    static createInstance(instant: number): ModificationTime {
+        const id = ObjectUtil.createId();
+        const modificationTime = new ModificationTime({
+            id,
+            key: 'TIME',
+            instant: instant,
+            name: id,
+            deletable: false,
+            draggable: false,
+            blendable: false
+        });
+        modificationTime.setInstants(instant, instant);
+        return modificationTime;
+    }
 
     private modificationContact: ModificationContact;
     private modificationDiscovery: ModificationDiscovery;
@@ -133,7 +149,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.discoveryRatiosByAgeGroup[ageGroupIndex];
     }
 
-    buildRatios(): void {
+    private buildRatios(): void {
 
         this.discoveryRatiosByAgeGroup = [];
         this.ageGroups.forEach(ageGroup => {

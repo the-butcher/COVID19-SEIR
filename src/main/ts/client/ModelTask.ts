@@ -29,9 +29,6 @@ export class ModelTask {
 
     static async commit(key: MODIFICATION____KEY, workerInput: IWorkerInput): Promise<void> {
 
-        // 1. update for immediate response
-        ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
-
         /**
          * terminate any running worker
          */
@@ -79,9 +76,6 @@ export class ModelTask {
                 //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
                 //     });
                 // }, 1000);
-
-                // 2. update to be sure that modification chart shows on initial load
-                ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
 
                 // show any contact updates
                 const displayableModification = ControlsContact.getInstance().getModification();

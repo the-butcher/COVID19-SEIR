@@ -297,12 +297,6 @@ export class SliderModification extends Slider {
 
         }
 
-
-        /**
-         * create a modification resolver of the appropriate type and use it to update the modification chart
-         */
-         ControlsConstants.rebuildModificationChart(ControlsConstants.MODIFICATION_PARAMS[key].getModificationResolver());
-
         const sliderThumb = this.findThumbById(this.selectableModificationId);
         if (ObjectUtil.isNotEmpty(sliderThumb)) {
             for (let index = 0; index < this.modificationIcons.length; index++) {

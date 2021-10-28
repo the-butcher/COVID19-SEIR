@@ -58,6 +58,7 @@ export class BaseData {
     private readonly baseDataset: {[K: string]: IBaseDataItemConfig};
     private readonly baseDataItems: {[K: string]: IBaseDataItem};
     private dailyOffsetInstantMin: number;
+    private dailyOffsetInstantMax: number;
 
     /**
      * a set of averages by age-group and week day
@@ -153,6 +154,7 @@ export class BaseData {
 
             } else {
                 this.dailyOffsetInstantMin = instant - TimeUtil.MILLISECONDS_PER___WEEK * 5;
+                this.dailyOffsetInstantMax = instant + TimeUtil.MILLISECONDS_PER___WEEK;
             }
 
         }
@@ -264,7 +266,7 @@ export class BaseData {
     }
 
     getAverageOffset(ageGroupIndex: number, instant: number): number | undefined {
-        if (instant > this.dailyOffsetInstantMin) {
+        if (instant > this.dailyOffsetInstantMin && instant <= this.dailyOffsetInstantMax) {
             return this.dailyOffsets[ageGroupIndex][new Date(instant).getDay()].getAverage();
         }
     }

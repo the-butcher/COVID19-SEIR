@@ -1,8 +1,6 @@
-import { Regression } from './../../model/regression/Regression';
-import { TimeUtil } from './../../util/TimeUtil';
-import { BaseData } from './../../model/basedata/BaseData';
-import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { MODIFICATION__FETCH } from './../../model/ModelConstants';
+import { Regression } from './../../model/regression/Regression';
 import { Demographics } from './../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesContact } from './IModificationValuesContact';

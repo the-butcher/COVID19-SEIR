@@ -135,7 +135,7 @@ export class ChartDiscovery {
         }
 
         const discoveryRatioTotal = modificationTime.getDiscoveryRatioTotal(); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
-        console.log('discoveryRatioTotal', discoveryRatioTotal);
+        // console.log('discoveryRatioTotal', discoveryRatioTotal);
         // this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
         this.valueTotalLabel.text = this.labellingDefinitionTooltip.format(discoveryRatioTotal); // ControlsConstants.LOCALE_FORMAT_FIXED (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 

@@ -1,17 +1,15 @@
-import { IModificationValuesContact } from './../../common/modification/IModificationValuesContact';
-import { ModelState } from './ModelState';
 import { Modifications } from '../../common/modification/Modifications';
-import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
 import { ECompartmentType } from '../compartment/ECompartmentType';
 import { ModelConstants } from '../ModelConstants';
 import { ModelImplRoot } from '../ModelImplRoot';
+import { IModificationValuesContact } from './../../common/modification/IModificationValuesContact';
 import { IModificationValuesStrain } from './../../common/modification/IModificationValuesStrain';
 import { ModificationTime } from './../../common/modification/ModificationTime';
 import { ModelInstants } from './../ModelInstants';
 import { IModelState } from './IModelState';
-import { IModificationValues } from '../../common/modification/IModificationValues';
+import { ModelState } from './ModelState';
 
 /**
  * definition for a type that hold model progress and, if complete, model data
@@ -28,6 +26,7 @@ export interface IDataItem {
     categoryX: string;
     valueset: { [K: string]: IDataValues };
     exposure: number[][];
+    seasonality: number;
     errors?: { [K: string]: number };
     derivs?: { [K: string]: number };
 }
@@ -43,6 +42,7 @@ export interface IDataValues {
     INCIDENCES: { [K: string]: number };
     EXPOSED: { [K: string]: number };
     INFECTIOUS: { [K: string]: number };
+    DISCOVERY: number;
     TOTAL: number;
 }
 
@@ -75,21 +75,10 @@ export class ModelStateIntegrator {
         this.resetExposure(); // be sure the exposure matrix is in a clean state upon init
     }
 
-    integrate(dT: number, tT: number): void {
-
-        const modificationTime = new ModificationTime({
-            id: ObjectUtil.createId(),
-            key: 'TIME',
-            instant: tT,
-            name: 'step',
-            deletable: false,
-            draggable: false,
-            blendable: false
-        });
-        modificationTime.setInstants(tT, tT); // tT, tT is by purpose, standing for instant, instant
-
+    private integrate(dT: number, tT: number): ModificationTime {
+        const modificationTime = ModificationTime.createInstance(tT);
         this.modelState.add(this.model.apply(this.modelState, dT, tT, modificationTime));
-
+        return modificationTime;
     }
 
     getInstant(): number {
@@ -136,6 +125,7 @@ export class ModelStateIntegrator {
 
         // one time evaluation of strains contributing
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+
         const compartmentFilterSusceptibleTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.S_SUSCEPTIBLE));
         const compartmentFilterExposedTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E_____EXPOSED));
         const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I__INFECTIOUS));
@@ -151,7 +141,7 @@ export class ModelStateIntegrator {
 
         for (; this.curInstant <= dstInstant; this.curInstant += ModelStateIntegrator.DT) {
 
-            this.integrate(ModelStateIntegrator.DT, this.curInstant);
+            const modificationTime = this.integrate(ModelStateIntegrator.DT, this.curInstant);
 
             // sum up strain exposures to a single exposure matrix
             modificationValuesStrain.forEach(modificationValueStrain => {
@@ -172,7 +162,9 @@ export class ModelStateIntegrator {
                 const removedVRTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVRTotal);
                 const removedV2Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV2Total);
                 const removedVCTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVCTotal);
+                const discoveryTotal = modificationTime.getDiscoveryRatioTotal();
 
+                // values that come by strain
                 const incidences: {[K: string]: number} = {};
                 const exposed: {[K: string]: number} = {};
                 const infectious: {[K: string]: number} = {};
@@ -197,7 +189,8 @@ export class ModelStateIntegrator {
                     instant: this.curInstant,
                     categoryX: TimeUtil.formatCategoryDate(this.curInstant),
                     valueset: {},
-                    exposure: this.exposure
+                    exposure: this.exposure,
+                    seasonality: modificationTime.getSeasonality()
                 };
                 dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
                     SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptibleTotal),
@@ -212,6 +205,7 @@ export class ModelStateIntegrator {
                     EXPOSED: exposed,
                     INFECTIOUS: infectious,
                     TOTAL: this.modelState.getNrmValueSum(compartmentFilterModelTotal) * absTotal,
+                    DISCOVERY: discoveryTotal
                 };
 
                 this.model.getDemographics().getAgeGroups().forEach(ageGroup => {
@@ -237,6 +231,7 @@ export class ModelStateIntegrator {
                     const removedVR = this.modelState.getNrmValueSum(compartmentFilterRemovedVR) * groupNormalizer;
                     const removedV2 = this.modelState.getNrmValueSum(compartmentFilterRemovedV2) * groupNormalizer;
                     const removedVC = this.modelState.getNrmValueSum(compartmentFilterRemovedVC) * groupNormalizer;
+                    const discovery = modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
 
                     const incidencesAgeGroup: {[K: string]: number} = {};
                     const exposedAgeGroup: {[K: string]: number} = {};
@@ -270,6 +265,7 @@ export class ModelStateIntegrator {
                         EXPOSED: exposedAgeGroup,
                         INFECTIOUS: infectiousAgeGroup,
                         TOTAL: this.modelState.getNrmValueSum(compartmentFilterAgeGroupTotal) * groupNormalizer,
+                        DISCOVERY: discovery
                     };
 
                 });
