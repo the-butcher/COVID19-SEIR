@@ -1,4 +1,5 @@
 import { Demographics } from '../../../common/demographics/Demographics';
+import { StrainUtil } from '../../../util/StrainUtil';
 import { TimeUtil } from '../../../util/TimeUtil';
 import { IModificationAdaptor } from '../fitter/IModificationAdaptor';
 import { IModificationSet } from '../fitter/IModificationSet';
@@ -54,6 +55,19 @@ export class ModificationAdaptorMultipliers3 implements IModificationAdaptor {
 
         modificationSet.modA.acceptUpdate({
             multipliers: multipliersA
+        });
+
+
+        Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+            for (let i=0; i<stepData.length; i++) {
+                const cases = StrainUtil.findCases(stepData[i], ageGroup);
+                const error = (cases.data / cases.base) - 1;
+                if (!stepData[i].errors) {
+                    stepData[i].errors = {};
+                }
+                stepData[i].errors[ageGroup.getName()] = error;
+            }
+
         });
 
         const correctionsA: { [K in string] : number } = {};

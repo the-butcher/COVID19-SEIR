@@ -43,9 +43,9 @@ export class ValueAdaptorCorrection3 extends ValueAdaptorBase3 {
         const remainingError = errA - this.accountedError;
 
         // add the new error to the accounted for stack
-        this.accountedError + errA;
+        // this.accountedError += errA;
 
-        const currMultA = Math.max(0.20, Math.min(4, prevMultA + remainingError * ModelStateFitter3.FIT___WEIGHT / 5));
+        const currMultA = Math.max(0.20, Math.min(4, prevMultA / (1 + remainingError * ModelStateFitter3.FIT___WEIGHT / 2)));
 
         return {
             prevMultA,

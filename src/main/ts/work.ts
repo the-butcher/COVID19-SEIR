@@ -10,6 +10,7 @@ import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
 import { ModelStateFitter1 } from './model/state/fitter1/ModelStateFitter1';
 import { ModelStateFitter3 } from './model/state/fitter3/ModelStateFitter3';
+import { ModelStateFitter4 } from './model/state/fitter4/ModelStateFitter4';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
 
@@ -71,7 +72,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
         //     });
         // });
 
-        // new ModelStateFitter3().adapt(modelStateIntegrator, maxInstant, modelProgress => {
+        // new ModelStateFitter4().adapt(modelStateIntegrator, maxInstant, modelProgress => {
         //     ctx.postMessage(modelProgress);
         // }).then(data => {
         //     const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());

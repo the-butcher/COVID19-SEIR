@@ -28,6 +28,8 @@ export interface IDataItem {
     categoryX: string;
     valueset: { [K: string]: IDataValues };
     exposure: number[][];
+    errors?: { [K: string]: number };
+    derivs?: { [K: string]: number };
 }
 export interface IDataValues {
     SUSCEPTIBLE: number;

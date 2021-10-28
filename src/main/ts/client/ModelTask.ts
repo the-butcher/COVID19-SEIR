@@ -75,7 +75,9 @@ export class ModelTask {
                 });
 
                 // setTimeout(() => {
-                //     ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                //     ChartAgeGroup.getInstance().exportToPng().then(() => {
+                //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                //     });
                 // }, 1000);
 
                 // 2. update to be sure that modification chart shows on initial load

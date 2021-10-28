@@ -35,9 +35,11 @@ export class Modifications {
     private static instance: Modifications;
 
     private modifications: Array<IModification<IModificationValues>>;
+    private lastUpdate: number;
 
     constructor() {
         this.modifications = [];
+        this.lastUpdate = -1;
     }
 
     buildModificationValues(): IModificationValues[] {
@@ -101,7 +103,11 @@ export class Modifications {
                 lastModification.setInstants(lastModification.getInstantA(), ModelInstants.getInstance().getMaxInstant());
             }
         });
+        this.lastUpdate = Date.now();
     }
 
+    getLastUpdate(): number {
+        return this.lastUpdate;
+    }
 
 }

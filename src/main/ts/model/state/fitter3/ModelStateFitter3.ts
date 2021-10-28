@@ -6,6 +6,7 @@ import { IModificationSet } from '../fitter/IModificationSet';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
 import { ModificationAdaptorCorrections3 } from './ModificationAdaptorCorrections3';
 import { ModificationAdaptorMultipliers3 } from './ModificationAdaptorMultipliers3';
+import { randomInt } from 'crypto';
 
 /**
  * model-fitter trying to lay an already pre-fitted curve on the averaged model's base curve
@@ -21,8 +22,8 @@ export class ModelStateFitter3 {
     // -- local (at the end) with a fit-interval of 2 (until variance can not be reduced any further)
     // -- local (at the end) with a fit-interval of 1 (for the very last step) length - 4
 
-    static readonly FIT_INTERVAL = 1;
-    static readonly FIT___WEIGHT = 0.01;
+    static readonly FIT_INTERVAL = 2;
+    static readonly FIT___WEIGHT = 0.1;
 
     async adapt(modelStateIntegrator: ModelStateIntegrator, maxInstant: number, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
 
@@ -48,38 +49,34 @@ export class ModelStateFitter3 {
         });
         // const modelStateBuilderCorrections = new ModificationAdaptorCorrections3();
 
-        let modificationIndex = modificationsContact.length - 6; // 3
+        let modificationIndex = 0; // Math.floor(Math.random() * ModelStateFitter3.FIT_INTERVAL); // modificationsContact.length - 6
 
-        const modificationContactOuterB = modificationsContact[modificationIndex];
-        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
-        const stepDataI = await modelStateIntegrator.buildModelData(modificationContactOuterB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-            // drop data from callback
-            progressCallback({
-                ratio: modelProgress.ratio
-            });
-        });
-        console.log(loggableRange, '++', stepDataI.length);
-        dataset.push(...stepDataI);
-        console.log('------------------------------------------------------------------------------------------');
+        // const modificationContactOuterB = modificationsContact[modificationIndex];
+        // let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
+        // const stepDataI = await modelStateIntegrator.buildModelData(modificationContactOuterB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        //     // drop data from callback
+        //     progressCallback({
+        //         ratio: modelProgress.ratio
+        //     });
+        // });
+        // console.log(loggableRange, '++', stepDataI.length);
+        // dataset.push(...stepDataI);
+        // modificationIndex++;
 
-        // let totalErrorMultipliers = 0;
-        // let totalErrorCorrections = 0;
         let errorStatsMultipliers = new Statistics();
-        // let errorStatsCorrections = new Statistics();
 
-        modificationIndex++;
-        for (; modificationIndex < modificationsContact.length - ModelStateFitter3.FIT_INTERVAL; modificationIndex++) {
+
+        for (; modificationIndex < modificationsContact.length - ModelStateFitter3.FIT_INTERVAL - 60; modificationIndex++) {
 
             const modificationContact = modificationsContact[modificationIndex];
 
             const modificationSet: IModificationSet = {
                 modA: modificationsContact[modificationIndex],
-                modB: modificationsContact[modificationIndex + ModelStateFitter3.FIT_INTERVAL]
+                modB: modificationsContact[modificationIndex + ModelStateFitter3.FIT_INTERVAL],
+                ratio: 1 - modificationIndex / modificationsContact.length
             }
 
             let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
-
-
 
             const corrErrs: { [K in string]: number} = {};
             Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
@@ -114,7 +111,7 @@ export class ModelStateFitter3 {
             //     });
             // });
 
-            console.log(loggableRange);
+            console.log(loggableRange, errorStatsMultipliers.getVariance().toFixed(8).padStart(7, ' '));
             // dataset.push(...stepDataI);
 
         }
@@ -155,7 +152,7 @@ export class ModelStateFitter3 {
         /**
          * fill rest of data
          */
-        loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(maxInstant)}`;
+        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(maxInstant)}`;
         const fillData = await modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio

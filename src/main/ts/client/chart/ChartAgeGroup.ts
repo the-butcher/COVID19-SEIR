@@ -3,9 +3,9 @@ import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { ModificationContact } from '../../common/modification/ModificationContact';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
+import { Regression } from '../../model/regression/Regression';
 import { Color } from '../../util/Color';
 import { QueryUtil } from '../../util/QueryUtil';
 import { CHART_MODE______KEY, ControlsConstants, IControlsChartDefinition } from '../gui/ControlsConstants';
@@ -23,7 +23,6 @@ import { ControlsVaccination } from './../controls/ControlsVaccination';
 import { ModelActions } from './../gui/ModelActions';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
-import regression, { DataPoint } from 'regression';
 
 export interface IModificationData {
     categoryX: string,
@@ -90,8 +89,10 @@ export class ChartAgeGroup {
     /**
      * visualize multipliers and corrections (for readability and plausibility)
      */
-    protected readonly seriesContactMultiplier: ChartAgeGroupSeries;
-    protected readonly seriesContactCorrection: ChartAgeGroupSeries;
+    protected readonly seriesContactMultiplierR: ChartAgeGroupSeries;
+    protected readonly seriesContactMultiplierO: ChartAgeGroupSeries;
+    protected readonly seriesContactCorrectionR: ChartAgeGroupSeries;
+    protected readonly seriesContactCorrectionO: ChartAgeGroupSeries;
 
 
     /**
@@ -281,15 +282,49 @@ export class ChartAgeGroup {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.seriesModification.getLabellingDefinition());
         });
 
-        this.seriesContactMultiplier = new ChartAgeGroupSeries({
+        this.seriesContactMultiplierR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent_000_100,
-            title: 'multipliers',
-            baseLabel: 'multipliers',
-            valueField: 'contactMultiplier',
-            colorKey: 'CONTACT',
+            title: 'multipliers (regression)',
+            baseLabel: 'multipliers (regression)',
+            valueField: 'contactMultiplierR',
+            colorKey: 'SEASONALITY',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.20,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactMultiplierO = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent_000_100,
+            title: 'multipliers (original)',
+            baseLabel: 'multipliers (original)',
+            valueField: 'contactMultiplierO',
+            colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
+            locationOnPath: 0.40,
+            labelled: true,
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactMultiplierO.bindToLegend(this.seriesContactMultiplierR);
+
+        this.seriesContactCorrectionR = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent_000_100,
+            title: 'corrections (regression)',
+            baseLabel: 'corrections (regression)',
+            valueField: 'contactCorrectionR',
+            colorKey: 'SEASONALITY',
+            strokeWidth: 1,
+            dashed: true,
             locationOnPath: 0.40,
             labelled: true,
             stacked: false,
@@ -297,24 +332,23 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-
-        this.seriesContactCorrection = new ChartAgeGroupSeries({
+        this.seriesContactCorrectionO = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent_000_100,
-            title: 'corrections',
-            baseLabel: 'corrections',
-            valueField: 'contactCorrection',
-            colorKey: 'CONTACT',
+            title: 'corrections (original)',
+            baseLabel: 'corrections (original)',
+            valueField: 'contactCorrectionO',
+            colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.40,
             labelled: true,
             stacked: false,
-            legend: true,
+            legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-
+        this.seriesContactCorrectionO.bindToLegend(this.seriesContactCorrectionR);
 
         this.seriesAgeGroupCasesP = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -329,7 +363,7 @@ export class ChartAgeGroup {
             labelled: true,
             stacked: false,
             legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
 
@@ -873,7 +907,7 @@ export class ChartAgeGroup {
         this.chart.cursor.triggerMove(point, 'soft'); // https://www.amcharts.com/docs/v4/tutorials/sticky-chart-cursor/
     }
 
-    exportToPng(): void {
+    async exportToPng(): Promise<void> {
         this.chart.exporting.export("png");
     }
 
@@ -960,14 +994,16 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVRC.setSeriesNote(ageGroup.getName());
 
-        this.seriesContactCorrection.setSeriesNote(ageGroup.getName());
+        this.seriesContactCorrectionR.setSeriesNote(ageGroup.getName());
+        this.seriesContactCorrectionO.setSeriesNote(ageGroup.getName());
 
     }
 
     async setContactCategory(categoryName: string): Promise<void> {
 
         this.categoryName = categoryName;
-        this.seriesContactMultiplier.setSeriesNote(this.categoryName);
+        this.seriesContactMultiplierR.setSeriesNote(this.categoryName);
+        this.seriesContactMultiplierO.setSeriesNote(this.categoryName);
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
             this.requestRenderModelData();
@@ -1177,8 +1213,10 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent_000_100.renderer.grid.template.disabled = !visible;
         this.yAxisPlotPercent_000_100.tooltip.disabled = !visible;
 
-        this.seriesContactMultiplier.setVisible(visible);
-        this.seriesContactCorrection.setVisible(visible);
+        this.seriesContactMultiplierR.setVisible(visible);
+        this.seriesContactMultiplierO.setVisible(visible);
+        this.seriesContactCorrectionR.setVisible(visible);
+        this.seriesContactCorrectionO.setVisible(visible);
 
     }
 
@@ -1330,27 +1368,11 @@ export class ChartAgeGroup {
         const heatData: any[] = [];
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
-        const modificationsContact = Modifications.getInstance().findModificationsByType('CONTACT').map(m => m as ModificationContact);
-
-        const toRegressionX = (instant: number) => {
-            return (instant - ModelInstants.getInstance().getMinInstant()) / (ModelInstants.getInstance().getMaxInstant() - ModelInstants.getInstance().getMinInstant());
-        };
-
-        const regressionData :DataPoint[] = [];
-        for (let i=modificationsContact.length - 20; i<modificationsContact.length; i++) {
-            const modificationContact = modificationsContact[i];
-            regressionData.push([
-                toRegressionX(modificationContact.getInstant()),
-                modificationContact.getCategoryValue(this.categoryName)
-            ]);
-        }
-        var regressionResult = regression.polynomial(regressionData, { order: 3 });
-        console.log('regressionResult', regressionResult);
-        var regressionEquation = (x: number) => Math.pow(x, 3) * regressionResult.equation[0] + Math.pow(x, 2) * regressionResult.equation[1] + x * regressionResult.equation[2] + regressionResult.equation[3];
-
 
         let maxGamma = 0;
         const randomVd = Math.random() * 0.00001;
+
+        // console.log('modelData', this.modelData);
 
         const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
         for (const dataItem of this.modelData) {
@@ -1368,13 +1390,15 @@ export class ChartAgeGroup {
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
-            const regressionX = toRegressionX(dataItem.instant);
-            const contactMultiplier = regressionEquation(regressionX); // regressionResult.points.find(p => p[0] > regressionX)?.[1];
-            const contactCorrection = modificationsContact.find(m => m.getInstant() === dataItem.instant)?.getCategoryValue(this.categoryName);
-            // contactMultiplier = modificationContact.getCategoryValue(this.categoryName);
-            // if (this.ageGroupIndex >= 0 && this.ageGroupIndex < Demographics.getInstance().getAgeGroups().length) {
-            //     contactCorrection = modificationContact.getCorrectionValue('other', this.ageGroupIndex) / 2;
-            // }
+            const multiplierResult = Regression.getInstance().getMultiplier(dataItem.instant, this.categoryName);
+            const contactMultiplierR = multiplierResult.regression;
+            const contactMultiplierO = multiplierResult.original;
+
+            const correctionResult = Regression.getInstance().getCorrection(dataItem.instant, this.ageGroupIndex);
+            const contactCorrectionR = correctionResult.regression ? (correctionResult.regression - 1) / 4 + 0.5 : undefined;
+            const contactCorrectionO = correctionResult.original ? (correctionResult.original - 1) / 4 + 0.5 : undefined;
+
+            // console.log(multiplierResult, correctionResult);
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1389,9 +1413,10 @@ export class ChartAgeGroup {
                 ageGroupRemovedVRC,
                 ageGroupIncidence,
                 ageGroupCasesP,
-                contactMultiplier,
-                contactCorrection
-                // ageGroupCasesN,
+                contactMultiplierR,
+                contactMultiplierO,
+                contactCorrectionR,
+                contactCorrectionO
             }
 
             // add one strain value per modification
@@ -1411,20 +1436,20 @@ export class ChartAgeGroup {
                 let gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
 
                 let color: string;
-                if (QueryUtil.getInstance().isDiffDisplay() && ObjectUtil.isNotEmpty(dataItem00)) {
+                if (QueryUtil.getInstance().isDiffDisplay() && dataItem && dataItem00) { //
 
-                    // console.log(dataItem.valueset[ageGroupHeat.getName()].CASES, dataItem00.getAverageCases(ageGroupHeat.getIndex()))
+                    // const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
 
-                    const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex());
+                    const caseValue = dataItem.derivs ? dataItem.derivs[ageGroupHeat.getName()] : 0;
 
                     let r = 0;
                     let g = 0;
                     let b = 0;
-                    if (caseValue >= 1) {
-                        g = (caseValue - 1) * 5;
+                    if (caseValue >= 0) {
+                        g = caseValue * 5;
                     }
                     else {
-                        r = (1 / caseValue - 1) * 5;
+                        r = caseValue * - 5;
                     }
                     // if (value > 0) {
                     //     g = value / 20;
@@ -1439,7 +1464,7 @@ export class ChartAgeGroup {
                     ColorUtil.rgbToHsv(rgb, hsv);
                     color = new Color(hsv[0], hsv[1], hsv[2]).getHex();
 
-                    label = caseValue.toLocaleString();
+                    label = caseValue?.toLocaleString();
                     // gamma = caseValue;
                     gamma = Math.pow(caseValue + randomVd, 1 / 0.9); // apply some gamma for better value perception
                     // gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception

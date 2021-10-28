@@ -8,6 +8,7 @@ import { ModificationResolverContact } from './common/modification/ModificationR
 import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
+import { Regression } from './model/regression/Regression';
 import { Logger } from './util/Logger';
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
@@ -129,6 +130,10 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             // initialize model mode
             ModelActions.getInstance();
 
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-10-28').getTime()));
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-03').getTime()));
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-09').getTime()));
+
             setTimeout(() => {
                 ModelActions.getInstance().toggleModelMode('CONTACT');
                 ModelActions.getInstance().toggleChartMode('INCIDENCE');
@@ -136,7 +141,8 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 requestAnimationFrame(() => {
 
                     ChartAgeGroup.getInstance().setAgeGroupIndex(Demographics.getInstance().getAgeGroups().length); // effectively set it to TOTAL
-                    ControlsConstants.MODIFICATION_PARAMS['STRAIN'].handleModificationUpdate();
+                    ChartAgeGroup.getInstance().setContactCategory('other'); // effectively set it to TOTAL
+                    ControlsConstants.MODIFICATION_PARAMS['CONTACT'].handleModificationUpdate();
 
                 });
             }, 250);

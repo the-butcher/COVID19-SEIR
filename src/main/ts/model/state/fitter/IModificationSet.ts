@@ -4,4 +4,5 @@ export interface IModificationSet {
     modA: ModificationContact;
     modB: ModificationContact;
     modC?: ModificationContact;
+    ratio?: number;
 }

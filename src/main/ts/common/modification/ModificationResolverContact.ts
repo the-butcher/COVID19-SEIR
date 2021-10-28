@@ -1,3 +1,4 @@
+import { Regression } from './../../model/regression/Regression';
 import { TimeUtil } from './../../util/TimeUtil';
 import { BaseData } from './../../model/basedata/BaseData';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
@@ -29,6 +30,40 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
     getTitle(): string {
         return 'contact rate';
+    }
+
+    createRegressionModification(instant: number): ModificationContact {
+
+        const regression = Regression.getInstance();
+        const multipliers: { [K in string]: number } = {};
+        const _corrections: { [K in string]: number } = {};
+        Demographics.getInstance().getCategories().forEach(category => {
+            multipliers[category.getName()] = regression.getMultiplier(instant, category.getName()).regression;
+        });
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            _corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
+        });
+        const corrections: { [K in string]: { [K in string]: number }} = {
+            'family': {..._corrections},
+            'school': {..._corrections},
+            'nursing': {..._corrections},
+            'work': {..._corrections},
+            'other': {..._corrections},
+        };
+
+        const id = ObjectUtil.createId();
+        return new ModificationContact({
+            id,
+            key: 'CONTACT',
+            name: `regression (${id})`,
+            instant,
+            deletable: true,
+            draggable: true,
+            blendable: true,
+            multipliers,
+            corrections
+        });
+
     }
 
     getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationContact {
@@ -88,7 +123,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 draggable: true,
                 blendable: true
             };
-            // console.log('creating with', modificationValues);
+            // console.log('creating', TimeUtil.formatCategoryDate(instant));
 
         }
 
@@ -97,10 +132,12 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         // }
         const modification = new ModificationContact(modificationValues);
         if (fetchType === 'CREATE') {
-            modification.setInstants(instant, instant); // will trigger update of 'work' multiplier
+            modification.setInstants(instant, instant); // will trigger update of 'work' and other mobility based values
+            console.log(fetchType, 'after delegation', modification.getModificationValues());
         }
 
-        return new ModificationContact(modificationValues);
+
+        return modification;
 
     }
 

@@ -89,15 +89,18 @@ export class BaseDataItem implements IBaseDataItem {
     }
 
     getMobilityOther(): number {
-        return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_O] / 120;
+        const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_O];
+        return configValue >=0 ? configValue / 120 : undefined;
     }
 
     getMobilityWork(): number {
-        return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_W] / 120;
+        const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_W];
+        return configValue >=0 ? configValue / 120 : undefined;
     }
 
     getMobilityHome(): number {
-        return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_H] / 108;
+        const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_H];
+        return configValue >=0 ? configValue / 120 : undefined;
     }
 
     /**
@@ -125,68 +128,60 @@ export class BaseDataItem implements IBaseDataItem {
         const dataItemP3 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 3);
         const dataItemP4 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 4);
 
-        // NO! - let base data be base data -- predictions to be made in the model
-        // // if there is no data item 4, substitute with an expected value for that day of week
-        // if (dataItemP2 && dataItemP3 && !dataItemP4) {
-        //     console.log('miss', TimeUtil.formatCategoryDate(this.instant));
-        //     Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-        //         const casesM1 = this.getCasesM1(ageGroup.getIndex());
-
-        //         var data:DataPoint[] = [
-        //             [0,1],
-        //             [32, 67],
-        //             [12, 79]
-        //         ];
-        //         var result = regression.polynomial(data, { order: 3 });
-        //         console.log('result', result);
-
-        //     });
-
-        // }
-
-        if (dataItemP2 && dataItemP3 && dataItemP4) {
+        if (dataItemP2 && dataItemP3) { //  && dataItemP3 && dataItemP4
 
             const ageGroupIndexTotal = Demographics.getInstance().getAgeGroups().length;
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                 const incidenceP2 = dataItemP2.getIncidence(ageGroup.getIndex());
                 const incidenceP3 = dataItemP3.getIncidence(ageGroup.getIndex());
-                const incidenceP4 = dataItemP4.getIncidence(ageGroup.getIndex());
-                if (incidenceP2 && incidenceP3 && incidenceP4) {
+                if (dataItemP4) {
+                    const incidenceP4 = dataItemP4.getIncidence(ageGroup.getIndex());
                     this.averageCases[ageGroup.getIndex()] = (incidenceP2 * 0.25 + incidenceP3 * 0.50 + incidenceP4 * 0.25) * ageGroup.getAbsValue() / 700000;
+                } else {
+                    this.averageCases[ageGroup.getIndex()] = incidenceP3 * ageGroup.getAbsValue() / 700000;
                 }
             });
 
-            const testsP2 = dataItemP2.getTestsM7();
-            const testsP3 = dataItemP3.getTestsM7();
-            const testsP4 = dataItemP4.getTestsM7();
-            if (testsP2 && testsP3 && testsP4) {
-                const averageCases = this.averageCases[ageGroupIndexTotal];
-                let _averagePositivity =  (testsP2 * 0.25 + testsP3 * 0.50 + testsP4 * 0.25) / 7;
-                _averagePositivity = averageCases / _averagePositivity;
-                if (!Number.isNaN(_averagePositivity)) {
-                    this.averagePositivity = _averagePositivity;
+            if (dataItemP4) {
+                const testsP2 = dataItemP2.getTestsM7();
+                const testsP3 = dataItemP3.getTestsM7();
+                const testsP4 = dataItemP4.getTestsM7();
+                if (testsP2 && testsP3 && testsP4) {
+                    const averageCases = this.averageCases[ageGroupIndexTotal];
+                    let _averagePositivity =  (testsP2 * 0.25 + testsP3 * 0.50 + testsP4 * 0.25) / 7;
+                    _averagePositivity = averageCases / _averagePositivity;
+                    if (!Number.isNaN(_averagePositivity)) {
+                        this.averagePositivity = _averagePositivity;
+                    }
                 }
             }
 
             let mobilityOtherValues: number[] = [];
             let mobilityWorkValues: number[] = [];
             let mobilityHomeValues: number[] = [];
-            for (let i = -3; i < 4; i++) {
-                const dataItemMI = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * i);
+
+            mobilityOtherValues.push(this.getMobilityOther());
+            mobilityWorkValues.push(this.getMobilityWork());
+            mobilityHomeValues.push(this.getMobilityHome());
+
+            const dataItemMI = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY);
+            const dataItemPI = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
+            if (dataItemMI.getMobilityOther() && dataItemPI.getMobilityOther()) {
                 mobilityOtherValues.push(dataItemMI.getMobilityOther());
+                mobilityOtherValues.push(dataItemPI.getMobilityOther());
+            }
+            if (dataItemMI.getMobilityWork() && dataItemPI.getMobilityWork()) {
                 mobilityWorkValues.push(dataItemMI.getMobilityWork());
+                mobilityWorkValues.push(dataItemPI.getMobilityWork());
+            }
+            if (dataItemMI.getMobilityHome() && dataItemPI.getMobilityHome()) {
                 mobilityHomeValues.push(dataItemMI.getMobilityHome());
+                mobilityHomeValues.push(dataItemPI.getMobilityHome());
             }
 
             mobilityOtherValues.sort((a, b) => a - b);
             mobilityWorkValues.sort((a, b) => a - b);
             mobilityHomeValues.sort((a, b) => a - b);
-
-            // console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
-            mobilityOtherValues = mobilityOtherValues.slice(2, mobilityOtherValues.length - 2);
-            mobilityWorkValues = mobilityWorkValues.slice(2, mobilityWorkValues.length - 2);
-            mobilityHomeValues = mobilityHomeValues.slice(2, mobilityHomeValues.length - 2);
-            // console.log('mobilityWorkValues', TimeUtil.formatCategoryDate(this.instant), mobilityWorkValues);
 
             this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) /  mobilityOtherValues.length;
             this.averageMobilityWork = mobilityWorkValues.reduce((a, b) => a + b, 0) / mobilityWorkValues.length;

@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import { BaseData } from '../../model/basedata/BaseData';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -43,14 +44,18 @@ export class ModificationContact extends AModification<IModificationValuesContac
         super.setInstants(instantA, instantB);
         const baseDataItem = BaseData.getInstance().findBaseDataItem(instantA);
         if (baseDataItem) {
+            const multipliers: { [K in string]: number } = {};
             const multiplierWork = baseDataItem.getAverageMobilityWork();
             if (multiplierWork) {
-                this.modificationValues.multipliers['work'] = multiplierWork * 0.60; // TODO magic multiplier, magic number
+                multipliers['work'] = multiplierWork * 0.60;
             }
             const multiplierHome = baseDataItem.getAverageMobilityHome();
             if (multiplierHome) {
-                this.modificationValues.multipliers['family'] = multiplierHome * 0.90; // TODO magic multiplier, magic number
+                multipliers['family'] = multiplierHome * 0.90;
             }
+            this.acceptUpdate({
+                multipliers
+            });
         }
     }
 

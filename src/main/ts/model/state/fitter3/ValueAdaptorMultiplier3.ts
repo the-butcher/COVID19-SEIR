@@ -31,7 +31,7 @@ export class ValueAdaptorMultiplier3 extends ValueAdaptorBase3 {
         super(params.ageGroup);
         this.contactCategory = params.contactCategory;
         this.accountedError = 0;
-        this.weightA = 0.01;
+        this.weightA = params.weightA;
     }
 
     getContactCategory(): string {
@@ -59,9 +59,9 @@ export class ValueAdaptorMultiplier3 extends ValueAdaptorBase3 {
         const remainingError = errA - this.accountedError;
 
         // add the new error to the accounted for stack
-        this.accountedError + errA;
+        // this.accountedError += errA;
 
-        const currMultA = Math.max(0.00, Math.min(1, prevMultA + remainingError * this.weightA));
+        const currMultA = Math.max(0.00, Math.min(1, prevMultA / (1 + remainingError * this.weightA)));
 
         return {
             prevMultA,
