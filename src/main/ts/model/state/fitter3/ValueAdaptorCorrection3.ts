@@ -36,8 +36,8 @@ export class ValueAdaptorCorrection3 extends ValueAdaptorBase3 {
 
         const errA = this.calculateErrA(modificationSet, stepDataset);
 
-        const prevMultA = modificationSet.modA.getCorrectionValue('other', this.getAgeGroup().getIndex());
-        const prevMultB = modificationSet.modB.getCorrectionValue('other', this.getAgeGroup().getIndex())
+        const prevMultA = modificationSet.modA.getCorrectionValue(this.getAgeGroup().getIndex());
+        const prevMultB = modificationSet.modB.getCorrectionValue(this.getAgeGroup().getIndex())
 
         // subtract anything that is assumed to already be accounted for
         const remainingError = errA - this.accountedError;

@@ -70,16 +70,16 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
 
             //         // line A (upper or lower, not necessarily important to know)
-            //         const mod0 = modificationsContact[i].getCorrectionValue('other', ageGroup.getIndex());
+            //         const mod0 = modificationsContact[i].getCorrectionValue(ageGroup.getIndex());
 
             //         // line B
-            //         const mod1 = modificationsContact[i + 1].getCorrectionValue('other', ageGroup.getIndex());
+            //         const mod1 = modificationsContact[i + 1].getCorrectionValue(ageGroup.getIndex());
 
             //         // line A (upper or lower, not necessarily important to know)
-            //         const mod2 = modificationsContact[i + 2].getCorrectionValue('other', ageGroup.getIndex());
+            //         const mod2 = modificationsContact[i + 2].getCorrectionValue(ageGroup.getIndex());
 
             //         // line B
-            //         const mod3 = modificationsContact[i + 3].getCorrectionValue('other', ageGroup.getIndex());
+            //         const mod3 = modificationsContact[i + 3].getCorrectionValue(ageGroup.getIndex());
 
             //         // midpoint on 02
             //         const mid02 = mod0 + (mod2 - mod0) / 2;
@@ -98,23 +98,11 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             //     // create modification values by modification id
             //     adaptedValues[modificationsContact[i + 1].getId()] = {
             //         multipliers: multipliers1,
-            //         corrections: {
-            //             'family': corrections1,
-            //             'school': corrections1,
-            //             'nursing': corrections1,
-            //             'work': corrections1,
-            //             'other': corrections1,
-            //         }
+            //         corrections: corrections1
             //     }
             //     adaptedValues[modificationsContact[i + 2].getId()] = {
             //         multipliers: multipliers2,
-            //         corrections: {
-            //             'family': corrections2,
-            //             'school': corrections2,
-            //             'nursing': corrections2,
-            //             'work': corrections2,
-            //             'other': corrections2,
-            //         }
+            //         corrections:corrections2
             //     }
 
             // }

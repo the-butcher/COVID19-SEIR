@@ -22,4 +22,9 @@ export interface IModificationValuesDiscovery extends IModificationValues {
      */
     multipliers: { [K in string] : number };
 
+    /**
+     * are this instance's value preceded by a smooth transition
+     */
+     blendable: boolean;
+
 }

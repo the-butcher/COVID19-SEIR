@@ -59,11 +59,6 @@ export interface IModification<P extends IModificationValues> {
     isDeletable(): boolean;
 
     /**
-     * are this instance's value preceded by a smooth transition
-     */
-    isBlendable(): boolean;
-
-    /**
      * check if this instance can be dragged along the modification slider
      */
     isDraggable(): boolean;

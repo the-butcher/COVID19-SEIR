@@ -44,8 +44,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
             instant: instant,
             name: id,
             deletable: false,
-            draggable: false,
-            blendable: false
+            draggable: false
         });
         modificationTime.setInstants(instant, instant);
         return modificationTime;

@@ -40,8 +40,8 @@ export interface IControlsDefinitions {
     container: string;
     handleModificationUpdate: () => Promise<void>;
     handleModificationDrag: (instant: number) => void;
-    getModificationResolver: () => IModificationResolver<IModificationValues, IModification<IModificationValues>>,
     showInEditor?: (modification: IModification<IModificationValues>) => void;
+    getModificationResolver(): IModificationResolver<IModificationValues,IModification<IModificationValues>>;
     labellingDefinition: ILabellingDefinition;
 }
 
@@ -250,10 +250,10 @@ export class ControlsConstants {
             handleModificationUpdate: () => {
                 return ModelTask.commit('STRAIN', ControlsConstants.createWorkerInput());
             },
-            handleModificationDrag: () => {},
             getModificationResolver: () => {
                 return new ModificationResolverStrain();
             },
+            handleModificationDrag: () => {},
             showInEditor: modification => ControlsStrain.getInstance().acceptModification(modification as ModificationStrain),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         },
@@ -263,10 +263,10 @@ export class ControlsConstants {
             handleModificationUpdate: () => {
                 return ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
             },
-            handleModificationDrag: () => {},
             getModificationResolver: () => {
                 return new ModificationResolverContact();
             },
+            handleModificationDrag: () => {},
             showInEditor: modification => ControlsContact.getInstance().acceptModification(modification as ModificationContact),
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -276,10 +276,10 @@ export class ControlsConstants {
             handleModificationUpdate: () => {
                 return ModelTask.commit('TESTING', ControlsConstants.createWorkerInput());
             },
-            handleModificationDrag: () => {},
             getModificationResolver: () => {
                 return new ModificationResolverDiscovery();
             },
+            handleModificationDrag: () => {},
             showInEditor: modification => {
                 ControlsDiscovery.getInstance().acceptModification(modification as ModificationDiscovery);
                 ChartAgeGroup.getInstance().setChartMode('TESTING');
@@ -292,10 +292,10 @@ export class ControlsConstants {
             handleModificationUpdate: () => {
                 return ModelTask.commit('VACCINATION', ControlsConstants.createWorkerInput());
             },
-            handleModificationDrag: () => {},
             getModificationResolver: () => {
                 return new ModificationResolverVaccination();
             },
+            handleModificationDrag: () => {},
             showInEditor: modification => {
                 ControlsVaccination.getInstance().acceptModification(modification as ModificationVaccination);
                 ChartAgeGroup.getInstance().setChartMode('VACCINATED');
@@ -324,10 +324,10 @@ export class ControlsConstants {
             handleModificationUpdate: () => {
                 return ModelTask.commit('SETTINGS', ControlsConstants.createWorkerInput());
             },
-            handleModificationDrag: () => {},
             getModificationResolver: () => {
                 return new ModificationResolverSettings();
             },
+            handleModificationDrag: () => {},
             showInEditor: modification => ControlsSettings.getInstance().acceptModification(modification as ModificationSettings),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         }
@@ -350,6 +350,10 @@ export class ControlsConstants {
             demographicsConfig: Demographics.getInstance().getDemographicsConfig(),
             modificationValues: Modifications.getInstance().buildModificationValues(),
             baseDataConfig: BaseData.getInstance().getBaseDataConfig(),
+            fitterParams: {
+                derivRatio: 0.2,
+                errorTLast: 200
+            }
         }
     }
 

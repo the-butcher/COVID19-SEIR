@@ -121,16 +121,6 @@ export class ControlsDiscovery {
     updateChart(): void {
 
         const instant = this.modification.getInstantA();
-        // console.log('updating instant', TimeUtil.formatCategoryDate(instant));
-        // const modificationTime = new ModificationTime({
-        //     id: ObjectUtil.createId(),
-        //     key: 'TIME',
-        //     instant,
-        //     name: 'step',
-        //     deletable: false,
-        //     draggable: false,
-        //     blendable: false
-        // });
         const modificationTime = ModificationTime.createInstance(instant);
         modificationTime.setInstants(instant, instant);
 

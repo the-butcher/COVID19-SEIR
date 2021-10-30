@@ -44,6 +44,10 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
         return this.modificationValues.bindToOverall;
     }
 
+    isBlendable(): boolean {
+        return this.modificationValues.blendable;
+    }
+
     getCategoryValue(contactCategoryName: string): number {
         if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
             this.modificationValues.multipliers[contactCategoryName] = 0.1;

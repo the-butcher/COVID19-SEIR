@@ -97,6 +97,7 @@ export class ChartAgeGroupSeries {
                 if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
                     const itemCurr = target.dataItems.values[indexCurr];
                     const valueCurr = itemCurr.dataContext[this.valueField];
+// ''                    console.log('indexCurr', this.series.name, indexCurr, valueCurr);
                     return valueCurr ? `${this.seriesLabel.text}: ${this.labellingDefinition.format(valueCurr)}` : undefined;
                 } else {
                     // console.log('no index found', this.series.name);
@@ -104,6 +105,15 @@ export class ChartAgeGroupSeries {
                 }
             });
         }
+        // this.series.tooltip.label.adapter.add("text", (value, target) {
+        //     if (target.dataItem && target.dataItem.valueY == 0) {
+        //       return "";
+        //     }
+        //     else {
+        //       return text;
+        //     }
+        //   });
+
         this.series.tooltip.disabled = !params.labelled;
         this.seriesLabel.disabled =  !params.labelled;
 

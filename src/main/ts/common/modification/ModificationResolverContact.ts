@@ -32,22 +32,22 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
     createRegressionModification(instant: number): ModificationContact {
 
-        const regression = Regression.getInstance();
+        const regression = Regression.getInstance(instant);
         const multipliers: { [K in string]: number } = {};
-        const _corrections: { [K in string]: number } = {};
+        const corrections: { [K in string]: number } = {};
         Demographics.getInstance().getCategories().forEach(category => {
             multipliers[category.getName()] = regression.getMultiplier(instant, category.getName()).regression;
         });
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            _corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
+            corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
         });
-        const corrections: { [K in string]: { [K in string]: number }} = {
-            'family': {..._corrections},
-            'school': {..._corrections},
-            'nursing': {..._corrections},
-            'work': {..._corrections},
-            'other': {..._corrections},
-        };
+        // const corrections: { [K in string]: { [K in string]: number }} = {
+        //     'family': {..._corrections},
+        //     'school': {..._corrections},
+        //     'nursing': {..._corrections},
+        //     'work': {..._corrections},
+        //     'other': {..._corrections},
+        // };
 
         const id = ObjectUtil.createId();
         return new ModificationContact({
@@ -57,10 +57,49 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
             instant,
             deletable: true,
             draggable: true,
-            blendable: true,
             multipliers,
             corrections
         });
+
+    }
+
+    interpolateValues(instant: number, modificationA: ModificationContact, modificationB: ModificationContact): IModificationValuesContact {
+
+        const modificationValuesA = modificationA.getModificationValues();
+        const modificationValuesB = modificationB.getModificationValues();
+
+        const multipliers: { [K: string]: number} = {};
+        const corrections: { [K: string]: number} = {};
+
+        const categoryNames = Demographics.getInstance().getCategories().map(c => c.getName());
+        const ageGroups = Demographics.getInstance().getAgeGroups();
+
+        const fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
+
+        categoryNames.forEach(categoryName => {
+
+            const multiplierA = modificationValuesA.multipliers[categoryName];
+            const multiplierB = modificationValuesB.multipliers[categoryName];
+            multipliers[categoryName] = multiplierA + (multiplierB - multiplierA) * fraction;
+
+        });
+
+        ageGroups.forEach(ageGroup => {
+            const correctionA = (modificationValuesA.corrections && modificationValuesA.corrections[ageGroup.getName()]) || 1;
+            const correctionB = (modificationValuesB.corrections && modificationValuesB.corrections[ageGroup.getName()]) || 1;
+            corrections[ageGroup.getName()] = correctionA + (correctionB - correctionA) * fraction;
+        });
+
+        return {
+            id: ObjectUtil.createId(),
+            key: 'CONTACT',
+            name: `interpolation (${modificationValuesA.name})`,
+            instant,
+            deletable: true,
+            draggable: true,
+            multipliers,
+            corrections
+        };
 
     }
 
@@ -70,45 +109,11 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1));
 
         let modificationValues: IModificationValuesContact;
-        if (modificationA && modificationB && modificationB.isBlendable() && modificationA.getInstantA() < modificationB.getInstantA()) {
 
-            const modificationValuesA = modificationA.getModificationValues();
-            const modificationValuesB = modificationB.getModificationValues();
+        // if creating between 2 modification, interpolate
+        if (fetchType === 'CREATE' && modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) {
 
-            const categoryNames = Demographics.getInstance().getCategories().map(c => c.getName());
-
-            const fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
-            const multipliers: { [K: string]: number} = {};
-            const corrections: { [K: string]: { [K: string]: number}} = {};
-            const ageGroups = Demographics.getInstance().getAgeGroups();
-
-            categoryNames.forEach(categoryName => {
-
-                corrections[categoryName] = {};
-
-                const multiplierA = modificationValuesA.multipliers[categoryName];
-                const multiplierB = modificationValuesB.multipliers[categoryName];
-                multipliers[categoryName] = multiplierA + (multiplierB - multiplierA) * fraction;
-
-                ageGroups.forEach(ageGroup => {
-                    const correctionA = (modificationValuesA.corrections && modificationValuesA.corrections[categoryName] && modificationValuesA.corrections[categoryName][ageGroup.getName()]) || 1;
-                    const correctionB = (modificationValuesB.corrections && modificationValuesB.corrections[categoryName] && modificationValuesB.corrections[categoryName][ageGroup.getName()]) || 1;
-                    corrections[categoryName][ageGroup.getName()] = correctionA + (correctionB - correctionA) * fraction;
-                });
-
-            });
-
-            modificationValues = {
-                id: ObjectUtil.createId(),
-                key: 'CONTACT',
-                name: `interpolation (${modificationValuesA.name})`,
-                instant,
-                deletable: true,
-                draggable: true,
-                blendable: modificationB.isBlendable(),
-                multipliers,
-                corrections
-            };
+            modificationValues = this.interpolateValues(instant, modificationA, modificationB);
 
         } else {
 
@@ -118,8 +123,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
                 id,
                 name: `interpolation (${id})`,
                 deletable: true,
-                draggable: true,
-                blendable: true
+                draggable: true
             };
             // console.log('creating', TimeUtil.formatCategoryDate(instant));
 
@@ -133,7 +137,6 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
             modification.setInstants(instant, instant); // will trigger update of 'work' and other mobility based values
             console.log(fetchType, 'after delegation', modification.getModificationValues());
         }
-
 
         return modification;
 

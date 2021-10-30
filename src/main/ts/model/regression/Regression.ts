@@ -1,3 +1,5 @@
+import { ModificationResolverContact } from './../../common/modification/ModificationResolverContact';
+import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { Modifications } from '../../common/modification/Modifications';
@@ -6,6 +8,7 @@ import { ValueRegressionCorrection } from './ValueRegressionCorrection';
 import { ValueRegressionMultiplier } from './ValueRegressionMultiplier';
 
 export interface IRegressionParams {
+    instant: number
     modificationCount: number;
 }
 
@@ -16,11 +19,15 @@ export interface IRegressionResult {
 
 export class Regression {
 
-    static getInstance(): Regression {
-        if (ObjectUtil.isEmpty(this.instance) || this.instance.instant < Modifications.getInstance().getLastUpdate()) {
+    static getInstance(instant: number): Regression {
+        if (ObjectUtil.isEmpty(this.instance)) {
             this.instance = new Regression({
-                modificationCount: 30
+                instant,
+                modificationCount: Modifications.getInstance().findModificationsByType('CONTACT').length
             });
+            if (ChartAgeGroup.getInstance().getChartMode() === 'CONTACT') {
+                ChartAgeGroup.getInstance().requestRenderModelData();
+            }
         }
         return this.instance;
     }
@@ -28,18 +35,26 @@ export class Regression {
 
     private readonly valueRegressionsMultiplier: { [K in string]: ValueRegressionMultiplier };
     private readonly valueRegressionsCorrection: { [K in string]: ValueRegressionCorrection };
+
     private readonly instant: number;
 
     private constructor(params: IRegressionParams) {
 
         // console.log('building regression');
+        this.instant = params.instant;
 
         this.valueRegressionsMultiplier = {};
         this.valueRegressionsCorrection = {};
 
-        this.instant = Modifications.getInstance().getLastUpdate();
+        let modificationsContactA = new ModificationResolverContact().getModifications().filter(m => m.getInstant() < this.instant);
+        let modificationsContactB = new ModificationResolverContact().getModifications().filter(m => m.getInstant() > this.instant);
 
-        const modificationsContact = Modifications.getInstance().findModificationsByType('CONTACT').map(m => m as ModificationContact);
+        console.log('mods a, b', modificationsContactA.length, modificationsContactB.length, Math.max(0, modificationsContactA.length - params.modificationCount / 2), Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
+
+        modificationsContactA = modificationsContactA.slice(Math.max(0, modificationsContactA.length - params.modificationCount / 2));
+        modificationsContactB = modificationsContactB.slice(0, Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
+
+        const modificationsContact: ModificationContact[] = [...modificationsContactA, ...modificationsContactB];
 
         /**
          * multipliers
@@ -47,6 +62,7 @@ export class Regression {
         Demographics.getInstance().getCategories().forEach(category => {
 
             const valueRegression = new ValueRegressionMultiplier({
+                instant: this.instant,
                 contactCategory: category.getName(),
                 modificationCount: params.modificationCount
             });
@@ -61,6 +77,7 @@ export class Regression {
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
 
             const valueRegression = new ValueRegressionCorrection({
+                instant: this.instant,
                 ageGroupIndex: ageGroup.getIndex(),
                 modificationCount: params.modificationCount
             });

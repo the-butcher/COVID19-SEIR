@@ -43,8 +43,7 @@ export class ModificationResolverSeasonality extends AModificationResolver<IModi
             instant,
             seasonality,
             deletable: false,
-            draggable: true,
-            blendable: false
+            draggable: true
         };
         return new ModificationSeasonality(seasonalityValues);
     }

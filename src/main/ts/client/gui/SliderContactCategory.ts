@@ -251,7 +251,7 @@ export class SliderContactCategory extends Slider {
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
         ageGroups.forEach(ageGroup => {
-            const correction = modification.getCorrectionValue(this.contactCategoryConfig.getName(), ageGroup.getIndex());;
+            const correction = modification.getCorrectionValue(ageGroup.getIndex());;
             if (correction !== 1) {
                 this.corrections[ageGroup.getName()] = correction;
             }

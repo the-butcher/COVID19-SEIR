@@ -27,7 +27,7 @@ export class ControlsContact {
 
     private readonly chartContact: ChartContactMatrix;
     private readonly slidersCategory: SliderContactCategory[];
-    private readonly iconBlendable: IconToggle;
+    private readonly iconReadonly: IconToggle;
 
     private modification: ModificationContact;
 
@@ -37,34 +37,40 @@ export class ControlsContact {
         this.chartContact = new ChartContactMatrix('chartContactDiv', true);
         this.slidersCategory = [];
 
-        this.iconBlendable = new IconToggle({
+        this.iconReadonly = new IconToggle({
             container: 'slidersCategoryDiv',
             state: false,
             handleToggle: state => {
                 this.handleChange();
             },
-            label: 'smooth transition'
+            label: 'readonly'
         });
 
         Demographics.getInstance().getCategories().forEach(contactCategory => {
-            const slider = new SliderContactCategory(contactCategory);
-            if (contactCategory.getName() === 'work' || contactCategory.getName() === 'family') {
-                slider.setDisabled(true);
+            this.slidersCategory.push(new SliderContactCategory(contactCategory));
+        });
+
+        this.setSliderStates();
+
+    }
+
+
+    setSliderStates(): void {
+
+        this.slidersCategory.forEach(sliderCategory => {
+            if (this.modification?.isReadonly() || sliderCategory.getName() === 'work' || sliderCategory.getName() === 'family') {
+                sliderCategory.setDisabled(true);
+            } else {
+                sliderCategory.setDisabled(false);
             }
-            this.slidersCategory.push(slider);
         });
 
     }
 
     handleCorrections(categoryCorrections: { [K in string] : number }): void {
 
-        const corrections: { [K in string] : { [K in string] : number } } = {};
-        this.slidersCategory.forEach(sliderCategory => {
-            corrections[sliderCategory.getName()] = categoryCorrections;
-        });
-
         this.modification.acceptUpdate({
-            corrections
+            corrections: {...categoryCorrections}
         });
         // console.log('handleChange', corrections, this.modification);
 
@@ -85,11 +91,13 @@ export class ControlsContact {
             multipliers[sliderCategory.getName()] = sliderCategory.getValue();
         });
 
-        const blendable = this.iconBlendable.getState();
+        const readonly = this.iconReadonly.getState();
         this.modification.acceptUpdate({
             multipliers,
-            blendable
+            readonly
         });
+
+        this.setSliderStates();
         // console.log('handleChange', corrections, this.modification);
 
         this.applyToChartContact();
@@ -106,8 +114,6 @@ export class ControlsContact {
 
     acceptModification(modification: ModificationContact): void {
 
-        // console.warn('acceptModification', modification, modification.isBlendable());
-
         Controls.acceptModification(modification);
         this.modification = modification;
 
@@ -115,7 +121,8 @@ export class ControlsContact {
             sliderCategory.setValue(modification.getCategoryValue(sliderCategory.getName()));
             sliderCategory.acceptModification(this.modification);
         });
-        this.iconBlendable.toggle(modification.isBlendable());
+        this.iconReadonly.toggle(modification.isReadonly());
+        this.setSliderStates();
 
         requestAnimationFrame(() => {
             this.applyToChartContact();

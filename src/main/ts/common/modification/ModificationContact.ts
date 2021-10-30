@@ -9,6 +9,7 @@ import { AModification } from './AModification';
 import { IContactCategories } from './IContactCategories';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesContact } from './IModificationValuesContact';
+import { IModificationValues } from './IModificationValues';
 
 /**
  * implementation of IModification for age-group contact matrix
@@ -38,6 +39,10 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
         this.resetValues();
 
+    }
+
+    isReadonly(): boolean {
+        return this.modificationValues.readonly;
     }
 
     setInstants(instantA: number, instantB: number): void {
@@ -117,35 +122,20 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
     getCellValue(indexContact: number, indexParticipant: number): number {
         let value = 0;
+        let correctionContact = this.getCorrectionValue(indexContact);
+        let correctionParticipant = this.getCorrectionValue(indexParticipant);
         this.contactCategories.forEach(contactCategory => {
-            let correctionContact = this.getCorrectionValue(contactCategory.getName(), indexContact);
-            let correctionParticipant = this.getCorrectionValue(contactCategory.getName(), indexParticipant);
             value += contactCategory.getCellValue(indexContact, indexParticipant) * this.getCategoryValue(contactCategory.getName()) * correctionContact * correctionParticipant;
         });
         return value;
     }
 
-    setCorrectionValue(categoryName: string, ageGroupIndex: number, correctionValue: number): void {
-        if (!this.modificationValues.corrections) {
-            this.modificationValues.corrections = {};
-        }
-        if (!this.modificationValues.corrections[categoryName]) {
-            this.modificationValues.corrections[categoryName] = {};
-        }
-        this.modificationValues.corrections[categoryName][this.ageGroups[ageGroupIndex].getName()]
-    }
-
-    getCorrectionValue(categoryName: string, ageGroupIndex: number): number {
+    getCorrectionValue(ageGroupIndex: number): number {
+        let correctionValue: number;
         if (this.modificationValues.corrections) {
-            const categoryCorrections = this.modificationValues.corrections[categoryName];
-            if (categoryCorrections) {
-                const correctionValue = categoryCorrections[this.ageGroups[ageGroupIndex].getName()];
-                if (correctionValue) {
-                    return correctionValue;
-                }
-            }
+            correctionValue = this.modificationValues.corrections[this.ageGroups[ageGroupIndex].getName()];
         }
-        return 1;
+        return correctionValue ? correctionValue : 1;
     }
 
     getColumnValue(indexAgeGroup: number): number {

@@ -39,8 +39,8 @@ export class ValueAdaptorCorrection1 extends ValueAdaptorBase1 {
         this.setError(modificationSet.modA, errA);
         this.setError(modificationSet.modB, errB);
 
-        const prevMultA = modificationSet.modA.getCorrectionValue('other', this.getAgeGroup().getIndex())
-        const prevMultB = modificationSet.modB.getCorrectionValue('other', this.getAgeGroup().getIndex())
+        const prevMultA = modificationSet.modA.getCorrectionValue(this.getAgeGroup().getIndex())
+        const prevMultB = modificationSet.modB.getCorrectionValue(this.getAgeGroup().getIndex())
         const currMultA = Math.max(0.20, Math.min(4, prevMultA + incrA));
         const currMultB = Math.max(0.20, Math.min(4, prevMultB + incrB));
 

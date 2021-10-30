@@ -34,9 +34,9 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
     getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationDiscovery {
 
         const modificationA = super.getModification(instant, fetchType);
-        const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1));
+        const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1)) as ModificationDiscovery;
 
-        if (modificationA && modificationB && modificationB.isBlendable() && modificationA.getInstantA() < modificationB.getInstantA()) {
+        if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) {
 
             const modificationValuesA = modificationA.getModificationValues();
             const modificationValuesB = modificationB.getModificationValues();

@@ -162,7 +162,7 @@ export class ModelImplRoot implements IModelSeir {
     }
 
     /**
-     * get all compartments that hold immune population, thus loosing immunity over time
+     * get all compartments holding immune population, thus loosing immunity over time
      * @param ageGroupIndex
      * @returns
      */

@@ -1,3 +1,4 @@
+import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
 import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
@@ -61,34 +62,26 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        // new ModelStateFitter1().adapt(modelStateIntegrator, maxInstant, modelProgress => {
+        // new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
         //     ctx.postMessage(modelProgress);
         // }).then(data => {
-        //     const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-        //     ctx.postMessage({
-        //         ratio: 1,
-        //         data,
-        //         modificationValuesContact
-        //     });
+        //     data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+        //     ctx.postMessage(data);
         // });
 
-        // new ModelStateFitter4().adapt(modelStateIntegrator, maxInstant, modelProgress => {
-        //     ctx.postMessage(modelProgress);
-        // }).then(data => {
-        //     const modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-        //     ctx.postMessage({
-        //         ratio: 1,
-        //         data,
-        //         modificationValuesContact
-        //     });
-        // });
-
-        /**
-         * complete model build (add more sophisticated logic here)
-         */
-        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        new ModelStateFitter4().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
             ctx.postMessage(modelProgress);
+        }).then(data => {
+            data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+            ctx.postMessage(data);
         });
+
+        // /**
+        //  * complete model build (add more sophisticated logic here)
+        //  */
+        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        //     ctx.postMessage(modelProgress);
+        // });
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

@@ -66,10 +66,6 @@ export abstract class AModification<P extends IModificationValues> implements IM
         return this.modificationValues.draggable;
     }
 
-    isBlendable(): boolean {
-        return this.modificationValues.blendable;
-    }
-
     acceptUpdate(update: Partial<P>): void {
         this.modificationValues = {...this.modificationValues, ...update};
     }

@@ -196,7 +196,6 @@ export class SliderModification extends Slider {
                     instant,
                     deletable: true,
                     draggable: true,
-                    blendable: copyableModification.isBlendable(),
                     primary: false
                 } as IModificationValues;
 

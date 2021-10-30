@@ -15,10 +15,12 @@ export interface IModificationValuesContact extends IModificationValues {
     /**
      * optionally, additional multiplier that may increase weight of a given age-group in a specific modification
      */
-    corrections?: { [K in string] : { [K in string] : number } };
+    corrections?: { [K in string] : number };
 
     mult___errs?: { [K in string] : number };
 
     corr___errs?: { [K in string] :  { [K in string] : number } };
+
+    readonly?: boolean;
 
 }

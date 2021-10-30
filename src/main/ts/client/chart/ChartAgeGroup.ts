@@ -8,6 +8,7 @@ import { BaseData } from '../../model/basedata/BaseData';
 import { Regression } from '../../model/regression/Regression';
 import { Color } from '../../util/Color';
 import { QueryUtil } from '../../util/QueryUtil';
+import { StrainUtil } from '../../util/StrainUtil';
 import { CHART_MODE______KEY, ControlsConstants } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
@@ -64,7 +65,7 @@ export class ChartAgeGroup {
      * percentage axis 0-100
      */
     protected readonly yAxisPlotPercent____0__100: ValueAxis;
-    protected readonly yAxisPlotPercent____0__400: ValueAxis;
+    protected readonly yAxisPlotPercent____0__300: ValueAxis;
 
     /**
      * incidence axis
@@ -94,6 +95,7 @@ export class ChartAgeGroup {
     protected readonly seriesContactCorrectionO: ChartAgeGroupSeries;
 
     protected readonly seriesSeasonality: ChartAgeGroupSeries;
+    protected readonly seriesReproduction: ChartAgeGroupSeries;
 
     /**
      * cases as of model
@@ -232,23 +234,23 @@ export class ChartAgeGroup {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent____0__100.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
 
-        this.yAxisPlotPercent____0__400 = this.chart.yAxes.push(new ValueAxis());
-        ChartUtil.getInstance().configureAxis(this.yAxisPlotPercent____0__400, 'Contact / Seasonality %');
-        this.yAxisPlotPercent____0__400.tooltip.exportable = false;
-        this.yAxisPlotPercent____0__400.visible = false;
-        this.yAxisPlotPercent____0__400.renderer.grid.template.disabled = true;
-        this.yAxisPlotPercent____0__400.rangeChangeDuration = 0;
-        this.yAxisPlotPercent____0__400.strictMinMax = true;
-        this.yAxisPlotPercent____0__400.min = 0.00;
-        this.yAxisPlotPercent____0__400.max = 4.00; // some extra required, or 100% label will not show
-        this.yAxisPlotPercent____0__400.tooltip.disabled = true;
+        this.yAxisPlotPercent____0__300 = this.chart.yAxes.push(new ValueAxis());
+        ChartUtil.getInstance().configureAxis(this.yAxisPlotPercent____0__300, 'Contact / Seasonality %');
+        this.yAxisPlotPercent____0__300.tooltip.exportable = false;
+        this.yAxisPlotPercent____0__300.visible = false;
+        this.yAxisPlotPercent____0__300.renderer.grid.template.disabled = true;
+        this.yAxisPlotPercent____0__300.rangeChangeDuration = 0;
+        this.yAxisPlotPercent____0__300.strictMinMax = true;
+        this.yAxisPlotPercent____0__300.min = 0.00;
+        this.yAxisPlotPercent____0__300.max = 3.00; // some extra required, or 100% label will not show
+        this.yAxisPlotPercent____0__300.tooltip.disabled = true;
 
 
-        this.yAxisPlotPercent____0__400.renderer.labels.template.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent____0__400.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
+        this.yAxisPlotPercent____0__300.renderer.labels.template.adapter.add('text', (value, target) => {
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent____0__300.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
-        this.yAxisPlotPercent____0__400.tooltip.label.adapter.add('text', (value, target) => {
-            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent____0__400.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
+        this.yAxisPlotPercent____0__300.tooltip.label.adapter.add('text', (value, target) => {
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent____0__300.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
 
 
@@ -592,7 +594,7 @@ export class ChartAgeGroup {
 
         this.seriesSeasonality = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotPercent____0__400,
+            yAxis: this.yAxisPlotPercent____0__300,
             title: 'seasonality',
             baseLabel: 'seasonality',
             valueField: 'seasonality',
@@ -609,9 +611,26 @@ export class ChartAgeGroup {
         this.seriesSeasonality.setSeriesNote('');
         this.seriesSeasonality.getSeries().strokeOpacity = 0.1;
 
+        this.seriesReproduction = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent____0__300,
+            title: 'reproduction',
+            baseLabel: 'reproduction',
+            valueField: 'reproduction',
+            colorKey: 'STRAIN',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
         this.seriesContactMultiplierR = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotPercent____0__400,
+            yAxis: this.yAxisPlotPercent____0__300,
             title: 'category contact',
             baseLabel: 'category contact',
             valueField: 'contactMultiplierR',
@@ -627,7 +646,7 @@ export class ChartAgeGroup {
         });
         this.seriesContactMultiplierO = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotPercent____0__400,
+            yAxis: this.yAxisPlotPercent____0__300,
             title: 'category estimation',
             baseLabel: 'category estimation',
             valueField: 'contactMultiplierO',
@@ -637,15 +656,14 @@ export class ChartAgeGroup {
             locationOnPath: 0.40,
             labelled: true,
             stacked: false,
-            legend: false,
+            legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactMultiplierO.bindToLegend(this.seriesContactMultiplierR);
 
         this.seriesContactCorrectionR = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotPercent____0__400,
+            yAxis: this.yAxisPlotPercent____0__300,
             title: 'age-group contact',
             baseLabel: 'age-group contact',
             valueField: 'contactCorrectionR',
@@ -661,7 +679,7 @@ export class ChartAgeGroup {
         });
         this.seriesContactCorrectionO = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotPercent____0__400,
+            yAxis: this.yAxisPlotPercent____0__300,
             title: 'age-group estimation',
             baseLabel: 'age-group estimation',
             valueField: 'contactCorrectionO',
@@ -671,11 +689,11 @@ export class ChartAgeGroup {
             locationOnPath: 0.40,
             labelled: true,
             stacked: false,
-            legend: false,
+            legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactCorrectionO.bindToLegend(this.seriesContactCorrectionR);
+
 
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
@@ -706,7 +724,7 @@ export class ChartAgeGroup {
         this.chart.zoomOutButton.background.fill = color('#555555');
         this.chart.zoomOutButton.background.states.getKey('down')!.properties.fill = color('#777777');
         this.chart.zoomOutButton.background.states.getKey('hover')!.properties.fill = color('#999999');
-        this.chart.zoomOutButton.dy = 30;
+        // this.chart.zoomOutButton.dy = 30;
         this.chart.zoomOutButton.scale = 0.77;
 
         this.chart.cursor.behavior = 'zoomX';
@@ -817,13 +835,13 @@ export class ChartAgeGroup {
 
             this.yAxisPlotAbsolute.y = percent(pixelPosPlot * pp);
             this.yAxisPlotPercent____0__100.y = percent(pixelPosPlot * pp);
-            this.yAxisPlotPercent____0__400.y = percent(pixelPosPlot * pp);
+            this.yAxisPlotPercent____0__300.y = percent(pixelPosPlot * pp);
             this.yAxisPlotIncidence.y = percent(pixelPosPlot * pp);
             this.yAxisHeat.y = percent(pixelPosHeat * pp);
 
             this.yAxisPlotAbsolute.height = percent(pixelHeightPlot * pp);
             this.yAxisPlotPercent____0__100.height = percent(pixelHeightPlot * pp);
-            this.yAxisPlotPercent____0__400.height = percent(pixelHeightPlot * pp);
+            this.yAxisPlotPercent____0__300.height = percent(pixelHeightPlot * pp);
             this.yAxisPlotIncidence.height = percent(pixelHeightPlot * pp);
 
             this.yAxisHeat.height = percent(pixelHeightHeat * pp);;
@@ -956,6 +974,7 @@ export class ChartAgeGroup {
 
         this.seriesContactCorrectionR.setSeriesNote(ageGroup.getName());
         this.seriesContactCorrectionO.setSeriesNote(ageGroup.getName());
+        this.seriesReproduction.setSeriesNote(ageGroup.getName());
 
     }
 
@@ -1140,14 +1159,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(visible); // visible
-        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
+        this.seriesAgeGroupIncidence.setVisible(false); // visible
+        this.seriesAgeGroupIncidenceR.setVisible(false); // visible
 
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
 
         this.seriesAgeGroupCasesP.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(visible); // visible
-        this.seriesAgeGroupCasesR.setVisible(visible); // visible
+        this.seriesAgeGroupCasesN.setVisible(false); // visible
+        this.seriesAgeGroupCasesR.setVisible(false); // visible
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1167,9 +1186,9 @@ export class ChartAgeGroup {
 
     setSeriesContactVisible(visible: boolean): void {
 
-        this.yAxisPlotPercent____0__400.visible = visible;
-        this.yAxisPlotPercent____0__400.renderer.grid.template.disabled = !visible;
-        this.yAxisPlotPercent____0__400.tooltip.disabled = !visible;
+        this.yAxisPlotPercent____0__300.visible = visible;
+        this.yAxisPlotPercent____0__300.renderer.grid.template.disabled = !visible;
+        this.yAxisPlotPercent____0__300.tooltip.disabled = !visible;
 
         this.seriesContactMultiplierR.setVisible(visible);
         this.seriesContactMultiplierO.setVisible(visible);
@@ -1177,7 +1196,7 @@ export class ChartAgeGroup {
         this.seriesContactCorrectionO.setVisible(visible);
 
         this.seriesSeasonality.setVisible(visible);
-
+        this.seriesReproduction.setVisible(visible);
 
     }
 
@@ -1189,6 +1208,10 @@ export class ChartAgeGroup {
         this.chartMode = chartMode;
         ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
         this.requestRenderModelData();
+    }
+
+    getChartMode(): CHART_MODE______KEY {
+        return this.chartMode;
     }
 
     setAxisRelativeMax(max: number): void {
@@ -1292,6 +1315,50 @@ export class ChartAgeGroup {
         }
     }
 
+    calculateRt(instantA: number, modificationValuesStrain: IModificationValuesStrain[]): number {
+
+        // const interval = TimeUtil.MILLISECONDS_PER____DAY;
+        if (this.ageGroupIndex === -1) {
+            return undefined;
+        }
+
+        const instantB = instantA - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const dataItemA = this.findDataItemByInstant(instantA);
+        const dataItemB = this.findDataItemByInstant(instantB);
+
+        const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex].getName();
+
+        if (dataItemA && dataItemB) {
+
+            // https://en.wikipedia.org/wiki/Basic_reproduction_number;
+
+            const exposedAllStrains = dataItemA.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID___________ALL];
+            let rT = 0;
+
+            for (let strainIndex = 0; strainIndex < modificationValuesStrain.length; strainIndex++) {
+
+                const modificationStrain = modificationValuesStrain[strainIndex];
+                const exposedStrainA = dataItemA.valueset[ageGroupName].EXPOSED[modificationStrain.id];
+                const exposedStrainB = dataItemB.valueset[ageGroupName].EXPOSED[modificationStrain.id];
+                const shareOfStrain = exposedStrainA / exposedAllStrains;
+
+                // const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
+                // rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
+
+                rT += StrainUtil.calculateR0(exposedStrainA, exposedStrainB, instantA, instantB, modificationStrain.serialInterval) * shareOfStrain;
+
+                // console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
+
+            }
+
+            return rT; // * dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].SUSCEPTIBLE; // / threshold;
+
+        }
+
+        return Number.NaN;
+
+    }
+
     async renderModelData(): Promise<void> {
 
         clearTimeout(this.renderTimeout);
@@ -1344,6 +1411,7 @@ export class ChartAgeGroup {
             const contactCorrectionO = correctionResult.original;
 
             const seasonality = dataItem.seasonality;
+            const reproduction = this.calculateRt(dataItem.instant, modificationValuesStrain);
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1363,7 +1431,8 @@ export class ChartAgeGroup {
                 contactMultiplierO,
                 contactCorrectionR,
                 contactCorrectionO,
-                seasonality
+                seasonality,
+                reproduction
             }
 
             // add one strain value per modification
@@ -1385,9 +1454,9 @@ export class ChartAgeGroup {
                 let color: string;
                 if (QueryUtil.getInstance().isDiffDisplay() && dataItem && dataItem00) { //
 
-                    // const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
+                    const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
 
-                    const caseValue = dataItem.derivs ? dataItem.derivs[ageGroupHeat.getName()] : 0;
+                    // const caseValue = dataItem.errors ? dataItem.errors[ageGroupHeat.getName()] : 0;
 
                     let r = 0;
                     let g = 0;

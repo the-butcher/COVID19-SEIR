@@ -1,9 +1,10 @@
+import { ModificationResolverTime } from './../common/modification/ModificationResolverTime';
 // @ts-ignore
 import ModelWorker from "worker-loader!./../work";
 import { Modifications } from '../common/modification/Modifications';
 import { IWorkerInput } from '../model/IWorkerInput';
 import { MODIFICATION____KEY } from '../model/ModelConstants';
-import { IModelProgress } from '../model/state/ModelStateIntegrator';
+import { IFitterParams, IModelProgress } from '../model/state/ModelStateIntegrator';
 import { ModificationContact } from './../common/modification/ModificationContact';
 import { ModificationResolverStrain } from './../common/modification/ModificationResolverStrain';
 import { ModelConstants } from './../model/ModelConstants';
@@ -27,6 +28,11 @@ export class ModelTask {
      */
     private static worker: ModelWorker;
 
+    private static fitterParams: IFitterParams = {
+        derivRatio: 0.1,
+        errorTLast: -1
+    }
+
     static async commit(key: MODIFICATION____KEY, workerInput: IWorkerInput): Promise<void> {
 
         /**
@@ -36,6 +42,8 @@ export class ModelTask {
             ModelTask.worker.terminate();
             ModelTask.worker = null;
         }
+
+        workerInput.fitterParams = ModelTask.fitterParams;
 
         /**
          * pass input for a full model rebuild to a web-worker where a few seconds of calculation will not interfere with responsiveness of gui
@@ -61,6 +69,8 @@ export class ModelTask {
                     dstIncidence
                 });
 
+                ModelTask.fitterParams = modelProgress.fitterParams;
+
                 modelProgress.modificationValuesContact?.forEach(modificationValuesContact => {
                     const modificationContact = Modifications.getInstance().findModificationById(modificationValuesContact.id) as ModificationContact;
                     // console.log(modificationContact.getId(), TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationValuesContact.multipliers);
@@ -75,7 +85,7 @@ export class ModelTask {
                 //     ChartAgeGroup.getInstance().exportToPng().then(() => {
                 //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
                 //     });
-                // }, 1000);
+                // }, 3000);
 
                 // show any contact updates
                 const displayableModification = ControlsContact.getInstance().getModification();
@@ -84,6 +94,8 @@ export class ModelTask {
                 SliderModification.getInstance().setProgress(0);
                 // ModelTask.worker.terminate();
                 // ModelTask.worker = null;
+
+                ModificationResolverTime.getInstance().buildModificationData();
 
 
             } else {

@@ -36,6 +36,8 @@ export class ModificationAdaptor4 implements IModificationAdaptor {
 
         // stepData[stepData.length - 1].errors = {};
         // stepData[stepData.length - 1].derivs = {};
+        stepData[stepData.length - 1].derivs = {};
+        stepData[stepData.length - 1].accums = {};
 
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
 
@@ -48,14 +50,22 @@ export class ModificationAdaptor4 implements IModificationAdaptor {
             }
             stepData[stepData.length - 1].errors[ageGroup.getName()] = error;
 
+            if (referenceData) {
+                stepData[stepData.length - 1].derivs[ageGroup.getName()] = stepData[stepData.length - 1].errors[ageGroup.getName()] - referenceData.errors[ageGroup.getName()];
+                stepData[stepData.length - 1].accums[ageGroup.getName()] = referenceData.accums[ageGroup.getName()] + referenceData.errors[ageGroup.getName()];
+            } else {
+                stepData[stepData.length - 1].derivs[ageGroup.getName()] = 0;
+                stepData[stepData.length - 1].accums[ageGroup.getName()] = 0;
+            }
+
             // if there is errors on reference data, calculate the derivate of error
             if (referenceData?.errors?.[ageGroup.getName()]) {
-                if (!stepData[stepData.length - 1].derivs) {
-                    stepData[stepData.length - 1].derivs = {};
-                }
-                stepData[stepData.length - 1].derivs[ageGroup.getName()] = stepData[stepData.length - 1].errors[ageGroup.getName()] - referenceData.errors[ageGroup.getName()];
+
                 // console.log(loggableRange, referenceData.derivs[ageGroup.getName()]);
+            } else {
+                stepData[stepData.length - 1].derivs[ageGroup.getName()] = 0;
             }
+
 
         });
 

@@ -19,6 +19,12 @@ export interface IModelProgress {
     calibratedStrains?: IModificationValuesStrain[];
     data?: IDataItem[];
     modificationValuesContact?: IModificationValuesContact[];
+    fitterParams?: IFitterParams;
+}
+
+export interface IFitterParams {
+    derivRatio: number;
+    errorTLast: number;
 }
 
 export interface IDataItem {
@@ -29,6 +35,7 @@ export interface IDataItem {
     seasonality: number;
     errors?: { [K: string]: number };
     derivs?: { [K: string]: number };
+    accums?: { [K: string]: number };
 }
 export interface IDataValues {
     SUSCEPTIBLE: number;

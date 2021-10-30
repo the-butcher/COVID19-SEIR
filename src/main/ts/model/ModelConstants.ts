@@ -61,7 +61,6 @@ export class ModelConstants {
                 dstIncidence: 1,
                 deletable: true,
                 draggable: true,
-                blendable: false,
                 primary: false
             }),
         },
@@ -75,7 +74,7 @@ export class ModelConstants {
                 multipliers: {},
                 deletable: true,
                 draggable: true,
-                blendable: true
+                readonly: false
             }),
         },
         'TESTING': {

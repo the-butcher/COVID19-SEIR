@@ -17,7 +17,7 @@ export class ValueRegressionCorrection extends ValueRegressionBase {
     }
 
     toValueY(modificationContact: ModificationContact): number {
-        return modificationContact.getCorrectionValue('other', this.ageGroupIndex);
+        return modificationContact.getCorrectionValue(this.ageGroupIndex);
     }
 
 }

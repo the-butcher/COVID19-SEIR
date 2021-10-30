@@ -97,18 +97,13 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
-* with modification chart gone, the zoom button needs to be moved up
+* review the breakthrough mechanism
 * rename "VACCINATED" chart to a more general term (i.e. STATE)
-* ~~order series or find out how to order legend items so associated items sit next to each other~~
-* ~~remove the small modification chart on top~~
 * add by age group R rate to the model output >> exportable and can be added to chart (define which chart view that would be)
 * add an age group discovery curve to the testing chart-view
-* ~~show age group name on correction and correction value too~~
 * acceptModification is called multiple times -> check for performance and streamline
 * checkpoints in the model for faster processing (could have some points where there is a calibrated set of strains and a continuable model state)
   * processing must reach back to the previous unchanged modification
-
-* ~~proper blending of corrections in ModificationResolverContact~~
 * consider corrections when calculating category ratio in ModificationContact (check if that is not the case already)
 * interpolated test rate gives above min and below max
 * wiki on github
@@ -137,7 +132,12 @@ A higher discovery rate means:
 * keep history in local storage (or internal, reset modification after validation problems)
   * introduce simple undo/redo
 
-#### Solved issues
+#### Done
+* ~~with modification chart gone, the zoom button needs to be moved up~~
+* ~~order series or find out how to order legend items so associated items sit next to each other~~
+* ~~remove the small modification chart on top~~
+* ~~show age group name on correction and correction value too~~
+* ~~proper blending of corrections in ModificationResolverContact~~
 * ~~hide base-data tooltip in prediction areas~~
 * ~~ModificationResolverDiscovery alters the apps-time modification, TODO instantiate mod-time and set instants on that instance~~
 * ~~adding a modification does not put storage in needs-save state~~

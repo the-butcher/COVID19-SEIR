@@ -35,9 +35,4 @@ export interface IModificationValues {
 
     draggable: boolean;
 
-    /**
-     * are this instance's value preceded by a smooth transition
-     */
-    blendable: boolean;
-
 }
