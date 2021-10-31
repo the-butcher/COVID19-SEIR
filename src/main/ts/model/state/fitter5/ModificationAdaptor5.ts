@@ -31,7 +31,7 @@ export class ModificationAdaptor5 {
             });
         });
 
-        const errorRatio = 0.25;
+        const errorRatio = 0.1;
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
@@ -55,7 +55,7 @@ export class ModificationAdaptor5 {
             corrections[ageGroup.getName()] = currCorrG;
         });
 
-        if (iterationIndex % 10 < 4) {
+        if (iterationIndex % 10 < 2) {
 
             modificationSet.modA.acceptUpdate({
                 multipliers: {

@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { Regression } from './../../model/regression/Regression';
@@ -63,7 +64,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
     }
 
-    interpolateValues(instant: number, modificationA: ModificationContact, modificationB: ModificationContact): IModificationValuesContact {
+    createInterpolatedInstance(instant: number, modificationA: ModificationContact, modificationB: ModificationContact): IModificationValuesContact {
 
         const modificationValuesA = modificationA.getModificationValues();
         const modificationValuesB = modificationB.getModificationValues();
@@ -103,6 +104,61 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
     }
 
+    createRangeProfileInstance(instant: number, modificationA: ModificationContact): IModificationValuesContact {
+
+        const modificationValuesA = modificationA.getModificationValues();
+
+        const multipliers: { [K: string]: number} = {};
+        const corrections: { [K: string]: number} = {};
+
+        // find the day within the modification range
+        const day = Math.floor((instant - modificationA.getInstantA()) / TimeUtil.MILLISECONDS_PER____DAY);
+
+        Demographics.getInstance().getCategories().forEach(category => {
+            multipliers[category.getName()] = modificationValuesA.multipliers[category.getName()];
+        });
+        // console.log('fraction', fraction);
+
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+
+            corrections[ageGroup.getName()] = modificationValuesA.corrections[ageGroup.getName()];
+
+            if (modificationValuesA.dailyerrors && modificationValuesA.dailyerrors[ageGroup.getName()]) {
+
+                corrections[ageGroup.getName()] = corrections[ageGroup.getName()] * (modificationValuesA.dailyerrors[ageGroup.getName()][day] + 1);
+
+            }
+
+        });
+
+        const id = ObjectUtil.createId();
+        return {
+            ...modificationA.getModificationValues(),
+            id,
+            name: `interpolation (${id})`,
+            key: 'CONTACT',
+            instant,
+            deletable: true,
+            draggable: true,
+            multipliers,
+            corrections
+        };
+
+    }
+
+    createCopy(instant: number, modificationA: ModificationContact): IModificationValuesContact {
+
+        const id = ObjectUtil.createId();
+        return {
+            ...modificationA.getModificationValues(),
+            id,
+            name: `interpolation (${id})`,
+            deletable: true,
+            draggable: true
+        };
+
+    }
+
     getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationContact {
 
         const modificationA = super.getModification(instant, fetchType);
@@ -111,27 +167,20 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         let modificationValues: IModificationValuesContact;
 
         // if creating between 2 modification, interpolate
-        if (fetchType === 'CREATE' && modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) {
+        if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) { // fetchType === 'CREATE' &&
 
-            modificationValues = this.interpolateValues(instant, modificationA, modificationB);
+            modificationValues = this.createInterpolatedInstance(instant, modificationA, modificationB);
+
+        // } else if (fetchType === 'INTERPOLATE') {
+
+        //     modificationValues = this.createRangeProfileInstance(instant, modificationA);
 
         } else {
 
-            const id = ObjectUtil.createId();
-            modificationValues = {
-                ...modificationA.getModificationValues(),
-                id,
-                name: `interpolation (${id})`,
-                deletable: true,
-                draggable: true
-            };
-            // console.log('creating', TimeUtil.formatCategoryDate(instant));
+            modificationValues = this.createCopy(instant, modificationA);
 
         }
 
-        // if (fetchType === 'CREATE') {
-        //     modificationValues.corrections = {}
-        // }
         const modification = new ModificationContact(modificationValues);
         if (fetchType === 'CREATE') {
             modification.setInstants(instant, instant); // will trigger update of 'work' and other mobility based values

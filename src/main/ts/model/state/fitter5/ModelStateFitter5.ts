@@ -28,7 +28,7 @@ export class ModelStateFitter5 {
 
         const modificationAdapter = new ModificationAdaptor5();
 
-        let modificationIndexStart = 2; // modificationsContact.length - 6; // 2;
+        let modificationIndexStart = 1; // modificationsContact.length - 6; // 2;
 
         const modificationContactOuterB = modificationsContact[modificationIndexStart];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -54,7 +54,7 @@ export class ModelStateFitter5 {
             let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
 
             const maxAbsErrorViolationsAllowed = 10;
-            const maxAbsErrorTolerance = 0.002;
+            const maxAbsErrorTolerance = 0.20; // 0.5%
 
             let maxAbsErrorLast = Number.MAX_VALUE;
             let maxAbsErrorGroup: string;
@@ -62,7 +62,7 @@ export class ModelStateFitter5 {
             let iterationIndex = 0;
             let violationIgnoreGroups: Set<string> = new Set();
 
-            while (true) {
+            while (!modificationSet.modA.isReadonly()) { //
 
                 const valueErrors = await modificationAdapter.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], iterationIndex++, progressCallback);
                 let maxAbsErrorCurr = 0;
@@ -128,7 +128,7 @@ export class ModelStateFitter5 {
             });
             dataset.push(...stepDataI);
 
-            if (iterationIndex > 50) {
+            if (iterationIndex > 10) {
                 break;
             }
 

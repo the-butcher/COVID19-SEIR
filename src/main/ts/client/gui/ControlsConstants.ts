@@ -205,10 +205,7 @@ export class ControlsConstants {
         },
         'CONTACT': {
             id: ObjectUtil.createId(),
-            getHeatValue: (dataItem, ageGroupName) => {
-                // what would be visualized here ???
-                return 0
-            },
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID___________ALL], // SAME AS INCIDENCE FOR NOW
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,

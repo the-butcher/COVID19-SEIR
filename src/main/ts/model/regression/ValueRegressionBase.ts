@@ -31,6 +31,7 @@ export abstract class ValueRegressionBase {
                 this.toValueY(modificationContact)
             ]);
         }
+        // const regressionResult = regression.polynomial(regressionData, { order: 2 });
         const regressionResult = regression.polynomial(regressionData, { order: 3 });
         // const regressionResult = regression.linear(regressionData);
         this.equationParams.push(...regressionResult.equation);
@@ -44,6 +45,7 @@ export abstract class ValueRegressionBase {
     getRegressionResult(instant: number): IRegressionResult {
         const regressionX = this.toRegressionX(instant);
         return {
+            // regression: Math.pow(regressionX, 2) * this.equationParams[0] + regressionX * this.equationParams[1] + this.equationParams[2],
             regression: Math.pow(regressionX, 3) * this.equationParams[0] + Math.pow(regressionX, 2) * this.equationParams[1] + regressionX * this.equationParams[2] + this.equationParams[3],
             // regression: regressionX * this.equationParams[0] + this.equationParams[1],
             original: this.originalValues[instant] // will be undefined in many cases

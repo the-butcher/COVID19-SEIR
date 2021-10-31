@@ -1,9 +1,7 @@
-import { ModificationResolverContact } from './../../common/modification/ModificationResolverContact';
-import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
-import { Modifications } from '../../common/modification/Modifications';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { ModificationResolverContact } from './../../common/modification/ModificationResolverContact';
 import { ValueRegressionCorrection } from './ValueRegressionCorrection';
 import { ValueRegressionMultiplier } from './ValueRegressionMultiplier';
 
@@ -19,17 +17,17 @@ export interface IRegressionResult {
 
 export class Regression {
 
-    static getInstance(instant: number): Regression {
-        if (ObjectUtil.isEmpty(this.instance)) {
+    static getInstance(instant?: number): Regression {
+
+        if (instant) {
             this.instance = new Regression({
                 instant,
-                modificationCount: Modifications.getInstance().findModificationsByType('CONTACT').length
+                modificationCount: 10
             });
-            if (ChartAgeGroup.getInstance().getChartMode() === 'CONTACT') {
-                ChartAgeGroup.getInstance().requestRenderModelData();
-            }
+
         }
         return this.instance;
+
     }
     private static instance: Regression;
 
@@ -47,14 +45,15 @@ export class Regression {
         this.valueRegressionsCorrection = {};
 
         let modificationsContactA = new ModificationResolverContact().getModifications().filter(m => m.getInstant() < this.instant);
+        let modificationsContact0 = new ModificationResolverContact().getModifications().find(m => m.getInstant() === this.instant);
         let modificationsContactB = new ModificationResolverContact().getModifications().filter(m => m.getInstant() > this.instant);
 
-        console.log('mods a, b', modificationsContactA.length, modificationsContactB.length, Math.max(0, modificationsContactA.length - params.modificationCount / 2), Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
+        // console.log('mods a, b', modificationsContactA.length, modificationsContactB.length, Math.max(0, modificationsContactA.length - params.modificationCount / 2), Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
 
         modificationsContactA = modificationsContactA.slice(Math.max(0, modificationsContactA.length - params.modificationCount / 2));
         modificationsContactB = modificationsContactB.slice(0, Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
 
-        const modificationsContact: ModificationContact[] = [...modificationsContactA, ...modificationsContactB];
+        const modificationsContact: ModificationContact[] = [...modificationsContactA, modificationsContact0, ...modificationsContactB];
 
         /**
          * multipliers

@@ -163,7 +163,7 @@ export class BaseData {
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
             const dataItem = this.findBaseDataItem(instant);
             if (dataItem) {
-                const value = dataItem.getReproductionNumber(Demographics.getInstance().getAgeGroups().length);
+                const value = dataItem.getReproduction(Demographics.getInstance().getAgeGroups().length);
                 if (value && !Number.isNaN(value)) {
                     reproductionMarkers.push({
                         instant,

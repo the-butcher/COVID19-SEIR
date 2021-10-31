@@ -243,8 +243,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         return this.cellValues[indexContact][indexParticipant];
 
-
-
     }
 
     getMaxCellValue(): number {

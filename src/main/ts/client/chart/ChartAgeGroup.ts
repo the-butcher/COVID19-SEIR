@@ -95,7 +95,16 @@ export class ChartAgeGroup {
     protected readonly seriesContactCorrectionO: ChartAgeGroupSeries;
 
     protected readonly seriesSeasonality: ChartAgeGroupSeries;
-    protected readonly seriesReproduction: ChartAgeGroupSeries;
+
+    /**
+     * reproduction as calculated
+     */
+    protected readonly seriesReproductionP: ChartAgeGroupSeries;
+
+    /**
+     * reproduction as reported
+     */
+    protected readonly seriesReproductionR: ChartAgeGroupSeries;
 
     /**
      * cases as of model
@@ -611,16 +620,33 @@ export class ChartAgeGroup {
         this.seriesSeasonality.setSeriesNote('');
         this.seriesSeasonality.getSeries().strokeOpacity = 0.1;
 
-        this.seriesReproduction = new ChartAgeGroupSeries({
+        this.seriesReproductionP = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent____0__300,
-            title: 'reproduction',
-            baseLabel: 'reproduction',
-            valueField: 'reproduction',
+            title: 'reproduction (model)',
+            baseLabel: 'reproduction (model)',
+            valueField: 'reproductionP',
             colorKey: 'STRAIN',
-            strokeWidth: 1,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.20,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesReproductionR = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent____0__300,
+            title: 'reproduction (ages)',
+            baseLabel: 'reproduction (ages)',
+            valueField: 'reproductionR',
+            colorKey: 'STRAIN',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.50,
             labelled: true,
             stacked: false,
             legend: true,
@@ -631,8 +657,8 @@ export class ChartAgeGroup {
         this.seriesContactMultiplierR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent____0__300,
-            title: 'category contact',
-            baseLabel: 'category contact',
+            title: 'category estimation',
+            baseLabel: 'category estimation',
             valueField: 'contactMultiplierR',
             colorKey: 'SEASONALITY',
             strokeWidth: 1,
@@ -647,8 +673,8 @@ export class ChartAgeGroup {
         this.seriesContactMultiplierO = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent____0__300,
-            title: 'category estimation',
-            baseLabel: 'category estimation',
+            title: 'category settings',
+            baseLabel: 'category settings',
             valueField: 'contactMultiplierO',
             colorKey: 'CASES',
             strokeWidth: 2,
@@ -664,8 +690,8 @@ export class ChartAgeGroup {
         this.seriesContactCorrectionR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent____0__300,
-            title: 'age-group contact',
-            baseLabel: 'age-group contact',
+            title: 'age-group estimation',
+            baseLabel: 'age-group estimation',
             valueField: 'contactCorrectionR',
             colorKey: 'SEASONALITY',
             strokeWidth: 1,
@@ -680,8 +706,8 @@ export class ChartAgeGroup {
         this.seriesContactCorrectionO = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent____0__300,
-            title: 'age-group estimation',
-            baseLabel: 'age-group estimation',
+            title: 'age-group settings',
+            baseLabel: 'age-group settings',
             valueField: 'contactCorrectionO',
             colorKey: 'CASES',
             strokeWidth: 2,
@@ -974,7 +1000,8 @@ export class ChartAgeGroup {
 
         this.seriesContactCorrectionR.setSeriesNote(ageGroup.getName());
         this.seriesContactCorrectionO.setSeriesNote(ageGroup.getName());
-        this.seriesReproduction.setSeriesNote(ageGroup.getName());
+        this.seriesReproductionP.setSeriesNote(ageGroup.getName());
+        this.seriesReproductionR.setSeriesNote(ageGroup.getName());
 
     }
 
@@ -1196,7 +1223,8 @@ export class ChartAgeGroup {
         this.seriesContactCorrectionO.setVisible(visible);
 
         this.seriesSeasonality.setVisible(visible);
-        this.seriesReproduction.setVisible(visible);
+        this.seriesReproductionP.setVisible(visible);
+        this.seriesReproductionR.setVisible(visible);
 
     }
 
@@ -1315,14 +1343,15 @@ export class ChartAgeGroup {
         }
     }
 
-    calculateRt(instantA: number, modificationValuesStrain: IModificationValuesStrain[]): number {
+    calculateRt(instant: number, modificationValuesStrain: IModificationValuesStrain[]): number {
 
         // const interval = TimeUtil.MILLISECONDS_PER____DAY;
         if (this.ageGroupIndex === -1) {
             return undefined;
         }
 
-        const instantB = instantA - TimeUtil.MILLISECONDS_PER____DAY * 4;
+        const instantA = instant - TimeUtil.MILLISECONDS_PER____DAY * 0;
+        const instantB = instant + TimeUtil.MILLISECONDS_PER____DAY * 1;
         const dataItemA = this.findDataItemByInstant(instantA);
         const dataItemB = this.findDataItemByInstant(instantB);
 
@@ -1411,7 +1440,7 @@ export class ChartAgeGroup {
             const contactCorrectionO = correctionResult.original;
 
             const seasonality = dataItem.seasonality;
-            const reproduction = this.calculateRt(dataItem.instant, modificationValuesStrain);
+            const reproductionP = this.calculateRt(dataItem.instant, modificationValuesStrain);
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1432,7 +1461,7 @@ export class ChartAgeGroup {
                 contactCorrectionR,
                 contactCorrectionO,
                 seasonality,
-                reproduction
+                reproductionP
             }
 
             // add one strain value per modification
@@ -1541,6 +1570,7 @@ export class ChartAgeGroup {
             let ageGroupAverageCasesR: number;
             let positivityRateR = null;
             let ageGroupCasesR = null;
+            let reproductionR = null;
             const dataItem00 = BaseData.getInstance().findBaseDataItem(instant);
             if (dataItem00) {
 
@@ -1559,6 +1589,8 @@ export class ChartAgeGroup {
                     positivityRateR *= 10; // TODO project this into a usable scale
                 }
 
+                reproductionR = dataItem00.getReproduction(ageGroupPlot.getIndex()); // dataItem00.getAverageMobilityOther();//
+
             } else {
                 // console.log('no data found', categoryX);
             }
@@ -1575,7 +1607,8 @@ export class ChartAgeGroup {
                 ageGroupIncidenceR,
                 ageGroupAverageCasesR,
                 positivityRateR,
-                ageGroupCasesR
+                ageGroupCasesR,
+                reproductionR
             }
             plotData.push(item);
 

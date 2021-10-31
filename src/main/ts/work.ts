@@ -14,6 +14,7 @@ import { ModelStateFitter3 } from './model/state/fitter3/ModelStateFitter3';
 import { ModelStateFitter4 } from './model/state/fitter4/ModelStateFitter4';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
+import { ModelStateFitter6 } from './model/state/fitter6/ModelStateFitter6';
 
 const ctx: Worker = self as any;
 
@@ -62,14 +63,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        // new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
-        //     ctx.postMessage(modelProgress);
-        // }).then(data => {
-        //     data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-        //     ctx.postMessage(data);
-        // });
-
-        new ModelStateFitter4().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+        new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
             ctx.postMessage(modelProgress);
         }).then(data => {
             data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());

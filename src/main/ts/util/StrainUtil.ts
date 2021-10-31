@@ -67,33 +67,6 @@ export class StrainUtil {
 
     }
 
-    // /**
-    //  * find the error ration (by which ratio cases in the given item are off from the base data cases)
-    //  * @param dataItem
-    //  * @param ageGroup
-    //  * @returns
-    //  */
-    //  static findMultiplierRatio(dataItem: IDataItem, ageGroup: AgeGroup): number {
-    //     const baseItem = BaseData.getInstance().findBaseDataItem(dataItem.instant);
-    //     if (baseItem) {
-    //         const ratio = dataItem.valueset[ageGroup.getName()].CASES / baseItem.getAverageCases(ageGroup.getIndex());
-    //         return (ratio - 1) * 0.25 + 1;
-    //     } else {
-    //         return Number.NaN;
-    //     }
-    // }
-
-    // static findCorrectionRatio(dataItem: IDataItem, ageGroup: AgeGroup): number {
-    //     const baseItem = BaseData.getInstance().findBaseDataItem(dataItem.instant);
-    //     if (baseItem) {
-    //         const ratio = dataItem.valueset[ageGroup.getName()].CASES / baseItem.getAverageCases(ageGroup.getIndex());
-    //         return (ratio - 1) * 0.5 + 1;
-    //     } else {
-    //         return Number.NaN;
-    //     }
-    // }
-
-
     static findCases(dataItem: IDataItem, ageGroup: AgeGroup): IDataCompare {
 
         const instant = dataItem.instant;
@@ -108,32 +81,5 @@ export class StrainUtil {
         }
 
     }
-
-    // static findSlope(dataItemPrev: IDataItem, dataItemCurr: IDataItem, ageGroup: AgeGroup): IDataCompare {
-
-    //     const days = (dataItemCurr.instant - dataItemPrev.instant) / TimeUtil.MILLISECONDS_PER____DAY;
-    //     const casesPrev = StrainUtil.findCases(dataItemPrev, ageGroup);
-    //     const casesCurr = StrainUtil.findCases(dataItemCurr, ageGroup);
-
-    //     return {
-    //         base: (casesCurr.base * 100000 / ageGroup.getAbsValue() - casesPrev.base * 100000 / ageGroup.getAbsValue()) / days,
-    //         data: (casesCurr.data * 100000 / ageGroup.getAbsValue() - casesPrev.data * 100000 / ageGroup.getAbsValue()) / days,
-    //     }
-
-    // }
-
-    // static findSlope(instantA: number, instantB: number, ageGroup: AgeGroup): number {
-
-    //     const days = (instantB - instantA) / TimeUtil.MILLISECONDS_PER____DAY;
-    //     const baseItemA = BaseData.getInstance().findBaseDataItem(instantA);
-    //     const baseItemB = BaseData.getInstance().findBaseDataItem(instantB);
-
-    //     const casesA = baseItemA.getAverageCases(ageGroup.getIndex());
-    //     const casesB = baseItemB.getAverageCases(ageGroup.getIndex());
-
-    //     return (casesB - casesA) / days;
-
-    // }
-
 
 }

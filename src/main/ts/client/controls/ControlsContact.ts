@@ -1,3 +1,4 @@
+import { Regression } from '../../model/regression/Regression';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
 import { ControlsConstants } from '../gui/ControlsConstants';
@@ -113,6 +114,8 @@ export class ControlsContact {
     }
 
     acceptModification(modification: ModificationContact): void {
+
+        Regression.getInstance(modification.getInstant());
 
         Controls.acceptModification(modification);
         this.modification = modification;

@@ -5,7 +5,7 @@ export class BaseDataItemCalibrate implements IBaseDataItem {
         return 0;
     }
 
-    getReproductionNumber(ageGroupIndex: number): number {
+    getReproduction(ageGroupIndex: number): number {
         return 0;
     }
 

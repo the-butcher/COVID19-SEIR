@@ -17,6 +17,8 @@ export interface IModificationValuesContact extends IModificationValues {
      */
     corrections?: { [K in string] : number };
 
+    dailyerrors?: { [K in string] : number[] };
+
     mult___errs?: { [K in string] : number };
 
     corr___errs?: { [K in string] :  { [K in string] : number } };

@@ -27,7 +27,7 @@ export interface IBaseDataItem {
 
     getCasesM1(ageGroupIndex: number): number;
     getAverageCases(ageGroupIndex: number): number;
-    getReproductionNumber(ageGroupIndex: number): number;
+    getReproduction(ageGroupIndex: number): number;
 
     getAverageMobilityOther(): number;
     getAverageMobilityWork(): number;
@@ -48,7 +48,7 @@ export class BaseDataItem implements IBaseDataItem {
 
     private readonly casesM1: number[];
     private readonly averageCases: number[];
-    private readonly reproductionNumbers: number[];
+    private readonly reproductions: number[];
 
     private averageMobilityOther: number;
     private averageMobilityWork: number;
@@ -61,7 +61,7 @@ export class BaseDataItem implements IBaseDataItem {
         this.incidences = [];
         this.averageCases = [];
         this.casesM1 = [];
-        this.reproductionNumbers = [];
+        this.reproductions = [];
     }
 
     getInstant(): number {
@@ -193,15 +193,15 @@ export class BaseDataItem implements IBaseDataItem {
 
     calculateAverageDerivates(): void {
 
-        const dataItemM2 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 2);
-        const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 2);
+        const dataItemM2 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 0);
+        const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 1);
         if (dataItemM2 && dataItemP2) {
 
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                 const averageCasesM2 = dataItemM2.getAverageCases(ageGroup.getIndex());
                 const averageCasesP2 = dataItemP2.getAverageCases(ageGroup.getIndex());
                 if (averageCasesM2 && averageCasesP2) {
-                    this.reproductionNumbers[ageGroup.getIndex()] = StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.getInstant(), dataItemP2.getInstant(), 4);
+                    this.reproductions[ageGroup.getIndex()] = StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.getInstant(), dataItemP2.getInstant(), 4);
                 }
             });
 
@@ -254,8 +254,8 @@ export class BaseDataItem implements IBaseDataItem {
         return this.averageCases[ageGroupIndex];
     }
 
-    getReproductionNumber(ageGroupIndex: number) {
-        return this.reproductionNumbers[ageGroupIndex];
+    getReproduction(ageGroupIndex: number) {
+        return this.reproductions[ageGroupIndex];
     }
 
 }
