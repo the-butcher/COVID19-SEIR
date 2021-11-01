@@ -1,9 +1,7 @@
-import { MODIFICATION__FETCH } from './../../model/ModelConstants';
-import { ModelInstants } from './../../model/ModelInstants';
-import { TimeUtil } from './../../util/TimeUtil';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { IModificationData } from './../../client/chart/ChartAgeGroup';
+import { MODIFICATION__FETCH } from './../../model/ModelConstants';
+import { ModelInstants } from './../../model/ModelInstants';
 import { IModification } from './IModification';
 import { IModificationResolver } from './IModificationResolver';
 import { IModificationValues } from './IModificationValues';
@@ -33,25 +31,25 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
         return this.typedModifications;
     }
 
-    getModificationData(): IModificationData[] {
+    // getModificationData(): IModificationData[] {
 
-        const minChartInstant = ModelInstants.getInstance().getMinInstant();
-        const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
+    //     const minChartInstant = ModelInstants.getInstance().getMinInstant();
+    //     const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
 
-        const modificationData = [];
-        for (let instant = minChartInstant; instant <= maxChartInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const modValueY = this.getValue(instant);
-            if (!Number.isNaN(modValueY)) {
-                modificationData.push({
-                    modValueY,
-                    categoryX: TimeUtil.formatCategoryDate(instant)
-                });
-            }
-        }
+    //     const modificationData = [];
+    //     for (let instant = minChartInstant; instant <= maxChartInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+    //         const modValueY = this.getValue(instant);
+    //         if (!Number.isNaN(modValueY)) {
+    //             modificationData.push({
+    //                 modValueY,
+    //                 categoryX: TimeUtil.formatCategoryDate(instant)
+    //             });
+    //         }
+    //     }
 
-        return modificationData;
+    //     return modificationData;
 
-    }
+    // }
 
     getModification(instant: number, fetchType: MODIFICATION__FETCH): M {
 

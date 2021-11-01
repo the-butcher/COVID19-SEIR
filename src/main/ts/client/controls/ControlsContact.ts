@@ -115,8 +115,6 @@ export class ControlsContact {
 
     acceptModification(modification: ModificationContact): void {
 
-        Regression.getInstance(modification.getInstant());
-
         Controls.acceptModification(modification);
         this.modification = modification;
 

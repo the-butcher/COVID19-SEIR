@@ -1,73 +1,50 @@
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
-import { ObjectUtil } from '../../util/ObjectUtil';
-import { ModificationResolverContact } from './../../common/modification/ModificationResolverContact';
 import { ValueRegressionCorrection } from './ValueRegressionCorrection';
 import { ValueRegressionMultiplier } from './ValueRegressionMultiplier';
 
 export interface IRegressionParams {
+
+    /**
+     * the point where regression values start
+     */
     instant: number
-    modificationCount: number;
+
+    /**
+     * the point in time where points start to be considered for regression
+     */
+    instantMods: number;
+
+    instantPoly: number;
+
+    modificationsContact: ModificationContact[];
+
 }
 
 export interface IRegressionResult {
-    regression: number;
+    regressionLin: number;
+    regressionPol: number;
     original?: number;
 }
 
 export class Regression {
 
-    static getInstance(instant?: number): Regression {
-
-        if (instant) {
-            this.instance = new Regression({
-                instant,
-                modificationCount: 20
-            });
-
-        }
-        return this.instance;
-
-    }
-    private static instance: Regression;
-
     private readonly valueRegressionsMultiplier: { [K in string]: ValueRegressionMultiplier };
     private readonly valueRegressionsCorrection: { [K in string]: ValueRegressionCorrection };
 
-    private readonly instant: number;
-
-    private constructor(params: IRegressionParams) {
-
-        // console.log('building regression');
-        this.instant = params.instant;
+    constructor(params: IRegressionParams) {
 
         this.valueRegressionsMultiplier = {};
         this.valueRegressionsCorrection = {};
-
-        // let modificationsContactA = new ModificationResolverContact().getModifications().filter(m => m.getInstant() < this.instant);
-        // let modificationsContact0 = new ModificationResolverContact().getModifications().find(m => m.getInstant() === this.instant);
-        // let modificationsContactB = new ModificationResolverContact().getModifications().filter(m => m.getInstant() > this.instant);
-
-        // // console.log('mods a, b', modificationsContactA.length, modificationsContactB.length, Math.max(0, modificationsContactA.length - params.modificationCount / 2), Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
-
-        // modificationsContactA = modificationsContactA.slice(Math.max(0, modificationsContactA.length - params.modificationCount / 2));
-        // modificationsContactB = modificationsContactB.slice(0, Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
-
-        // const modificationsContact: ModificationContact[] = [...modificationsContactA, modificationsContact0, ...modificationsContactB];
-
-        const modificationsContact: ModificationContact[] = new ModificationResolverContact().getModifications();
-
         /**
          * multipliers
          */
         Demographics.getInstance().getCategories().forEach(category => {
 
             const valueRegression = new ValueRegressionMultiplier({
-                instant: this.instant,
-                contactCategory: category.getName(),
-                modificationCount: params.modificationCount
+                ...params,
+                contactCategory: category.getName()
             });
-            valueRegression.setup(modificationsContact);
             this.valueRegressionsMultiplier[category.getName()] = valueRegression;
 
         });
@@ -78,11 +55,9 @@ export class Regression {
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
 
             const valueRegression = new ValueRegressionCorrection({
-                instant: this.instant,
-                ageGroupIndex: ageGroup.getIndex(),
-                modificationCount: params.modificationCount
+                ...params,
+                ageGroupIndex: ageGroup.getIndex()
             });
-            valueRegression.setup(modificationsContact);
             this.valueRegressionsCorrection[ageGroup.getIndex()] = valueRegression;
 
         });
@@ -98,7 +73,8 @@ export class Regression {
             return this.valueRegressionsCorrection[ageGroupIndex].getRegressionResult(instant);
         } else {
             return {
-                regression: 0
+                regressionPol: 0,
+                regressionLin: 0
             }
         }
     }

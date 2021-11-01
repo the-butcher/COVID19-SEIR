@@ -57,8 +57,8 @@ export class ControlsRegression {
         Controls.acceptModification(modification);
         this.modification = modification;
 
-        this.sliderBackDays.setValue(this.modification.getModificationCount());
-        this.sliderPolyDays.setValue(this.modification.getPolynomialDays());
+        this.sliderBackDays.setValue(this.modification.getBackDays());
+        this.sliderPolyDays.setValue(this.modification.getPolyDays());
 
         requestAnimationFrame(() => {
             this.sliderBackDays.handleResize();

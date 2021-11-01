@@ -3,7 +3,6 @@ import { IRegressionParams } from './Regression';
 import { ValueRegressionBase } from './ValueRegressionBase';
 
 export interface IRegressionParamsMultiplier extends IRegressionParams {
-    modificationCount: number;
     contactCategory: string;
 }
 
@@ -14,6 +13,7 @@ export class ValueRegressionMultiplier extends ValueRegressionBase {
     constructor(params: IRegressionParamsMultiplier) {
         super(params);
         this.contactCategory = params.contactCategory;
+        this.setup();
     }
 
     toValueY(modificationContact: ModificationContact): number {

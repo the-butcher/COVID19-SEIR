@@ -3,7 +3,6 @@ import { IRegressionParams, IRegressionResult } from './Regression';
 import { ValueRegressionBase } from './ValueRegressionBase';
 
 export interface IRegressionParamsCorrection extends IRegressionParams {
-    modificationCount: number;
     ageGroupIndex: number;
 }
 
@@ -14,6 +13,7 @@ export class ValueRegressionCorrection extends ValueRegressionBase {
     constructor(params: IRegressionParamsCorrection) {
         super(params);
         this.ageGroupIndex = params.ageGroupIndex;
+        this.setup();
     }
 
     toValueY(modificationContact: ModificationContact): number {

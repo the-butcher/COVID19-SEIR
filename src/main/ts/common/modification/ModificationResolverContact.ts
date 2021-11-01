@@ -1,7 +1,6 @@
-import { TimeUtil } from './../../util/TimeUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
-import { Regression } from './../../model/regression/Regression';
+import { TimeUtil } from './../../util/TimeUtil';
 import { Demographics } from './../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesContact } from './IModificationValuesContact';
@@ -19,38 +18,38 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         super('CONTACT');
     }
 
-    createRegressionModification(instant: number): ModificationContact {
+    // createRegressionModification(instant: number): ModificationContact {
 
-        const regression = Regression.getInstance(instant);
-        const multipliers: { [K in string]: number } = {};
-        const corrections: { [K in string]: number } = {};
-        Demographics.getInstance().getCategories().forEach(category => {
-            multipliers[category.getName()] = regression.getMultiplier(instant, category.getName()).regression;
-        });
-        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
-        });
-        // const corrections: { [K in string]: { [K in string]: number }} = {
-        //     'family': {..._corrections},
-        //     'school': {..._corrections},
-        //     'nursing': {..._corrections},
-        //     'work': {..._corrections},
-        //     'other': {..._corrections},
-        // };
+    //     const regression = Regression.getInstance(instant);
+    //     const multipliers: { [K in string]: number } = {};
+    //     const corrections: { [K in string]: number } = {};
+    //     Demographics.getInstance().getCategories().forEach(category => {
+    //         multipliers[category.getName()] = regression.getMultiplier(instant, category.getName()).regression;
+    //     });
+    //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+    //         corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
+    //     });
+    //     // const corrections: { [K in string]: { [K in string]: number }} = {
+    //     //     'family': {..._corrections},
+    //     //     'school': {..._corrections},
+    //     //     'nursing': {..._corrections},
+    //     //     'work': {..._corrections},
+    //     //     'other': {..._corrections},
+    //     // };
 
-        const id = ObjectUtil.createId();
-        return new ModificationContact({
-            id,
-            key: 'CONTACT',
-            name: `regression (${id})`,
-            instant,
-            deletable: true,
-            draggable: true,
-            multipliers,
-            corrections
-        });
+    //     const id = ObjectUtil.createId();
+    //     return new ModificationContact({
+    //         id,
+    //         key: 'CONTACT',
+    //         name: `regression (${id})`,
+    //         instant,
+    //         deletable: true,
+    //         draggable: true,
+    //         multipliers,
+    //         corrections
+    //     });
 
-    }
+    // }
 
     createInterpolatedInstance(instant: number, modificationA: ModificationContact, modificationB: ModificationContact): IModificationValuesContact {
 

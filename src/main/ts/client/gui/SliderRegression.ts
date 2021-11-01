@@ -31,7 +31,7 @@ export class SliderRegression extends Slider {
             container,
             min: Math.min(...range),
             max: Math.max(...range),
-            step: 0.1,
+            step: 0.5,
             values: [1.0],
             ticks: range.slice(0, -2),
             label: title,
@@ -39,7 +39,11 @@ export class SliderRegression extends Slider {
                 return new IconSlider();
             },
             labelFormatFunction: (index, value, type) => {
-                return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
+                if (type === 'tick') {
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
+                } else {
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                }
             },
             handleValueChange: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
@@ -51,7 +55,7 @@ export class SliderRegression extends Slider {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`;
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value) / 100;

@@ -1,8 +1,10 @@
+import { ModificationRegression } from './../../common/modification/ModificationRegression';
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { ModificationResolverRegression } from '../../common/modification/ModificationResolverRegression';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Regression } from '../../model/regression/Regression';
@@ -1428,8 +1430,8 @@ export class ChartAgeGroup {
         const heatData: any[] = [];
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
         // const modificationResolverSeasonality = new ModificationResolverSeasonality();
-
 
         let maxGamma = 0;
         const randomVd = Math.random() * 0.00001;
@@ -1462,12 +1464,12 @@ export class ChartAgeGroup {
             /**
              * does regression need to be on model data?
              */
-            const multiplierResult = Regression.getInstance().getMultiplier(dataItem.instant, this.categoryName);
-            const contactMultiplierR = multiplierResult.regression;
+            const multiplierResult = modificationRegression.getRegression().getMultiplier(dataItem.instant, this.categoryName);
+            const contactMultiplierR = multiplierResult.regressionLin;
             const contactMultiplierO = multiplierResult.original;
 
-            const correctionResult = Regression.getInstance().getCorrection(dataItem.instant, _ageGroupIndex);
-            const contactCorrectionR = correctionResult.regression;
+            const correctionResult = modificationRegression.getRegression().getCorrection(dataItem.instant, _ageGroupIndex);
+            const contactCorrectionR = correctionResult.regressionLin;
             const contactCorrectionO = correctionResult.original;
 
             const seasonality = dataItem.seasonality;

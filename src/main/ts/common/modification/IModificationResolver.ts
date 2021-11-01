@@ -1,5 +1,4 @@
-import { IModificationData } from '../../client/chart/ChartAgeGroup';
-import { MODIFICATION____KEY, MODIFICATION__FETCH } from './../../model/ModelConstants';
+import { MODIFICATION__FETCH, MODIFICATION____KEY } from './../../model/ModelConstants';
 import { IModification } from './IModification';
 import { IModificationValues } from './IModificationValues';
 
@@ -22,9 +21,9 @@ export interface IModificationResolver<V extends IModificationValues, M extends 
      */
     getModification(instant: number, fetchType: MODIFICATION__FETCH): M;
 
-    /**
-     * get the current modification data held by this instance
-     */
-    getModificationData(): IModificationData[];
+    // /**
+    //  * get the current modification data held by this instance
+    //  */
+    // getModificationData(): IModificationData[];
 
 }

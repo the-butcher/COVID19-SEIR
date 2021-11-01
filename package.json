@@ -38,6 +38,7 @@
     "@babel/preset-env": "^7.14.1",
     "@types/jest": "^26.0.23",
     "bezier-js": "^4.1.1",
+    "circular-dependency-plugin": "^5.2.2",
     "regression": "^2.0.1",
     "ts-jest": "^27.0.1",
     "tslint": "^6.1.3",

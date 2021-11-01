@@ -1,4 +1,3 @@
-import { TimeUtil } from './../../util/TimeUtil';
 import { BaseData } from '../../model/basedata/BaseData';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -9,7 +8,6 @@ import { AModification } from './AModification';
 import { IContactCategories } from './IContactCategories';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesContact } from './IModificationValuesContact';
-import { IModificationValues } from './IModificationValues';
 
 /**
  * implementation of IModification for age-group contact matrix
