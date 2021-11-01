@@ -1,3 +1,4 @@
+import { IDataCompare } from './../../../util/StrainUtil';
 import { Demographics } from '../../../common/demographics/Demographics';
 import { AgeGroup } from '../../../common/demographics/AgeGroup';
 import { StrainUtil } from '../../../util/StrainUtil';
@@ -19,7 +20,7 @@ import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIn
  */
 export class ModificationAdaptor5 {
 
-    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number}> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, providerOfDataCompare: (dataItem: IDataItem, ageGroup: AgeGroup) => IDataCompare , progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number}> {
 
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())}`;
 
@@ -35,7 +36,7 @@ export class ModificationAdaptor5 {
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-            const cases = StrainUtil.findCases(stepData[stepData.length - 1], ageGroup);
+            const cases = providerOfDataCompare(stepData[stepData.length - 1], ageGroup); //  StrainUtil.findCases(stepData[stepData.length - 1], ageGroup);
             const error = cases.base != 0 ? (cases.data / cases.base) - 1 : 0;
             errorsG[ageGroup.getName()] = error;
         });
@@ -62,20 +63,28 @@ export class ModificationAdaptor5 {
                     'other': currMultO,
                     'nursing': currMultN,
                     'school': currMultS
-                },
-                // corrections: {...corrections}
+                }
             });
+            // if (modificationSet.ratio === 1) {
+            //     modificationSet.modB.acceptUpdate({
+            //         multipliers: {
+            //             'other': currMultO,
+            //             'nursing': currMultN,
+            //             'school': currMultS
+            //         }
+            //     });
+            // }
 
         } else {
 
             modificationSet.modA.acceptUpdate({
-                // multipliers: {
-                //     'other': currMultO,
-                //     'nursing': currMultN,
-                //     'school': currMultS
-                // },
                 corrections: {...corrections}
             });
+            // if (modificationSet.ratio === 1) {
+            //     modificationSet.modB.acceptUpdate({
+            //         corrections: {...corrections}
+            //     });
+            // }
 
         }
 

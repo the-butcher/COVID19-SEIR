@@ -1,3 +1,4 @@
+import { Regression } from './../../model/regression/Regression';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { TimeUtil } from './../../util/TimeUtil';

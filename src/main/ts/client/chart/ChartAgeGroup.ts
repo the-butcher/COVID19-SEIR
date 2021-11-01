@@ -1465,11 +1465,11 @@ export class ChartAgeGroup {
              * does regression need to be on model data?
              */
             const multiplierResult = modificationRegression.getRegression().getMultiplier(dataItem.instant, this.categoryName);
-            const contactMultiplierR = multiplierResult.regressionLin;
+            const contactMultiplierR = multiplierResult.regression;
             const contactMultiplierO = multiplierResult.original;
 
             const correctionResult = modificationRegression.getRegression().getCorrection(dataItem.instant, _ageGroupIndex);
-            const contactCorrectionR = correctionResult.regressionLin;
+            const contactCorrectionR = correctionResult.regression;
             const contactCorrectionO = correctionResult.original;
 
             const seasonality = dataItem.seasonality;

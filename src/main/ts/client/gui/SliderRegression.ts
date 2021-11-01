@@ -31,7 +31,7 @@ export class SliderRegression extends Slider {
             container,
             min: Math.min(...range),
             max: Math.max(...range),
-            step: 0.5,
+            step: 0.1,
             values: [1.0],
             ticks: range.slice(0, -2),
             label: title,

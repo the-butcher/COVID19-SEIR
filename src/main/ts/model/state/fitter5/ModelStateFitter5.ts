@@ -1,3 +1,7 @@
+import { IDataCompare } from './../../../util/StrainUtil';
+import { AgeGroup } from './../../../common/demographics/AgeGroup';
+import { BaseData } from './../../basedata/BaseData';
+import { Regression } from './../../regression/Regression';
 import { Demographics } from '../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
 import { TimeUtil } from '../../../util/TimeUtil';
@@ -5,6 +9,7 @@ import { IModificationSet } from '../fitter/IModificationSet';
 import { IDataItem, IFitterParams, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
 import { ModificationAdaptor5 } from './ModificationAdaptor5';
 import { isConstructSignatureDeclaration } from 'typescript';
+import { StrainUtil } from '../../../util/StrainUtil';
 
 /**
  * model-fitter trying to lay an already pre-fitted curve on the averaged model's base curve
@@ -24,11 +29,12 @@ export class ModelStateFitter5 {
     async adapt(fitterParams: IFitterParams, modelStateIntegrator: ModelStateIntegrator, maxInstant: number, progressCallback: (progress: IModelProgress) => void): Promise<IModelProgress> {
 
         const dataset: IDataItem[] = [];
-        const modificationsContact = new ModificationResolverContact().getModifications();
+        const modificationResolver = new ModificationResolverContact();
+        const modificationsContact = modificationResolver.getModifications();
 
         const modificationAdapter = new ModificationAdaptor5();
 
-        let modificationIndexStart = 30; // modificationsContact.length - 6; // 2;
+        let modificationIndexStart = modificationsContact.length - 8; // modificationsContact.length - 6; // 2;
 
         const modificationContactOuterB = modificationsContact[modificationIndexStart];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -41,20 +47,35 @@ export class ModelStateFitter5 {
         console.log(loggableRange, '++', stepDataI.length);
         dataset.push(...stepDataI);
 
-        // modificationIndexStart++;
+        let providerOfDataItem: (dataItem: IDataItem, ageGroup: AgeGroup) => IDataCompare = StrainUtil.findCases;
+
 
         for (let modificationIndex = modificationIndexStart; modificationIndex < modificationsContact.length - ModelStateFitter5.FIT_INTERVAL; modificationIndex ++) {
 
+            const ratio = (modificationIndex + 2) / modificationsContact.length;
             const modificationSet: IModificationSet = {
                 modA: modificationsContact[modificationIndex],
                 modB: modificationsContact[modificationIndex + ModelStateFitter5.FIT_INTERVAL],
-                ratio: 1 - modificationIndex / modificationsContact.length
+                ratio
             }
+
+            // if (ratio === 1) {
+            //     providerOfDataItem = (dataItem: IDataItem, ageGroup: AgeGroup) => {
+            //         const modItemA = BaseData.getInstance().findBaseDataItem(modificationSet.modA.getInstant()); // find the item at posA
+            //         const modItem0 = BaseData.getInstance().findBaseDataItem(modificationSet.modA.getInstant() - (modificationSet.modB.getInstant() - modificationSet.modA.getInstant()))
+            //         const avgCaseA = modItemA.getAverageCases(ageGroup.getIndex());
+            //         const avgCase0 = modItem0.getAverageCases(ageGroup.getIndex());
+            //         return {
+            //             base: avgCaseA + (avgCase0 - avgCaseA),
+            //             data: dataItem.valueset[ageGroup.getName()].CASES
+            //         }
+            //     };
+            // }
 
             let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
 
             const maxAbsErrorViolationsAllowed = 10;
-            const maxAbsErrorTolerance = 0.03; // 0.5%
+            const maxAbsErrorTolerance = 0.05; // 0.5%
 
             let maxAbsErrorLast = Number.MAX_VALUE;
             let maxAbsErrorGroup: string;
@@ -64,7 +85,7 @@ export class ModelStateFitter5 {
 
             while (!modificationSet.modA.isReadonly()) { //
 
-                const valueErrors = await modificationAdapter.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], iterationIndex++, progressCallback);
+                const valueErrors = await modificationAdapter.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], iterationIndex++, providerOfDataItem, progressCallback);
                 let maxAbsErrorCurr = 0;
                 Object.keys(valueErrors).forEach(key => {
                     // dont consider ignore groups for max error
@@ -134,11 +155,7 @@ export class ModelStateFitter5 {
 
         }
 
-        const contactValuesM2 = modificationsContact[modificationsContact.length-2].getModificationValues();
-        modificationsContact[modificationsContact.length-1].acceptUpdate({
-            multipliers: {...contactValuesM2.multipliers},
-            corrections: {...contactValuesM2.corrections},
-        });        
+
 
         console.log('------------------------------------------------------------------------------------------');
 

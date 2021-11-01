@@ -7,7 +7,7 @@ export abstract class ValueRegressionBase {
 
     private readonly instant: number;
     private readonly instantMods: number;
-    private readonly instantPoly: number;
+    private readonly polyWeight: number;
     private readonly equationParamsLin: number[];
     private readonly equationParamsPol: number[];
     private readonly originalValues: { [K in string]: number };
@@ -17,7 +17,7 @@ export abstract class ValueRegressionBase {
 
         this.instant = params.instant;
         this.instantMods = params.instantMods;
-        this.instantPoly = params.instantPoly;
+        this.polyWeight = params.polyWeight;
         this.equationParamsLin = [];
         this.equationParamsPol = [];
         this.originalValues = {};
@@ -37,7 +37,14 @@ export abstract class ValueRegressionBase {
                 this.toRegressionX(relevantModification.getInstant()),
                 this.toValueY(relevantModification)
             ]);
-            this.originalValues[relevantModification.getInstant()] = this.toValueY(relevantModification);
+
+        });
+
+        /**
+         * raw data, should contain all modifications
+         */
+        this.modificationsContact.forEach(modificationContact => {
+            this.originalValues[modificationContact.getInstant()] = this.toValueY(modificationContact);
         });
 
         const regressionResultPol = regression.polynomial(regressionData, { order: 3 });
@@ -56,9 +63,12 @@ export abstract class ValueRegressionBase {
         const regressionPol = Math.pow(regressionX, 3) * this.equationParamsPol[0] + Math.pow(regressionX, 2) * this.equationParamsPol[1] + regressionX * this.equationParamsPol[2] + this.equationParamsPol[3];
         const regressionLin = regressionX * this.equationParamsLin[0] + this.equationParamsLin[1];
 
+        const ratioPol = this.polyWeight;
+        const ratioLin = 1 - ratioPol;
+
+        const regression = regressionPol * ratioPol + regressionLin * ratioLin;
         return {
-            regressionPol,
-            regressionLin,
+            regression,
             original: this.originalValues[instant] // will be undefined in many cases
         };
 

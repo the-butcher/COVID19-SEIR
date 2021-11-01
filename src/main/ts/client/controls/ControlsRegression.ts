@@ -25,25 +25,25 @@ export class ControlsRegression {
     private static instance: ControlsRegression;
 
     private sliderBackDays: SliderRegression;
-    private sliderPolyDays: SliderRegression;
+    private sliderPolyWeight: SliderRegression;
 
     private modification: ModificationRegression;
 
     constructor() {
 
         this.sliderBackDays = new SliderRegression("back days", ModelConstants.RANGE_________BACK_DAYS);
-        this.sliderPolyDays = new SliderRegression("poly days", ModelConstants.RANGE_________POLY_DAYS);
+        this.sliderPolyWeight = new SliderRegression("poly weight", ModelConstants.RANGE____PERCENTAGE_100);
 
     }
 
     handleChange(): void {
 
         const backDays = this.sliderBackDays.getValue();
-        const polyDays = this.sliderPolyDays.getValue();
+        const polyWeight = this.sliderPolyWeight.getValue();
 
         this.modification.acceptUpdate({
             back_days: backDays,
-            poly_days: polyDays
+            poly_days: polyWeight
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
@@ -58,11 +58,11 @@ export class ControlsRegression {
         this.modification = modification;
 
         this.sliderBackDays.setValue(this.modification.getBackDays());
-        this.sliderPolyDays.setValue(this.modification.getPolyDays());
+        this.sliderPolyWeight.setValue(this.modification.getPolyWeight());
 
         requestAnimationFrame(() => {
             this.sliderBackDays.handleResize();
-            this.sliderPolyDays.handleResize();
+            this.sliderPolyWeight.handleResize();
         });
 
         this.modification = modification;

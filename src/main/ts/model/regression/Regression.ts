@@ -22,8 +22,7 @@ export interface IRegressionParams {
 }
 
 export interface IRegressionResult {
-    regressionLin: number;
-    regressionPol: number;
+    regression: number;
     original?: number;
 }
 
@@ -73,8 +72,7 @@ export class Regression {
             return this.valueRegressionsCorrection[ageGroupIndex].getRegressionResult(instant);
         } else {
             return {
-                regressionPol: 0,
-                regressionLin: 0
+                regression: 0
             }
         }
     }
