@@ -22,7 +22,7 @@ export class Regression {
         if (instant) {
             this.instance = new Regression({
                 instant,
-                modificationCount: 10
+                modificationCount: 20
             });
 
         }
@@ -44,16 +44,18 @@ export class Regression {
         this.valueRegressionsMultiplier = {};
         this.valueRegressionsCorrection = {};
 
-        let modificationsContactA = new ModificationResolverContact().getModifications().filter(m => m.getInstant() < this.instant);
-        let modificationsContact0 = new ModificationResolverContact().getModifications().find(m => m.getInstant() === this.instant);
-        let modificationsContactB = new ModificationResolverContact().getModifications().filter(m => m.getInstant() > this.instant);
+        // let modificationsContactA = new ModificationResolverContact().getModifications().filter(m => m.getInstant() < this.instant);
+        // let modificationsContact0 = new ModificationResolverContact().getModifications().find(m => m.getInstant() === this.instant);
+        // let modificationsContactB = new ModificationResolverContact().getModifications().filter(m => m.getInstant() > this.instant);
 
-        // console.log('mods a, b', modificationsContactA.length, modificationsContactB.length, Math.max(0, modificationsContactA.length - params.modificationCount / 2), Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
+        // // console.log('mods a, b', modificationsContactA.length, modificationsContactB.length, Math.max(0, modificationsContactA.length - params.modificationCount / 2), Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
 
-        modificationsContactA = modificationsContactA.slice(Math.max(0, modificationsContactA.length - params.modificationCount / 2));
-        modificationsContactB = modificationsContactB.slice(0, Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
+        // modificationsContactA = modificationsContactA.slice(Math.max(0, modificationsContactA.length - params.modificationCount / 2));
+        // modificationsContactB = modificationsContactB.slice(0, Math.min(params.modificationCount / 2, modificationsContactB.length - 1));
 
-        const modificationsContact: ModificationContact[] = [...modificationsContactA, modificationsContact0, ...modificationsContactB];
+        // const modificationsContact: ModificationContact[] = [...modificationsContactA, modificationsContact0, ...modificationsContactB];
+
+        const modificationsContact: ModificationContact[] = new ModificationResolverContact().getModifications();
 
         /**
          * multipliers

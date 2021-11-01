@@ -119,8 +119,13 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             ModelActions.getInstance();
 
             // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-10-28').getTime()));
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-03').getTime()));
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-10-31').getTime()));
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-02').getTime()));
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-04').getTime()));
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-07').getTime()));
             // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-09').getTime()));
+            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-11').getTime()));
+
 
             setTimeout(() => {
                 ModelActions.getInstance().toggleModelMode('CONTACT');

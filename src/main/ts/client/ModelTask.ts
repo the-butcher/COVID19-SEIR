@@ -82,15 +82,15 @@ export class ModelTask {
                     StorageUtil.getInstance().setSaveRequired(true);
                 });
 
-                setTimeout(() => {
-                    ChartAgeGroup.getInstance().exportToPng().then(() => {
-                        ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                    });
-                }, 3000);
+                // setTimeout(() => {
+                //     ChartAgeGroup.getInstance().exportToPng().then(() => {
+                //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                //     });
+                // }, 3000);
 
                 // show any contact updates
-                const displayableModification = ControlsContact.getInstance().getModification();
-                ControlsContact.getInstance().acceptModification(displayableModification);
+                // const displayableModification = ControlsContact.getInstance().getModification();
+                // ControlsContact.getInstance().acceptModification(displayableModification);
 
                 SliderModification.getInstance().setProgress(0);
                 // ModelTask.worker.terminate();

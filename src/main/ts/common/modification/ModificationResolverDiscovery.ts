@@ -1,11 +1,9 @@
-import { MODIFICATION__FETCH } from './../../model/ModelConstants';
-import { ModificationTime } from './ModificationTime';
-import { Modifications } from './Modifications';
-import { ModificationResolverTime } from './ModificationResolverTime';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
 import { ModificationDiscovery } from './ModificationDiscovery';
+import { ModificationTime } from './ModificationTime';
 
 /**
  * modification resolver for testing modifications
@@ -19,17 +17,6 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
         super('TESTING');
     }
 
-    getMinValue(): number {
-        return 0;
-    }
-
-    getMaxValue(): number {
-        return 1;
-    }
-
-    getTitle(): string {
-        return 'discovery rate';
-    }
 
     getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationDiscovery {
 

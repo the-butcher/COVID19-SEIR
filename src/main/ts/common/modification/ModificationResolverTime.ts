@@ -62,18 +62,6 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
 
     }
 
-    getMinValue(): number {
-        return 0;
-    }
-
-    getMaxValue(): number {
-        return Math.max(...this.getModificationData().map(d => d.modValueY)) * 1.05;
-    }
-
-    getTitle(): string {
-        return 'exposure/day';
-    }
-
     getMaxCellValue(): number {
         return this.maxCellValue;
     }
@@ -84,11 +72,6 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
 
     findContactMatrix(instant: number): IContactMatrix {
         return this.contactMatrices.find(m => m.getInstant() === instant);
-    }
-
-    getValue(instant: number): number {
-        console.warn('NI');
-        return Number.NaN;
     }
 
 }

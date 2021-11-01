@@ -1,5 +1,5 @@
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
-import { color, create, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
+import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
@@ -171,6 +171,9 @@ export class ChartAgeGroup {
     private ageGroupMarker: Rectangle;
     private intervalHandle: number;
 
+    private titleContainer: Container;
+    private chartTitle: Label;
+
     private constructor() {
 
         useTheme(am4themes_dark);
@@ -182,6 +185,26 @@ export class ChartAgeGroup {
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
+
+        this.titleContainer = this.chart.chartContainer.createChild(Container);
+        this.titleContainer.layout = "absolute";
+        this.titleContainer.toBack();
+        this.titleContainer.width = percent(100);
+        this.titleContainer.paddingBottom = 10;
+
+        this.chartTitle = this.titleContainer.createChild(Label);
+        this.chartTitle.text = '';
+        this.chartTitle.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.chartTitle.fontSize = ControlsConstants.FONT_SIZE;
+        this.chartTitle.fill = color(ControlsConstants.COLOR____FONT);
+
+        let dateTitle = this.titleContainer.createChild(Label);
+        dateTitle.text = "ages, bmsgpk, google mobility, @FleischerHannes";
+        dateTitle.align = "right";
+        dateTitle.dy = 2;
+        dateTitle.fontFamily = ControlsConstants.FONT_FAMILY;
+        dateTitle.fontSize = ControlsConstants.FONT_SIZE - 2;
+        dateTitle.fill = color(ControlsConstants.COLOR____FONT);
 
         ChartUtil.getInstance().configureLegend(this.chart);
         ChartUtil.getInstance().configureChartPadding(this.chart);
@@ -870,7 +893,10 @@ export class ChartAgeGroup {
             this.yAxisPlotPercent____0__300.height = percent(pixelHeightPlot * pp);
             this.yAxisPlotIncidence.height = percent(pixelHeightPlot * pp);
 
-            this.yAxisHeat.height = percent(pixelHeightHeat * pp);;
+            this.yAxisHeat.height = percent(pixelHeightHeat * pp);
+
+            const offsetX = this.chart.plotContainer.pixelX + this.xAxis.pixelX;
+            this.chartTitle.x = offsetX;
 
         });
 
@@ -896,7 +922,8 @@ export class ChartAgeGroup {
     }
 
     getAgeGroupName(): string {
-        return Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex].getName();
+        const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[this.getAgeGroupIndex()].getName()
+        return ageGroupName === 'TOTAL' ? 'all ages' : ageGroupName;
     }
 
     getAgeGroupIndex(): number {
@@ -923,6 +950,7 @@ export class ChartAgeGroup {
     async setAgeGroupIndex(ageGroupIndex: number): Promise<void> {
 
         const requiresBaseDataRender = this.ageGroupIndex !== ageGroupIndex;
+
         this.ageGroupIndex = ageGroupIndex;
         const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
         this.absValue = ageGroup.getAbsValue();
@@ -1186,14 +1214,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(false); // visible
-        this.seriesAgeGroupIncidenceR.setVisible(false); // visible
+        this.seriesAgeGroupIncidence.setVisible(visible); // visible
+        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
 
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
 
         this.seriesAgeGroupCasesP.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(false); // visible
-        this.seriesAgeGroupCasesR.setVisible(false); // visible
+        this.seriesAgeGroupCasesN.setVisible(visible); // visible
+        this.seriesAgeGroupCasesR.setVisible(visible); // visible
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1235,7 +1263,12 @@ export class ChartAgeGroup {
     setChartMode(chartMode: CHART_MODE______KEY): void {
         this.chartMode = chartMode;
         ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
+        this.updateTitle();
         this.requestRenderModelData();
+    }
+
+    private updateTitle(): void {
+        this.chartTitle.text = `${ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].title} :: ${this.getAgeGroupName()}`;
     }
 
     getChartMode(): CHART_MODE______KEY {
@@ -1345,17 +1378,14 @@ export class ChartAgeGroup {
 
     calculateRt(instant: number, modificationValuesStrain: IModificationValuesStrain[]): number {
 
-        // const interval = TimeUtil.MILLISECONDS_PER____DAY;
-        if (this.ageGroupIndex === -1) {
-            return undefined;
-        }
+        const _ageGroupIndex = this.getAgeGroupIndex();
 
-        const instantA = instant - TimeUtil.MILLISECONDS_PER____DAY * 0;
-        const instantB = instant + TimeUtil.MILLISECONDS_PER____DAY * 1;
+        const instantA = instant - TimeUtil.MILLISECONDS_PER____DAY * 2;
+        const instantB = instant + TimeUtil.MILLISECONDS_PER____DAY * 2;
         const dataItemA = this.findDataItemByInstant(instantA);
         const dataItemB = this.findDataItemByInstant(instantB);
 
-        const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex].getName();
+        const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex].getName();
 
         if (dataItemA && dataItemB) {
 
@@ -1392,6 +1422,7 @@ export class ChartAgeGroup {
 
         clearTimeout(this.renderTimeout);
 
+        const _ageGroupIndex = this.getAgeGroupIndex();
 
         const plotData: any[] = [];
         const heatData: any[] = [];
@@ -1405,7 +1436,7 @@ export class ChartAgeGroup {
 
         // console.log('modelData', this.modelData);
 
-        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
+        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex];
         for (const dataItem of this.modelData) {
 
             // const modificationTime = ModificationTime.createInstance(dataItem.instant);
@@ -1435,7 +1466,7 @@ export class ChartAgeGroup {
             const contactMultiplierR = multiplierResult.regression;
             const contactMultiplierO = multiplierResult.original;
 
-            const correctionResult = Regression.getInstance().getCorrection(dataItem.instant, this.ageGroupIndex);
+            const correctionResult = Regression.getInstance().getCorrection(dataItem.instant, _ageGroupIndex);
             const contactCorrectionR = correctionResult.regression;
             const contactCorrectionO = correctionResult.original;
 
@@ -1555,7 +1586,9 @@ export class ChartAgeGroup {
 
         const plotData: any[] = [];
 
-        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
+        const _ageGroupIndex = this.getAgeGroupIndex();
+
+        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex];
 
         const instantMin = ModelInstants.getInstance().getMinInstant();
         const instantMax = ModelInstants.getInstance().getMaxInstant();

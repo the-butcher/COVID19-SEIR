@@ -2,8 +2,10 @@ import { IModification } from '../common/modification/IModification';
 import { IModificationValuesDiscovery } from '../common/modification/IModificationValueDiscovery';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IModificationValuesContact } from '../common/modification/IModificationValuesContact';
+import { IModificationValuesRegression } from '../common/modification/IModificationValuesRegression';
 import { ModificationContact } from '../common/modification/ModificationContact';
 import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
+import { ModificationRegression } from '../common/modification/ModificationRegression';
 import { ModificationSeasonality } from '../common/modification/ModificationSeasonality';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
@@ -17,7 +19,7 @@ import { IModificationValuesTime } from './../common/modification/IModificationV
 import { IModificationValuesVaccination } from './../common/modification/IModificationValuesVaccination';
 
 export type MODIFICATION_NATURE = 'INSTANT' | 'RANGE';
-export type MODIFICATION____KEY = 'TIME' | 'STRAIN' | 'CONTACT' | 'TESTING' | 'VACCINATION' | 'SEASONALITY' | 'SETTINGS';
+export type MODIFICATION____KEY = 'TIME' | 'STRAIN' | 'CONTACT' | 'TESTING' | 'VACCINATION' | 'SEASONALITY' | 'SETTINGS' | 'REGRESSION';
 export type MODIFICATION__FETCH = 'INTERPOLATE' | 'CREATE';
 
 /**
@@ -100,6 +102,9 @@ export class ModelConstants {
         },
         'SETTINGS': {
             createValuesModification: (modificationValues) => new ModificationSettings(modificationValues as IModificationValuesSettings),
+        },
+        'REGRESSION': {
+            createValuesModification: (modificationValues) => new ModificationRegression(modificationValues as IModificationValuesRegression),
         }
     };
 
@@ -133,6 +138,8 @@ export class ModelConstants {
     static readonly RANGE___SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
     static readonly RANGE________________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     static readonly RANGE________UNDETECTED = [0, 1, 2, 3];
+    static readonly RANGE_________BACK_DAYS = [0, 5, 10, 15, 20];
+    static readonly RANGE_________POLY_DAYS = [0, 1, 2, 3, 4, 5];
 
 }
 

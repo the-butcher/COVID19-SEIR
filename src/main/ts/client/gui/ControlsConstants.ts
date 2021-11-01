@@ -34,6 +34,9 @@ import { IWorkerInput } from './../../model/IWorkerInput';
 import { ModelInstants } from './../../model/ModelInstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
+import { ModificationResolverRegression } from '../../common/modification/ModificationResolverRegression';
+import { ModificationRegression } from '../../common/modification/ModificationRegression';
+import { ControlsRegression } from '../controls/ControlsRegression';
 
 export interface IControlsDefinitions {
     icon: string;
@@ -55,7 +58,8 @@ export interface IControlsDefinitions {
 // }
 
 export interface IHeatmapColorDefinition {
-    id: string,
+    id: string;
+    title: string;
     getHeatColor: (value: number) => string;
 }
 export interface IHeatmapChartDefinition extends IHeatmapColorDefinition {
@@ -135,17 +139,20 @@ export class ControlsConstants {
         'TESTING': '#29c437',
         'VACCINATION': '#0c90bb',
         'SEASONALITY': '#dbd905',
-        'SETTINGS': '#687580'
+        'SETTINGS': '#687580',
+        'REGRESSION': '#976b00'
     };
 
     static readonly HEATMAP_______PLAIN: IHeatmapColorDefinition = {
         id: ObjectUtil.createId(),
+        title: 'plain',
         getHeatColor: (value) => new Color(0.0, 0.0, Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex()
     }
 
     static readonly HEATMAP_DATA_PARAMS: {[K in CHART_MODE______KEY]: IHeatmapChartDefinition} = {
         'INCIDENCE': {
             id: ObjectUtil.createId(),
+            title: 'Incidence',
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID___________ALL],
             getHeatLabel: (value) => QueryUtil.getInstance().isDiffDisplay() ? `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}` : `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}`,
             getHeatColor: (value) => new Color(0.00, 0.00, Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
@@ -160,6 +167,7 @@ export class ControlsConstants {
         },
         'VACCINATED': {
             id: ObjectUtil.createId(),
+            title: 'Compartments',
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].SUSCEPTIBLE,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.54, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
@@ -175,6 +183,7 @@ export class ControlsConstants {
         },
         'EXPOSED': {
             id: ObjectUtil.createId(),
+            title: 'Exposed',
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID___________ALL],
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
@@ -190,6 +199,7 @@ export class ControlsConstants {
         },
         'TESTING': {
             id: ObjectUtil.createId(),
+            title: 'Testing estimates',
             getHeatValue: (dataItem, ageGroupName) => Math.min(1, dataItem.valueset[ageGroupName].DISCOVERY),
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.35, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
@@ -205,6 +215,7 @@ export class ControlsConstants {
         },
         'CONTACT': {
             id: ObjectUtil.createId(),
+            title: 'Contact / Regression',
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID___________ALL], // SAME AS INCIDENCE FOR NOW
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
@@ -314,6 +325,19 @@ export class ControlsConstants {
                 ChartAgeGroup.getInstance().setChartMode('CONTACT');
             },
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
+        },
+        'REGRESSION': {
+            icon: 'M 6.9858 -4.3491 H 2.2521 C 1.3949 -4.3491 0.9656 -3.3126 1.5718 -2.7065 L 2.8708 -1.4074 L -0.071 1.5348 L -3.0128 -1.407 C -3.5138 -1.9082 -4.3263 -1.9082 -4.827 -1.407 L -7.5812 1.3472 C -7.8318 1.5978 -7.8318 2.0039 -7.5812 2.2546 L -6.6743 3.1616 C -6.4236 3.4119 -6.0174 3.4119 -5.7669 3.1616 L -3.9201 1.3143 L -0.9783 4.2561 C -0.4771 4.7573 0.3353 4.7573 0.836 4.2561 L 4.6851 0.407 L 5.9842 1.7061 C 6.5904 2.3123 7.6269 1.8829 7.6269 1.0257 V -3.7076 C 7.6273 -4.062 7.3402 -4.3491 6.9858 -4.3491 Z',
+            container: 'modificationRegressionDiv',
+            handleModificationUpdate: () => {
+                return ModelTask.commit('REGRESSION', ControlsConstants.createWorkerInput());
+            },
+            getModificationResolver: () => {
+                return new ModificationResolverRegression();
+            },
+            handleModificationDrag: () => {},
+            showInEditor: modification => ControlsRegression.getInstance().acceptModification(modification as ModificationRegression),
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         },
         'SETTINGS': {
             icon: 'm 6.8 3.62 h -9.52 v -0.45 c 0 -0.25 -0.2 -0.45 -0.45 -0.45 h -0.91 c -0.25 0 -0.45 0.2 -0.45 0.45 v 0.45 h -2.27 c -0.25 0 -0.45 0.2 -0.45 0.45 v 0.91 c 0 0.25 0.2 0.45 0.45 0.45 h 2.27 v 0.45 c 0 0.25 0.2 0.45 0.45 0.45 h 0.91 c 0.25 0 0.45 -0.2 0.45 -0.45 v -0.45 h 9.51 c 0.25 0 0.45 -0.2 0.45 -0.45 v -0.91 c 0 -0.25 -0.2 -0.45 -0.45 -0.45 z m 0 -4.53 h -2.27 v -0.45 c 0 -0.25 -0.2 -0.45 -0.45 -0.45 h -0.91 c -0.25 0 -0.45 0.2 -0.45 0.45 v 0.45 h -9.52 c -0.25 0 -0.45 0.2 -0.45 0.45 v 0.91 c 0 0.25 0.2 0.45 0.45 0.45 h 9.51 v 0.45 c 0 0.25 0.2 0.45 0.45 0.45 h 0.91 c 0.25 0 0.45 -0.2 0.45 -0.45 v -0.45 h 2.27 c 0.25 0 0.45 -0.2 0.45 -0.45 v -0.91 c 0 -0.25 -0.2 -0.45 -0.45 -0.45 z m 0 -4.53 h -5.89 v -0.45 c 0 -0.25 -0.2 -0.45 -0.45 -0.45 h -0.91 c -0.25 0 -0.45 0.2 -0.45 0.45 v 0.45 h -5.9 c -0.24 -0 -0.45 0.21 -0.45 0.46 v 0.91 c 0 0.25 0.2 0.45 0.45 0.45 h 5.89 v 0.45 c 0 0.25 0.2 0.45 0.45 0.45 h 0.91 c 0.25 0 0.45 -0.2 0.45 -0.45 v -0.45 h 5.89 c 0.25 0 0.45 -0.2 0.45 -0.45 v -0.91 c 0 -0.25 -0.2 -0.45 -0.45 -0.45 z',

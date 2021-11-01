@@ -193,8 +193,8 @@ export class BaseDataItem implements IBaseDataItem {
 
     calculateAverageDerivates(): void {
 
-        const dataItemM2 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 0);
-        const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 1);
+        const dataItemM2 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 2);
+        const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 2);
         if (dataItemM2 && dataItemP2) {
 
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {

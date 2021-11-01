@@ -16,24 +16,12 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
         super('VACCINATION');
     }
 
-    getMinValue(): number {
-        return 0;
-    }
-
-    getMaxValue(): number {
-        return 1;
-    }
-
-    getTitle(): string {
-        return 'fully vaccinated';
-    }
-
-    getValue(instant: number): number {
-        const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
-        if (dataItemCur) {
-            return dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].REMOVED_V2;
-        }
-        return Number.NaN;
-    }
+    // getValue(instant: number): number {
+    //     const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
+    //     if (dataItemCur) {
+    //         return dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].REMOVED_V2;
+    //     }
+    //     return Number.NaN;
+    // }
 
 }

@@ -90,6 +90,19 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 
 #### Thoughts
+* process for auto-modeller
+  * let ModelStateFitter5 (which works purely on errors) iterate the model with increasing precision until tolerance met
+  * create some ModificationContact subclass that will not persist with the model (but maybe persisting does not matter), those modifications shall put themselves onto the prediction curves
+  * add confidence interval (find out how the confidence interval expands out from begin of prediction)
+  * do not forget to introduce new testing modifications as more testing information comes with the data - find a way to automate
+* do all of the above in a way that allows to simulate historic predictions in order to validate and improve patterns
+* think about ways to provide repeatable results of presentation
+  * diagram needs an appropriate title containing data source, and twitter account
+  * primary diagram (overall prediction)
+  * secondary diagrams (one per age group?) - how to a arrange on a single sheet? maybe use 5x2 or 4x3 and use extra space for text, secondary diagrams will likely not need to have the heatmap included
+  * find out how to render
+  * long term prediction (?) - probably only makes sense in a set of multiple predictions
+
 * goal is to reliably identify a total share of cases found (the model needs then to make assumptions which age-group gets which share)
 * positivity rate in pcr is influenced by antigen
 * found / tested_antigen = positivity_rate_antigen (the actual amount of positive tests should already reflect sensitivity)

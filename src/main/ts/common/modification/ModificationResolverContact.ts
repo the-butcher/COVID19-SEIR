@@ -19,18 +19,6 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         super('CONTACT');
     }
 
-    getMinValue(): number {
-        return 0;
-    }
-
-    getMaxValue(): number {
-        return 1;
-    }
-
-    getTitle(): string {
-        return 'contact rate';
-    }
-
     createRegressionModification(instant: number): ModificationContact {
 
         const regression = Regression.getInstance(instant);

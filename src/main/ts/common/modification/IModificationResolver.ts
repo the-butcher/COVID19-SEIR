@@ -27,25 +27,4 @@ export interface IModificationResolver<V extends IModificationValues, M extends 
      */
     getModificationData(): IModificationData[];
 
-    /**
-     * get a value displayable in the modification minichart
-     * @param instant
-     */
-    getValue(instant: number): number;
-
-    /**
-     * get the lower limit of the modification chart as suitable for this instance
-     */
-    getMinValue(): number
-
-    /**
-     * get the upper limit of the modification chart as suitable for this instance
-     */
-    getMaxValue(): number
-
-    /**
-     * get a meaningful series title for the information provided by this resolver
-     */
-    getTitle(): string;
-
 }

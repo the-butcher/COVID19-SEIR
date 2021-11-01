@@ -74,12 +74,4 @@ export abstract class AModificationResolver<V extends IModificationValues, M ext
         }
     }
 
-    abstract getValue(instant: number): number;
-
-    abstract getMaxValue(): number;
-
-    abstract getMinValue(): number;
-
-    abstract getTitle(): string;
-
 }

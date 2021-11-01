@@ -83,10 +83,8 @@ export class ModificationContact extends AModification<IModificationValuesContac
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
-        // console.warn('update.corrections 1', update.corrections);
         update.multipliers = {...this.modificationValues.multipliers, ...update.multipliers};
         update.corrections = {...this.modificationValues.corrections, ...update.corrections};
-        // console.warn('update.corrections 2', update.corrections);
         super.acceptUpdate(update);
         this.resetValues();
     }

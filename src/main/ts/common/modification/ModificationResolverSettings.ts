@@ -18,14 +18,6 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
         super('SETTINGS');
     }
 
-    getMinValue(): number {
-        return Demographics.getInstance().getAbsTotal() * 0.95;
-    }
-
-    getMaxValue(): number {
-        return Demographics.getInstance().getAbsTotal() * 1.05;
-    }
-
     getValue(instant: number): number {
         const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
         if (dataItemCur) {
@@ -34,10 +26,6 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
             return value;
         }
         return Number.NaN;
-    }
-
-    getTitle(): string {
-        return 'total (control value)';
     }
 
 }
