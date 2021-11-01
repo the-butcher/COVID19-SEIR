@@ -63,8 +63,8 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        // new ModelStateFitter4().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
-        //     ctx.postMessage(modelProgress);
+        // new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+        //     ctx.postMessage(modelProgress); 
         // }).then(data => {
         //     data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
         //     ctx.postMessage(data);
