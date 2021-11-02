@@ -20,7 +20,7 @@ export class ModelStateFitter7 {
     async adapt(fitterParams: IFitterParams, modelStateIntegrator: ModelStateIntegrator, maxInstant: number, progressCallback: (progress: IModelProgress) => void): Promise<IModelProgress> {
 
         const dataset: IDataItem[] = [];
-        const modificationsContact = new ModificationResolverContact().getModifications();
+        const modificationsContact = new ModificationResolverContact().getModifications().splice(3); // skip first 3
 
         const modelStateBuilderMultipliers = new ModificationAdaptor7();
 
@@ -65,54 +65,73 @@ export class ModelStateFitter7 {
 
             const modificationContact = modificationsContact[modificationIndex];
 
-            const minPullInstant = modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4;
-            const maxPullInstant = modificationContact.getInstant() + TimeUtil.MILLISECONDS_PER____DAY * 4;
+            // const minPullInstant = modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY * 0;
+            // const maxPullInstant = modificationContact.getInstant() + TimeUtil.MILLISECONDS_PER____DAY * 0;
 
-            const pullDataset = stepData.filter(d => d.instant >= minPullInstant && d.instant <= maxPullInstant);
+            // const pullDataset = stepData.filter(d => d.instant >= minPullInstant && d.instant <= maxPullInstant);
+            const pullDataset = stepData.filter(d => d.instant === modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY * 0);
 
             pullDataset.forEach(pullData => {
-                const weight = 1 - (Math.abs(pullData.instant - modificationContact.getInstant()) / (TimeUtil.MILLISECONDS_PER____DAY * 4));
+                const weight = 1; // 1 - (Math.abs(pullData.instant - modificationContact.getInstant()) / (TimeUtil.MILLISECONDS_PER____DAY * 8));
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-                    const weighedDeriv = pullData.derivs[ageGroup.getName()] * weight;
+                    const weighedDeriv = Math.pow(pullData.derivs[ageGroup.getName()], 2) * Math.sign(pullData.derivs[ageGroup.getName()]) * weight;
                     pullVals[modificationContact.getId()][ageGroup.getName()] = pullVals[modificationContact.getId()][ageGroup.getName()] + weighedDeriv;
                 });
             });
 
         }
 
-        for (let modificationIndex = 2; modificationIndex < modificationsContact.length; modificationIndex ++) {
+        const blockCount = 1;
+        const blockSize = Math.floor(modificationsContact.length / blockCount);
+        console.log('blockCount', blockCount, blockSize);
+        
+        for (let blockIndex = 0; blockIndex < blockCount; blockIndex++) {
 
-            const modificationContact = modificationsContact[modificationIndex];
-            const pullVal = pullVals[modificationContact.getId()];
+            let modificationIndexA = blockIndex * blockSize + fitterParams.fitter7Idx;
+            const modificationIndexB = modificationIndexA + 10;
 
-            const prevMultO = modificationContact.getCategoryValue('other');
-            const prevMultN = modificationContact.getCategoryValue('nursing');
-            const prevMultS = modificationContact.getCategoryValue('school');
+            const modA = modificationsContact[modificationIndexA % modificationsContact.length];
+            const modB = modificationsContact[modificationIndexB % modificationsContact.length];
+            console.log(TimeUtil.formatCategoryDate(modA.getInstant()), ' -- ', TimeUtil.formatCategoryDate(modB.getInstant()))
+            for (; modificationIndexA < modificationIndexB; modificationIndexA ++) {
 
-            const currMultO = Math.max(0.00, Math.min(1, prevMultO - pullVal['TOTAL'] * 0.1));
-            const currMultN = Math.max(0.00, Math.min(1, prevMultN - pullVal['>= 85'] * 0.2));
-            const currMultS = Math.max(0.00, Math.min(1, prevMultS - pullVal['05-14'] * 0.2));
+                const modificationContact = modificationsContact[modificationIndexA % modificationsContact.length];
 
-            const corrections: { [K in string]: number } = {};
-            Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-                const prevCorrG = modificationContact.getCorrectionValue(ageGroup.getIndex());
-                const currCorrG = Math.max(0.20, Math.min(4, prevCorrG - pullVal[ageGroup.getName()] * 0.1)); // TODO try multiplication
-                corrections[ageGroup.getName()] = currCorrG;
-            });
+                const pullVal = pullVals[modificationContact.getId()];
 
-            modificationContact.acceptUpdate({
-                multipliers: {
-                    'other': currMultO,
-                    'nursing': currMultN,
-                    'school': currMultS
-                },
-                corrections
-            });
+                const prevMultO = modificationContact.getCategoryValue('other');
+                const prevMultN = modificationContact.getCategoryValue('nursing');
+                const prevMultS = modificationContact.getCategoryValue('school');
+
+                const currMultO = Math.max(0.00, Math.min(1, prevMultO / (1 + pullVal['TOTAL'] * 1)));
+                const currMultN = Math.max(0.00, Math.min(1, prevMultN / (1 + pullVal['>= 85'] * 2)));
+                const currMultS = Math.max(0.00, Math.min(1, prevMultS / (1 + pullVal['05-14'] * 2)));
+
+                const corrections: { [K in string]: number } = {};
+                Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+                    const prevCorrG = modificationContact.getCorrectionValue(ageGroup.getIndex());
+                    const currCorrG = Math.max(0.20, Math.min(4, prevCorrG / (1 + pullVal[ageGroup.getName()] * 1))); // TODO try multiplication
+                    corrections[ageGroup.getName()] = currCorrG;
+                });
+
+                modificationContact.acceptUpdate({
+                    multipliers: {
+                        'other': currMultO,
+                        'nursing': currMultN,
+                        'school': currMultS
+                    },
+                    corrections
+                });
+
+            }
 
         }
 
 
-        console.log('------------------------------------------------------------------------------------------');
+        console.log('------------------------------------------------------------------------------------------', fitterParams.fitter7Idx);
+
+        // pass back increased index
+        fitterParams.fitter7Idx = fitterParams.fitter7Idx + 1;
 
         /**
          * fill rest of data, if any

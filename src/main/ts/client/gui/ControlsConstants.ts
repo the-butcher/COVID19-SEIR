@@ -373,7 +373,8 @@ export class ControlsConstants {
             baseDataConfig: BaseData.getInstance().getBaseDataConfig(),
             fitterParams: {
                 derivRatio: 0.2,
-                errorTLast: 200
+                errorTLast: 200,
+                fitter7Idx: 2
             }
         }
     }

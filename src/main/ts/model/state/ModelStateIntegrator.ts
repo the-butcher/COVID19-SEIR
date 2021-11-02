@@ -25,6 +25,7 @@ export interface IModelProgress {
 export interface IFitterParams {
     derivRatio: number;
     errorTLast: number;
+    fitter7Idx: number;
 }
 
 export interface IDataItem {

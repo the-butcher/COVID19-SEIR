@@ -30,7 +30,8 @@ export class ModelTask {
 
     private static fitterParams: IFitterParams = {
         derivRatio: 0.1,
-        errorTLast: -1
+        errorTLast: -1,
+        fitter7Idx: 0
     }
 
     static async commit(key: MODIFICATION____KEY, workerInput: IWorkerInput): Promise<void> {
