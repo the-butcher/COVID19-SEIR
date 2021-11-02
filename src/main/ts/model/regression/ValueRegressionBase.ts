@@ -1,3 +1,4 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import regression, { DataPoint } from 'regression';
 import { ModelInstants } from '../ModelInstants';
 import { ModificationContact } from './../../common/modification/ModificationContact';
@@ -62,6 +63,15 @@ export abstract class ValueRegressionBase {
         const regressionX = this.toRegressionX(instant);
         const regressionPol = Math.pow(regressionX, 3) * this.equationParamsPol[0] + Math.pow(regressionX, 2) * this.equationParamsPol[1] + regressionX * this.equationParamsPol[2] + this.equationParamsPol[3];
         const regressionLin = regressionX * this.equationParamsLin[0] + this.equationParamsLin[1];
+
+        // // (cos(x)+1)/2 1@0, 0@pi
+        // const daysOff = Math.abs(instant - this.instant) / TimeUtil.MILLISECONDS_PER____DAY;
+        // const daysRel = 14;
+        // let ratioPol = 0;
+        // if (daysOff <= daysRel) {
+        //     const daysRad = daysOff / daysRel * Math.PI;
+        //     ratioPol = (Math.cos(daysRad) + 1) / 2;
+        // }
 
         const ratioPol = this.polyWeight;
         const ratioLin = 1 - ratioPol;

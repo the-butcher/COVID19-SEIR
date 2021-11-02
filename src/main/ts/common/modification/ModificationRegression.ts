@@ -23,6 +23,10 @@ export class ModificationRegression extends AModification<IModificationValuesReg
         return this.modificationValues.back_days;
     }
 
+    getPolyWeight(): number {
+        return this.modificationValues.poly_days; // TODO rename property
+    }
+
     getRegression(): Regression {
         return this.regression;
     }
@@ -47,17 +51,10 @@ export class ModificationRegression extends AModification<IModificationValuesReg
         this.regression = new Regression({
             instant: this.getInstantA(),
             instantMods: this.getInstantA() - this.getBackDays() * TimeUtil.MILLISECONDS_PER____DAY,
-            instantPoly: this.getInstantA() + this.getPolyWeight() * TimeUtil.MILLISECONDS_PER____DAY,
+            polyWeight: this.getPolyWeight(),
             modificationsContact:  new ModificationResolverContact().getModifications()
         })
     }
 
-    /**
-     * number of days that the polynomial regression counts
-     * @returns
-     */
-    getPolyWeight(): number {
-        return this.modificationValues.poly_days;
-    }
 
 }

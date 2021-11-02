@@ -15,7 +15,7 @@ export interface IRegressionParams {
      */
     instantMods: number;
 
-    instantPoly: number;
+    polyWeight: number;
 
     modificationsContact: ModificationContact[];
 

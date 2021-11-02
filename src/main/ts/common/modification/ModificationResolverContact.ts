@@ -1,3 +1,5 @@
+import { ModificationRegression } from './ModificationRegression';
+import { Modifications } from './Modifications';
 import { Regression } from './../../model/regression/Regression';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
@@ -19,38 +21,32 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         super('CONTACT');
     }
 
-    // createRegressionModification(instant: number): ModificationContact {
+    createRegressionModification(instant: number): IModificationValuesContact {
 
-    //     const regression = Regression.getInstance(instant);
-    //     const multipliers: { [K in string]: number } = {};
-    //     const corrections: { [K in string]: number } = {};
-    //     Demographics.getInstance().getCategories().forEach(category => {
-    //         multipliers[category.getName()] = regression.getMultiplier(instant, category.getName()).regression;
-    //     });
-    //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-    //         corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
-    //     });
-    //     // const corrections: { [K in string]: { [K in string]: number }} = {
-    //     //     'family': {..._corrections},
-    //     //     'school': {..._corrections},
-    //     //     'nursing': {..._corrections},
-    //     //     'work': {..._corrections},
-    //     //     'other': {..._corrections},
-    //     // };
+        const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
+        const regression = modificationRegression.getRegression();
 
-    //     const id = ObjectUtil.createId();
-    //     return new ModificationContact({
-    //         id,
-    //         key: 'CONTACT',
-    //         name: `regression (${id})`,
-    //         instant,
-    //         deletable: true,
-    //         draggable: true,
-    //         multipliers,
-    //         corrections
-    //     });
+        const multipliers: { [K in string]: number } = {};
+        const corrections: { [K in string]: number } = {};
+        Demographics.getInstance().getCategories().forEach(category => {
+            multipliers[category.getName()] = regression.getMultiplier(instant, category.getName()).regression;
+        });
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
+        });
+        const id = ObjectUtil.createId();
+        return{
+            id,
+            key: 'CONTACT',
+            name: `regression (${id})`,
+            instant,
+            deletable: true,
+            draggable: true,
+            multipliers,
+            corrections
+        };
 
-    // }
+    }
 
     createInterpolatedInstance(instant: number, modificationA: ModificationContact, modificationB: ModificationContact): IModificationValuesContact {
 
@@ -92,48 +88,6 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
     }
 
-    createRangeProfileInstance(instant: number, modificationA: ModificationContact): IModificationValuesContact {
-
-        const modificationValuesA = modificationA.getModificationValues();
-
-        const multipliers: { [K: string]: number} = {};
-        const corrections: { [K: string]: number} = {};
-
-        // find the day within the modification range
-        const day = Math.floor((instant - modificationA.getInstantA()) / TimeUtil.MILLISECONDS_PER____DAY);
-
-        Demographics.getInstance().getCategories().forEach(category => {
-            multipliers[category.getName()] = modificationValuesA.multipliers[category.getName()];
-        });
-        // console.log('fraction', fraction);
-
-        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-
-            corrections[ageGroup.getName()] = modificationValuesA.corrections[ageGroup.getName()];
-
-            if (modificationValuesA.dailyerrors && modificationValuesA.dailyerrors[ageGroup.getName()]) {
-
-                corrections[ageGroup.getName()] = corrections[ageGroup.getName()] * (modificationValuesA.dailyerrors[ageGroup.getName()][day] + 1);
-
-            }
-
-        });
-
-        const id = ObjectUtil.createId();
-        return {
-            ...modificationA.getModificationValues(),
-            id,
-            name: `interpolation (${id})`,
-            key: 'CONTACT',
-            instant,
-            deletable: true,
-            draggable: true,
-            multipliers,
-            corrections
-        };
-
-    }
-
     createCopy(instant: number, modificationA: ModificationContact): IModificationValuesContact {
 
         const id = ObjectUtil.createId();
@@ -154,14 +108,16 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
 
         let modificationValues: IModificationValuesContact;
 
-        // if creating between 2 modification, interpolate
-        if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) { // fetchType === 'CREATE' &&
+        const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
+
+        if (modificationRegression && instant > modificationRegression.getInstantA()) { // in the prediction range?
+
+            modificationValues = this.createRegressionModification(instant);
+            // console.log(TimeUtil.formatCategoryDate(instant), modificationValues)
+
+        } else if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) { // fetchType === 'CREATE' &&
 
             modificationValues = this.createInterpolatedInstance(instant, modificationA, modificationB);
-
-        // } else if (fetchType === 'INTERPOLATE') {
-
-        //     modificationValues = this.createRangeProfileInstance(instant, modificationA);
 
         } else {
 

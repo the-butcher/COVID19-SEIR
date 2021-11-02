@@ -34,7 +34,7 @@ export class ModelStateFitter5 {
 
         const modificationAdapter = new ModificationAdaptor5();
 
-        let modificationIndexStart = modificationsContact.length - 8; // modificationsContact.length - 6; // 2;
+        let modificationIndexStart = modificationsContact.length - 7; // modificationsContact.length - 6; // 2;
 
         const modificationContactOuterB = modificationsContact[modificationIndexStart];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -59,14 +59,17 @@ export class ModelStateFitter5 {
                 ratio
             }
 
+            // for the very last modification this creates faked values along an age-group wise local prediction
+            // more sophisticated and based on the last available values
             // if (ratio === 1) {
             //     providerOfDataItem = (dataItem: IDataItem, ageGroup: AgeGroup) => {
             //         const modItemA = BaseData.getInstance().findBaseDataItem(modificationSet.modA.getInstant()); // find the item at posA
             //         const modItem0 = BaseData.getInstance().findBaseDataItem(modificationSet.modA.getInstant() - (modificationSet.modB.getInstant() - modificationSet.modA.getInstant()))
             //         const avgCaseA = modItemA.getAverageCases(ageGroup.getIndex());
             //         const avgCase0 = modItem0.getAverageCases(ageGroup.getIndex());
+            //         // console.log(ageGroup.getName(), avgCaseA + (avgCaseA - avgCase0))
             //         return {
-            //             base: avgCaseA + (avgCase0 - avgCaseA),
+            //             base: avgCaseA + (avgCaseA - avgCase0),
             //             data: dataItem.valueset[ageGroup.getName()].CASES
             //         }
             //     };
@@ -75,7 +78,7 @@ export class ModelStateFitter5 {
             let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
 
             const maxAbsErrorViolationsAllowed = 10;
-            const maxAbsErrorTolerance = 0.05; // 0.5%
+            const maxAbsErrorTolerance = 0.015; // 0.5%
 
             let maxAbsErrorLast = Number.MAX_VALUE;
             let maxAbsErrorGroup: string;
