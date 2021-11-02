@@ -20,97 +20,97 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             ModelInstants.setInstanceFromValues(modelConfig.model_____daterange.map(d => new Date(d).getTime()))
             Modifications.setInstanceFromValues(modelConfig.model_modifications);
 
-            const modificationsContact = new ModificationResolverContact().getModifications();
+            // const modificationsContact = new ModificationResolverContact().getModifications();
 
-            const adaptedValues: { [K in string]: Partial<IModificationValuesContact> } = {};
-            for (let i = 3; i<modificationsContact.length - 3; i+=2) {
+            // const adaptedValues: { [K in string]: Partial<IModificationValuesContact> } = {};
+            // for (let i = 3; i<modificationsContact.length - 3; i+=2) {
 
-                // build multipliers for each category
-                const multipliers1: { [K in string]: number } = {};
-                const multipliers2: { [K in string]: number } = {};
-                Demographics.getInstance().getCategories().forEach(category => {
+            //     // build multipliers for each category
+            //     const multipliers1: { [K in string]: number } = {};
+            //     const multipliers2: { [K in string]: number } = {};
+            //     Demographics.getInstance().getCategories().forEach(category => {
 
-                    // line A
-                    const mod0 = modificationsContact[i].getCategoryValue(category.getName());
+            //         // line A
+            //         const mod0 = modificationsContact[i].getCategoryValue(category.getName());
 
-                    // line B (a value that may be an outlier)
-                    const mod1 = modificationsContact[i + 1].getCategoryValue(category.getName());
+            //         // line B (a value that may be an outlier)
+            //         const mod1 = modificationsContact[i + 1].getCategoryValue(category.getName());
 
-                    // line A (a value that may be an outlier)
-                    const mod2 = modificationsContact[i + 2].getCategoryValue(category.getName());
+            //         // line A (a value that may be an outlier)
+            //         const mod2 = modificationsContact[i + 2].getCategoryValue(category.getName());
 
-                    // line B
-                    const mod3 = modificationsContact[i + 3].getCategoryValue(category.getName());
+            //         // line B
+            //         const mod3 = modificationsContact[i + 3].getCategoryValue(category.getName());
 
-                    // midpoint on 02
-                    const mid02 = mod0 + (mod2 - mod0) / 2;
-                    const corr1 = (mid02 - mod1) / 2;
+            //         // midpoint on 02
+            //         const mid02 = mod0 + (mod2 - mod0) / 2;
+            //         const corr1 = (mid02 - mod1) / 2;
 
-                    // midpoint on 13
-                    const mid13 = mod1 + (mod3 - mod1) / 2;
-                    const corr2 = (mid13 - mod2) / 2;
+            //         // midpoint on 13
+            //         const mid13 = mod1 + (mod3 - mod1) / 2;
+            //         const corr2 = (mid13 - mod2) / 2;
 
-                    // const mod03i = (mod2 - mod0) / 2 + (mod3 - mod1) / 2;
-                    // const mod03a = (mod2a - mod0) / 2 + (mod3 - mod1a) / 2;
-                    // const mod03d = (mod03a - mod03i);
-                    // const mod03a = (mod1a - mod0) / 2 + (mod2a - mod1a) / 2 + (mod3 - mod2a) / 2;
+            //         // const mod03i = (mod2 - mod0) / 2 + (mod3 - mod1) / 2;
+            //         // const mod03a = (mod2a - mod0) / 2 + (mod3 - mod1a) / 2;
+            //         // const mod03d = (mod03a - mod03i);
+            //         // const mod03a = (mod1a - mod0) / 2 + (mod2a - mod1a) / 2 + (mod3 - mod2a) / 2;
 
-                    // midpoint between old value and opposite midpoint
-                    const mod1a = mod1 + corr1;
-                    // midpoint between old value and opposite midpoint
-                    const mod2a = mod2 + corr2;
+            //         // midpoint between old value and opposite midpoint
+            //         const mod1a = mod1 + corr1;
+            //         // midpoint between old value and opposite midpoint
+            //         const mod2a = mod2 + corr2;
 
-                    multipliers1[category.getName()] = mod1a;
-                    multipliers2[category.getName()] = mod2a;
+            //         multipliers1[category.getName()] = mod1a;
+            //         multipliers2[category.getName()] = mod2a;
 
-                });
+            //     });
 
-                const corrections1: { [K in string]: number } = {};
-                const corrections2: { [K in string]: number } = {};
-                Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            //     const corrections1: { [K in string]: number } = {};
+            //     const corrections2: { [K in string]: number } = {};
+            //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
 
-                    // line A (upper or lower, not necessarily important to know)
-                    const mod0 = modificationsContact[i].getCorrectionValue(ageGroup.getIndex());
+            //         // line A (upper or lower, not necessarily important to know)
+            //         const mod0 = modificationsContact[i].getCorrectionValue(ageGroup.getIndex());
 
-                    // line B
-                    const mod1 = modificationsContact[i + 1].getCorrectionValue(ageGroup.getIndex());
+            //         // line B
+            //         const mod1 = modificationsContact[i + 1].getCorrectionValue(ageGroup.getIndex());
 
-                    // line A (upper or lower, not necessarily important to know)
-                    const mod2 = modificationsContact[i + 2].getCorrectionValue(ageGroup.getIndex());
+            //         // line A (upper or lower, not necessarily important to know)
+            //         const mod2 = modificationsContact[i + 2].getCorrectionValue(ageGroup.getIndex());
 
-                    // line B
-                    const mod3 = modificationsContact[i + 3].getCorrectionValue(ageGroup.getIndex());
+            //         // line B
+            //         const mod3 = modificationsContact[i + 3].getCorrectionValue(ageGroup.getIndex());
 
-                    // midpoint on 02
-                    const mid02 = mod0 + (mod2 - mod0) / 2;
-                    // halfway between old value and opposite midpoint
-                    const mod1a = (mod1 + (mid02 - mod1) / 2);
-                    corrections1[ageGroup.getName()] = mod1a;
+            //         // midpoint on 02
+            //         const mid02 = mod0 + (mod2 - mod0) / 2;
+            //         // halfway between old value and opposite midpoint
+            //         const mod1a = (mod1 + (mid02 - mod1) / 2);
+            //         corrections1[ageGroup.getName()] = mod1a;
 
-                    // midpoint on 13
-                    const mid13 = mod1 + (mod3 - mod1) / 2;
-                    // halfway between old value and opposite midpoint
-                    const mod2a = (mod2 + (mid13 - mod2) / 2);
-                    corrections2[ageGroup.getName()] = mod2a;
+            //         // midpoint on 13
+            //         const mid13 = mod1 + (mod3 - mod1) / 2;
+            //         // halfway between old value and opposite midpoint
+            //         const mod2a = (mod2 + (mid13 - mod2) / 2);
+            //         corrections2[ageGroup.getName()] = mod2a;
 
-                });
+            //     });
 
-                // create modification values by modification id
-                adaptedValues[modificationsContact[i + 1].getId()] = {
-                    multipliers: multipliers1,
-                    corrections: corrections1
-                }
-                adaptedValues[modificationsContact[i + 2].getId()] = {
-                    multipliers: multipliers2,
-                    corrections:corrections2
-                }
+            //     // create modification values by modification id
+            //     adaptedValues[modificationsContact[i + 1].getId()] = {
+            //         multipliers: multipliers1,
+            //         corrections: corrections1
+            //     }
+            //     adaptedValues[modificationsContact[i + 2].getId()] = {
+            //         multipliers: multipliers2,
+            //         corrections:corrections2
+            //     }
 
-            }
+            // }
 
-            for (let i = 3; i<modificationsContact.length - 3; i+=2) {
-                modificationsContact[i + 1].acceptUpdate(adaptedValues[modificationsContact[i + 1].getId()]);
-                modificationsContact[i + 2].acceptUpdate(adaptedValues[modificationsContact[i + 2].getId()]);
-            }
+            // for (let i = 3; i<modificationsContact.length - 3; i+=2) {
+            //     modificationsContact[i + 1].acceptUpdate(adaptedValues[modificationsContact[i + 1].getId()]);
+            //     modificationsContact[i + 2].acceptUpdate(adaptedValues[modificationsContact[i + 2].getId()]);
+            // }
 
             // needs model-instants to be ready
             BaseData.getInstance().calculateDailyStats();

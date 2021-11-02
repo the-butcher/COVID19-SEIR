@@ -34,6 +34,8 @@ export class ModificationAdaptor7 {
             });
         });
 
+        modelStateIntegrator.rollback();
+
         for (let i=0; i<stepData.length; i++) {
             stepData[i].errors = {};
             stepData[i].derivs = {};

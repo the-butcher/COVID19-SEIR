@@ -1516,9 +1516,9 @@ export class ChartAgeGroup {
                 let color: string;
                 if (QueryUtil.getInstance().isDiffDisplay() && dataItem && dataItem00) { //
 
-                    // const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
+                    const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
 
-                    const caseValue = dataItem.errors ? dataItem.errors[ageGroupHeat.getName()] : 0;
+                    // const caseValue = dataItem.errors ? dataItem.errors[ageGroupHeat.getName()] : 0;
 
                     let r = 0;
                     let g = 0;
