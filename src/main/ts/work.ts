@@ -1,4 +1,3 @@
-import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
 import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
@@ -9,12 +8,8 @@ import { StrainCalibrator } from './model/calibration/StrainCalibrator';
 import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
-import { ModelStateFitter1 } from './model/state/fitter1/ModelStateFitter1';
-import { ModelStateFitter3 } from './model/state/fitter3/ModelStateFitter3';
-import { ModelStateFitter4 } from './model/state/fitter4/ModelStateFitter4';
+import { ModelStateFitter7 } from './model/state/fitter7/ModelStateFitter7';
 import { Logger } from './util/Logger';
-import { TimeUtil } from './util/TimeUtil';
-import { ModelStateFitter6 } from './model/state/fitter6/ModelStateFitter6';
 
 const ctx: Worker = self as any;
 
@@ -63,19 +58,19 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        // new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
-        //     ctx.postMessage(modelProgress);
-        // }).then(data => {
-        //     data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-        //     ctx.postMessage(data);
-        // });
+        new ModelStateFitter7().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+            ctx.postMessage(modelProgress);
+        }).then(data => {
+            data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+            ctx.postMessage(data);
+        });
 
         /**
          * complete model build (add more sophisticated logic here)
          */
-        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-            ctx.postMessage(modelProgress);
-        });
+        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        //     ctx.postMessage(modelProgress);
+        // });
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

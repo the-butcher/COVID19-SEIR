@@ -51,6 +51,8 @@ export abstract class ValueRegressionBase {
         const regressionResultPol = regression.polynomial(regressionData, { order: 3 });
         const regressionResultLin = regression.linear(regressionData);
 
+        // console.log('reg', regressionResultPol, regressionResultLin)
+
         this.equationParamsPol.push(...regressionResultPol.equation);
         this.equationParamsLin.push(...regressionResultLin.equation);
 

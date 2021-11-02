@@ -35,7 +35,6 @@ export interface IDataItem {
     seasonality: number;
     errors?: { [K: string]: number };
     derivs?: { [K: string]: number };
-    accums?: { [K: string]: number };
 }
 export interface IDataValues {
     SUSCEPTIBLE: number;

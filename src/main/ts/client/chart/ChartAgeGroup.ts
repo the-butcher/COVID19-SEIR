@@ -816,8 +816,8 @@ export class ChartAgeGroup {
         this.columnTemplate = this.seriesHeat.columns.template;
         this.columnTemplate.strokeWidth = 0;
         this.columnTemplate.tooltipText = `{${ChartAgeGroup.FIELD_CATEGORY_X}}, {${ChartAgeGroup.FIELD_CATEGORY_Y}}: {label}`;
-        this.columnTemplate.width = percent(95);
-        this.columnTemplate.height = percent(95);
+        this.columnTemplate.width = percent(100);
+        this.columnTemplate.height = percent(100);
         this.columnTemplate.events.on('hit', e => {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
             ModelActions.getInstance().toggleAgeGroup(index);
@@ -1216,14 +1216,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(visible); // visible
-        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
+        this.seriesAgeGroupIncidence.setVisible(false); // visible
+        this.seriesAgeGroupIncidenceR.setVisible(false); // visible
 
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
 
         this.seriesAgeGroupCasesP.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(visible); // visible
-        this.seriesAgeGroupCasesR.setVisible(visible); // visible
+        this.seriesAgeGroupCasesN.setVisible(false); // visible
+        this.seriesAgeGroupCasesR.setVisible(false); // visible
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1516,9 +1516,9 @@ export class ChartAgeGroup {
                 let color: string;
                 if (QueryUtil.getInstance().isDiffDisplay() && dataItem && dataItem00) { //
 
-                    const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
+                    // const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
 
-                    // const caseValue = dataItem.errors ? dataItem.errors[ageGroupHeat.getName()] : 0;
+                    const caseValue = dataItem.errors ? dataItem.errors[ageGroupHeat.getName()] : 0;
 
                     let r = 0;
                     let g = 0;
