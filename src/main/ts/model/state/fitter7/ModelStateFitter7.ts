@@ -1,3 +1,4 @@
+import { Statistics } from './../../../util/Statistics';
 import { Demographics } from './../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
 import { IModificationSet } from '../fitter/IModificationSet';
@@ -11,7 +12,9 @@ import { ModificationAdaptor7 } from './ModificationAdaptor7';
  * @author h.fleischer
  * @since 25.10.2021
  *
- * this type iterates forth an back in specific, i.e. 7 day steps, then from the ratio between the average offset of that interval calculates corrections and multipliers
+ *
+ * leads to oscillation (runge phenomenon?) the further away it gets from origin
+ *
  */
 export class ModelStateFitter7 {
 
@@ -38,19 +41,6 @@ export class ModelStateFitter7 {
         console.log(loggableRange, '++', stepData.length);
         dataset.push(...stepData);
 
-        /**
-         * now think of derivates as forces applied to the curve
-         * these forces will act in their neighbourhood on modifications and corrections to both sides of the error
-         *
-         * a derivate error will want to "twist" the curve at that point, so it would i.e. reduce value on the previous modification, but increase on the following modification
-         *
-         * with exponential growth leverage will have a large role (try different operators)
-         * keep in mind that it may be necessary to use square errors rather than plain values
-         *
-         * the modifications act against each other as well
-         * 1) add errors to correction pool
-         * 2) smooth the forces between respective modifications (or does the system take care of that anyways)
-         */
 
         // setup containers, values by modification id and age group
         const pullVals: { [K in string]: { [K in string]: number } } = {};
@@ -61,18 +51,22 @@ export class ModelStateFitter7 {
             });
         }
 
-        for (let modificationIndex = 0; modificationIndex < modificationsContact.length; modificationIndex ++) {
+        for (let modificationIndex = 1; modificationIndex < modificationsContact.length; modificationIndex ++) {
 
             const modificationContact = modificationsContact[modificationIndex];
+            console.log(TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationIndex);
 
-            const minPullInstant = modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY * 7;
-            const maxPullInstant = modificationContact.getInstant() + TimeUtil.MILLISECONDS_PER____DAY * 0;
+            const minPullInstant = modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY * 5;
+            const maxPullInstant = modificationContact.getInstant() + TimeUtil.MILLISECONDS_PER____DAY * 5;
             const pullDataset = stepData.filter(d => d.instant >= minPullInstant && d.instant <= maxPullInstant);
 
             // const pullDataset = stepData.filter(d => d.instant === modificationContact.getInstant());
 
             pullDataset.forEach(pullData => {
-                const weight = 1; // 1 - (Math.abs(pullData.instant - modificationContact.getInstant()) / (TimeUtil.MILLISECONDS_PER____DAY * 4));
+                const lever = Math.abs(pullData.instant - modificationContact.getInstant()) / (TimeUtil.MILLISECONDS_PER____DAY * 5);
+                console.log(Math.pow(1-lever,2));
+                const weight = Math.pow(1 - lever, 2);
+                // const weight = 10 / Math.pow(modificationIndex, 2);
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                     const weighedDeriv = pullData.derivs[ageGroup.getName()] * weight;
                     pullVals[modificationContact.getId()][ageGroup.getName()] = pullVals[modificationContact.getId()][ageGroup.getName()] + weighedDeriv;
@@ -81,24 +75,29 @@ export class ModelStateFitter7 {
 
         }
 
-        for (let modificationIndex = 2; modificationIndex < modificationsContact.length; modificationIndex ++) {
+        for (let modificationIndex = 3; modificationIndex < modificationsContact.length; modificationIndex ++) {
 
             const modificationContact = modificationsContact[modificationIndex];
             const pullVal = pullVals[modificationContact.getId()];
+
+            const pullData = stepData.find(d => d.instant === modificationContact.getInstant());
 
             const prevMultO = modificationContact.getCategoryValue('other');
             const prevMultN = modificationContact.getCategoryValue('nursing');
             const prevMultS = modificationContact.getCategoryValue('school');
 
-            const currMultO = Math.max(0.00, Math.min(1, prevMultO - pullVal['TOTAL'] * 0.1));
-            const currMultN = Math.max(0.00, Math.min(1, prevMultN - pullVal['>= 85'] * 0.2));
-            const currMultS = Math.max(0.00, Math.min(1, prevMultS - pullVal['05-14'] * 0.2));
+            const currMultO = Math.max(0.00, Math.min(1, prevMultO / (1 + pullVal['TOTAL'] * 0.1)));
+            const currMultN = Math.max(0.00, Math.min(1, prevMultN / (1 + pullVal['>= 85'] * 0.2)));
+            const currMultS = Math.max(0.00, Math.min(1, prevMultS / (1 + pullVal['05-14'] * 0.2)));
 
-            const corrections: { [K in string]: number } = {};
+            const corrections: { [K in  string]: number } = {};
             Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+
                 const prevCorrG = modificationContact.getCorrectionValue(ageGroup.getIndex());
-                const currCorrG = Math.max(0.20, Math.min(4, prevCorrG - pullVal[ageGroup.getName()] * 0.1)); // TODO try multiplication
+                const currCorrG = Math.max(0.20, Math.min(4, prevCorrG / (1 + pullVal[ageGroup.getName()] * 0.1))); // TODO try multiplication
                 corrections[ageGroup.getName()] = currCorrG;
+
+                pullData.derivs[ageGroup.getName()] = pullVal[ageGroup.getName()];
             });
 
             modificationContact.acceptUpdate({

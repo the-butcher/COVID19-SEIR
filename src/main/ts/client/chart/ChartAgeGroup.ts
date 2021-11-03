@@ -1378,45 +1378,66 @@ export class ChartAgeGroup {
         }
     }
 
+    // calculateRt(instant: number, modificationValuesStrain: IModificationValuesStrain[]): number {
+
+    //     const _ageGroupIndex = this.getAgeGroupIndex();
+
+    //     const instantA = instant - TimeUtil.MILLISECONDS_PER____DAY * 2;
+    //     const instantB = instant + TimeUtil.MILLISECONDS_PER____DAY * 2;
+    //     const dataItemA = this.findDataItemByInstant(instantA);
+    //     const dataItemB = this.findDataItemByInstant(instantB);
+
+    //     const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex].getName();
+
+    //     if (dataItemA && dataItemB) {
+
+    //         // https://en.wikipedia.org/wiki/Basic_reproduction_number;
+
+    //         const exposedAllStrains = dataItemA.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID___________ALL];
+    //         let rT = 0;
+
+    //         for (let strainIndex = 0; strainIndex < modificationValuesStrain.length; strainIndex++) {
+
+    //             const modificationStrain = modificationValuesStrain[strainIndex];
+    //             const exposedStrainA = dataItemA.valueset[ageGroupName].EXPOSED[modificationStrain.id];
+    //             const exposedStrainB = dataItemB.valueset[ageGroupName].EXPOSED[modificationStrain.id];
+    //             const shareOfStrain = exposedStrainA / exposedAllStrains;
+
+    //             // const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
+    //             // rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
+
+    //             rT += StrainUtil.calculateR0(exposedStrainA, exposedStrainB, instantA, instantB, modificationStrain.serialInterval) * shareOfStrain;
+
+    //             // console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
+
+    //         }
+
+    //         return rT; // * dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].SUSCEPTIBLE; // / threshold;
+
+    //     }
+
+    //     return Number.NaN;
+
+    // }
+
     calculateRt(instant: number, modificationValuesStrain: IModificationValuesStrain[]): number {
 
         const _ageGroupIndex = this.getAgeGroupIndex();
+        const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex].getName();
+
 
         const instantA = instant - TimeUtil.MILLISECONDS_PER____DAY * 2;
         const instantB = instant + TimeUtil.MILLISECONDS_PER____DAY * 2;
-        const dataItemA = this.findDataItemByInstant(instantA);
-        const dataItemB = this.findDataItemByInstant(instantB);
+        const dataItemM2 = this.findDataItemByInstant(instantA);
+        const dataItemP2 = this.findDataItemByInstant(instantB);
 
-        const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex].getName();
+        if (dataItemM2 && dataItemP2) {
 
-        if (dataItemA && dataItemB) {
-
-            // https://en.wikipedia.org/wiki/Basic_reproduction_number;
-
-            const exposedAllStrains = dataItemA.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID___________ALL];
-            let rT = 0;
-
-            for (let strainIndex = 0; strainIndex < modificationValuesStrain.length; strainIndex++) {
-
-                const modificationStrain = modificationValuesStrain[strainIndex];
-                const exposedStrainA = dataItemA.valueset[ageGroupName].EXPOSED[modificationStrain.id];
-                const exposedStrainB = dataItemB.valueset[ageGroupName].EXPOSED[modificationStrain.id];
-                const shareOfStrain = exposedStrainA / exposedAllStrains;
-
-                // const growthRate = (exposedStrainNxt / exposedStrainCur) - 1;
-                // rT += Math.pow(Math.E, growthRate * modificationStrain.getSerialInterval()) * shareOfStrain;
-
-                rT += StrainUtil.calculateR0(exposedStrainA, exposedStrainB, instantA, instantB, modificationStrain.serialInterval) * shareOfStrain;
-
-                // console.log(new Date(instant), modificationStrain.getName(), shareOfStrain)
-
-            }
-
-            return rT; // * dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_ALL].SUSCEPTIBLE; // / threshold;
+        const averageCasesM2 = dataItemM2.valueset[ageGroupName].CASES;
+        const averageCasesP2 = dataItemP2.valueset[ageGroupName].CASES;
+        return StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.instant, dataItemP2.instant, 4);
 
         }
-
-        return Number.NaN;
 
     }
 
@@ -1516,9 +1537,9 @@ export class ChartAgeGroup {
                 let color: string;
                 if (QueryUtil.getInstance().isDiffDisplay() && dataItem && dataItem00) { //
 
-                    // const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
+                    const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
 
-                    const caseValue = dataItem.errors ? dataItem.errors[ageGroupHeat.getName()] : 0;
+                    // const caseValue = dataItem.derivs ? dataItem.derivs[ageGroupHeat.getName()] : 0;
 
                     let r = 0;
                     let g = 0;

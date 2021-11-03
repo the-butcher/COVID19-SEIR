@@ -34,7 +34,7 @@ export class ModelStateFitter5 {
 
         const modificationAdapter = new ModificationAdaptor5();
 
-        let modificationIndexStart = modificationsContact.length - 7; // modificationsContact.length - 6; // 2;
+        let modificationIndexStart = 3; // modificationsContact.length - 6; // 2;
 
         const modificationContactOuterB = modificationsContact[modificationIndexStart];
         let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
@@ -78,7 +78,7 @@ export class ModelStateFitter5 {
             let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
 
             const maxAbsErrorViolationsAllowed = 10;
-            const maxAbsErrorTolerance = 0.015; // 0.5%
+            const maxAbsErrorTolerance = 0.10; // 0.5%
 
             let maxAbsErrorLast = Number.MAX_VALUE;
             let maxAbsErrorGroup: string;

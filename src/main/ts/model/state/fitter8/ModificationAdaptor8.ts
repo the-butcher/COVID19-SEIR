@@ -6,6 +6,7 @@ import { IModificationAdaptor } from '../fitter/IModificationAdaptor';
 import { IModificationSet } from '../fitter/IModificationSet';
 import { IValueErrors } from '../IValueAdaptor';
 import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
+import { BaseData } from '../../basedata/BaseData';
 
 /**
  * modification adapter for curve multipliers
@@ -15,7 +16,7 @@ import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIn
  * this type updates curve multipliers, from the errors produced by 1-n value-adaptors
  * multipliers are applied to the first modification in a modification set assumed to exist from a starting modification and an ending modification
  */
-export class ModificationAdaptor7 {
+export class ModificationAdaptor8 {
 
     constructor() {
 
@@ -45,15 +46,14 @@ export class ModificationAdaptor7 {
 
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
 
-                const cases = StrainUtil.findCases(stepData[i], ageGroup);
-                const error = (cases.data / cases.base) - 1;
-
+                const baseDataItemM1 = BaseData.getInstance().findBaseDataItem(stepData[i - 1].instant);
+                const baseDataItem00 = BaseData.getInstance().findBaseDataItem(stepData[i].instant);
                 // write error to data
-                stepData[i].errors[ageGroup.getName()] = error;
+                stepData[i].errors[ageGroup.getName()] = baseDataItem00.getReproduction(ageGroup.getIndex()) - baseDataItemM1.getReproduction(ageGroup.getIndex());
 
                 // write derivate of error to data
                 if (stepData[i - 1].errors) {
-                    stepData[i - 1].derivs[ageGroup.getName()] = stepData[i].errors[ageGroup.getName()] - stepData[i - 1].errors[ageGroup.getName()];
+                    stepData[i].derivs[ageGroup.getName()] = stepData[i].errors[ageGroup.getName()] - stepData[i - 1].errors[ageGroup.getName()];
                 }
 
             });

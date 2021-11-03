@@ -8,8 +8,11 @@ import { StrainCalibrator } from './model/calibration/StrainCalibrator';
 import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
+import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
 import { ModelStateFitter7 } from './model/state/fitter7/ModelStateFitter7';
+import { ModelStateFitter8 } from './model/state/fitter8/ModelStateFitter8';
 import { Logger } from './util/Logger';
+import { TimeUtil } from './util/TimeUtil';
 
 const ctx: Worker = self as any;
 
@@ -58,7 +61,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        new ModelStateFitter7().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+        new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
             ctx.postMessage(modelProgress);
         }).then(data => {
             data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
