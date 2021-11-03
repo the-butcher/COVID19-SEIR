@@ -1,9 +1,7 @@
-import { AgeGroup } from '../../../common/demographics/AgeGroup';
-import { Demographics } from '../../../common/demographics/Demographics';
+import { Demographics } from './../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
 import { IModificationSet } from '../fitter/IModificationSet';
 import { IDataItem, IFitterParams, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
-import { IDataCompare } from './../../../util/StrainUtil';
 import { TimeUtil } from './../../../util/TimeUtil';
 import { ModificationAdaptor7 } from './ModificationAdaptor7';
 
@@ -27,100 +25,18 @@ export class ModelStateFitter7 {
         const modelStateBuilderMultipliers = new ModificationAdaptor7();
 
 
-        let modificationIndexStart = 2; // modificationsContact.length - 6; // 2;
-
-        const modificationContactOuterB = modificationsContact[modificationIndexStart];
-        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
-        const stepDataI = await modelStateIntegrator.buildModelData(modificationContactOuterB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-            // drop data from callback
-            progressCallback({
-                ratio: modelProgress.ratio
-            });
-        });
-        console.log(loggableRange, '++', stepDataI.length);
-        dataset.push(...stepDataI);
-
-        // let providerOfDataItem: (dataItem: IDataItem, ageGroup: AgeGroup) => IDataCompare = StrainUtil.findCases;
-
-        for (let modificationIndexA = modificationIndexStart; modificationIndexA < modificationsContact.length - 1; modificationIndexA ++) {
-
-            const modificationIndexB = Math.min(modificationIndexA + 12, modificationsContact.length - 1);
-            const modificationSet: IModificationSet = {
-                modA: modificationsContact[modificationIndexA],
-                modB: modificationsContact[modificationIndexB],
-            }
-
-            let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
-
-            const stepData = await modelStateBuilderMultipliers.adapt(modelStateIntegrator, modificationSet, progressCallback);
-
-            // setup containers, values by modification id and age group
-            const pullVals: { [K in string]: { [K in string]: number } } = {};
-            for (let modificationIndex2 = modificationIndexA + 1; modificationIndex2 < modificationIndexB; modificationIndex2 ++) {
-                pullVals[modificationsContact[modificationIndex2].getId()] = {};
-                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-                    pullVals[modificationsContact[modificationIndex2].getId()][ageGroup.getName()] = 0;
-                });
-            }
-
-            // find the stored derivate and apply with a weight
-            for (let modificationIndex2 = modificationIndexA + 1; modificationIndex2 < modificationIndexB; modificationIndex2 ++) {
-
-                const modificationContact = modificationsContact[modificationIndex2];
-
-                const pullData = stepData.find(d => d.instant === modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY * 0);
-
-                const weight = (Math.cos((modificationIndex2 - modificationIndexA - 1) / 10 * Math.PI) + 1) / 2;
-                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-                    const weighedDeriv = Math.pow(pullData.derivs[ageGroup.getName()], 2) * Math.sign(pullData.derivs[ageGroup.getName()]) * weight;
-                    pullVals[modificationContact.getId()][ageGroup.getName()] = pullVals[modificationContact.getId()][ageGroup.getName()] + weighedDeriv;
-                });
-
-            }
-
-            for (let modificationIndex2 = modificationIndexA + 1; modificationIndex2 < modificationIndexB; modificationIndex2 ++) {
-
-                const modificationContact = modificationsContact[modificationIndex2];
-
-                const pullVal = pullVals[modificationContact.getId()];
-
-                const prevMultO = modificationContact.getCategoryValue('other');
-                const prevMultN = modificationContact.getCategoryValue('nursing');
-                const prevMultS = modificationContact.getCategoryValue('school');
-
-                const currMultO = Math.max(0.00, Math.min(1, prevMultO / (1 + pullVal['TOTAL'] * 1)));
-                const currMultN = Math.max(0.00, Math.min(1, prevMultN / (1 + pullVal['>= 85'] * 2)));
-                const currMultS = Math.max(0.00, Math.min(1, prevMultS / (1 + pullVal['05-14'] * 2)));
-
-                const corrections: { [K in string]: number } = {};
-                Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-                    const prevCorrG = modificationContact.getCorrectionValue(ageGroup.getIndex());
-                    const currCorrG = Math.max(0.20, Math.min(4, prevCorrG / (1 + pullVal[ageGroup.getName()] * 1))); // TODO try multiplication
-                    corrections[ageGroup.getName()] = currCorrG;
-                });
-
-                modificationContact.acceptUpdate({
-                    multipliers: {
-                        'other': currMultO,
-                        'nursing': currMultN,
-                        'school': currMultS
-                    },
-                    corrections
-                });
-
-            }
-
-            const modificationN = modificationsContact[modificationIndexA + 1];
-            const stepDataI = await modelStateIntegrator.buildModelData(modificationN.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-                // drop data from callback
-                progressCallback({
-                    ratio: modelProgress.ratio
-                });
-            });
-            console.log(loggableRange, '++', stepDataI.length);
-            dataset.push(...stepDataI);
-
+        /**
+         * a single run to collect errors and error derivates
+         */
+        const modificationSet: IModificationSet = {
+            modA: modificationsContact[0],
+            modB: modificationsContact[modificationsContact.length - 1]
         }
+        let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
+
+        const stepData = await modelStateBuilderMultipliers.adapt(modelStateIntegrator, modificationSet, progressCallback);
+        console.log(loggableRange, '++', stepData.length);
+        dataset.push(...stepData);
 
         /**
          * now think of derivates as forces applied to the curve
@@ -136,61 +52,68 @@ export class ModelStateFitter7 {
          * 2) smooth the forces between respective modifications (or does the system take care of that anyways)
          */
 
+        // setup containers, values by modification id and age group
+        const pullVals: { [K in string]: { [K in string]: number } } = {};
+        for (let modificationIndex = 0; modificationIndex < modificationsContact.length; modificationIndex ++) {
+            pullVals[modificationsContact[modificationIndex].getId()] = {};
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+                pullVals[modificationsContact[modificationIndex].getId()][ageGroup.getName()] = 0;
+            });
+        }
+
+        for (let modificationIndex = 0; modificationIndex < modificationsContact.length; modificationIndex ++) {
+
+            const modificationContact = modificationsContact[modificationIndex];
+
+            const minPullInstant = modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY * 7;
+            const maxPullInstant = modificationContact.getInstant() + TimeUtil.MILLISECONDS_PER____DAY * 0;
+            const pullDataset = stepData.filter(d => d.instant >= minPullInstant && d.instant <= maxPullInstant);
+
+            // const pullDataset = stepData.filter(d => d.instant === modificationContact.getInstant());
+
+            pullDataset.forEach(pullData => {
+                const weight = 1; // 1 - (Math.abs(pullData.instant - modificationContact.getInstant()) / (TimeUtil.MILLISECONDS_PER____DAY * 4));
+                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+                    const weighedDeriv = pullData.derivs[ageGroup.getName()] * weight;
+                    pullVals[modificationContact.getId()][ageGroup.getName()] = pullVals[modificationContact.getId()][ageGroup.getName()] + weighedDeriv;
+                });
+            });
+
+        }
+
+        for (let modificationIndex = 2; modificationIndex < modificationsContact.length; modificationIndex ++) {
+
+            const modificationContact = modificationsContact[modificationIndex];
+            const pullVal = pullVals[modificationContact.getId()];
+
+            const prevMultO = modificationContact.getCategoryValue('other');
+            const prevMultN = modificationContact.getCategoryValue('nursing');
+            const prevMultS = modificationContact.getCategoryValue('school');
+
+            const currMultO = Math.max(0.00, Math.min(1, prevMultO - pullVal['TOTAL'] * 0.1));
+            const currMultN = Math.max(0.00, Math.min(1, prevMultN - pullVal['>= 85'] * 0.2));
+            const currMultS = Math.max(0.00, Math.min(1, prevMultS - pullVal['05-14'] * 0.2));
+
+            const corrections: { [K in string]: number } = {};
+            Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+                const prevCorrG = modificationContact.getCorrectionValue(ageGroup.getIndex());
+                const currCorrG = Math.max(0.20, Math.min(4, prevCorrG - pullVal[ageGroup.getName()] * 0.1)); // TODO try multiplication
+                corrections[ageGroup.getName()] = currCorrG;
+            });
+
+            modificationContact.acceptUpdate({
+                multipliers: {
+                    'other': currMultO,
+                    'nursing': currMultN,
+                    'school': currMultS
+                },
+                corrections
+            });
+
+        }
 
 
-
-
-        // const blockCount = 1;
-        // const blockSize = Math.floor(modificationsContact.length / blockCount);
-        // console.log('blockCount', blockCount, blockSize);
-
-        // for (let blockIndex = 0; blockIndex < blockCount; blockIndex++) {
-
-        //     let modificationIndexA = blockIndex * blockSize + fitterParams.fitter7Idx;
-        //     const modificationIndexB = modificationIndexA + 10;
-
-        //     const modA = modificationsContact[modificationIndexA % modificationsContact.length];
-        //     const modB = modificationsContact[modificationIndexB % modificationsContact.length];
-        //     console.log(TimeUtil.formatCategoryDate(modA.getInstant()), ' -- ', TimeUtil.formatCategoryDate(modB.getInstant()))
-        //     for (; modificationIndexA < modificationIndexB; modificationIndexA ++) {
-
-        //         const modificationContact = modificationsContact[modificationIndexA % modificationsContact.length];
-
-        //         const pullVal = pullVals[modificationContact.getId()];
-
-        //         const prevMultO = modificationContact.getCategoryValue('other');
-        //         const prevMultN = modificationContact.getCategoryValue('nursing');
-        //         const prevMultS = modificationContact.getCategoryValue('school');
-
-        //         const currMultO = Math.max(0.00, Math.min(1, prevMultO / (1 + pullVal['TOTAL'] * 1)));
-        //         const currMultN = Math.max(0.00, Math.min(1, prevMultN / (1 + pullVal['>= 85'] * 2)));
-        //         const currMultS = Math.max(0.00, Math.min(1, prevMultS / (1 + pullVal['05-14'] * 2)));
-
-        //         const corrections: { [K in string]: number } = {};
-        //         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-        //             const prevCorrG = modificationContact.getCorrectionValue(ageGroup.getIndex());
-        //             const currCorrG = Math.max(0.20, Math.min(4, prevCorrG / (1 + pullVal[ageGroup.getName()] * 1))); // TODO try multiplication
-        //             corrections[ageGroup.getName()] = currCorrG;
-        //         });
-
-        //         modificationContact.acceptUpdate({
-        //             multipliers: {
-        //                 'other': currMultO,
-        //                 'nursing': currMultN,
-        //                 'school': currMultS
-        //             },
-        //             corrections
-        //         });
-
-        //     }
-
-        // }
-
-
-        console.log('------------------------------------------------------------------------------------------', fitterParams.fitter7Idx);
-
-        // pass back increased index
-        fitterParams.fitter7Idx = fitterParams.fitter7Idx + 1;
+        console.log('------------------------------------------------------------------------------------------');
 
         /**
          * fill rest of data, if any
