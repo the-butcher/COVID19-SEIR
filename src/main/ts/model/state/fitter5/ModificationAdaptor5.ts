@@ -32,7 +32,7 @@ export class ModificationAdaptor5 {
             });
         });
 
-        const errorRatio = 0.05;
+        const errorRatio = 0.04;
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
@@ -45,14 +45,14 @@ export class ModificationAdaptor5 {
         const prevMultN = modificationSet.modA.getCategoryValue('nursing');
         const prevMultS = modificationSet.modA.getCategoryValue('school');
 
-        const currMultO = Math.max(0.00, Math.min(1, prevMultO - errorsG['TOTAL'] * errorRatio * 0.2));
-        const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio));
-        const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio));
+        const currMultO = Math.max(0.00, Math.min(1, prevMultO - errorsG['TOTAL'] * errorRatio * 0.5));
+        const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 1.0));
+        const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 1.0));
 
         const corrections: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             const prevCorrG = modificationSet.modA.getCorrectionValue(ageGroup.getIndex());
-            const currCorrG = Math.max(0.20, Math.min(4, prevCorrG - errorsG[ageGroup.getName()] * errorRatio * 0.2));
+            const currCorrG = Math.max(0.01, Math.min(4, prevCorrG - errorsG[ageGroup.getName()] * errorRatio * 0.25));
             corrections[ageGroup.getName()] = currCorrG;
         });
 
