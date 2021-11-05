@@ -82,10 +82,6 @@ export class ModelImplRoot implements IModelSeir {
         modificationTime.setInstants(ModelInstants.getInstance().getMinInstant(), ModelInstants.getInstance().getMinInstant());
         const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
 
-        // const modificationTesting = modifications.findModificationsByType('TESTING')[0] as ModificationDiscovery;
-
-        // console.log('modificationTime', modificationTime, modificationTesting);
-
         this.demographics = demographics;
         modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {
             this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTime, baseData));
@@ -117,7 +113,7 @@ export class ModelImplRoot implements IModelSeir {
             // const absValueVD = absValue12 * shareOfID;
             const absValueVU = absValue12 * shareOfIU;
 
-            const vaccinationModel = new ModelImplVaccination(this, demographics, absValue12 - absValueVU, absValueVU, ageGroup);
+            const vaccinationModel = new ModelImplVaccination(this, demographics, modificationSettings, absValue12 - absValueVU, absValueVU, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
             const durationToReexposable = modificationSettings.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
@@ -167,7 +163,7 @@ export class ModelImplRoot implements IModelSeir {
      * @returns
      */
     getCompartmentsLoosingImmunity(ageGroupIndex: number): CompartmentBase[] {
-        return [this.vaccinationModels[ageGroupIndex].getCompartmentV(), this.compartmentsRemovedD[ageGroupIndex], this.compartmentsRemovedU[ageGroupIndex]];
+        return [this.vaccinationModels[ageGroupIndex].getCompartmentV(), this.vaccinationModels[ageGroupIndex].getCompartmentU(), this.compartmentsRemovedD[ageGroupIndex], this.compartmentsRemovedU[ageGroupIndex]];
     }
 
     /**
@@ -281,6 +277,11 @@ export class ModelImplRoot implements IModelSeir {
                 result.addNrmValue(-nrmImmunityLoss, compartmentLoosingImmunity);
 
             });
+
+            // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+            //     console.log('loss', TimeUtil.formatCategoryDate(tT), nrmImmunityLossSum * this.getAbsTotal() * 24);
+            // }
+
             result.addNrmValue(nrmImmunityLossSum, compartmentSusceptible);
 
             // const compartmentRemovedD = this.compartmentsRemovedD[ageGroupIndex];
@@ -303,6 +304,10 @@ export class ModelImplRoot implements IModelSeir {
     applyVaccination(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();
+
+        // if (tT > 1636144278000) {
+        //     return result;
+        // }
 
         // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
         //     console.log('mult', TimeUtil.formatCategoryDate(tT), requestMultiplier, nrmJabTotal * this.getAbsTotal() * 24);

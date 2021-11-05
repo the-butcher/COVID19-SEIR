@@ -1216,14 +1216,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(false); // visible
-        this.seriesAgeGroupIncidenceR.setVisible(false); // visible
+        this.seriesAgeGroupIncidence.setVisible(visible); // visible
+        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
 
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
 
         this.seriesAgeGroupCasesP.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(false); // visible
-        this.seriesAgeGroupCasesR.setVisible(false); // visible
+        this.seriesAgeGroupCasesN.setVisible(visible); // visible
+        this.seriesAgeGroupCasesR.setVisible(visible); // visible
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1339,7 +1339,7 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = maxIncidence * 1.05;
+            this.yAxisPlotIncidence.max = maxIncidence * 1.25;
 
             this.yAxisPlotPercent____0__100.min = 0;
             this.yAxisPlotPercent____0__100.max = maxInfectious * 1.00;

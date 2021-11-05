@@ -1,3 +1,4 @@
+import { ModificationSettings } from './../common/modification/ModificationSettings';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationTime } from '../common/modification/ModificationTime';
@@ -12,6 +13,7 @@ import { ModelImplRoot } from './ModelImplRoot';
 import { ModelInstants } from './ModelInstants';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
+import { RationalDurationFixed } from './rational/RationalDurationFixed';
 
 export class ModelImplVaccination implements IModelSeir {
 
@@ -42,7 +44,7 @@ export class ModelImplVaccination implements IModelSeir {
      */
     private readonly compartmentC: CompartmentBase;
 
-    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, absValueI: number, absValueU: number, ageGroup: AgeGroup) {
+    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, modificationSettings: ModificationSettings, absValueI: number, absValueU: number, ageGroup: AgeGroup) {
 
         this.parentModel = parentModel;
         this.absTotal = modelSettings.getAbsTotal();
@@ -57,10 +59,12 @@ export class ModelImplVaccination implements IModelSeir {
         const absVacc1 = baseDataItemPre.getVacc1(this.ageGroupName);
         const absVacc2 = baseDataItemPre.getVacc2(this.ageGroupName);
 
+        const durationToReexposable = modificationSettings.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
+
         this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
         this.compartmentI = new CompartmentBase(ECompartmentType.R__REMOVED_VI, this.absTotal, absValueI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
-        this.compartmentU = new CompartmentBase(ECompartmentType.R__REMOVED_VU, this.absTotal, absValueU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
-        this.compartmentV = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, absVacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
+        this.compartmentU = new CompartmentBase(ECompartmentType.R__REMOVED_VU, this.absTotal, absValueU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
+        this.compartmentV = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, absVacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
 
     }
 

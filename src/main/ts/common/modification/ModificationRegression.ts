@@ -53,7 +53,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
             instantMods: this.getInstantA() - this.getBackDays() * TimeUtil.MILLISECONDS_PER____DAY,
             polyWeight: this.getPolyWeight(),
             modificationsContact:  new ModificationResolverContact().getModifications()
-        })
+        });
     }
 
 

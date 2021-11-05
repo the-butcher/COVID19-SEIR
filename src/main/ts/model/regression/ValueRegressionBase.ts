@@ -31,7 +31,7 @@ export abstract class ValueRegressionBase {
         // look into each category
         const regressionData: DataPoint[] = [];
 
-        // reduce to modifications that are relevant for our instance
+        // reduce to modifications that are relevant for current settings
         const relevantModifications = this.modificationsContact.filter(m => m.getInstantA() >= this.instantMods && m.getInstantA() <= this.instant);
         relevantModifications.forEach(relevantModification => {
             regressionData.push([
@@ -48,10 +48,18 @@ export abstract class ValueRegressionBase {
             this.originalValues[modificationContact.getInstant()] = this.toValueY(modificationContact);
         });
 
+        // const regressionResultPol = regression.exponential(regressionData, { order: 3 });
         const regressionResultPol = regression.polynomial(regressionData, { order: 3 });
         const regressionResultLin = regression.linear(regressionData);
 
         // console.log('reg', regressionResultPol, regressionResultLin)
+
+        console.log(`X;Y`);
+        relevantModifications.forEach(relevantModification => {
+            const regressionX = this.toRegressionX(relevantModification.getInstant());
+            const regressionY = this.toValueY(relevantModification);
+            console.log(`${regressionX.toLocaleString()};${regressionY.toLocaleString()}`);
+        });
 
         this.equationParamsPol.push(...regressionResultPol.equation);
         this.equationParamsLin.push(...regressionResultLin.equation);
@@ -63,22 +71,16 @@ export abstract class ValueRegressionBase {
 
         // put instant into regressions space
         const regressionX = this.toRegressionX(instant);
+
+        // const regressionPol = this.equationParamsPol[0] * Math.exp(this.equationParamsPol[1] * regressionX); // 0.33e^(0.82x) Math.exp
         const regressionPol = Math.pow(regressionX, 3) * this.equationParamsPol[0] + Math.pow(regressionX, 2) * this.equationParamsPol[1] + regressionX * this.equationParamsPol[2] + this.equationParamsPol[3];
         const regressionLin = regressionX * this.equationParamsLin[0] + this.equationParamsLin[1];
-
-        // // (cos(x)+1)/2 1@0, 0@pi
-        // const daysOff = Math.abs(instant - this.instant) / TimeUtil.MILLISECONDS_PER____DAY;
-        // const daysRel = 14;
-        // let ratioPol = 0;
-        // if (daysOff <= daysRel) {
-        //     const daysRad = daysOff / daysRel * Math.PI;
-        //     ratioPol = (Math.cos(daysRad) + 1) / 2;
-        // }
 
         const ratioPol = this.polyWeight;
         const ratioLin = 1 - ratioPol;
 
         const regression = regressionPol * ratioPol + regressionLin * ratioLin;
+
         return {
             regression,
             original: this.originalValues[instant] // will be undefined in many cases
