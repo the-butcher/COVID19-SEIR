@@ -61,19 +61,19 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
-            ctx.postMessage(modelProgress);
-        }).then(data => {
-            data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-            ctx.postMessage(data);
-        });
+        // new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+        //     ctx.postMessage(modelProgress);
+        // }).then(data => {
+        //     data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+        //     ctx.postMessage(data);
+        // });
 
         /**
          * complete model build (add more sophisticated logic here)
          */
-        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-        //     ctx.postMessage(modelProgress);
-        // });
+        modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            ctx.postMessage(modelProgress);
+        });
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

@@ -1440,8 +1440,6 @@ export class ChartAgeGroup {
         const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex];
         for (const dataItem of this.modelData) {
 
-            // const modificationTime = ModificationTime.createInstance(dataItem.instant);
-
             // data independent from sub-strains
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
             const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID___________ALL];;
@@ -1626,11 +1624,6 @@ export class ChartAgeGroup {
             } else {
                 // console.log('no data found', categoryX);
             }
-
-            // let ageGroupCasesN = ageGroupAverageCasesR && BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), instant);
-            // if (ageGroupCasesN) {
-            //     ageGroupCasesN *= ageGroupAverageCasesR;
-            // }
 
             const item = {
                 categoryX,

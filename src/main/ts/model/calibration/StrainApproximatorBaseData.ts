@@ -71,6 +71,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
         }) as ModificationTime;
         modificationTime.setInstants(this.instantPre, this.instantPre);
 
+
         const modificationContact = this.modifications.findModificationsByType('CONTACT')[0] as ModificationContact;
         const modificationValueContact = modificationContact.getModificationValues();
         const modificationDiscovery = this.modifications.findModificationsByType('TESTING')[0] as ModificationDiscovery;

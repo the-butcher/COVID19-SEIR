@@ -88,7 +88,10 @@ export class ModelImplRoot implements IModelSeir {
 
         demographics.getAgeGroups().forEach(ageGroup => {
 
-            let absValueSC = ageGroup.getAbsValue();
+            let absValueSC = ageGroup.getAbsValue()
+            this.strainModels.forEach(strainModel => {
+                absValueSC -=  strainModel.getNrmValueGroup(ageGroup.getIndex()) * this.getAbsTotal();
+            });
 
             // removed at model init and reduced by initial share of vaccination
             let absValueID = referenceDataRemoved.getRemoved(ageGroup.getName());
@@ -119,16 +122,18 @@ export class ModelImplRoot implements IModelSeir {
             const compartmentRemovedU = new CompartmentBase(ECompartmentType.R__REMOVED_IU, this.demographics.getAbsTotal(), absValueIU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
             this.compartmentsRemovedU.push(compartmentRemovedU);
 
-            // const absValueSusceptible = ageGroup.getAbsValue() - this.getNrmValueGroup(ageGroup.getIndex(), true) * this.getAbsValue();
             const compartmentSusceptible = new CompartmentBase(ECompartmentType.S_SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSC, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
             this.compartmentsSusceptible.push(compartmentSusceptible);
 
         });
 
-        // now find out how many people are already contained in compartments / by age group
-        demographics.getAgeGroups().forEach(ageGroup => {
-
-        });
+        // let total = 0;
+        // demographics.getAgeGroups().forEach(ageGroup => {
+        //     const nrmValueGroup = this.getNrmValueGroup(ageGroup.getIndex());
+        //     console.log('model built', ageGroup.getName(), nrmValueGroup * ageGroup.getAbsValue());
+        //     total += nrmValueGroup;
+        // });
+        // console.log('model built', 'total', total);
 
     }
 
@@ -180,11 +185,9 @@ export class ModelImplRoot implements IModelSeir {
         return this.vaccinationModels[ageGroupIndex].getCompartmentV();
     }
 
-    getNrmValueGroup(ageGroupIndex: number, excludeSusceptible?: boolean): number {
+    getNrmValueGroup(ageGroupIndex: number): number {
         let nrmValueGroup = 0;
-        if (!excludeSusceptible) {
-            nrmValueGroup += this.compartmentsSusceptible[ageGroupIndex].getNrmValue();
-        }
+        nrmValueGroup += this.compartmentsSusceptible[ageGroupIndex].getNrmValue();
         nrmValueGroup += this.compartmentsRemovedD[ageGroupIndex].getNrmValue();
         nrmValueGroup += this.compartmentsRemovedU[ageGroupIndex].getNrmValue();
         this.strainModels.forEach(strainModel => {
