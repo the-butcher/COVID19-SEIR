@@ -1440,10 +1440,6 @@ export class ChartAgeGroup {
         const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex];
         for (const dataItem of this.modelData) {
 
-            console.log('TOTAL', dataItem.valueset.TOTAL.TOTAL);
-
-            // const modificationTime = ModificationTime.createInstance(dataItem.instant);
-
             // data independent from sub-strains
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
             const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID___________ALL];;

@@ -141,8 +141,6 @@ export class ModelImplRoot implements IModelSeir {
 
         });
 
-        console.log('----------------------------------------------------------------------------------');
-
     }
 
     findStrainModel(strainId: string): ModelImplStrain {
