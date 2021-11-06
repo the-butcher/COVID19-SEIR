@@ -101,17 +101,31 @@ export class ModelImplRoot implements IModelSeir {
             absValueSC -= absValueIU;
 
             const vaccinationConfig = modificationTime.getVaccinationConfig2(ageGroup.getName());
-            const grpValueV1 = vaccinationConfig.v1 - vaccinationConfig.v2;
-            const grpValueV2 = vaccinationConfig.v2; // some of those may be dangling around in VU
+            const grpValueV1 = vaccinationConfig.v1; // - vaccinationConfig.v2; // subtract v2 to have a v1 status
+            const grpValueV2 = vaccinationConfig.v2;
 
             let absValueV1 = grpValueV1 * ageGroup.getAbsValue();
             let absValueV2 = grpValueV2 * ageGroup.getAbsValue();
 
-            absValueSC -= absValueV2;
-            absValueSC -= absValueV1;
-            const absValueVU = 0;
+            // console.log(ageGroup.getName(), absValueV1.toFixed(2).padStart(10, ' '), absValueSC.toFixed(2).padStart(10, ' '), absValueID.toFixed(2).padStart(10, ' '), absValueIU.toFixed(2).padStart(10, ' '));
 
-            const vaccinationModel = new ModelImplVaccination(this, demographics, modificationTime, absValueV1, absValueVU, absValueV2, ageGroup);
+            const absWeight1 = absValueSC + absValueID + absValueIU;
+            let absValueVI = absWeight1 !== 0 ? absValueV1 * absValueSC / absWeight1 : 0;
+            const absValueVD = absWeight1 !== 0 ? absValueV1 * absValueID / absWeight1 : 0;
+            let absValueVU = absWeight1 !== 0 ? absValueV1 * absValueIU / absWeight1 : 0;
+
+            absValueSC -= absValueVI;
+            absValueIU -= absValueVU;
+            absValueID -= absValueVD;
+
+            const absWeight2 = absValueVI + absValueVU;
+            const absValueVI2 = absWeight2 !== 0 ? absValueV2 * absValueVI / absWeight2 : 0;
+            const absValueVU2 = absWeight2 !== 0 ? absValueV2 * absValueVU / absWeight2 : 0;
+
+            absValueVI -= absValueVI2;
+            absValueVU -= absValueVU2;
+
+            const vaccinationModel = new ModelImplVaccination(this, demographics, modificationTime, absValueVI, absValueVU, absValueV2 + absValueVD, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
             const durationToReexposable = modificationTime.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
@@ -127,13 +141,7 @@ export class ModelImplRoot implements IModelSeir {
 
         });
 
-        // let total = 0;
-        // demographics.getAgeGroups().forEach(ageGroup => {
-        //     const nrmValueGroup = this.getNrmValueGroup(ageGroup.getIndex());
-        //     console.log('model built', ageGroup.getName(), nrmValueGroup * ageGroup.getAbsValue());
-        //     total += nrmValueGroup;
-        // });
-        // console.log('model built', 'total', total);
+        console.log('----------------------------------------------------------------------------------');
 
     }
 
@@ -312,7 +320,7 @@ export class ModelImplRoot implements IModelSeir {
              */
             const nrmValueVI = Math.max(minRemain, state.getNrmValue(this.vaccinationModels[i].getCompartmentI())) - minRemain; // immunizing to vaccinated (regular second shot)
             const nrmValueVU = Math.max(minRemain, state.getNrmValue(this.vaccinationModels[i].getCompartmentU())) - minRemain; // vaccinated to vaccinated
-            const nrmWeight2 = nrmValueVI + nrmValueVU;
+            const nrmWeight2 = nrmValueVI; // + nrmValueVU;
 
             const nrmJabIV = nrmWeight2 !== 0 ? nrmJab2T * nrmValueVI / nrmWeight2 : 0;
             const nrmJabUV = nrmWeight2 !== 0 ? nrmJab2T * nrmValueVU / nrmWeight2 : 0;
