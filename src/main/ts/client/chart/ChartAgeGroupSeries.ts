@@ -134,12 +134,12 @@ export class ChartAgeGroupSeries {
 
         this.series.name = params.title;
 
-        this.series.segments.template.events.on('over', () => {
-            this.series.tooltip.disabled = false;
-        });
-        this.series.segments.template.events.on('out', () => {
-            this.series.tooltip.disabled = true;
-        });
+        // this.series.segments.template.events.on('over', () => {
+        //     this.series.tooltip.disabled = false;
+        // });
+        // this.series.segments.template.events.on('out', () => {
+        //     this.series.tooltip.disabled = true;
+        // });
 
     }
 
@@ -160,7 +160,7 @@ export class ChartAgeGroupSeries {
         this.series.fillOpacity = stacked ? 0.7 : 0.0;
         this.series.strokeOpacity = stacked ? 0.7 : 1.0;
 
-        this.series.segments.template.interactionsEnabled = stacked;
+        // this.series.segments.template.interactionsEnabled = stacked;
 
         this.series.tooltip.disabled = stacked;
 

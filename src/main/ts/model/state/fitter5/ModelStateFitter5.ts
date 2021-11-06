@@ -37,7 +37,7 @@ export class ModelStateFitter5 {
         let modificationIndexStart = 3; // modificationsContact.length - 6; // 2;
 
         const modificationContactOuterB = modificationsContact[modificationIndexStart];
-        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
+        let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationContactOuterB.getInstant())}`;
         const stepDataI = await modelStateIntegrator.buildModelData(modificationContactOuterB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             // drop data from callback
             progressCallback({
@@ -75,7 +75,7 @@ export class ModelStateFitter5 {
             //     };
             // }
 
-            let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
+            let loggableRange = `${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modB.getInstant())}`;
 
             const maxAbsErrorViolationsAllowed = 10;
             const maxAbsErrorTolerance = 0.015; // 0.5%
@@ -165,7 +165,7 @@ export class ModelStateFitter5 {
         /**
          * fill rest of data
          */
-        loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(maxInstant)}`;
+        loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(maxInstant)}`;
         const fillData = await modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio,

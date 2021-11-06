@@ -55,7 +55,7 @@ export class ModelStateFitter1 {
         let modificationIndex = Math.max(3, modificationsContact.length - 4); // -3 >> will adapt the last two modifications
 
         const modificationContactOuterB = modificationsContact[modificationIndex];
-        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationContactOuterB.getInstant())}`;
+        let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationContactOuterB.getInstant())}`;
         const stepDataI = await modelStateIntegrator.buildModelData(modificationContactOuterB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             // drop data from callback
             progressCallback({
@@ -75,7 +75,7 @@ export class ModelStateFitter1 {
                 modB: modificationsContact[modificationIndex - 1],
                 modC: modificationsContact[modificationIndex]
             }
-            let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modC.getInstant())}`;
+            let loggableRange = `${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modB.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modC.getInstant())}`;
 
             let adaptResultA: IValueErrors;
             let adaptResultB: IValueErrors;
@@ -167,7 +167,7 @@ export class ModelStateFitter1 {
         /**
          * fill rest of data
          */
-        loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(maxInstant)}`;
+        loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(maxInstant)}`;
         const fillData = await modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio

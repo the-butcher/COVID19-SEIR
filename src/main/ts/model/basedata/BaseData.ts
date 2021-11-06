@@ -272,7 +272,7 @@ export class BaseData {
     }
 
     private buildBaseDataItem(instant: number): IBaseDataItem {
-        const categoryX = TimeUtil.formatCategoryDate(instant);
+        const categoryX = TimeUtil.formatCategoryDateFull(instant);
         const baseDataItemConfig = this.baseDataset[categoryX];
         if (baseDataItemConfig) {
             this.baseDataItems[instant] = new BaseDataItem(instant, baseDataItemConfig);

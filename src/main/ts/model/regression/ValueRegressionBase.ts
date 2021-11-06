@@ -54,12 +54,12 @@ export abstract class ValueRegressionBase {
 
         // console.log('reg', regressionResultPol, regressionResultLin)
 
-        console.log(`X;Y`);
-        relevantModifications.forEach(relevantModification => {
-            const regressionX = this.toRegressionX(relevantModification.getInstant());
-            const regressionY = this.toValueY(relevantModification);
-            console.log(`${regressionX.toLocaleString()};${regressionY.toLocaleString()}`);
-        });
+        // console.log(`X;Y`);
+        // relevantModifications.forEach(relevantModification => {
+        //     const regressionX = this.toRegressionX(relevantModification.getInstant());
+        //     const regressionY = this.toValueY(relevantModification);
+        //     console.log(`${regressionX.toLocaleString()};${regressionY.toLocaleString()}`);
+        // });
 
         this.equationParamsPol.push(...regressionResultPol.equation);
         this.equationParamsLin.push(...regressionResultLin.equation);

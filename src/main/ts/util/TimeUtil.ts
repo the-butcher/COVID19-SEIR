@@ -12,13 +12,13 @@ export class TimeUtil {
     static readonly MILLISECONDS_PER___WEEK: number = TimeUtil.MILLISECONDS_PER____DAY * 7;
     static readonly MILLISECONDS_PER___YEAR: number = TimeUtil.MILLISECONDS_PER____DAY * 365;
 
-    static formatCategoryDate(instant: number): string {
+    static formatCategoryDateFull(instant: number): string {
         const date = new Date(instant);
         // @ts-ignore
         return `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getFullYear()).padStart(2, '0')}`;
     }
 
-    static formatCategoryDayOfMonth(instant: number): string {
+    static formatCategoryDateDay(instant: number): string {
         // @ts-ignore
         return String(new Date(instant).getDate()).padStart(2, '0');
     }

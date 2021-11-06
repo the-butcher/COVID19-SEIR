@@ -47,7 +47,7 @@ export abstract class ValueAdaptorBase1 implements IValueAdaptor {
                 return - ((casesA.data / casesA.base) - 1);
             }
         }
-        console.log('failed to find casesA', TimeUtil.formatCategoryDate(modificationSet.modB.getInstant()), stepDataset.length);
+        console.log('failed to find casesA', TimeUtil.formatCategoryDateFull(modificationSet.modB.getInstant()), stepDataset.length);
         return 0;
 
     }

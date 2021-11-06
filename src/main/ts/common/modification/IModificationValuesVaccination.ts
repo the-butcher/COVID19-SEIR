@@ -1,5 +1,5 @@
+import { IVaccinationConfig2 } from '../demographics/IVaccinationConfig2';
 import { IModificationValues as IModificationValues } from './IModificationValues';
-import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
 
 /**
  *
@@ -9,8 +9,8 @@ import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
 export interface IModificationValuesVaccination extends IModificationValues {
 
     /**
-     * vaccination curves by age-groups
+     * absolute vaccination numbers at the instant of this modification
      */
-    vaccinationCurves: { [K in string] : IVaccinationConfig };
+    vaccinations: { [K in string] : IVaccinationConfig2 }
 
 }

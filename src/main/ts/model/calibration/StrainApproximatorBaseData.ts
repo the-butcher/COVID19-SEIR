@@ -1,3 +1,4 @@
+import { ModificationVaccination } from './../../common/modification/ModificationVaccination';
 import { DataItem } from '@amcharts/amcharts4/core';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
@@ -66,8 +67,7 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
             key: 'TIME',
             name: 'straintime',
             deletable: true,
-            draggable: true,
-            blendable: false
+            draggable: true
         }) as ModificationTime;
         modificationTime.setInstants(this.instantPre, this.instantPre);
 
@@ -75,9 +75,14 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
         const modificationValueContact = modificationContact.getModificationValues();
         const modificationDiscovery = this.modifications.findModificationsByType('TESTING')[0] as ModificationDiscovery;
         const modificationValueDiscovery = modificationDiscovery.getModificationValues();
+        const modificationVaccination = this.modifications.findModificationsByType('VACCINATION')[0] as ModificationVaccination;
+        const modificationValueVaccination = modificationVaccination.getModificationValues();
 
         modificationValueContact.instant = this.instantPre;
         modificationValueDiscovery.instant = this.instantPre;
+        modificationValueVaccination.instant = this.instantPre;
+
+
 
         // fill with zeroes for each age group
         const heatmapPreIncidencesB = ageGroups.map(() => 0);

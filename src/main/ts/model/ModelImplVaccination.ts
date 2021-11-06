@@ -35,16 +35,16 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly compartmentV: CompartmentBase;
 
     /**
-     * people immunized after previously having been infected
+     * people immunized after previously having been infected unknowingly
      */
     private readonly compartmentU: CompartmentBase;
 
-    /**
-     * control compartment (not contributing to model sum, but useful to validate actual vacc1 progress)
-     */
-    private readonly compartmentC: CompartmentBase;
+    // /**
+    //  * control compartment (not contributing to model sum, but useful to validate actual vacc1 progress)
+    //  */
+    // private readonly compartmentC: CompartmentBase;
 
-    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, modificationSettings: ModificationSettings, absValueI: number, absValueU: number, ageGroup: AgeGroup) {
+    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, modificationTime: ModificationTime, absValueVI: number, absValueVU: number, absValueV2: number, ageGroup: AgeGroup) {
 
         this.parentModel = parentModel;
         this.absTotal = modelSettings.getAbsTotal();
@@ -52,19 +52,21 @@ export class ModelImplVaccination implements IModelSeir {
         this.ageGroupTotal = ageGroup.getAbsValue();
         this.ageGroupName = ageGroup.getName();
 
-        const instantPre = ModelInstants.getInstance().getPreInstant();
-        const baseDataItemPre = BaseData.getInstance().findBaseDataItem(instantPre);
+        // const instantPre = ModelInstants.getInstance().getPreInstant();
+        // const baseDataItemPre = BaseData.getInstance().findBaseDataItem(instantPre);
 
         // the "control" compartment shows absolute number of first vaccinations
-        const absVacc1 = baseDataItemPre.getVacc1(this.ageGroupName);
-        const absVacc2 = baseDataItemPre.getVacc2(this.ageGroupName);
+        // const absVacc1 = baseDataItemPre.getVacc1(this.ageGroupName);
+        // const absVacc2 = baseDataItemPre.getVacc2(this.ageGroupName);
 
-        const durationToReexposable = modificationSettings.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
+        // const modificationSettings = modificationTime.findModificationsByType('SETTINGS')[0] as ModificationSettings;
 
-        this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
-        this.compartmentI = new CompartmentBase(ECompartmentType.R__REMOVED_VI, this.absTotal, absValueI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
-        this.compartmentU = new CompartmentBase(ECompartmentType.R__REMOVED_VU, this.absTotal, absValueU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
-        this.compartmentV = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, absVacc2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
+        const durationToReexposable = modificationTime.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
+
+        // this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
+        this.compartmentI = new CompartmentBase(ECompartmentType.R__REMOVED_VI, this.absTotal, absValueVI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
+        this.compartmentU = new CompartmentBase(ECompartmentType.R__REMOVED_VU, this.absTotal, absValueVU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
+        this.compartmentV = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, absValueV2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
 
     }
 
@@ -84,9 +86,9 @@ export class ModelImplVaccination implements IModelSeir {
         return this.compartmentV;
     }
 
-    getCompartmentC(): CompartmentBase {
-        return this.compartmentC;
-    }
+    // getCompartmentC(): CompartmentBase {
+    //     return this.compartmentC;
+    // }
 
     getNrmValueGroup(ageGroupIndex: number): number {
         return ageGroupIndex === this.ageGroupIndex ? this.getNrmValue() : 0;
@@ -125,7 +127,7 @@ export class ModelImplVaccination implements IModelSeir {
         initialState.addNrmValue(this.compartmentI.getNrmValue(), this.compartmentI);
         initialState.addNrmValue(this.compartmentU.getNrmValue(), this.compartmentU);
         initialState.addNrmValue(this.compartmentV.getNrmValue(), this.compartmentV);
-        initialState.addNrmValue(this.compartmentC.getNrmValue(), this.compartmentC);
+        // initialState.addNrmValue(this.compartmentC.getNrmValue(), this.compartmentC);
         return initialState;
     }
 

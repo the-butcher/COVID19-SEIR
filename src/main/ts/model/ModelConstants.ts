@@ -1,3 +1,5 @@
+import { Demographics } from './../common/demographics/Demographics';
+import { IVaccinationConfig2 } from './../common/demographics/IVaccinationConfig2';
 import { IModification } from '../common/modification/IModification';
 import { IModificationValuesDiscovery } from '../common/modification/IModificationValueDiscovery';
 import { IModificationValues } from '../common/modification/IModificationValues';
@@ -21,13 +23,6 @@ import { IModificationValuesVaccination } from './../common/modification/IModifi
 export type MODIFICATION_NATURE = 'INSTANT' | 'RANGE';
 export type MODIFICATION____KEY = 'TIME' | 'STRAIN' | 'CONTACT' | 'TESTING' | 'VACCINATION' | 'SEASONALITY' | 'SETTINGS' | 'REGRESSION';
 export type MODIFICATION__FETCH = 'INTERPOLATE' | 'CREATE';
-
-/**
- * enumeration of infectious type
- * PRIMARY - infected, having been susceptible previously
- * BREAKTHROUGH - infected, having been vaccinated previously
- */
-export type INFECTIOUS_____TYPE = 'PRIMARY' | 'BREAKTHROUGH';
 
 export interface IModificationDefinitions {
     createDefaultModification?: (instant: number) => IModification<IModificationValues>;
@@ -96,6 +91,24 @@ export class ModelConstants {
         },
         'VACCINATION': {
             createValuesModification: (modificationValues) => new ModificationVaccination(modificationValues as IModificationValuesVaccination),
+            createDefaultModification: (instant: number) => {
+                const vaccinations: { [K in string]: IVaccinationConfig2 } = {};
+                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+                    vaccinations[ageGroup.getName()] = {
+                        v1: 0,
+                        v2: 0
+                    }
+                });
+                return new ModificationVaccination({
+                    id: ObjectUtil.createId(),
+                    key: 'VACCINATION',
+                    name: 'testing',
+                    instant,
+                    deletable: true,
+                    draggable: true,
+                    vaccinations
+                });
+            }
         },
         'SEASONALITY': {
             createValuesModification: (modificationValues) => new ModificationSeasonality(modificationValues as IModificationValuesSeasonality),

@@ -12,7 +12,6 @@ import { CompartmentInfectious } from './compartment/CompartmentInfectious';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
-import { INFECTIOUS_____TYPE } from './ModelConstants';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelImplStrain } from './ModelImplStrain';
 import { RationalDurationFixed } from './rational/RationalDurationFixed';
@@ -34,7 +33,6 @@ export class ModelImplInfectious implements IModelSeir {
     private readonly ageGroupTotal: number;
 
     private readonly compartmentsInfectiousPrimary: CompartmentInfectious[];
-    private readonly compartmentsInfectiousBreakthrough: CompartmentInfectious[];
     private readonly compartmentsIncidence: CompartmentBase[];
 
     private integrationSteps: IModelIntegrationStep[];
@@ -43,7 +41,6 @@ export class ModelImplInfectious implements IModelSeir {
 
         this.parentModel = parentModel;
         this.compartmentsInfectiousPrimary = [];
-        this.compartmentsInfectiousBreakthrough = [];
         this.compartmentsIncidence = [];
         this.integrationSteps = [];
 
@@ -100,7 +97,6 @@ export class ModelImplInfectious implements IModelSeir {
             const dailyActual = dailyTested / modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
             this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic, `_INF_${ObjectUtil.padZero(chainIndex)}`));
-            this.compartmentsInfectiousBreakthrough.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, 0, this.ageGroupIndex, strainValues.id, compartmentParam.rB, duration, compartmentParam.presymptomatic, `_BRK_${ObjectUtil.padZero(chainIndex)}`));
 
             absCompartmentInfectiousSum += absCompartment;
 
@@ -122,7 +118,6 @@ export class ModelImplInfectious implements IModelSeir {
          * connect infection compartments among each other
          */
         this.linkCompartmentsInfectious(this.compartmentsInfectiousPrimary);
-        this.linkCompartmentsInfectious(this.compartmentsInfectiousBreakthrough);
 
         /**
          * connect incidence compartments among each other, last compartment juts looses its population to nowhere without further propagation
@@ -202,28 +197,16 @@ export class ModelImplInfectious implements IModelSeir {
         return this.parentModel.getRootModel();
     }
 
-    getFirstCompartment(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious {
-        if (infectiousType === 'PRIMARY') {
-            return this.compartmentsInfectiousPrimary[0];
-        } else {
-            return this.compartmentsInfectiousBreakthrough[0];
-        }
+    getFirstCompartment(): CompartmentInfectious {
+        return this.compartmentsInfectiousPrimary[0];
     }
 
-    getLastCompartment(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious {
-        if (infectiousType === 'PRIMARY') {
-            return this.compartmentsInfectiousPrimary[this.compartmentsInfectiousPrimary.length - 1];
-        } else {
-            return this.compartmentsInfectiousBreakthrough[this.compartmentsInfectiousBreakthrough.length - 1];
-        }
+    getLastCompartment(): CompartmentInfectious {
+        return this.compartmentsInfectiousPrimary[this.compartmentsInfectiousPrimary.length - 1];
     }
 
-    getCompartments(infectiousType: INFECTIOUS_____TYPE): CompartmentInfectious[] {
-        if (infectiousType === 'PRIMARY') {
-            return this.compartmentsInfectiousPrimary;
-        } else {
-            return this.compartmentsInfectiousBreakthrough;
-        }
+    getCompartments(): CompartmentInfectious[] {
+        return this.compartmentsInfectiousPrimary;
     }
 
     /**

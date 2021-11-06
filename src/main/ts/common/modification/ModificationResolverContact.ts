@@ -94,6 +94,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         return {
             ...modificationA.getModificationValues(),
             id,
+            instant,
             name: `interpolation (${id})`,
             deletable: true,
             draggable: true
@@ -128,7 +129,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         const modification = new ModificationContact(modificationValues);
         if (fetchType === 'CREATE') {
             modification.setInstants(instant, instant); // will trigger update of 'work' and other mobility based values
-            console.log(fetchType, 'after delegation', modification.getModificationValues());
+            // console.log(fetchType, 'after delegation', modification.getModificationValues());
         }
 
         return modification;

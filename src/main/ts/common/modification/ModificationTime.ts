@@ -1,3 +1,5 @@
+import { IVaccinationConfig2 } from './../demographics/IVaccinationConfig2';
+import { TimeUtil } from './../../util/TimeUtil';
 import { ModelImplRoot } from './../../model/ModelImplRoot';
 import { deprecate } from 'util';
 import { CompartmentChain } from '../../model/compartment/CompartmentChain';
@@ -21,6 +23,7 @@ import { ModificationSettings } from './ModificationSettings';
 import { ModificationVaccination } from './ModificationVaccination';
 import { Dictionary } from '@amcharts/amcharts4/core';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { ModificationResolverVaccination } from './ModificationResolverVaccination';
 
 export interface IRatios {
     contact: number;
@@ -50,6 +53,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return modificationTime;
     }
 
+    // private modificationVaccination0: ModificationVaccination;
+
     private modificationContact: ModificationContact;
     private modificationDiscovery: ModificationDiscovery;
     private modificationVaccination: ModificationVaccination;
@@ -64,6 +69,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private discoveryRatiosByAgeGroup: IRatios[];
     private discoveryRatioOverall: number;
 
+    private vaccinationsPerDay: { [K in string]: IVaccinationConfig2 };
+
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
     private readonly absTotal: number;
@@ -73,6 +80,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.ageGroups = [...Demographics.getInstance().getAgeGroups()];
         this.contactCategories = [...Demographics.getInstance().getCategories()];
         this.absTotal = Demographics.getInstance().getAbsTotal();
+        this.vaccinationsPerDay = {};
         this.resetValues();
     }
 
@@ -86,14 +94,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     acceptUpdate(update: Partial<IModificationValuesTime>): void {
         // nothing to be updated
-    }
-
-    getLut1ByName(ageGroup: string): { [K in number]: number} {
-        return this.modificationVaccination.getLut1ByName(ageGroup);
-    }
-
-    getLut2ByName(ageGroup: string): { [K in number]: number} {
-        return this.modificationVaccination.getLut2ByName(ageGroup);
     }
 
     /**
@@ -115,11 +115,39 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         super.setInstants(instantA, instantB);
         this.modificationContact = new ModificationResolverContact().getModification(this.getInstantA(), 'INTERPOLATE');
         this.modificationDiscovery = new ModificationResolverDiscovery().getModification(this.getInstantA(), 'INTERPOLATE');
-        this.modificationVaccination = Modifications.getInstance().findModificationsByType('VACCINATION')[0] as ModificationVaccination; // not mutable, thus reusable
+
+        // vaccinations for this instant / for a day previous
+        const modificationResolverVaccination = new ModificationResolverVaccination();
+        this.modificationVaccination = modificationResolverVaccination.getModification(this.getInstantA(), 'INTERPOLATE');
+
+        // const modificationVaccinationM1 = modificationResolverVaccination.getModification(this.getInstantA() - TimeUtil.MILLISECONDS_PER____DAY, 'INTERPOLATE');
+        // Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+        //     const vaccConfigM1 = modificationVaccinationM1.getVaccinationConfig2(ageGroup.getName());
+        //     const vaccConfig00 = this.modificationVaccination.getVaccinationConfig2(ageGroup.getName());
+        //     this.vaccinationsPerDay[ageGroup.getName()] = {
+        //         d1: vaccConfig00.v1 - vaccConfigM1.v1,
+        //         d2: vaccConfig00.v2 - vaccConfigM1.v2,
+
+        //     }
+        //     // if (instantA % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        //     //     console.log(ageGroup.getName(), this.vaccinationsPerDay[ageGroup.getName()]);
+        //     // }
+        // });
+
+        // this.modificationVaccination0 = Modifications.getInstance().findModificationsByType('VACCINATION')[0] as ModificationVaccination; // not mutable, thus reusable
+
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA(), 'INTERPOLATE');
         this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
         this.resetValues();
 
+    }
+
+    getVaccinationConfig2(ageGroup: string): IVaccinationConfig2 {
+        return this.modificationVaccination.getVaccinationConfig2(ageGroup);
+    }
+
+    getReexposure(): number {
+        return this.modificationSettings.getReexposure();
     }
 
     resetValues(): void {
@@ -130,7 +158,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.columnValues = [];
         this.discoveryRatiosByAgeGroup = undefined;
         this.cellValues = [];
-
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
             this.columnValues[indexContact] = -1;
         }

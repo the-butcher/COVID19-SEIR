@@ -35,7 +35,7 @@ export class ModelStateFitter8 {
             modA: modificationsContact[0],
             modB: modificationsContact[modificationsContact.length - 1]
         }
-        let loggableRange = `${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modB.getInstant())}`;
+        let loggableRange = `${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modB.getInstant())}`;
 
         const stepData = await modelStateBuilderMultipliers.adapt(modelStateIntegrator, modificationSet, progressCallback);
         console.log(loggableRange, '++', stepData.length);
@@ -57,7 +57,7 @@ export class ModelStateFitter8 {
 
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                 if (ageGroup.getName() === 'TOTAL' && Math.sign(pullDataM1.derivs[ageGroup.getName()]) !== Math.sign(pullData00.derivs[ageGroup.getName()])) {
-                    console.log(TimeUtil.formatCategoryDate(pullDataM1.instant), ageGroup.getName(), Math.sign(pullDataM1.derivs[ageGroup.getName()]), Math.sign(pullData00.derivs[ageGroup.getName()]));
+                    console.log(TimeUtil.formatCategoryDateFull(pullDataM1.instant), ageGroup.getName(), Math.sign(pullDataM1.derivs[ageGroup.getName()]), Math.sign(pullData00.derivs[ageGroup.getName()]));
                 }
             });
         }
@@ -119,7 +119,7 @@ export class ModelStateFitter8 {
         /**
          * fill rest of data, if any
          */
-        loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(maxInstant)}`;
+        loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(maxInstant)}`;
         const fillData = await modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio,

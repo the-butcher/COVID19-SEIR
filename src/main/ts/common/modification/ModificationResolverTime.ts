@@ -56,7 +56,7 @@ export class ModificationResolverTime extends AModificationResolver<IModificatio
         this.modificationData = this.contactMatrices.map(m => {
             return {
                 modValueY: m.getMatrixSum() * Demographics.getInstance().getAbsTotal(),
-                categoryX: TimeUtil.formatCategoryDate(m.getInstant())
+                categoryX: TimeUtil.formatCategoryDateFull(m.getInstant())
             }
         });
 

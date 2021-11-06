@@ -273,7 +273,7 @@ export class ChartContactMatrix {
         if (this.showToggleAndPercentage) {
             this.valueTotalLabel.text = (matrixValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
         } else {
-            this.valueTotalLabel.text = TimeUtil.formatCategoryDate(contactMatrix.getInstant());
+            this.valueTotalLabel.text = TimeUtil.formatCategoryDateFull(contactMatrix.getInstant());
         }
 
         if (this.fullDataUpdate) {

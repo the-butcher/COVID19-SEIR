@@ -22,7 +22,7 @@ export class ModificationAdaptor5 {
 
     async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, providerOfDataCompare: (dataItem: IDataItem, ageGroup: AgeGroup) => IDataCompare , progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number}> {
 
-        let loggableRange = `${TimeUtil.formatCategoryDate(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDate(modificationSet.modA.getInstant())}`;
+        let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())}`;
 
         modelStateIntegrator.checkpoint();
 

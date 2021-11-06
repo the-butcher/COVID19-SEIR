@@ -48,15 +48,6 @@ export interface IControlsDefinitions {
     labellingDefinition: ILabellingDefinition;
 }
 
-// export interface IControlsChartDefinition {
-//     min: number;
-//     max: number;
-//     labellingDefinition: ILabellingDefinition;
-//     color: string;
-//     text: string;
-//     useObjectColors: boolean;
-// }
-
 export interface IHeatmapColorDefinition {
     id: string;
     title: string;
@@ -74,7 +65,7 @@ export interface ILabellingDefinition {
 }
 
 export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'EXPOSED' | 'TESTING' | 'CONTACT';
-export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
+export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'IMMUNIZING' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
  * collection of type specific functionality, think methods on enum-constants
@@ -124,6 +115,7 @@ export class ControlsConstants {
 
     static readonly COLORS: {[K in COMPARTMENT__COLORS]:string} = {
         'SUSCEPTIBLE': '#515f6c',
+        'IMMUNIZING': '#516c63',
         'EXPOSED': '#bb890c',
         'INFECTIOUS': '#da0edf',
         'REMOVED': '#83ca0d',

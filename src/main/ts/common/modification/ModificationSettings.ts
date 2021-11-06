@@ -15,7 +15,7 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         super('RANGE', modificationParams);
     }
 
-    getUndetected(): number {
+    getInitialUndetected(): number {
         return this.modificationValues.undetected;
     }
 

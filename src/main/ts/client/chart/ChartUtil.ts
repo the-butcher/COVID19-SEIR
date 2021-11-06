@@ -146,7 +146,6 @@ export class ChartUtil {
         axis.tooltip.background.strokeWidth = 0.25;
         axis.tooltip.background.stroke = color(ControlsConstants.COLOR____FONT);
         axis.tooltip.background.cornerRadius = 0;
-        // axis.tooltip.background.opacity = 0.90;
         axis.tooltip.background.fill = color(ControlsConstants.COLOR______BG);
 
         axis.tooltip.label.fontFamily = ControlsConstants.FONT_FAMILY;
@@ -162,10 +161,6 @@ export class ChartUtil {
         axis.renderer.grid.template.disabled = false;
         axis.renderer.grid.template.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
         axis.renderer.minGridDistance = 12;
-        // axis.renderer.events.on('sizechanged', e => {
-        //     // console.log('axis width changed', e, title);
-        // })
-
 
         axis.fontFamily = ControlsConstants.FONT_FAMILY;
         axis.fontSize = ControlsConstants.FONT_SIZE - 2;

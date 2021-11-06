@@ -15,16 +15,6 @@ export interface IModificationValuesStrain extends IModificationValues {
     r0: number;
 
     /**
-     * a ratio of vaccinated population that, given the properties of this strain, will still be susceptible to infection
-     */
-    breakthroughRisk?: number
-
-    /**
-     * a secondary reproduction number, applicable to breakthrough cases
-     */
-    rB?: number;
-
-    /**
      * is this the primary strain in the model (the first strain and as such not-deletable)
      */
     primary: boolean;

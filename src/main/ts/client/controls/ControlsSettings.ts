@@ -66,7 +66,7 @@ export class ControlsSettings {
         Controls.acceptModification(modification);
         this.modification = modification;
 
-        this.sliderUndetected.setValue(this.modification.getUndetected());
+        this.sliderUndetected.setValue(this.modification.getInitialUndetected());
         this.sliderQuarantine.setValue(this.modification.getQuarantine(-1)); // TODO - deprecate the slider, then introduce a contact category specific setting and calculate a value from there
 
         let reexposure = this.modification.getReexposure();

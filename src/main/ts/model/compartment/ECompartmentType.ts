@@ -14,7 +14,6 @@ export enum ECompartmentType {
     R__REMOVED_VI, // vaccinated, immunizing
     R__REMOVED_VU, // vaccinated, after unknown infection
     R__REMOVED_V2, // vaccinated, without previous infection
-    X__REMOVED_VC, // vaccinated (control compartment)
     R________DEAD,
     X__INCUBATE_0,
     X__INCUBATE_N,
