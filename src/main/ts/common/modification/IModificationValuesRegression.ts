@@ -19,4 +19,8 @@ export interface IModificationValuesRegression extends IModificationValues {
      */
     poly_days: number;
 
+    multiplier_randoms?: { [K in string]: number };
+
+    correction_randoms?: { [K in string]: number };
+
 }

@@ -43,6 +43,7 @@ export class ModelActions {
     private readonly modelModeIcons: IconModelMode[];
     private readonly chartModeIcons: IconChartMode[];
     private readonly ageGroupIcons: IconChartMode[];
+    private readonly categoryIcons: IconChartMode[];
 
     private readonly actionIcons: IconAction[];
 
@@ -51,6 +52,7 @@ export class ModelActions {
         this.modelModeIcons = [];
         this.chartModeIcons = [];
         this.ageGroupIcons = [];
+        this.categoryIcons = [];
         this.actionIcons = [];
 
         Object.keys(ModelConstants.MODIFICATION_PARAMS).forEach((key: MODIFICATION____KEY) => {
@@ -141,7 +143,22 @@ export class ModelActions {
             }));
         });
 
+        Demographics.getInstance().getCategories().forEach(category => {
+            this.categoryIcons.push(new IconChartMode({
+                container: 'categorytoggleDiv',
+                label: category.getName(),
+                iconKey: category.getName(),
+                handleClick: () => this.toggleCategory(category.getName())
+            }));
+        })
 
+    }
+
+    toggleCategory(name: string): void {
+        this.categoryIcons.forEach(categoryIcon => {
+            categoryIcon.setActive(categoryIcon.getIconKey() === name);
+        });
+        ChartAgeGroup.getInstance().setContactCategory(name);
     }
 
     toggleAgeGroup(index: number): void {

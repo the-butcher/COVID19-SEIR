@@ -1,8 +1,18 @@
+import { FDistribution } from './FDistribution';
 import { TimeUtil } from './../../util/TimeUtil';
 import regression, { DataPoint } from 'regression';
 import { ModelInstants } from '../ModelInstants';
 import { ModificationContact } from './../../common/modification/ModificationContact';
 import { IRegressionParams, IRegressionResult } from './Regression';
+import { dataLoader } from '@amcharts/amcharts4/core';
+
+export interface IWorkingHotellingParams {
+    num: number;
+    sse: number;
+    avg: number;
+    tss: number;
+    wh2: number;
+}
 
 export abstract class ValueRegressionBase {
 
@@ -13,6 +23,7 @@ export abstract class ValueRegressionBase {
     private readonly equationParamsPol: number[];
     private readonly originalValues: { [K in string]: number };
     private readonly modificationsContact: ModificationContact[];
+    private whParams: IWorkingHotellingParams;
 
     constructor(params: IRegressionParams) {
 
@@ -64,25 +75,88 @@ export abstract class ValueRegressionBase {
         this.equationParamsPol.push(...regressionResultPol.equation);
         this.equationParamsLin.push(...regressionResultLin.equation);
 
+        // calculate stats from
+        // console.log('-----------------------------');
+
+        // org.apache.commons.math3.stat.regression.SimpleRegression.java
+        let n = 0;
+        let xBar: number;
+        let yBar: number;
+        let sumX: number = 0;
+        let sumXX: number = 0;
+        let sumY: number = 0;
+        let sumYY: number = 0;
+        let sumXY: number = 0;
+
+        for (let n=0; n<regressionData.length; n++) {
+            const x = regressionData[n][0];
+            const y = regressionData[n][1];
+            // console.log(`regression.addData(${x}, ${y});`);
+            if (n == 0) {
+                xBar = x;
+                yBar = y;
+            } else {
+                const fact1 = 1.0 + n;
+                const fact2 = n / (1.0 + n);
+                const dx = x - xBar;
+                const dy = y - yBar;
+                sumXX += dx * dx * fact2;
+                sumYY += dy * dy * fact2;
+                sumXY += dx * dy * fact2;
+                xBar += dx / fact1;
+                yBar += dy / fact1;
+            }
+            sumX += x;
+        }
+
+        // const sse = sumYY - sumXY * sumXY / sumXX;
+        // console.log('sse', sse);
+        // const meanSquareError = sumSquaredError / (regressionData.length - 2)
+        // console.log('meanSquareError', meanSquareError);
+        // const tss = sumYY;
+        // console.log('tss', tss);
+        // const avg = sumX / regressionData.length;
+        // console.log('avg', avg);
+
+        this.whParams = {
+            num: regressionData.length,
+            avg: sumX / regressionData.length,
+            tss: sumYY,
+            sse: sumYY - sumXY * sumXY / sumXX,
+            wh2: new FDistribution().inverseCumulativeProbability95(regressionData.length - 2) * 2
+        }
+
     }
+
 
 
     getRegressionResult(instant: number): IRegressionResult {
 
         // put instant into regressions space
-        const regressionX = this.toRegressionX(instant);
+        const x = this.toRegressionX(instant);
 
         // const regressionPol = this.equationParamsPol[0] * Math.exp(this.equationParamsPol[1] * regressionX); // 0.33e^(0.82x) Math.exp
-        const regressionPol = Math.pow(regressionX, 3) * this.equationParamsPol[0] + Math.pow(regressionX, 2) * this.equationParamsPol[1] + regressionX * this.equationParamsPol[2] + this.equationParamsPol[3];
-        const regressionLin = regressionX * this.equationParamsLin[0] + this.equationParamsLin[1];
+        const regressionPol = Math.pow(x, 3) * this.equationParamsPol[0] + Math.pow(x, 2) * this.equationParamsPol[1] + x * this.equationParamsPol[2] + this.equationParamsPol[3];
+        const regressionLin = x * this.equationParamsLin[0] + this.equationParamsLin[1];
 
         const ratioPol = this.polyWeight;
         const ratioLin = 1 - ratioPol;
 
-        const regression = regressionPol * ratioPol + regressionLin * ratioLin;
+        const y = regressionPol * ratioPol + regressionLin * ratioLin;
+
+        // https://en.wikipedia.org/wiki/Working%E2%80%93Hotelling_procedure
+        const term1a = this.whParams.sse / (this.whParams.num - 2);
+        const term2a = 1 / this.whParams.num + Math.pow(x - this.whParams.avg, 2) / this.whParams.tss;
+        const ci95 = Math.sqrt(this.whParams.wh2 * term1a * term2a);
+
+        // const std = Math.sqrt(this.whParams.num) * (ci95 * 2) / 3.92;
+        // console.log('std', ci95, std, ci95 * 2 / std);
 
         return {
-            regression,
+            regression: y,
+            ci95Min: y - ci95,
+            ci95Max: y + ci95,
+            ci95Dim: ci95, //Math.sqrt(this.whParams.num) * ci95 / 1.96,
             original: this.originalValues[instant] // will be undefined in many cases
         };
 
@@ -104,3 +178,4 @@ export abstract class ValueRegressionBase {
     };
 
 }
+

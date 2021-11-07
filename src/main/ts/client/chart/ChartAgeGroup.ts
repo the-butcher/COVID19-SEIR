@@ -1,13 +1,10 @@
-import { ModificationRegression } from './../../common/modification/ModificationRegression';
 import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { ModificationResolverRegression } from '../../common/modification/ModificationResolverRegression';
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
-import { Regression } from '../../model/regression/Regression';
 import { Color } from '../../util/Color';
 import { QueryUtil } from '../../util/QueryUtil';
 import { StrainUtil } from '../../util/StrainUtil';
@@ -15,6 +12,7 @@ import { CHART_MODE______KEY, ControlsConstants } from '../gui/ControlsConstants
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
 import { Demographics } from './../../common/demographics/Demographics';
+import { ModificationRegression } from './../../common/modification/ModificationRegression';
 import { ModelConstants } from './../../model/ModelConstants';
 import { ModelInstants } from './../../model/ModelInstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
@@ -22,7 +20,6 @@ import { ColorUtil } from './../../util/ColorUtil';
 import { ICoordinate } from './../../util/ICoordinate';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { TimeUtil } from './../../util/TimeUtil';
-import { ControlsVaccination } from './../controls/ControlsVaccination';
 import { ModelActions } from './../gui/ModelActions';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
 import { ChartUtil } from './ChartUtil';
@@ -82,6 +79,8 @@ export class ChartAgeGroup {
      * primary incidence series (all strains)
      */
     protected readonly seriesAgeGroupIncidence: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupIncidence95U: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupIncidence95L: ChartAgeGroupSeries;
 
     /**
      * incidence series by strain
@@ -92,8 +91,15 @@ export class ChartAgeGroup {
      * visualize multipliers and corrections (for readability and plausibility)
      */
     protected readonly seriesContactMultiplierR: ChartAgeGroupSeries;
+    protected readonly seriesContactMultiplierR95U: ChartAgeGroupSeries;
+    protected readonly seriesContactMultiplierR95L: ChartAgeGroupSeries;
+
     protected readonly seriesContactMultiplierO: ChartAgeGroupSeries;
+
     protected readonly seriesContactCorrectionR: ChartAgeGroupSeries;
+    protected readonly seriesContactCorrectionR95U: ChartAgeGroupSeries;
+    protected readonly seriesContactCorrectionR95L: ChartAgeGroupSeries;
+
     protected readonly seriesContactCorrectionO: ChartAgeGroupSeries;
 
     protected readonly seriesSeasonality: ChartAgeGroupSeries;
@@ -382,6 +388,43 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesAgeGroupIncidence95L = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotIncidence,
+            title: 'incidence (CI95)',
+            baseLabel: 'incidence (CI95)',
+            valueField: 'ageGroupIncidence95L',
+            colorKey: 'CASES',
+            strokeWidth: 2,
+            dashed: true,
+            locationOnPath: 0.10,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupIncidence.bindToLegend(this.seriesAgeGroupIncidence95L);
+
+        this.seriesAgeGroupIncidence95U = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotIncidence,
+            title: 'incidence (CI95)',
+            baseLabel: 'incidence (CI95)',
+            valueField: 'ageGroupIncidence95U',
+            colorKey: 'CASES',
+            strokeWidth: 2,
+            dashed: true,
+            locationOnPath: 0.10,
+            labelled: true,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupIncidence.bindToLegend(this.seriesAgeGroupIncidence95U);
+
+
         this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
@@ -673,6 +716,44 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesContactMultiplierR95L = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent____0__300,
+            title: 'category estimation',
+            baseLabel: 'category estimation',
+            valueField: 'contactMultiplierR95L',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labelled: false,
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactMultiplierR95L.getSeries().strokeOpacity = 0.5;
+        this.seriesContactMultiplierR.bindToLegend(this.seriesContactMultiplierR95L);
+        this.seriesContactMultiplierR95U = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent____0__300,
+            title: 'category estimation',
+            baseLabel: 'category estimation',
+            valueField: 'contactMultiplierR95U',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labelled: false,
+            stacked: true,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactMultiplierR95U.getSeries().strokeOpacity = 0.5;
+        this.seriesContactMultiplierR95U.getSeries().fillOpacity = 0.2;
+        this.seriesContactMultiplierR.bindToLegend(this.seriesContactMultiplierR95U);
+
         this.seriesContactMultiplierO = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent____0__300,
@@ -685,7 +766,7 @@ export class ChartAgeGroup {
             locationOnPath: 0.40,
             labelled: true,
             stacked: false,
-            legend: true,
+            legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
@@ -706,6 +787,44 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesContactCorrectionR95L = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent____0__300,
+            title: 'age-group estimation',
+            baseLabel: 'age-group estimation',
+            valueField: 'contactCorrectionR95L',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labelled: false,
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactCorrectionR95L.getSeries().strokeOpacity = 0.5;
+        this.seriesContactCorrectionR.bindToLegend(this.seriesContactCorrectionR95L);
+        this.seriesContactCorrectionR95U = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent____0__300,
+            title: 'age-group estimation',
+            baseLabel: 'age-group estimation',
+            valueField: 'contactCorrectionR95U',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labelled: false,
+            stacked: true,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactCorrectionR95U.getSeries().strokeOpacity = 0.5;
+        this.seriesContactCorrectionR95U.getSeries().fillOpacity = 0.2;
+        this.seriesContactCorrectionR.bindToLegend(this.seriesContactCorrectionR95U);
+
         this.seriesContactCorrectionO = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent____0__300,
@@ -897,6 +1016,12 @@ export class ChartAgeGroup {
             };
         });
 
+        document.addEventListener('keyup', e => {
+            if (e.key === 'x') {
+                this.exportToPng();
+            }
+        });
+
         // this.setChartMode('INCIDENCE');
 
     }
@@ -976,17 +1101,12 @@ export class ChartAgeGroup {
                 this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setSeriesNote(ageGroup.getName());
             });
 
-            // if (ModelActions.getInstance().getKey() === 'VACCINATION' && ageGroup.getName() !== ModelConstants.AGEGROUP_NAME_______ALL) {
-            //     ControlsVaccination.getInstance().showVaccinationCurve(ageGroup.getName());
-            // } else {
-            //     ControlsVaccination.getInstance().hideVaccinationCurve();
-            // }
-
-            // this.applyMaxYAxisValue();
-
         }
 
         this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupIncidence95L.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupIncidence95U.setSeriesNote(ageGroup.getName());
+
         this.seriesAgeGroupIncidenceR.setSeriesNote(ageGroup.getName());
 
         this.seriesAgeGroupAverageCasesR.setSeriesNote(ageGroup.getName());
@@ -1008,6 +1128,9 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
 
         this.seriesContactCorrectionR.setSeriesNote(ageGroup.getName());
+        this.seriesContactCorrectionR95L.setSeriesNote(ageGroup.getName());
+        this.seriesContactCorrectionR95U.setSeriesNote(ageGroup.getName());
+
         this.seriesContactCorrectionO.setSeriesNote(ageGroup.getName());
         this.seriesReproductionP.setSeriesNote(ageGroup.getName());
         this.seriesReproductionR.setSeriesNote(ageGroup.getName());
@@ -1017,7 +1140,11 @@ export class ChartAgeGroup {
     async setContactCategory(categoryName: string): Promise<void> {
 
         this.categoryName = categoryName;
+
         this.seriesContactMultiplierR.setSeriesNote(this.categoryName);
+        this.seriesContactMultiplierR95L.setSeriesNote(this.categoryName);
+        this.seriesContactMultiplierR95U.setSeriesNote(this.categoryName);
+
         this.seriesContactMultiplierO.setSeriesNote(this.categoryName);
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
@@ -1195,6 +1322,9 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
         this.seriesAgeGroupIncidence.setVisible(visible); // visible
+        this.seriesAgeGroupIncidence95L.setVisible(visible);
+        this.seriesAgeGroupIncidence95U.setVisible(visible);
+
         this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
 
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
@@ -1226,8 +1356,15 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent____0__300.tooltip.disabled = !visible;
 
         this.seriesContactMultiplierR.setVisible(visible);
+        this.seriesContactMultiplierR95L.setVisible(visible);
+        this.seriesContactMultiplierR95U.setVisible(visible);
+
         this.seriesContactMultiplierO.setVisible(visible);
+
         this.seriesContactCorrectionR.setVisible(visible);
+        this.seriesContactCorrectionR95L.setVisible(visible);
+        this.seriesContactCorrectionR95U.setVisible(visible);
+
         this.seriesContactCorrectionO.setVisible(visible);
 
         this.seriesSeasonality.setVisible(visible);
@@ -1460,16 +1597,29 @@ export class ChartAgeGroup {
             /**
              * does regression need to be on model data?
              */
-            const multiplierResult = modificationRegression.getRegression().getMultiplier(dataItem.instant, this.categoryName);
+            const multiplierResult = modificationRegression.getMultiplier(dataItem.instant, this.categoryName);
             const contactMultiplierR = multiplierResult.regression;
+            const contactMultiplierR95L = multiplierResult.ci95Min;
+            const contactMultiplierR95U = multiplierResult.ci95Max - multiplierResult.ci95Min;
+
             const contactMultiplierO = multiplierResult.original;
 
-            const correctionResult = modificationRegression.getRegression().getCorrection(dataItem.instant, _ageGroupIndex);
+            const correctionResult = modificationRegression.getCorrection(dataItem.instant, _ageGroupIndex);
             const contactCorrectionR = correctionResult.regression;
+            const contactCorrectionR95L = correctionResult.ci95Min;
+            const contactCorrectionR95U = correctionResult.ci95Max - correctionResult.ci95Min;
+
             const contactCorrectionO = correctionResult.original;
 
             const seasonality = dataItem.seasonality;
             const reproductionP = this.calculateRt(dataItem.instant, modificationValuesStrain);
+
+            let ageGroupIncidence95L: number;
+            let ageGroupIncidence95U: number;
+            if (dataItem.valueset[ageGroupPlot.getName()].PREDICTION) {
+                ageGroupIncidence95L = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg - dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1.96; // magic number -- formalize
+                ageGroupIncidence95U = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg + dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1.96; // magic number -- formalize
+            }
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1482,11 +1632,17 @@ export class ChartAgeGroup {
                 ageGroupRemovedVU,
                 ageGroupRemovedV2,
                 ageGroupIncidence,
+                ageGroupIncidence95L,
+                ageGroupIncidence95U,
                 ageGroupCasesP,
                 ageGroupCasesN,
                 contactMultiplierR,
+                contactMultiplierR95L,
+                contactMultiplierR95U,
                 contactMultiplierO,
                 contactCorrectionR,
+                contactCorrectionR95L,
+                contactCorrectionR95U,
                 contactCorrectionO,
                 seasonality,
                 reproductionP

@@ -14,6 +14,8 @@ import { ControlsContact } from './controls/ControlsContact';
 import { ControlsConstants } from './gui/ControlsConstants';
 import { SliderModification } from './gui/SliderModification';
 import { StorageUtil } from './storage/StorageUtil';
+import { ModificationResolverRegression } from '../common/modification/ModificationResolverRegression';
+import { ModificationRegression } from '../common/modification/ModificationRegression';
 
 /**
  * utility type that will pass rebuilding of the model to a web-worker
@@ -72,6 +74,9 @@ export class ModelTask {
 
                 ModelTask.fitterParams = modelProgress.fitterParams;
 
+                /**
+                 * restore any values that may have been altered in the worker
+                 */
                 modelProgress.modificationValuesContact?.forEach(modificationValuesContact => {
                     const modificationContact = Modifications.getInstance().findModificationById(modificationValuesContact.id) as ModificationContact;
                     // console.log(modificationContact.getId(), TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationValuesContact.multipliers);
@@ -82,12 +87,14 @@ export class ModelTask {
                     });
                     StorageUtil.getInstance().setSaveRequired(true);
                 });
+                const modificationRegression = Modifications.getInstance().findModificationById(modelProgress.modificationValuesRegression.id) as ModificationRegression;
+                modificationRegression.acceptUpdate(modelProgress.modificationValuesRegression);
 
-                setTimeout(() => {
-                    // ChartAgeGroup.getInstance().exportToPng().then(() => {
-                        ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                    // });
-                }, 3000);
+                // setTimeout(() => {
+                //     // ChartAgeGroup.getInstance().exportToPng().then(() => {
+                //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                //     // });
+                // }, 3000);
 
                 // show any contact updates
                 // const displayableModification = ControlsContact.getInstance().getModification();
