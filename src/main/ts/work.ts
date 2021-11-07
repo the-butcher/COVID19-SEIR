@@ -2,6 +2,7 @@ import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
+import { ModificationResolverRegression } from './common/modification/ModificationResolverRegression';
 import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { StrainCalibrator } from './model/calibration/StrainCalibrator';
@@ -11,6 +12,7 @@ import { ModelInstants } from './model/ModelInstants';
 import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
 import { ModelStateFitter7 } from './model/state/fitter7/ModelStateFitter7';
 import { ModelStateFitter8 } from './model/state/fitter8/ModelStateFitter8';
+import { ModelStateFitter9Reg1 } from './model/state/fitter9reg1/ModelStateFitter9Reg1';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
 
@@ -61,10 +63,19 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             ctx.postMessage(modelProgress);
         });
 
-        new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+        /**
+         * for each regression instance generate a gaussian noise number
+         * -- then find the right path in the regression instance as of 95 known value
+         * run the prediction and store incidence in stats for each day, from those stats build ci for incidence
+         *
+         * iterate
+         */
+
+        new ModelStateFitter9Reg1().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
             ctx.postMessage(modelProgress);
         }).then(data => {
             data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+            data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
             ctx.postMessage(data);
         });
 

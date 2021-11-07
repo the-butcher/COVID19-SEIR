@@ -34,10 +34,6 @@ export class SliderContactCategory extends Slider {
 
         container.appendChild(canvasContainer);
 
-        container.addEventListener('pointerup', () => {
-            ChartAgeGroup.getInstance().setContactCategory(this.contactCategoryConfig.getName());
-        })
-
         const ticks = ModelConstants.RANGE____PERCENTAGE_100.slice(0, -1);
 
         super({

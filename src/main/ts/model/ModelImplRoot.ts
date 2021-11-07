@@ -290,7 +290,7 @@ export class ModelImplRoot implements IModelSeir {
             /**
              * threshold value that keeps compartments from intersecting and doing strange things
              */
-            const minRemain = 100 / this.vaccinationModels[i].getAgeGroupTotal();
+            const minRemain = 500 / this.vaccinationModels[i].getAgeGroupTotal();
             const vaccinationsPerDay = modificationTime.getVaccinationConfig2(this.vaccinationModels[i].getAgeGroupName());
 
             /**

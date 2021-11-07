@@ -79,13 +79,14 @@ export class ModificationAdaptorMultipliers3 implements IModificationAdaptor {
         });
 
         modificationSet.modA.acceptUpdate({
-            corrections: {
-                'family': correctionsA,
-                'school': correctionsA,
-                'nursing': correctionsA,
-                'work': correctionsA,
-                'other': correctionsA
-            }
+            corrections: correctionsA
+            // corrections: {
+            //     'family': correctionsA,
+            //     'school': correctionsA,
+            //     'nursing': correctionsA,
+            //     'work': correctionsA,
+            //     'other': correctionsA
+            // }
         });
 
         // modelStateIntegrator.rollback();

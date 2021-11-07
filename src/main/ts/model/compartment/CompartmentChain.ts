@@ -8,7 +8,6 @@ import { RationalDurationFixed } from '../rational/RationalDurationFixed';
 export interface ICompartmentParams {
     type: ECompartmentType;
     r0: number; // reproduction outbound from this specific compartment
-    rB: number;
     instantA: number; // start of this compartment (with respect to mean)
     instantB: number; // end of this compartment (with respect to mean)
     i0Normal: number;
@@ -71,7 +70,6 @@ export class CompartmentChain {
             this.compartmentParams.push({
                 type: ECompartmentType.I__INFECTIOUS,
                 r0: reproduction,
-                rB: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,
                 i0Normal: normalizedDuration,
@@ -87,7 +85,6 @@ export class CompartmentChain {
             this.compartmentParams.push({
                 type: ECompartmentType.I__INFECTIOUS,
                 r0: reproduction,
-                rB: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,
                 i0Normal: normalizedDuration,
@@ -118,7 +115,6 @@ export class CompartmentChain {
         strainedCompartmentParams.push({
             type: ECompartmentType.E_____EXPOSED,
             r0: CompartmentChain.NO_REPRODUCTION,
-            rB: CompartmentChain.NO_REPRODUCTION,
             instantA: 0,
             instantB: Math.round(toStrainedValue(this.compartmentParams[0].instantA) * TimeUtil.MILLISECONDS_PER____DAY),
             i0Normal: 0,
@@ -129,7 +125,6 @@ export class CompartmentChain {
             strainedCompartmentParams.push({
                 type: compartmentParam.type,
                 r0: compartmentParam.r0 * strainValues.r0,
-                rB: compartmentParam.rB * strainValues.rB,
                 instantA: Math.round(toStrainedValue(compartmentParam.instantA) * TimeUtil.MILLISECONDS_PER____DAY),
                 instantB: Math.round(toStrainedValue(compartmentParam.instantB) * TimeUtil.MILLISECONDS_PER____DAY),
                 i0Normal: compartmentParam.i0Normal,

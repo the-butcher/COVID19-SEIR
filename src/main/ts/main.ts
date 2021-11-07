@@ -1,15 +1,34 @@
+import { Statistics } from './util/Statistics';
+import { StrainUtil } from './util/StrainUtil';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
 import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
-import { IModificationValuesContact } from './common/modification/IModificationValuesContact';
-import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
-import { Regression } from './model/regression/Regression';
+import { FDistribution } from './model/regression/FDistribution';
 import { Logger } from './util/Logger';
+
+// let ci95 = 0.6;
+// let less = 0;
+// let more = 0;
+
+// const scale = 5 / 1.96;
+
+// // const stats = new Statistics();
+// for (let i=0; i<100000; i++) {
+//     const random = ci95 * StrainUtil.randomGaussian(scale, scale); // puts standard deviation to 1
+//     if (Math.abs(random) >= ci95) {
+//         more++;
+//     } else {
+//         less++;
+//     }
+//     // console.log(StrainUtil.randomGaussian(-1, 1));
+// }
+// console.log(less, more);
+
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
@@ -131,10 +150,11 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 ModelActions.getInstance().toggleModelMode('CONTACT');
                 ModelActions.getInstance().toggleChartMode('INCIDENCE');
                 ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
+                ModelActions.getInstance().toggleCategory('other');
                 requestAnimationFrame(() => {
 
                     ChartAgeGroup.getInstance().setAgeGroupIndex(Demographics.getInstance().getAgeGroups().length); // effectively set it to TOTAL
-                    ChartAgeGroup.getInstance().setContactCategory('other'); // effectively set it to TOTAL
+                    // ChartAgeGroup.getInstance().setContactCategory('other'); // effectively set it to TOTAL
                     ControlsConstants.MODIFICATION_PARAMS['CONTACT'].handleModificationUpdate();
 
                 });

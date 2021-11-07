@@ -24,15 +24,15 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
     createRegressionModification(instant: number): IModificationValuesContact {
 
         const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
-        const regression = modificationRegression.getRegression();
+        // const regression = modificationRegression.getRegression();
 
         const multipliers: { [K in string]: number } = {};
         const corrections: { [K in string]: number } = {};
         Demographics.getInstance().getCategories().forEach(category => {
-            multipliers[category.getName()] = regression.getMultiplier(instant, category.getName()).regression;
+            multipliers[category.getName()] = modificationRegression.getMultiplier(instant, category.getName()).regression;
         });
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            corrections[ageGroup.getName()] = regression.getCorrection(instant, ageGroup.getIndex()).regression;
+            corrections[ageGroup.getName()] = modificationRegression.getCorrection(instant, ageGroup.getIndex()).regression;
         });
         const id = ObjectUtil.createId();
         return{

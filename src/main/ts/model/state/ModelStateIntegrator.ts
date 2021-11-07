@@ -1,3 +1,4 @@
+import { IModificationValuesRegression } from './../../common/modification/IModificationValuesRegression';
 import { Modifications } from '../../common/modification/Modifications';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
@@ -18,6 +19,7 @@ export interface IModelProgress {
     ratio: number;
     calibratedStrains?: IModificationValuesStrain[];
     data?: IDataItem[];
+    modificationValuesRegression?: IModificationValuesRegression;
     modificationValuesContact?: IModificationValuesContact[];
     fitterParams?: IFitterParams;
 }
@@ -26,6 +28,12 @@ export interface IFitterParams {
     derivRatio: number;
     errorTLast: number;
     fitter7Idx: number;
+}
+
+export interface IDataForecast {
+    avg: number;
+    std: number;
+    num: number;
 }
 
 export interface IDataItem {
@@ -46,6 +54,7 @@ export interface IDataValues {
     REMOVED_V2: number;
     CASES: number;
     INCIDENCES: { [K: string]: number };
+    PREDICTION?: IDataForecast;
     EXPOSED: { [K: string]: number };
     INFECTIOUS: { [K: string]: number };
     DISCOVERY: number;

@@ -20,6 +20,10 @@ export class Statistics {
         this.isDirty = true;
     }
 
+    size(): number {
+        return this.values.length;
+    }
+
     addValue(value: number): void {
         this.values.push(value);
         this.isDirty = true;
