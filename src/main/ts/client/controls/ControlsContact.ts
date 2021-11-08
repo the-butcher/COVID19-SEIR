@@ -1,4 +1,3 @@
-import { Regression } from '../../model/regression/Regression';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
 import { ControlsConstants } from '../gui/ControlsConstants';

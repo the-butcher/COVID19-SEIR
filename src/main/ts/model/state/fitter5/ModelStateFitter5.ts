@@ -1,7 +1,7 @@
 import { IDataCompare } from './../../../util/StrainUtil';
 import { AgeGroup } from './../../../common/demographics/AgeGroup';
 import { BaseData } from './../../basedata/BaseData';
-import { Regression } from './../../regression/Regression';
+import { Regression } from '../../regression/_Regression';
 import { Demographics } from '../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
 import { TimeUtil } from '../../../util/TimeUtil';

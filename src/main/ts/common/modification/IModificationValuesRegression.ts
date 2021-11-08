@@ -1,7 +1,10 @@
-import { IRegressionParams } from '../../model/regression/Regression';
 import { IModificationValues } from './IModificationValues';
 
-
+export interface IRegressionConfig {
+    back_days_a: number;
+    back_days_b: number;
+    poly_weight: number;
+}
 
 /**
  * @author h.fleischer
@@ -9,15 +12,9 @@ import { IModificationValues } from './IModificationValues';
  */
 export interface IModificationValuesRegression extends IModificationValues {
 
-    /**
-     * number of modifications to consider in regression analyses when looking back
-     */
-    back_days: number;
+    multiplier_configs?: { [K in string]: IRegressionConfig };
 
-    /**
-     * number of days that polynomial regression has a weight along the future axis
-     */
-    poly_days: number;
+    correction_configs?: { [K in string]: IRegressionConfig };
 
     multiplier_randoms?: { [K in string]: number };
 

@@ -110,13 +110,13 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
-* review the breakthrough mechanism
+* ~~review the breakthrough mechanism~~
 * rename "VACCINATED" chart to a more general term (i.e. STATE)
 * add by age group R rate to the model output >> exportable and can be added to chart (define which chart view that would be)
 * add an age group discovery curve to the testing chart-view
 * acceptModification is called multiple times -> check for performance and streamline
-* checkpoints in the model for faster processing (could have some points where there is a calibrated set of strains and a continuable model state)
-  * processing must reach back to the previous unchanged modification
+* ~~NO checkpoints in the model for faster processing (could have some points where there is a calibrated set of strains and a continuable model state)~~
+  * ~~processing must reach back to the previous unchanged modification~~
 * consider corrections when calculating category ratio in ModificationContact (check if that is not the case already)
 * interpolated test rate gives above min and below max
 * wiki on github

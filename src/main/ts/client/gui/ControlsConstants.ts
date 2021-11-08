@@ -64,7 +64,7 @@ export interface ILabellingDefinition {
     format(value: number): string;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'EXPOSED' | 'TESTING' | 'CONTACT';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'EXPOSED' | 'TESTING' | 'CONTACT' | 'REPRODUCTION';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'IMMUNIZING' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
@@ -150,11 +150,12 @@ export class ControlsConstants {
             getHeatColor: (value) => new Color(0.00, 0.00, Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
-                chart.setSeriesIncidenceVisible(true);
-                chart.setSeriesEIVisible(false, true);
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(false);
                 chart.setSeriesContactVisible(false);
+                chart.setSeriesReproductionVisible(false);
+                chart.setSeriesIncidenceVisible(true);
+                chart.setSeriesEIVisible(false, true);
             }
         },
         'VACCINATED': {
@@ -166,11 +167,11 @@ export class ControlsConstants {
             getHeatMax: () => 1,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesEIVisible(true, true);
-                chart.setSeriesSRVisible(true);
                 chart.setSeriesTestingVisible(false);
                 chart.setSeriesContactVisible(false);
-                chart.setAxisRelativeMax(1.01);
+                chart.setSeriesReproductionVisible(false);
+                chart.setSeriesEIVisible(true, true);
+                chart.setSeriesSRVisible(true);
             }
         },
         'EXPOSED': {
@@ -182,11 +183,11 @@ export class ControlsConstants {
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesEIVisible(true, false);
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(false);
                 chart.setSeriesContactVisible(false);
-                chart.setAxisRelativeMax(1.01);
+                chart.setSeriesReproductionVisible(false);
+                chart.setSeriesEIVisible(true, false);
             }
         },
         'TESTING': {
@@ -200,9 +201,9 @@ export class ControlsConstants {
                 chart.setSeriesIncidenceVisible(false);
                 chart.setSeriesEIVisible(false, false);
                 chart.setSeriesSRVisible(false);
-                chart.setSeriesTestingVisible(true);
                 chart.setSeriesContactVisible(false);
-                chart.setAxisRelativeMax(1.01);
+                chart.setSeriesReproductionVisible(false);
+                chart.setSeriesTestingVisible(true);
             }
         },
         'CONTACT': {
@@ -217,8 +218,24 @@ export class ControlsConstants {
                 chart.setSeriesEIVisible(false, false);
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(false);
+                chart.setSeriesReproductionVisible(false);
                 chart.setSeriesContactVisible(true);
-                chart.setAxisRelativeMax(1.01);
+            }
+        },
+        'REPRODUCTION': {
+            id: ObjectUtil.createId(),
+            title: 'Reproduction',
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID___________ALL], // TODO add reproduction to model data
+            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
+            getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatMax: (maxValue) => maxValue,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(false);
+                chart.setSeriesEIVisible(false, false);
+                chart.setSeriesSRVisible(false);
+                chart.setSeriesTestingVisible(false);
+                chart.setSeriesContactVisible(false);
+                chart.setSeriesReproductionVisible(true);
             }
         }
     }
@@ -241,6 +258,12 @@ export class ControlsConstants {
             },
             showInEditor: modification => {
                 ControlsTime.getInstance().acceptModification(modification as ModificationTime);
+            },
+            handleCategoryToggled: () => {
+                // no action
+            },
+            handleAgeGroupToggled: () => {
+                // no action
             },
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2 //FIXED
         },

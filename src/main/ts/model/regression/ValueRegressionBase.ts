@@ -1,10 +1,9 @@
-import { FDistribution } from './FDistribution';
-import { TimeUtil } from './../../util/TimeUtil';
 import regression, { DataPoint } from 'regression';
+import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ModelInstants } from '../ModelInstants';
-import { ModificationContact } from './../../common/modification/ModificationContact';
-import { IRegressionParams, IRegressionResult } from './Regression';
-import { dataLoader } from '@amcharts/amcharts4/core';
+import { FDistribution } from './FDistribution';
+import { IRegressionParams } from './IRegressionParams';
+import { IRegressionResult } from './IRegressionResult';
 
 export interface IWorkingHotellingParams {
     num: number;
@@ -16,8 +15,9 @@ export interface IWorkingHotellingParams {
 
 export abstract class ValueRegressionBase {
 
-    private readonly instant: number;
-    private readonly instantMods: number;
+    // private readonly instant: number;
+    private readonly instantA: number;
+    private readonly instantB: number;
     private readonly polyWeight: number;
     private readonly equationParamsLin: number[];
     private readonly equationParamsPol: number[];
@@ -27,8 +27,9 @@ export abstract class ValueRegressionBase {
 
     constructor(params: IRegressionParams) {
 
-        this.instant = params.instant;
-        this.instantMods = params.instantMods;
+        // this.instant = params.instant;
+        this.instantA = params.instantA;
+        this.instantB = params.instantB;
         this.polyWeight = params.polyWeight;
         this.equationParamsLin = [];
         this.equationParamsPol = [];
@@ -43,7 +44,7 @@ export abstract class ValueRegressionBase {
         const regressionData: DataPoint[] = [];
 
         // reduce to modifications that are relevant for current settings
-        const relevantModifications = this.modificationsContact.filter(m => m.getInstantA() >= this.instantMods && m.getInstantA() <= this.instant);
+        const relevantModifications = this.modificationsContact.filter(m => m.getInstantA() >= this.instantA && m.getInstantA() <= this.instantB);
         relevantModifications.forEach(relevantModification => {
             regressionData.push([
                 this.toRegressionX(relevantModification.getInstant()),
@@ -128,37 +129,47 @@ export abstract class ValueRegressionBase {
 
     }
 
-
-
     getRegressionResult(instant: number): IRegressionResult {
 
-        // put instant into regressions space
-        const x = this.toRegressionX(instant);
+        if (instant > this.instantA) {
 
-        // const regressionPol = this.equationParamsPol[0] * Math.exp(this.equationParamsPol[1] * regressionX); // 0.33e^(0.82x) Math.exp
-        const regressionPol = Math.pow(x, 3) * this.equationParamsPol[0] + Math.pow(x, 2) * this.equationParamsPol[1] + x * this.equationParamsPol[2] + this.equationParamsPol[3];
-        const regressionLin = x * this.equationParamsLin[0] + this.equationParamsLin[1];
+            // put instant into regressions space
+            const x = this.toRegressionX(instant);
 
-        const ratioPol = this.polyWeight;
-        const ratioLin = 1 - ratioPol;
+            // const regressionPol = this.equationParamsPol[0] * Math.exp(this.equationParamsPol[1] * regressionX); // 0.33e^(0.82x) Math.exp
+            const regressionPol = Math.pow(x, 3) * this.equationParamsPol[0] + Math.pow(x, 2) * this.equationParamsPol[1] + x * this.equationParamsPol[2] + this.equationParamsPol[3];
+            const regressionLin = x * this.equationParamsLin[0] + this.equationParamsLin[1];
 
-        const y = regressionPol * ratioPol + regressionLin * ratioLin;
+            const ratioPol = this.polyWeight;
+            const ratioLin = 1 - ratioPol;
 
-        // https://en.wikipedia.org/wiki/Working%E2%80%93Hotelling_procedure
-        const term1a = this.whParams.sse / (this.whParams.num - 2);
-        const term2a = 1 / this.whParams.num + Math.pow(x - this.whParams.avg, 2) / this.whParams.tss;
-        const ci95 = Math.sqrt(this.whParams.wh2 * term1a * term2a);
+            const y = regressionPol * ratioPol + regressionLin * ratioLin;
 
-        // const std = Math.sqrt(this.whParams.num) * (ci95 * 2) / 3.92;
-        // console.log('std', ci95, std, ci95 * 2 / std);
+            // https://en.wikipedia.org/wiki/Working%E2%80%93Hotelling_procedure
+            const term1a = this.whParams.sse / (this.whParams.num - 2);
+            const term2a = 1 / this.whParams.num + Math.pow(x - this.whParams.avg, 2) / this.whParams.tss;
+            const ci95 = Math.sqrt(this.whParams.wh2 * term1a * term2a);
 
-        return {
-            regression: y,
-            ci95Min: y - ci95,
-            ci95Max: y + ci95,
-            ci95Dim: ci95, //Math.sqrt(this.whParams.num) * ci95 / 1.96,
-            original: this.originalValues[instant] // will be undefined in many cases
-        };
+            // const std = Math.sqrt(this.whParams.num) * (ci95 * 2) / 3.92;
+            // console.log('std', ci95, std, ci95 * 2 / std);
+
+            return {
+                regression: y,
+                ci95Min: y - ci95,
+                ci95Max: y + ci95,
+                ci95Dim: ci95,
+                original: this.originalValues[instant] // will be undefined in many cases
+            };
+
+        } else {
+            return {
+                original: this.originalValues[instant], // will be undefined in many cases
+                ci95Min: undefined,
+                ci95Max: undefined,
+                ci95Dim: undefined
+            };
+        }
+
 
     }
 

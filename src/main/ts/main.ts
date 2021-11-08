@@ -149,12 +149,10 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             setTimeout(() => {
                 ModelActions.getInstance().toggleModelMode('CONTACT');
                 ModelActions.getInstance().toggleChartMode('INCIDENCE');
-                ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
-                ModelActions.getInstance().toggleCategory('other');
                 requestAnimationFrame(() => {
 
-                    ChartAgeGroup.getInstance().setAgeGroupIndex(Demographics.getInstance().getAgeGroups().length); // effectively set it to TOTAL
-                    // ChartAgeGroup.getInstance().setContactCategory('other'); // effectively set it to TOTAL
+                    ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
+                    ModelActions.getInstance().toggleCategory('other');
                     ControlsConstants.MODIFICATION_PARAMS['CONTACT'].handleModificationUpdate();
 
                 });

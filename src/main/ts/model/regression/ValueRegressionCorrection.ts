@@ -1,5 +1,5 @@
 import { ModificationContact } from '../../common/modification/ModificationContact';
-import { IRegressionParams, IRegressionResult } from './Regression';
+import { IRegressionParams } from './IRegressionParams';
 import { ValueRegressionBase } from './ValueRegressionBase';
 
 export interface IRegressionParamsCorrection extends IRegressionParams {

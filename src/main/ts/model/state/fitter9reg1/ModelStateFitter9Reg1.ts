@@ -47,7 +47,7 @@ export class ModelStateFitter9Reg1 {
             predictionStats[ageGroup.getName()] = {}; // new Statistics();
         });
 
-        const iterations = 10;
+        const iterations = 20;
         for (let i = 0; i < iterations; i++) {
 
             console.log('iteration', i);
@@ -65,23 +65,27 @@ export class ModelStateFitter9Reg1 {
 
             randomDataset.forEach(randomData => {
 
-                // be sure to have a container for this day
-                const incidenceKey = TimeUtil.formatCategoryDateFull(randomData.instant);
-                if (!incidenceKeys.has(incidenceKey)) {
-                    incidenceKeys.add(incidenceKey);
-                    predictionStats[incidenceKey] = {};
-                }
+                if (randomData.instant > (modificationRegression.getInstantA() + TimeUtil.MILLISECONDS_PER____DAY)) {
 
-                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-
-                    // be sure to have a container for this group within this day
-                    if (!predictionStats[incidenceKey][ageGroup.getName()]) {
-                        predictionStats[incidenceKey][ageGroup.getName()] = new Statistics();
+                    // be sure to have a container for this day
+                    const incidenceKey = TimeUtil.formatCategoryDateFull(randomData.instant);
+                    if (!incidenceKeys.has(incidenceKey)) {
+                        incidenceKeys.add(incidenceKey);
+                        predictionStats[incidenceKey] = {};
                     }
 
-                    predictionStats[incidenceKey][ageGroup.getName()].addValue(randomData.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+                    Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
 
-                });
+                        // be sure to have a container for this group within this day
+                        if (!predictionStats[incidenceKey][ageGroup.getName()]) {
+                            predictionStats[incidenceKey][ageGroup.getName()] = new Statistics();
+                        }
+
+                        predictionStats[incidenceKey][ageGroup.getName()].addValue(randomData.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+
+                    });
+
+                }
 
             });
 
