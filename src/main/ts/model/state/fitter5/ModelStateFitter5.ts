@@ -78,7 +78,7 @@ export class ModelStateFitter5 {
             let loggableRange = `${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modB.getInstant())}`;
 
             const maxAbsErrorViolationsAllowed = 10;
-            const maxAbsErrorTolerance = 0.01; // 0.5%
+            const maxAbsErrorTolerance = 0.05; // 0.5%
 
             let maxAbsErrorLast = Number.MAX_VALUE;
             let maxAbsErrorGroup: string;

@@ -45,7 +45,7 @@ export class ModificationAdaptor5 {
         const prevMultN = modificationSet.modA.getCategoryValue('nursing');
         const prevMultS = modificationSet.modA.getCategoryValue('school');
 
-        const currMultO = Math.max(0.00, Math.min(1, prevMultO - errorsG['TOTAL'] * errorRatio * 0.5));
+        const currMultO = Math.max(0.00, Math.min(1, prevMultO - errorsG['TOTAL'] * errorRatio * 0.75));
         const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 1.0));
         const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 1.0));
 
