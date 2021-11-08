@@ -1,13 +1,11 @@
-import { ModificationRegression } from './ModificationRegression';
-import { Modifications } from './Modifications';
-import { Regression } from './../../model/regression/Regression';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
-import { TimeUtil } from './../../util/TimeUtil';
 import { Demographics } from './../demographics/Demographics';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesContact } from './IModificationValuesContact';
 import { ModificationContact } from './ModificationContact';
+import { ModificationRegression } from './ModificationRegression';
+import { Modifications } from './Modifications';
 
 /**
  * modification resolver for contact modifications
@@ -29,10 +27,10 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         const multipliers: { [K in string]: number } = {};
         const corrections: { [K in string]: number } = {};
         Demographics.getInstance().getCategories().forEach(category => {
-            multipliers[category.getName()] = modificationRegression.getMultiplier(instant, category.getName()).regression;
+            multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instant, category.getName()).regression;
         });
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            corrections[ageGroup.getName()] = modificationRegression.getCorrection(instant, ageGroup.getIndex()).regression;
+            corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instant, ageGroup.getName()).regression;
         });
         const id = ObjectUtil.createId();
         return{

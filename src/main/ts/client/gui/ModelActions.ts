@@ -1,15 +1,20 @@
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { IRegressionResult } from '../../model/regression/IRegressionResult';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartAgeGroup } from '../chart/ChartAgeGroup';
+import { ControlsRegression } from '../controls/ControlsRegression';
 import { StorageUtil } from '../storage/StorageUtil';
 import { Demographics } from './../../common/demographics/Demographics';
-import { CHART_MODE______KEY } from './ControlsConstants';
+import { CHART_MODE______KEY, ControlsConstants } from './ControlsConstants';
 import { IconAction } from './IconAction';
 import { IconChartMode } from './IconChartMode';
 import { IconModelMode } from './IconModelMode';
 import { SliderModification } from './SliderModification';
 
-
+export interface IRegressionPointer {
+    value: string,
+    type: 'MULTIPLIER' | 'CORRECTION';
+}
 
 export interface IIconActionParams {
     container: string;
@@ -40,6 +45,9 @@ export class ModelActions {
     private static instance: ModelActions;
 
     private key: MODIFICATION____KEY;
+
+    private regressionPointer: IRegressionPointer;
+
     private readonly modelModeIcons: IconModelMode[];
     private readonly chartModeIcons: IconChartMode[];
     private readonly ageGroupIcons: IconChartMode[];
@@ -126,6 +134,12 @@ export class ModelActions {
             iconKey: 'CONTACT',
             handleClick: () => ModelActions.getInstance().toggleChartMode('CONTACT')
         }));
+        this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
+            label: 'REPRODUCTION',
+            iconKey: 'REPRODUCTION',
+            handleClick: () => ModelActions.getInstance().toggleChartMode('REPRODUCTION')
+        }));
 
         const ageGroups = [...Demographics.getInstance().getAgeGroups()].reverse();
         this.ageGroupIcons.push(new IconChartMode({
@@ -146,7 +160,7 @@ export class ModelActions {
         Demographics.getInstance().getCategories().forEach(category => {
             this.categoryIcons.push(new IconChartMode({
                 container: 'categorytoggleDiv',
-                label: category.getName(),
+                label: category.getName().toUpperCase(),
                 iconKey: category.getName(),
                 handleClick: () => this.toggleCategory(category.getName())
             }));
@@ -154,18 +168,33 @@ export class ModelActions {
 
     }
 
-    toggleCategory(name: string): void {
-        this.categoryIcons.forEach(categoryIcon => {
-            categoryIcon.setActive(categoryIcon.getIconKey() === name);
-        });
-        ChartAgeGroup.getInstance().setContactCategory(name);
+    getRegressionPointer(): IRegressionPointer {
+        return this.regressionPointer;
     }
 
-    toggleAgeGroup(index: number): void {
-        this.ageGroupIcons.forEach(ageGroupIcon => {
-            ageGroupIcon.setActive(ageGroupIcon.getIconKey() === index);
+    toggleCategory(category: string): void {
+        this.regressionPointer = {
+            value: category,
+            type: 'MULTIPLIER'
+        }
+        this.categoryIcons.forEach(categoryIcon => {
+            categoryIcon.setActive(categoryIcon.getIconKey() === category);
         });
-        ChartAgeGroup.getInstance().setAgeGroupIndex(index);
+        ControlsRegression.getInstance().handleRegressionPointerChange();
+        ChartAgeGroup.getInstance().setContactCategory(category);
+    }
+
+    toggleAgeGroup(ageGroupIndex: number): void {
+        const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
+        this.regressionPointer = {
+            value: ageGroup.getName(),
+            type: 'CORRECTION'
+        }
+        this.ageGroupIcons.forEach(ageGroupIcon => {
+            ageGroupIcon.setActive(ageGroupIcon.getIconKey() === ageGroupIndex);
+        });
+        ControlsRegression.getInstance().handleRegressionPointerChange();
+        ChartAgeGroup.getInstance().setAgeGroupIndex(ageGroupIndex);
     }
 
     toggleChartMode(chartMode: CHART_MODE______KEY): void {
@@ -175,6 +204,10 @@ export class ModelActions {
         ChartAgeGroup.getInstance().setChartMode(chartMode);
     }
 
+    /**
+     * the current model mode
+     * @returns
+     */
     getKey(): MODIFICATION____KEY {
         return this.key;
     }

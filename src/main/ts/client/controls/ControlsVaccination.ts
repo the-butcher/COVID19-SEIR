@@ -43,8 +43,8 @@ export class ControlsVaccination {
 
         this.slidersVaccination.forEach(sliderVaccination => {
             vaccinations[sliderVaccination.getName()] = {
-                v1: sliderVaccination.getValue(0),
-                v2: sliderVaccination.getValue(1)
+                v1: sliderVaccination.getValue(1),
+                v2: sliderVaccination.getValue(0)
             };
         });
 
@@ -65,8 +65,8 @@ export class ControlsVaccination {
 
         this.slidersVaccination.forEach(sliderVaccination => {
             const vaccinations = this.modification.getVaccinationConfig2(sliderVaccination.getName());
-            sliderVaccination.setValue(0, vaccinations.v1);
-            sliderVaccination.setValue(1, vaccinations.v2);
+            sliderVaccination.setValue(1, vaccinations.v1);
+            sliderVaccination.setValue(0, vaccinations.v2);
         });
 
         requestAnimationFrame(() => {

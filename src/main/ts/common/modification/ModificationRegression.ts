@@ -1,9 +1,12 @@
-import { Demographics } from './../demographics/Demographics';
-import { StrainUtil } from './../../util/StrainUtil';
-import { IRegressionResult, Regression } from '../../model/regression/Regression';
+import { ChartAgeGroup } from './../../client/chart/ChartAgeGroup';
 import { TimeUtil } from './../../util/TimeUtil';
+import { IRegressionResult } from '../../model/regression/IRegressionResult';
+import { ValueRegressionCorrection } from '../../model/regression/ValueRegressionCorrection';
+import { ValueRegressionMultiplier } from './../../model/regression/ValueRegressionMultiplier';
+import { StrainUtil } from './../../util/StrainUtil';
+import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
-import { IModificationValuesRegression } from './IModificationValuesRegression';
+import { IModificationValuesRegression, IRegressionConfig } from './IModificationValuesRegression';
 import { ModificationResolverContact } from './ModificationResolverContact';
 
 /**
@@ -15,10 +18,13 @@ import { ModificationResolverContact } from './ModificationResolverContact';
  */
 export class ModificationRegression extends AModification<IModificationValuesRegression> {
 
-    private regression: Regression;
+    private multiplierRegressions: { [K in string]: ValueRegressionMultiplier };
+    private correctionRegressions: { [K in string]: ValueRegressionCorrection };
 
     constructor(modificationParams: IModificationValuesRegression) {
         super('INSTANT', modificationParams);
+        this.multiplierRegressions = {};
+        this.correctionRegressions = {};
         this.normalize();
     }
 
@@ -29,7 +35,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
             multiplier_randoms[category.getName()] = 0;
         });
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            correction_randoms[ageGroup.getIndex()] = 0;
+            correction_randoms[ageGroup.getName()] = 0;
         });
         this.acceptUpdate({
             multiplier_randoms,
@@ -38,26 +44,29 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     }
 
     randomize(): void {
+
         const multiplier_randoms: { [K in string]: number} = {};
         const correction_randoms: { [K in string]: number} = {};
+
         Demographics.getInstance().getCategories().forEach(category => {
             multiplier_randoms[category.getName()] = StrainUtil.randomGaussian(StrainUtil.RANDOM_SCALE_095);
         });
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            correction_randoms[ageGroup.getIndex()] = StrainUtil.randomGaussian(StrainUtil.RANDOM_SCALE_095);
+            correction_randoms[ageGroup.getName()] = StrainUtil.randomGaussian(StrainUtil.RANDOM_SCALE_095);
         });
         this.acceptUpdate({
             multiplier_randoms,
             correction_randoms
         });
+
     }
 
-    getBackDays(): number {
-        return this.modificationValues.back_days;
+    getMultiplierConfig(category: string): IRegressionConfig {
+        return this.modificationValues.multiplier_configs[category];
     }
 
-    getPolyWeight(): number {
-        return this.modificationValues.poly_days; // TODO rename property
+    getCorrectionConfig(ageGroupName: string): IRegressionConfig {
+        return this.modificationValues.correction_configs[ageGroupName];
     }
 
     /**
@@ -66,12 +75,30 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      * @param contactCategory
      * @returns
      */
-    getMultiplier(instant: number, contactCategory: string): IRegressionResult {
-        const result = this.regression.getMultiplier(instant, contactCategory);
-        return {
-            ...result,
-            regression: result.regression + result.ci95Dim * this.modificationValues.multiplier_randoms[contactCategory]
+    getMultiplierRegression(instant: number, contactCategory: string): IRegressionResult {
+
+        if (!this.multiplierRegressions[contactCategory]) {
+            const multiplier_configs: { [K in string]: IRegressionConfig } = {};
+            multiplier_configs[contactCategory] = {
+                back_days_a: -20,
+                back_days_b: 0,
+                poly_weight: 0.1
+            }
+            this.acceptUpdate({
+                multiplier_configs
+            });
         }
+
+        const result = this.multiplierRegressions[contactCategory].getRegressionResult(instant);
+        if (result.regression && result.ci95Dim) {
+            return {
+                ...result,
+                regression: result.regression + result.ci95Dim * this.modificationValues.multiplier_randoms[contactCategory]
+            }
+        } else {
+            return result;
+        }
+
     }
 
     /**
@@ -80,12 +107,26 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      * @param ageGroupIndex
      * @returns
      */
-     getCorrection(instant: number, ageGroupIndex: number): IRegressionResult {
-        const result = this.regression.getCorrection(instant, ageGroupIndex);
+     getCorrectionRegression(instant: number, ageGroupName: string): IRegressionResult {
+
+        if (!this.correctionRegressions[ageGroupName]) {
+            const correction_configs: { [K in string]: IRegressionConfig } = {};
+            correction_configs[ageGroupName] = {
+                back_days_a: -20,
+                back_days_b: 0,
+                poly_weight: 0.1
+            }
+            this.acceptUpdate({
+                correction_configs
+            });
+        }
+
+        const result = this.correctionRegressions[ageGroupName].getRegressionResult(instant);
         return {
             ...result,
-            regression: result.regression + result.ci95Dim * this.modificationValues.correction_randoms[ageGroupIndex]
+            regression: result.regression + result.ci95Dim * this.modificationValues.correction_randoms[ageGroupName]
         }
+
     }
 
     /**
@@ -93,24 +134,46 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      */
     setInstants(instantA: number, instantB: number): void {
         super.setInstants(instantA, instantB);
-        this.updateRegression();
+        this.updateRegressions(this.modificationValues.multiplier_configs, this.modificationValues.correction_configs);
     }
 
     /**
      * internal regression needs to update when some value changes
      */
     acceptUpdate(update: Partial<IModificationValuesRegression>): void {
+        this.updateRegressions({...update.multiplier_configs}, {...update.correction_configs});
+        update.multiplier_configs = {...this.modificationValues.multiplier_configs, ...update.multiplier_configs};
+        update.correction_configs = {...this.modificationValues.correction_configs, ...update.correction_configs};
         super.acceptUpdate(update);
-        this.updateRegression();
     }
 
-    private updateRegression(): void {
-        this.regression = new Regression({
-            instant: this.getInstantA(),
-            instantMods: this.getInstantA() - this.getBackDays() * TimeUtil.MILLISECONDS_PER____DAY,
-            polyWeight: this.getPolyWeight(),
-            modificationsContact:  new ModificationResolverContact().getModifications()
-        });
+    private updateRegressions(multiplierConfigs: { [K in string]: IRegressionConfig}, correctionConfigs: { [K in string]: IRegressionConfig}): void {
+
+        for (const key of Object.keys(multiplierConfigs)) {
+            const regressionConfig = multiplierConfigs[key];
+            this.multiplierRegressions[key] = new ValueRegressionMultiplier({
+                contactCategory: key,
+                instantA: this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY,
+                instantB: this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY,
+                polyWeight: regressionConfig.poly_weight,
+                modificationsContact:  new ModificationResolverContact().getModifications()
+            });
+        }
+
+        for (const key of Object.keys(correctionConfigs)) {
+            const regressionConfig = correctionConfigs[key];
+            const ageGroupIndex = Demographics.getInstance().findAgeGroupByName(key).getIndex();
+            this.correctionRegressions[key] = new ValueRegressionCorrection({
+                ageGroupIndex,
+                instantA: this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY,
+                instantB: this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY,
+                polyWeight: regressionConfig.poly_weight,
+                modificationsContact:  new ModificationResolverContact().getModifications()
+            });
+        }
+
+        // ChartAgeGroup.getInstance().renderRegressionData();
+
     }
 
 

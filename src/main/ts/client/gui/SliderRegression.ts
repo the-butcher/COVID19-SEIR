@@ -8,7 +8,7 @@ export class SliderRegression extends Slider {
 
     static readonly CLASS_CORRECTION_LABEL = 'correction-label';
 
-    constructor(title: string, range: number[]) {
+    constructor(title: string, range: number[], ...values: number[]) {
 
         const container = document.createElement('div');
         container.classList.add('slider-modification');
@@ -32,8 +32,8 @@ export class SliderRegression extends Slider {
             min: Math.min(...range),
             max: Math.max(...range),
             step: 0.01,
-            values: [1.0],
-            ticks: range.slice(0, -2),
+            values,
+            ticks: range,
             label: title,
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
@@ -63,16 +63,16 @@ export class SliderRegression extends Slider {
             }
         });
 
-        this.setLabelPosition(13);
+        // this.setLabelPosition(13);
 
     }
 
-    getValue(): number {
-        return this.getSliderThumbs()[0].getValue();
+    getValue(index: number): number {
+        return this.getSliderThumbs()[index].getValue();
     }
 
-    setValue(value: number): void {
-        const thumbElement = this.getSliderThumbs()[0];
+    setValue(index: number, value: number): void {
+        const thumbElement = this.getSliderThumbs()[index];
         thumbElement.setValue(value);
         this.redrawSliderElement(thumbElement, 7, true);
     }
