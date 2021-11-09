@@ -47,7 +47,7 @@ export class ModelStateFitter9Reg1 {
             predictionStats[ageGroup.getName()] = {}; // new Statistics();
         });
 
-        const iterations = 20;
+        const iterations = 10;
         for (let i = 0; i < iterations; i++) {
 
             console.log('iteration', i);
@@ -90,14 +90,6 @@ export class ModelStateFitter9Reg1 {
             });
 
         }
-
-        incidenceKeys.forEach(incidenceKey => {
-            console.log(incidenceKey);
-            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-                const ageGroupStats = predictionStats[incidenceKey][ageGroup.getName()];
-                // console.log(ageGroup.getName(), ageGroupStats.getAverage().toFixed(8), ageGroupStats.getStandardDeviation().toFixed(8));
-            });
-        });
 
         modificationRegression.normalize();
 

@@ -41,14 +41,19 @@ export class FDistribution {
   }
 
   inverseCumulativeProbability95(df2: number): number {
-      for (let i=0; i<this.lookup.length; i++) {
-        if (this.lookup[i][0] === df2) {
-            return this.lookup[i][1];
-        } else if (this.lookup[i][0] > df2) {
-            // TODO interpolation
-            this.lookup[i-1][1];
+      if (df2 > 0) {
+        for (let i=0; i<this.lookup.length; i++) {
+          if (this.lookup[i][0] === df2) {
+              return this.lookup[i][1];
+          } else if (this.lookup[i][0] > df2) {
+              // TODO interpolation
+              return this.lookup[i-1][1];
+          }
         }
+      } else {
+        return Number.MAX_VALUE;
       }
+
   }
 
 

@@ -8,6 +8,13 @@ import { ILabellingDefinition } from './../gui/ControlsConstants';
 import { ChartAgeGroup } from './ChartAgeGroup';
 import { ChartUtil } from './ChartUtil';
 
+
+export interface ISeriesLabels {
+    tooltip: boolean;
+    pathtip: boolean;
+}
+
+
 export interface IChartAgeGroupSeriesParams {
     chart: XYChart;
     yAxis: ValueAxis;
@@ -17,7 +24,7 @@ export interface IChartAgeGroupSeriesParams {
     colorKey: COMPARTMENT__COLORS;
     strokeWidth: number;
     dashed: boolean;
-    labelled: boolean;
+    labels: ISeriesLabels;
     locationOnPath: number;
     stacked: boolean;
     legend: boolean;
@@ -114,8 +121,8 @@ export class ChartAgeGroupSeries {
         //     }
         //   });
 
-        this.series.tooltip.disabled = !params.labelled;
-        this.seriesLabel.disabled =  !params.labelled;
+        this.series.tooltip.disabled = !params.labels.tooltip;
+        this.seriesLabel.disabled =  !params.labels.pathtip;
 
         this.getSeries().events.on('hidden', () => {
             this.boundSeries.forEach(series => {

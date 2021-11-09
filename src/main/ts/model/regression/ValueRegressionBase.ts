@@ -1,9 +1,11 @@
+import { TimeUtil } from './../../util/TimeUtil';
 import regression, { DataPoint } from 'regression';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ModelInstants } from '../ModelInstants';
 import { FDistribution } from './FDistribution';
 import { IRegressionParams } from './IRegressionParams';
 import { IRegressionResult } from './IRegressionResult';
+import { ValueAxisBreak } from '@amcharts/amcharts4/charts';
 
 export interface IWorkingHotellingParams {
     num: number;
@@ -43,41 +45,51 @@ export abstract class ValueRegressionBase {
         // look into each category
         const regressionData: DataPoint[] = [];
 
-        // reduce to modifications that are relevant for current settings
-        const relevantModifications = this.modificationsContact.filter(m => m.getInstantA() >= this.instantA && m.getInstantA() <= this.instantB);
-        relevantModifications.forEach(relevantModification => {
-            regressionData.push([
-                this.toRegressionX(relevantModification.getInstant()),
-                this.toValueY(relevantModification)
-            ]);
+        const minInstant = this.modificationsContact[0].getInstant();
+        const maxInstant = this.modificationsContact[this.modificationsContact.length - 1].getInstant(); // last modification instance
 
-        });
+        let modificationA: ModificationContact;
+        let modificationB: ModificationContact;
+        let instant = minInstant;
+        while ((modificationA = this.modificationsContact.find(m => m.getInstantB() > instant)) && (modificationB = this.modificationsContact.find(m => m.getInstantA() >= instant))) { // single equals sign on purpose!!
 
-        /**
-         * raw data, should contain all modifications
-         */
-        this.modificationsContact.forEach(modificationContact => {
-            this.originalValues[modificationContact.getInstant()] = this.toValueY(modificationContact);
-        });
+        // for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
 
-        // const regressionResultPol = regression.exponential(regressionData, { order: 3 });
+            // const modificationA = this.modificationsContact.find(m => m.getInstantB() > instant);
+            // const modificationB = this.modificationsContact.find(m => m.getInstantA() >= instant);
+
+            const fraction = modificationB.getInstantA() !== modificationA.getInstantA() ? (instant - modificationA.getInstantA()) / (modificationB.getInstantA() - modificationA.getInstantA()) : 0;
+            const valueYA = this.toValueY(modificationA);
+            const valueYB = this.toValueY(modificationB);
+            const valueYM = valueYA + (valueYB - valueYA) * fraction;
+
+            /**
+             * relevant data
+             */
+            if (instant >= this.instantA && instant <= this.instantB) {
+
+                regressionData.push([
+                    this.toRegressionX(instant),
+                    valueYM
+                ]);
+
+            }
+
+            if (!modificationA || !modificationB) {
+                console.log(TimeUtil.formatCategoryDateFull(instant), modificationA, modificationB);
+            }
+
+            this.originalValues[instant] = valueYM;
+
+            instant += TimeUtil.MILLISECONDS_PER____DAY;
+
+        }
+
         const regressionResultPol = regression.polynomial(regressionData, { order: 3 });
         const regressionResultLin = regression.linear(regressionData);
 
-        // console.log('reg', regressionResultPol, regressionResultLin)
-
-        // console.log(`X;Y`);
-        // relevantModifications.forEach(relevantModification => {
-        //     const regressionX = this.toRegressionX(relevantModification.getInstant());
-        //     const regressionY = this.toValueY(relevantModification);
-        //     console.log(`${regressionX.toLocaleString()};${regressionY.toLocaleString()}`);
-        // });
-
         this.equationParamsPol.push(...regressionResultPol.equation);
         this.equationParamsLin.push(...regressionResultLin.equation);
-
-        // calculate stats from
-        // console.log('-----------------------------');
 
         // org.apache.commons.math3.stat.regression.SimpleRegression.java
         let n = 0;
@@ -90,9 +102,10 @@ export abstract class ValueRegressionBase {
         let sumXY: number = 0;
 
         for (let n=0; n<regressionData.length; n++) {
+
             const x = regressionData[n][0];
             const y = regressionData[n][1];
-            // console.log(`regression.addData(${x}, ${y});`);
+
             if (n == 0) {
                 xBar = x;
                 yBar = y;
@@ -127,6 +140,7 @@ export abstract class ValueRegressionBase {
             wh2: new FDistribution().inverseCumulativeProbability95(regressionData.length - 2) * 2
         }
 
+
     }
 
     getRegressionResult(instant: number): IRegressionResult {
@@ -149,6 +163,7 @@ export abstract class ValueRegressionBase {
             const term1a = this.whParams.sse / (this.whParams.num - 2);
             const term2a = 1 / this.whParams.num + Math.pow(x - this.whParams.avg, 2) / this.whParams.tss;
             const ci95 = Math.sqrt(this.whParams.wh2 * term1a * term2a);
+            const ci68 = ci95 / 1.96;
 
             // const std = Math.sqrt(this.whParams.num) * (ci95 * 2) / 3.92;
             // console.log('std', ci95, std, ci95 * 2 / std);

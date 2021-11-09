@@ -87,6 +87,7 @@ export class StrainUtil {
     }
 
     static readonly RANDOM_SCALE_095 = 5 / 1.96;
+    static readonly RANDOM_SCALE_068 = 5 / 1.00;
 
     /**
      * https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve

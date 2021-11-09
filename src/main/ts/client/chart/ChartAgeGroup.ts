@@ -30,6 +30,11 @@ export interface IModificationData {
     modValueY: number
 }
 
+export interface ISeriesLabels {
+    tooltip: boolean;
+    pathtip: boolean;
+}
+
 /**
  * central chart of the application
  *
@@ -81,6 +86,8 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupIncidence: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupIncidence95U: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupIncidence95L: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupIncidence68U: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupIncidence68L: ChartAgeGroupSeries;
 
     /**
      * incidence series by strain
@@ -191,20 +198,23 @@ export class ChartAgeGroup {
         this.titleContainer.toBack();
         this.titleContainer.width = percent(100);
         this.titleContainer.paddingBottom = 10;
+        this.titleContainer.exportable = true;
 
         this.chartTitle = this.titleContainer.createChild(Label);
         this.chartTitle.text = '';
         this.chartTitle.fontFamily = ControlsConstants.FONT_FAMILY;
         this.chartTitle.fontSize = ControlsConstants.FONT_SIZE;
         this.chartTitle.fill = color(ControlsConstants.COLOR____FONT);
+        this.chartTitle.exportable = true;
 
         let dateTitle = this.titleContainer.createChild(Label);
-        dateTitle.text = "ages, bmsgpk, google mobility, @FleischerHannes";
+        dateTitle.text = `@FleischerHannes, ${TimeUtil.formatCategoryDateFull(Date.now())} - data: ages, bmsgpk, google`;
         dateTitle.align = "right";
         dateTitle.dy = 2;
         dateTitle.fontFamily = ControlsConstants.FONT_FAMILY;
         dateTitle.fontSize = ControlsConstants.FONT_SIZE - 2;
         dateTitle.fill = color(ControlsConstants.COLOR____FONT);
+        dateTitle.exportable = true;
 
         ChartUtil.getInstance().configureLegend(this.chart);
         ChartUtil.getInstance().configureChartPadding(this.chart);
@@ -284,31 +294,82 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.10,
-            labelled: false,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
             stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupIncidence95L.getSeries().strokeOpacity = 0.0;
+        this.seriesAgeGroupIncidence95L.getSeries().strokeOpacity = 0.5;
         this.seriesAgeGroupIncidence95U = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
             title: 'incidence (CI95)',
-            baseLabel: 'incidence (CI95)',
+            baseLabel: 'CI 95%',
             valueField: 'ageGroupIncidence95U',
             colorKey: 'CASES',
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.10,
-            labelled: false,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
             stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupIncidence95U.getSeries().strokeOpacity = 0.5;
+        this.seriesAgeGroupIncidence95U.getSeries().fillOpacity = 0.2;
+        this.seriesAgeGroupIncidence95U.bindToLegend(this.seriesAgeGroupIncidence95L);
+
+        this.seriesAgeGroupIncidence68L = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotIncidence,
+            title: 'incidence (CI68)',
+            baseLabel: 'incidence (CI68)',
+            valueField: 'ageGroupIncidence68L',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.10,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupIncidence95U.getSeries().fillOpacity = 0.2;
-        this.seriesAgeGroupIncidence95U.getSeries().strokeOpacity = 0.0;
+        this.seriesAgeGroupIncidence68L.getSeries().strokeOpacity = 0.5;
+        this.seriesAgeGroupIncidence68U = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotIncidence,
+            title: 'incidence (CI68)',
+            baseLabel: 'CI 68%',
+            valueField: 'ageGroupIncidence68U',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.10,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupIncidence68U.getSeries().strokeOpacity = 0.5;
+        this.seriesAgeGroupIncidence68U.getSeries().fillOpacity = 0.2;
+        this.seriesAgeGroupIncidence68U.bindToLegend(this.seriesAgeGroupIncidence68L);
+
 
         this.seriesAgeGroupCasesP = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -320,7 +381,10 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.40,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
@@ -336,7 +400,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.35,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
@@ -353,7 +420,10 @@ export class ChartAgeGroup {
             strokeWidth: 0.5,
             dashed: false,
             locationOnPath: 1.10,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
@@ -370,7 +440,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.90,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
@@ -388,15 +461,16 @@ export class ChartAgeGroup {
             colorKey: 'INCIDENCE',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.10,
-            labelled: true,
+            locationOnPath: 0.8,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupIncidence.bindToLegend(this.seriesAgeGroupIncidence95L);
-        this.seriesAgeGroupIncidence.bindToLegend(this.seriesAgeGroupIncidence95U);
 
 
         this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
@@ -409,7 +483,10 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.35,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
@@ -431,7 +508,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.15,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -447,7 +527,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.25,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -465,7 +548,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.1,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -486,7 +572,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.1,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -506,7 +595,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.1,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -525,7 +617,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.05,
-            labelled: false,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -543,7 +638,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.25,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS,
@@ -559,7 +657,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.75,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS,
@@ -579,7 +680,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.00,
-            labelled: false,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -595,7 +699,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.00,
-            labelled: false,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
             stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -614,7 +721,10 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.35,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
@@ -628,10 +738,13 @@ export class ChartAgeGroup {
             baseLabel: 'seasonality',
             valueField: 'seasonality',
             colorKey: 'SEASONALITY',
-            strokeWidth: 5,
+            strokeWidth: 30,
             dashed: false,
             locationOnPath: 0.20,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -650,7 +763,10 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.20,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
@@ -667,7 +783,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.50,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
@@ -684,7 +803,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: true,
             locationOnPath: 0.80,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -700,9 +822,12 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.20,
-            labelled: false,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
             stacked: false,
-            legend: true,
+            legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
@@ -718,7 +843,10 @@ export class ChartAgeGroup {
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.20,
-            labelled: false,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
             stacked: true,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -738,7 +866,10 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.40,
-            labelled: true,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
             stacked: false,
             legend: false,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
@@ -927,8 +1058,7 @@ export class ChartAgeGroup {
     }
 
     getAgeGroupName(): string {
-        const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[this.getAgeGroupIndex()].getName()
-        return ageGroupName === 'TOTAL' ? 'all' : ageGroupName;
+        return Demographics.getInstance().getAgeGroupsWithTotal()[this.getAgeGroupIndex()].getName()
     }
 
     getAgeGroupIndex(): number {
@@ -1010,6 +1140,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupIncidence95L.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupIncidence95U.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupIncidence68L.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupIncidence68U.setSeriesNote(ageGroup.getName());
 
         this.seriesAgeGroupIncidenceR.setSeriesNote(ageGroup.getName());
 
@@ -1165,7 +1297,10 @@ export class ChartAgeGroup {
                 strokeWidth: 1,
                 dashed: true,
                 locationOnPath: this.seriesAgeGroupLabelLocation,
-                labelled: false,
+                labels: {
+                    tooltip: false,
+                    pathtip: false
+                },
                 stacked: false,
                 legend: false,
                 labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
@@ -1233,6 +1368,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidence.setVisible(visible); // visible
         this.seriesAgeGroupIncidence95L.setVisible(visible);
         this.seriesAgeGroupIncidence95U.setVisible(visible);
+        this.seriesAgeGroupIncidence68L.setVisible(visible);
+        this.seriesAgeGroupIncidence68U.setVisible(visible);
 
         this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
 
@@ -1276,6 +1413,7 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.visible = visible;
         this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
         this.yAxisPlotPercent.tooltip.disabled = !visible;
+        this.setAxisPercentBounds(0, 2);
 
         this.seriesReproductionP.setVisible(visible);
         this.seriesReproductionR.setVisible(visible);
@@ -1298,7 +1436,7 @@ export class ChartAgeGroup {
     }
 
     private updateTitle(): void {
-        this.chartTitle.text = `${ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].title} (Age: ${this.getAgeGroupName()})`;
+        this.chartTitle.text = `${ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].title} [font-size: 12px](age: ${this.getAgeGroupName()})[/]`;
     }
 
     getChartMode(): CHART_MODE______KEY {
@@ -1534,14 +1672,18 @@ export class ChartAgeGroup {
                 ageGroupCasesN *= ageGroupCasesP;
             }
 
-            const seasonality = dataItem.seasonality;
+            const seasonality = dataItem.seasonality * 1.3;
             const reproductionP = this.calculateRt(dataItem.instant, modificationValuesStrain);
 
             let ageGroupIncidence95L: number;
             let ageGroupIncidence95U: number;
+            let ageGroupIncidence68L: number;
+            let ageGroupIncidence68U: number;
             if (dataItem.valueset[ageGroupPlot.getName()].PREDICTION) {
                 ageGroupIncidence95L = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg - dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1.96; // magic number -- formalize
                 ageGroupIncidence95U = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg + dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1.96 - ageGroupIncidence95L; // magic number -- formalize
+                ageGroupIncidence68L = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg - dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1; // magic number -- formalize
+                ageGroupIncidence68U = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg + dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1 - ageGroupIncidence68L; // magic number -- formalize
             }
 
             const item = {
@@ -1557,6 +1699,8 @@ export class ChartAgeGroup {
                 ageGroupIncidence,
                 ageGroupIncidence95L,
                 ageGroupIncidence95U,
+                ageGroupIncidence68L,
+                ageGroupIncidence68U,
                 ageGroupCasesP,
                 ageGroupCasesN,
                 seasonality,

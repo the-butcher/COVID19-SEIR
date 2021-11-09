@@ -1,15 +1,16 @@
-import { ControlsConstants } from './../gui/ControlsConstants';
+import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
+import { SliderModification } from './../gui/SliderModification';
+import { ModificationTime } from './../../common/modification/ModificationTime';
 import { ChartUtil } from './ChartUtil';
 import { SankeyDiagram } from "@amcharts/amcharts4/charts";
-import { color, create, Label, Tooltip, useTheme } from "@amcharts/amcharts4/core";
+import { color, Container, create, IDisposer, Label, percent, Tooltip, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
+import { TimeUtil } from '../../util/TimeUtil';
 import { Demographics } from './../../common/demographics/Demographics';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
 import { ObjectUtil } from './../../util/ObjectUtil';
-import { QueryUtil } from '../../util/QueryUtil';
-import { min } from '@amcharts/amcharts4/.internal/core/utils/Math';
-import { groupEnd } from 'console';
+import { ControlsConstants } from './../gui/ControlsConstants';
 
 export interface IChartData {
     contact: string;
@@ -17,6 +18,8 @@ export interface IChartData {
     contactLabel: string;
     participantLabel: string;
     value: number;
+    sumContact: number;
+    sumParticipant: number;
     color: string;
 }
 
@@ -44,11 +47,17 @@ export class ChartAgeGroupFlow {
     private readonly absTotal: number;
 
     // private readonly chartTitle: Label;
+    private titleContainer: Container;
+    private chartTitle: Label;
+
+    private hitDisposer: IDisposer;
 
     private constructor() {
 
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
+
+
 
         this.instant = new Date('2021-05-01').getTime();
         this.absTotal = Demographics.getInstance().getAbsTotal();
@@ -58,14 +67,11 @@ export class ChartAgeGroupFlow {
         this.chart.dataFields.toName = "participant";
         this.chart.dataFields.value = "value";
         this.chart.dataFields.color = "color";
-        this.chart.paddingTop = 6;
-        this.chart.paddingRight = 6;
-        this.chart.paddingBottom = 6;
-        this.chart.paddingLeft = 6;
+        // this.chart.paddingTop = 6;
+        // this.chart.paddingRight = 6;
+        // this.chart.paddingBottom = 6;
+        // this.chart.paddingLeft = 6;
 
-        this.chart.nodes.template.nameLabel.label.fontFamily = ControlsConstants.FONT_FAMILY;
-        this.chart.nodes.template.nameLabel.label.fontSize = ControlsConstants.FONT_SIZE - 3;
-        this.chart.nodes.template.nameLabel.label.fill = color(ControlsConstants.COLOR____FONT);
 
         this.chart.interpolationDuration = 0;
 
@@ -77,12 +83,47 @@ export class ChartAgeGroupFlow {
             };
         });
 
+        this.chart.paddingTop = 36;
+        this.chart.paddingRight = 12;
+        this.chart.paddingBottom = 12;
+        this.chart.paddingLeft = 12;
+
+        this.titleContainer = this.chart.chartContainer.createChild(Container);
+        this.titleContainer.dy = -32;
+        this.titleContainer.layout = "absolute";
+        this.titleContainer.toBack();
+        this.titleContainer.width = percent(100);
+        this.titleContainer.paddingBottom = 10;
+        this.titleContainer.exportable = true;
+
+        this.chartTitle = this.titleContainer.createChild(Label);
+        this.chartTitle.text = 'Exposure [font-size: 12px](estimate)[/]';
+        this.chartTitle.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.chartTitle.fontSize = ControlsConstants.FONT_SIZE;
+        this.chartTitle.fill = color(ControlsConstants.COLOR____FONT);
+        this.chartTitle.exportable = true;
+
+        let dateTitle = this.titleContainer.createChild(Label);
+        dateTitle.text = `@FleischerHannes, ${TimeUtil.formatCategoryDateFull(Date.now())} - data: ages, bmsgpk, google`;
+        dateTitle.align = "right";
+        dateTitle.dy = 2;
+        dateTitle.fontFamily = ControlsConstants.FONT_FAMILY;
+        dateTitle.fontSize = ControlsConstants.FONT_SIZE - 2;
+        dateTitle.fill = color(ControlsConstants.COLOR____FONT);
+        dateTitle.exportable = true;
+
+        this.chart.nodes.template.nameLabel.label.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.chart.nodes.template.nameLabel.label.fontSize = ControlsConstants.FONT_SIZE - 3;
+        this.chart.nodes.template.nameLabel.label.fill = color(ControlsConstants.COLOR____FONT);
+        this.chart.nodes.template.nameLabel.label.adapter.add('dx', (value, target) => {
+            return target.parent.parent.pixelX > 0 ? -52 : value;
+        });
+
+
         // this.chart.links.template.colorMode = "gradient";
         this.chart.links.template.events.on("over", e => {
 
             const relativeX = e.pointer.point.x - document.getElementById('chartDivAgeGroupFlow').getBoundingClientRect().left;
-
-            // console.log(relativeX, this.chart.pixelWidth);
 
             if (relativeX > this.chart.pixelWidth / 2) {
                 const fromName = e.target.dataItem.fromName;
@@ -112,12 +153,12 @@ export class ChartAgeGroupFlow {
         this.chart.links.template.tooltip.background.strokeWidth = 0.25;
         this.chart.links.template.tooltip.background.stroke = color(ControlsConstants.COLOR____FONT);
         this.chart.links.template.tooltip.background.cornerRadius = 0;
-        this.chart.links.template.tooltip.background.tooltipColorSource
+        // this.chart.links.template.tooltip.background.tooltipColorSource
         this.chart.links.template.tooltip.background.fill = color(ControlsConstants.COLOR______BG);
         this.chart.links.template.tooltip.getFillFromObject = false;
         this.chart.links.template.adapter.add('tooltipText', (value, target) => {
             const dataItem = target.dataItem.dataContext as IChartData;
-            return `${dataItem.contactLabel} > ${dataItem.participantLabel}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.value * this.absTotal)}`
+            return `${dataItem.contactLabel} > ${dataItem.participantLabel}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.value * this.absTotal).padStart(5, '\u00A0')}\n${dataItem.contactLabel} > OTHER: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.sumContact * this.absTotal).padStart(5, '\u00A0')}\nOTHER > ${dataItem.contactLabel}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.sumParticipant * this.absTotal).padStart(5, '\u00A0')}`
         });
 
         this.chart.links.template.tooltip.label.fontFamily = ControlsConstants.FONT_FAMILY;
@@ -131,23 +172,29 @@ export class ChartAgeGroupFlow {
         this.chart.links.template.events.on("out", e => {
             this.chart.links.each((link) => {
                 link.fillOpacity = 0.2;
+                link.fill = color('#6da0bf');
             });
         });
 
-        this.chart.events.on('hit', e => {
-            this.exportToPng();
+        this.hitDisposer = this.chart.events.on('hit', e => {
+            this.handleHit();
         });
 
     }
 
-    setInstant(instant: number) {
-        // this.chartTitle.text = new Date(instant).toLocaleDateString();
-        this.instant = instant;
-        this.requestRenderModelData();
+    async handleHit(): Promise<void> {
+        await this.exportToPng();
+        this.setInstant(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
     }
 
-    exportToPng(): void {
-        this.chart.exporting.export("png");
+    setInstant(instant: number) {
+        this.instant = instant;
+        this.requestRenderModelData();
+
+    }
+
+    async exportToPng(): Promise<boolean> {
+        return this.chart.exporting.export("png");
     }
 
     async acceptModelData(modelData: IDataItem[]): Promise<void> {
@@ -179,14 +226,29 @@ export class ChartAgeGroupFlow {
 
             if (dataItem.instant > this.instant) {
 
+                this.chartTitle.text = `Exposure [font-size: 12px](estimate for ${TimeUtil.formatCategoryDateFull(this.instant)})[/]`;
+
                 let values: number[] = [];
+                let totalValue = 0;
+                let totalByContact: number[] = [];
+                let totalByParticipant: number[] = [];
+                Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
+                    totalByContact[ageGroupContact.getIndex()] = 0;
+                    totalByParticipant[ageGroupContact.getIndex()] = 0;
+                });
                 Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupParticipant => {
-                        values.push(dataItem.exposure[ageGroupContact.getIndex()][ageGroupParticipant.getIndex()]);
+                        const value = dataItem.exposure[ageGroupContact.getIndex()][ageGroupParticipant.getIndex()];
+                        values.push(value);
+                        totalValue += value;
+                        totalByContact[ageGroupContact.getIndex()] = totalByContact[ageGroupContact.getIndex()] + value;
+                        totalByParticipant[ageGroupParticipant.getIndex()] = totalByParticipant[ageGroupParticipant.getIndex()] + value;
                     });
                 });
                 values = values.sort((a,b) => b - a);
-                const minValue = values[Math.min(20, values.length - 1)]; // show the 20 largest connections
+                const minValue = values[Math.min(200, values.length - 1)]; // show the 20 largest connections
+                // console.log('totalValue', totalValue);
+                // document.getElementById('chartDivAgeGroupFlow').style.height = Math.floor(totalValue * 300000) + 'px';
 
                 Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupParticipant => {
@@ -196,11 +258,13 @@ export class ChartAgeGroupFlow {
                             // console.log('adding', value, minValue);
                             chartData.push({
                                 contact: `${ageGroupContact.getName()}`,
-                                participant: `p${ageGroupParticipant.getName()}`,
+                                participant: ` ${ageGroupParticipant.getName()}`,
                                 contactLabel: `${ageGroupContact.getName()}`,
                                 participantLabel: `${ageGroupParticipant.getName()}`,
                                 value,
-                                color: ControlsConstants.COLOR____FONT
+                                sumContact: totalByContact[ageGroupContact.getIndex()],
+                                sumParticipant: totalByParticipant[ageGroupContact.getIndex()],
+                                color: '#3e5c6e' // ControlsConstants.COLOR____FONT
                             });
                             groupNames.add(ageGroupContact.getName());
                             groupNames.add(ageGroupParticipant.getName());
@@ -211,7 +275,9 @@ export class ChartAgeGroupFlow {
                                 contactLabel: `${ageGroupContact.getName()}`,
                                 participantLabel: `${ageGroupParticipant.getName()}`,
                                 value: 0,
-                                color: ControlsConstants.COLOR____FONT
+                                sumContact: 0,
+                                sumParticipant: 0,
+                                color: '#3e5c6e' // ControlsConstants.COLOR____FONT
                             });
                         }
 
