@@ -1,3 +1,4 @@
+import { IRegressionConfig } from './../../common/modification/IModificationValuesRegression';
 import { TimeUtil } from './../../util/TimeUtil';
 import regression, { DataPoint } from 'regression';
 import { ModificationContact } from '../../common/modification/ModificationContact';
@@ -6,6 +7,7 @@ import { FDistribution } from './FDistribution';
 import { IRegressionParams } from './IRegressionParams';
 import { IRegressionResult } from './IRegressionResult';
 import { ValueAxisBreak } from '@amcharts/amcharts4/charts';
+import { ILoessResult } from './ILoessResult';
 
 export interface IWorkingHotellingParams {
     num: number;
@@ -15,6 +17,7 @@ export interface IWorkingHotellingParams {
     wh2: number;
 }
 
+
 export abstract class ValueRegressionBase {
 
     // private readonly instant: number;
@@ -23,9 +26,14 @@ export abstract class ValueRegressionBase {
     private readonly polyWeight: number;
     private readonly equationParamsLin: number[];
     private readonly equationParamsPol: number[];
-    private readonly originalValues: { [K in string]: number };
+
+    private readonly modelValues: { [K in string]: number };
+    private readonly loessValues: { [K in string]: ILoessResult };
+
     private readonly modificationsContact: ModificationContact[];
     private whParams: IWorkingHotellingParams;
+
+    private loessModel: any;
 
     constructor(params: IRegressionParams) {
 
@@ -35,7 +43,8 @@ export abstract class ValueRegressionBase {
         this.polyWeight = params.polyWeight;
         this.equationParamsLin = [];
         this.equationParamsPol = [];
-        this.originalValues = {};
+        this.modelValues = {};
+        this.loessValues = {};
         this.modificationsContact = params.modificationsContact;
 
     }
@@ -48,42 +57,80 @@ export abstract class ValueRegressionBase {
         const minInstant = this.modificationsContact[0].getInstant();
         const maxInstant = this.modificationsContact[this.modificationsContact.length - 1].getInstant(); // last modification instance
 
-        let modificationA: ModificationContact;
-        let modificationB: ModificationContact;
-        let instant = minInstant;
-        while ((modificationA = this.modificationsContact.find(m => m.getInstantB() > instant)) && (modificationB = this.modificationsContact.find(m => m.getInstantA() >= instant))) { // single equals sign on purpose!!
+        console.log('setup regression', TimeUtil.formatCategoryDateFull(minInstant), TimeUtil.formatCategoryDateFull(maxInstant));
 
-        // for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        var Loess = require('loess')
+        const x: number[] = [];
+        const y: number[] = [];
+        this.modificationsContact.forEach(modificationContact => {
+            x.push(this.toRegressionX(modificationContact.getInstant()));
+            y.push(this.toValueY(modificationContact));
+        });
+        var options = {span: 0.2, band: 0.95} // , degree: 1
+        this.loessModel = new Loess.default({
+            x,
+            y
+        }, options);
 
-            // const modificationA = this.modificationsContact.find(m => m.getInstantB() > instant);
-            // const modificationB = this.modificationsContact.find(m => m.getInstantA() >= instant);
+        this.modificationsContact.forEach(modificationContact => {
 
-            const fraction = modificationB.getInstantA() !== modificationA.getInstantA() ? (instant - modificationA.getInstantA()) / (modificationB.getInstantA() - modificationA.getInstantA()) : 0;
-            const valueYA = this.toValueY(modificationA);
-            const valueYB = this.toValueY(modificationB);
-            const valueYM = valueYA + (valueYB - valueYA) * fraction;
+            const instant = modificationContact.getInstant();
 
-            /**
-             * relevant data
-             */
+            const x = this.toRegressionX(instant);
+            const loessPrediction = this.loessModel.predict({
+                x: [x]
+            });
+
             if (instant >= this.instantA && instant <= this.instantB) {
-
                 regressionData.push([
-                    this.toRegressionX(instant),
-                    valueYM
+                    x,
+                    loessPrediction.fitted[0]
                 ]);
-
             }
 
-            if (!modificationA || !modificationB) {
-                console.log(TimeUtil.formatCategoryDateFull(instant), modificationA, modificationB);
+            this.modelValues[instant] = this.toValueY(modificationContact)
+            this.loessValues[instant] = {
+                x,
+                y: loessPrediction.fitted[0],
+                semiOff: loessPrediction.halfwidth[0]
             }
 
-            this.originalValues[instant] = valueYM;
+        });
 
-            instant += TimeUtil.MILLISECONDS_PER____DAY;
 
-        }
+        // let modificationA: ModificationContact;
+        // let modificationB: ModificationContact;
+        // let instant = minInstant;
+        // while ((modificationA = this.modificationsContact.find(m => m.getInstantB() > instant)) && (modificationB = this.modificationsContact.find(m => m.getInstantA() >= instant))) { // single equals sign on purpose!!
+
+        //     const fraction = modificationB.getInstantA() !== modificationA.getInstantA() ? (instant - modificationA.getInstantA()) / (modificationB.getInstantA() - modificationA.getInstantA()) : 0;
+        //     const valueYA = this.toValueY(modificationA);
+        //     const valueYB = this.toValueY(modificationB);
+        //     const valueYM = valueYA + (valueYB - valueYA) * fraction;
+
+        //     /**
+        //      * relevant data
+        //      */
+        //     if (instant >= this.instantA && instant <= this.instantB) {
+
+        //         regressionData.push([
+        //             this.toRegressionX(instant),
+        //             valueYM
+        //         ]);
+
+        //     }
+
+        //     if (!modificationA || !modificationB) {
+        //         console.log(TimeUtil.formatCategoryDateFull(instant), modificationA, modificationB);
+        //     }
+
+        //     this.originalValues[instant] = model.predict(this.toRegressionX(instant)); // valueYM;
+
+        //     instant += TimeUtil.MILLISECONDS_PER____DAY;
+
+        // }
+
+        // this is possibly dangerous - build another regression on top of the loess regression
 
         const regressionResultPol = regression.polynomial(regressionData, { order: 3 });
         const regressionResultLin = regression.linear(regressionData);
@@ -143,6 +190,11 @@ export abstract class ValueRegressionBase {
 
     }
 
+    getLastLoessValue(): ILoessResult {
+        const keys = Object.keys(this.loessValues);
+        return this.loessValues[keys[keys.length - 1]];
+    }
+
     getRegressionResult(instant: number): IRegressionResult {
 
         if (instant > this.instantA) {
@@ -150,35 +202,49 @@ export abstract class ValueRegressionBase {
             // put instant into regressions space
             const x = this.toRegressionX(instant);
 
-            // const regressionPol = this.equationParamsPol[0] * Math.exp(this.equationParamsPol[1] * regressionX); // 0.33e^(0.82x) Math.exp
+
+            // const loessPrediction = this.loessModel.predict({
+            //     x: [x]
+            // })
+            // const wh2 = loessPrediction.halfwidth[0];
+
+            // const regressionPol = loessPrediction.fitted[0];
+            // // const ci95 = loessPrediction.halfwidth[0];
+
+            // // const regressionPol = this.equationParamsPol[0] * Math.exp(this.equationParamsPol[1] * regressionX);
             const regressionPol = Math.pow(x, 3) * this.equationParamsPol[0] + Math.pow(x, 2) * this.equationParamsPol[1] + x * this.equationParamsPol[2] + this.equationParamsPol[3];
             const regressionLin = x * this.equationParamsLin[0] + this.equationParamsLin[1];
 
             const ratioPol = this.polyWeight;
             const ratioLin = 1 - ratioPol;
-
             const y = regressionPol * ratioPol + regressionLin * ratioLin;
 
-            // https://en.wikipedia.org/wiki/Working%E2%80%93Hotelling_procedure
-            const term1a = this.whParams.sse / (this.whParams.num - 2);
-            const term2a = 1 / this.whParams.num + Math.pow(x - this.whParams.avg, 2) / this.whParams.tss;
-            const ci95 = Math.sqrt(this.whParams.wh2 * term1a * term2a);
-            const ci68 = ci95 / 1.96;
+            // find last valid loess prediction
+            const loessValue = this.getLastLoessValue();
+            const yOff = loessValue.semiOff;
 
-            // const std = Math.sqrt(this.whParams.num) * (ci95 * 2) / 3.92;
-            // console.log('std', ci95, std, ci95 * 2 / std);
+            const termLa = this.whParams.sse / (this.whParams.num - 2);
+            const termLb = Math.pow(x - loessValue.x, 2) / this.whParams.tss;
+            const ci95 = yOff + Math.pow(x - loessValue.x, 2); // Math.sqrt(yOffU * termLa * termLb);
+
+            // // https://en.wikipedia.org/wiki/Working%E2%80%93Hotelling_procedure
+            // const term1a = this.whParams.sse / (this.whParams.num - 2);
+            // const term2a = 1 / this.whParams.num + Math.pow(x - this.whParams.avg, 2) / this.whParams.tss;
+            // const ci95 = Math.sqrt(this.whParams.wh2 * term1a * term2a);
 
             return {
                 regression: y,
                 ci95Min: y - ci95,
                 ci95Max: y + ci95,
                 ci95Dim: ci95,
-                original: this.originalValues[instant] // will be undefined in many cases
+                model: this.modelValues[instant], // will be undefined in many cases
+                loess: this.loessValues[instant]
             };
 
         } else {
             return {
-                original: this.originalValues[instant], // will be undefined in many cases
+                model: this.modelValues[instant], // will be undefined in many cases
+                loess: this.loessValues[instant],
                 ci95Min: undefined,
                 ci95Max: undefined,
                 ci95Dim: undefined

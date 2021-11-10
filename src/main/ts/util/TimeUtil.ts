@@ -31,4 +31,13 @@ export class TimeUtil {
         return `${ye}-${mo}-${da}`;
     }
 
+    static parseCategoryDateFull(category: string): number {
+        const parts = category.split('.');
+        const ye = parts[2];
+        const mo = parts[1];
+        const da = parts[0];
+        const dateString = `${ye}-${mo}-${da}`;
+        return new Date(dateString).getTime();
+    }
+
 }

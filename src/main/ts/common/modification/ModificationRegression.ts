@@ -62,10 +62,20 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     }
 
     getMultiplierConfig(category: string): IRegressionConfig {
+        // return {
+        //     back_days_a: -35,
+        //     back_days_b: 0,
+        //     poly_weight: 0.1
+        // };
         return this.modificationValues.multiplier_configs[category];
     }
 
     getCorrectionConfig(ageGroupName: string): IRegressionConfig {
+        // return {
+        //     back_days_a: -35,
+        //     back_days_b: 0,
+        //     poly_weight: 0.1
+        // };
         return this.modificationValues.correction_configs[ageGroupName];
     }
 
@@ -155,24 +165,28 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
         for (const key of Object.keys(multiplierConfigs)) {
             const regressionConfig = multiplierConfigs[key];
+            const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
             this.multiplierRegressions[key] = new ValueRegressionMultiplier({
                 contactCategory: key,
-                instantA: this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY,
-                instantB: this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY,
+                instantA,
+                instantB,
                 polyWeight: regressionConfig.poly_weight,
-                modificationsContact:  new ModificationResolverContact().getModifications()
+                modificationsContact:  new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
             });
         }
 
         for (const key of Object.keys(correctionConfigs)) {
             const regressionConfig = correctionConfigs[key];
             const ageGroupIndex = Demographics.getInstance().findAgeGroupByName(key).getIndex();
+            const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
             this.correctionRegressions[key] = new ValueRegressionCorrection({
                 ageGroupIndex,
-                instantA: this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY,
-                instantB: this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY,
+                instantA,
+                instantB,
                 polyWeight: regressionConfig.poly_weight,
-                modificationsContact:  new ModificationResolverContact().getModifications()
+                modificationsContact:  new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
             });
         }
 

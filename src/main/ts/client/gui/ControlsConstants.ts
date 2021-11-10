@@ -259,12 +259,6 @@ export class ControlsConstants {
             showInEditor: modification => {
                 ControlsTime.getInstance().acceptModification(modification as ModificationTime);
             },
-            handleCategoryToggled: () => {
-                // no action
-            },
-            handleAgeGroupToggled: () => {
-                // no action
-            },
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2 //FIXED
         },
         'STRAIN': {

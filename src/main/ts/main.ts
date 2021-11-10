@@ -1,3 +1,4 @@
+import { TimeUtil } from './util/TimeUtil';
 import { Statistics } from './util/Statistics';
 import { StrainUtil } from './util/StrainUtil';
 import { ChartAgeGroup } from './client/chart/ChartAgeGroup';
@@ -10,24 +11,6 @@ import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { FDistribution } from './model/regression/FDistribution';
 import { Logger } from './util/Logger';
-
-// let ci95 = 0.6;
-// let less = 0;
-// let more = 0;
-
-// const scale = 5 / 1.96;
-
-// // const stats = new Statistics();
-// for (let i=0; i<100000; i++) {
-//     const random = ci95 * StrainUtil.randomGaussian(scale, scale); // puts standard deviation to 1
-//     if (Math.abs(random) >= ci95) {
-//         more++;
-//     } else {
-//         less++;
-//     }
-//     // console.log(StrainUtil.randomGaussian(-1, 1));
-// }
-// console.log(less, more);
 
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
@@ -137,23 +120,18 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             // initialize model mode
             ModelActions.getInstance();
 
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-10-28').getTime()));
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-10-31').getTime()));
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-02').getTime()));
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-04').getTime()));
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-07').getTime()));
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-09').getTime()));
-            // Modifications.getInstance().addModification(new ModificationResolverContact().createRegressionModification(new Date('2021-11-11').getTime()));
-
-
             setTimeout(() => {
                 ModelActions.getInstance().toggleModelMode('CONTACT');
                 ModelActions.getInstance().toggleChartMode('INCIDENCE');
                 requestAnimationFrame(() => {
 
-                    ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
-                    ModelActions.getInstance().toggleCategory('other');
-                    ControlsConstants.MODIFICATION_PARAMS['CONTACT'].handleModificationUpdate();
+                    ChartAgeGroup.getInstance().renderBaseData().then(() => {
+                        ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length);
+                        ModelActions.getInstance().toggleCategory('other');
+                        ControlsConstants.MODIFICATION_PARAMS['CONTACT'].handleModificationUpdate();
+                    });
+
+
 
                 });
             }, 250);

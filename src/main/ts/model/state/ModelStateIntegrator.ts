@@ -61,6 +61,7 @@ export interface IDataValues {
     TOTAL: number;
 }
 
+
 /**
  * performs an euler-integration in 1 hour steps on a model-state
  *
@@ -122,6 +123,90 @@ export class ModelStateIntegrator {
     rollback(): void {
         this.curInstant = this.rollbackInstant;
         this.modelState = this.rollbackState;
+    }
+
+    async emptyModelData(dstInstant: number, dataFilter: (curInstant: number) => boolean, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
+
+        const dataSet: IDataItem[] = [];
+
+        const minChartInstant = ModelInstants.getInstance().getMinInstant();
+        const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+
+        for (; this.curInstant <= dstInstant; this.curInstant += ModelStateIntegrator.DT) {
+
+            const modificationTime = this.integrate(ModelStateIntegrator.DT, this.curInstant);
+
+            if (dataFilter(this.curInstant)) {
+
+                const incidences: {[K: string]: number} = {};
+                const exposed: {[K: string]: number} = {};
+                const infectious: {[K: string]: number} = {};
+                modificationValuesStrain.forEach(modificationValueStrain => {
+                    incidences[modificationValueStrain.id] = undefined;
+                    exposed[modificationValueStrain.id] = undefined;
+                    infectious[modificationValueStrain.id] = undefined;
+                });
+
+                const dataItem: IDataItem = {
+                    instant: this.curInstant,
+                    categoryX: TimeUtil.formatCategoryDateFull(this.curInstant),
+                    valueset: {},
+                    exposure: this.exposure,
+                    seasonality: modificationTime.getSeasonality()
+                };
+                dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
+                    SUSCEPTIBLE: undefined,
+                    REMOVED_ID: undefined,
+                    REMOVED_IU: undefined,
+                    REMOVED_VI: undefined,
+                    REMOVED_VU: undefined,
+                    REMOVED_V2: undefined,
+                    CASES: undefined,
+                    INCIDENCES: incidences,
+                    EXPOSED: exposed,
+                    INFECTIOUS: infectious,
+                    TOTAL: undefined,
+                    DISCOVERY: undefined
+                };
+
+                this.model.getDemographics().getAgeGroups().forEach(ageGroup => {
+
+                    dataItem.valueset[ageGroup.getName()] = {
+                        SUSCEPTIBLE: undefined,
+                        REMOVED_ID: undefined,
+                        REMOVED_IU: undefined,
+                        REMOVED_VI: undefined,
+                        REMOVED_VU: undefined,
+                        REMOVED_V2: undefined,
+                        CASES: undefined,
+                        INCIDENCES: incidences,
+                        EXPOSED: exposed,
+                        INFECTIOUS: infectious,
+                        TOTAL: undefined,
+                        DISCOVERY: undefined
+                    };
+
+                });
+
+                dataSet.push(dataItem);
+
+            }
+
+            progressCallback({
+                ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant)
+            });
+
+        }
+
+        // console.log('model-state', this.modelState.toJSON());
+        progressCallback({
+            ratio: (this.curInstant - minChartInstant) / (maxChartInstant - minChartInstant),
+            data: dataSet
+        });
+
+        return dataSet;
+
     }
 
     async buildModelData(dstInstant: number, dataFilter: (curInstant: number) => boolean, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {

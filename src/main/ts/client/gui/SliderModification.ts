@@ -1,3 +1,5 @@
+import { ChartAgeGroup } from './../chart/ChartAgeGroup';
+import { ChartContactMatrix } from './../chart/ChartContactMatrix';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -68,8 +70,8 @@ export class SliderModification extends Slider {
             handleThumbPicked: (index) => {
                 if (index >= 0) {
                     const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
-                    // console.log('picked modification', modification);
                     ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
+                    ChartAgeGroup.getInstance().updateModificationInstant(modification.getInstantA()); // update marker in age group chart
                 }
             }
         });

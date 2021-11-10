@@ -1,4 +1,4 @@
-import { CategoryAxis, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
+import { CategoryAxis, CategoryAxisDataItem, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
@@ -100,7 +100,10 @@ export class ChartAgeGroup {
     protected readonly seriesContactValue: ChartAgeGroupSeries;
     protected readonly seriesContactValue95U: ChartAgeGroupSeries;
     protected readonly seriesContactValue95L: ChartAgeGroupSeries;
-    protected readonly seriesContactValueO: ChartAgeGroupSeries;
+    protected readonly seriesContactValueM: ChartAgeGroupSeries;
+    protected readonly seriesContactValueL: ChartAgeGroupSeries;
+    protected readonly seriesContactValueLL: ChartAgeGroupSeries;
+    protected readonly seriesContactValueLU: ChartAgeGroupSeries;
 
     protected readonly seriesSeasonality: ChartAgeGroupSeries;
 
@@ -161,6 +164,8 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedVR2: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupIncidenceR: ChartAgeGroupSeries; // real incidence
     protected readonly seriesPositivityRateR: ChartAgeGroupSeries; // real test numbers
+
+    private readonly selectedModificationRange: CategoryAxisDataItem;
 
     /**
      * real average cases
@@ -250,6 +255,17 @@ export class ChartAgeGroup {
         this.xAxis.tooltip.label.verticalCenter = 'middle';
 
         this.addWeekendRanges();
+
+        /**
+         * marker line to indicate the currently selected modification on the modification slider
+         */
+        this.selectedModificationRange = this.xAxis.axisRanges.create();
+        this.selectedModificationRange.label.visible = false;
+        this.selectedModificationRange.grid.fillOpacity = 0.00;
+        this.selectedModificationRange.grid.strokeOpacity = 0.75;
+        this.selectedModificationRange.grid.strokeWidth = 0.75
+        this.selectedModificationRange.grid.strokeDasharray = '2, 2';
+        this.selectedModificationRange.grid.stroke = color(ControlsConstants.COLOR____FONT).brighten(-0.4);
 
         this.yAxisPlotAbsolute = this.chart.yAxes.push(new ValueAxis());
         ChartUtil.getInstance().configureAxis(this.yAxisPlotAbsolute, 'population');
@@ -856,12 +872,32 @@ export class ChartAgeGroup {
         this.seriesContactValue95U.getSeries().fillOpacity = 0.2;
         this.seriesContactValue.bindToLegend(this.seriesContactValue95U);
 
-        this.seriesContactValueO = new ChartAgeGroupSeries({
+        this.seriesContactValueM = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
             title: 'contact settings',
             baseLabel: 'contact settings',
-            valueField: 'contactValueO',
+            valueField: 'contactValueM',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.40,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesContactValueL = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'contact smoothed',
+            baseLabel: 'contact smoothed',
+            valueField: 'contactValueL',
             colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
@@ -875,6 +911,49 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesContactValueLL = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'contact loess off',
+            baseLabel: 'contact loess off',
+            valueField: 'contactValueLL',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactValueLL.getSeries().strokeOpacity = 0.5;
+        this.seriesContactValue.bindToLegend(this.seriesContactValueLL);
+        this.seriesContactValueLU = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'contact loess off',
+            baseLabel: 'contact loess off',
+            valueField: 'contactValueLU',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: true,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactValueLU.getSeries().strokeOpacity = 0.5;
+        this.seriesContactValueLU.getSeries().fillOpacity = 0.2;
+        this.seriesContactValue.bindToLegend(this.seriesContactValueLU);
 
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
@@ -974,8 +1053,8 @@ export class ChartAgeGroup {
 
             const minCategory = this.xAxis.positionToCategory(this.xAxis.start);
             const maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
-            const minInstant = this.findDataItemByCategory(minCategory).instant;
-            const maxInstant = this.findDataItemByCategory(maxCategory).instant;
+            const minInstant = TimeUtil.parseCategoryDateFull(minCategory);
+            const maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
 
             const ticks = SliderModification.getInstance().getTickValues().filter(t => t > minInstant && t < maxInstant);
 
@@ -1166,7 +1245,10 @@ export class ChartAgeGroup {
         this.seriesContactValue.setSeriesNote(ageGroup.getName());
         this.seriesContactValue95L.setSeriesNote(ageGroup.getName());
         this.seriesContactValue95U.setSeriesNote(ageGroup.getName());
-        this.seriesContactValueO.setSeriesNote(ageGroup.getName());
+        this.seriesContactValueM.setSeriesNote(ageGroup.getName());
+        this.seriesContactValueL.setSeriesNote(ageGroup.getName());
+        this.seriesContactValueLL.setSeriesNote(ageGroup.getName());
+        this.seriesContactValueLU.setSeriesNote(ageGroup.getName());
 
         this.seriesReproductionP.setSeriesNote(ageGroup.getName());
         this.seriesReproductionR.setSeriesNote(ageGroup.getName());
@@ -1180,7 +1262,10 @@ export class ChartAgeGroup {
         this.seriesContactValue.setSeriesNote(this.categoryName);
         this.seriesContactValue95L.setSeriesNote(this.categoryName);
         this.seriesContactValue95U.setSeriesNote(this.categoryName);
-        this.seriesContactValueO.setSeriesNote(this.categoryName);
+        this.seriesContactValueM.setSeriesNote(this.categoryName);
+        this.seriesContactValueL.setSeriesNote(this.categoryName);
+        this.seriesContactValueLL.setSeriesNote(this.categoryName);
+        this.seriesContactValueLU.setSeriesNote(this.categoryName);
 
         if (this.getChartMode() === 'CONTACT') {
             this.renderRegressionData();
@@ -1395,6 +1480,10 @@ export class ChartAgeGroup {
 
     }
 
+    updateModificationInstant(instant: number): void {
+        this.selectedModificationRange.category = TimeUtil.formatCategoryDateFull(instant);
+    }
+
     setSeriesContactVisible(visible: boolean): void {
 
         this.yAxisPlotPercent.visible = visible;
@@ -1404,7 +1493,10 @@ export class ChartAgeGroup {
         this.seriesContactValue.setVisible(visible);
         this.seriesContactValue95L.setVisible(visible);
         this.seriesContactValue95U.setVisible(visible);
-        this.seriesContactValueO.setVisible(visible);
+        this.seriesContactValueM.setVisible(visible);
+        this.seriesContactValueL.setVisible(visible);
+        this.seriesContactValueLL.setVisible(visible);
+        this.seriesContactValueLU.setVisible(visible);
 
     }
 
@@ -1487,8 +1579,8 @@ export class ChartAgeGroup {
 
             const minCategory = this.xAxis.positionToCategory(this.xAxis.start);
             const maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
-            const minInstant = this.findDataItemByCategory(minCategory).instant;
-            const maxInstant = this.findDataItemByCategory(maxCategory).instant;
+            const minInstant = TimeUtil.parseCategoryDateFull(minCategory); // this.findDataItemByCategory(minCategory).instant;
+            const maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
 
             let maxIncidence = 0;
             let maxInfectious = 0;
@@ -1613,14 +1705,20 @@ export class ChartAgeGroup {
             const contactValue = renderableRegressionResult.regression;
             const contactValue95L = renderableRegressionResult.ci95Min;
             const contactValue95U = renderableRegressionResult.ci95Max && renderableRegressionResult.ci95Max - renderableRegressionResult.ci95Min;
-            const contactValueO = renderableRegressionResult.original;
+            const contactValueM = renderableRegressionResult.model;
+            const contactValueL = renderableRegressionResult.loess && renderableRegressionResult.loess.y;
+            const contactValueLL = renderableRegressionResult.loess && renderableRegressionResult.loess.y - renderableRegressionResult.loess.semiOff;
+            const contactValueLU = renderableRegressionResult.loess && 2 * renderableRegressionResult.loess.semiOff;
 
             const item = {
                 categoryX: dataItem.categoryX,
                 contactValue,
                 contactValue95L,
                 contactValue95U,
-                contactValueO
+                contactValueM,
+                contactValueL,
+                contactValueLL,
+                contactValueLU
             }
 
             plotData.push(item);
@@ -1632,7 +1730,10 @@ export class ChartAgeGroup {
         this.seriesContactValue.getSeries().data = chartData;
         this.seriesContactValue95L.getSeries().data = chartData;
         this.seriesContactValue95U.getSeries().data = chartData;
-        this.seriesContactValueO.getSeries().data = chartData;
+        this.seriesContactValueM.getSeries().data = chartData;
+        this.seriesContactValueL.getSeries().data = chartData;
+        this.seriesContactValueLL.getSeries().data = chartData;
+        this.seriesContactValueLU.getSeries().data = chartData;
 
     }
 
@@ -1720,7 +1821,7 @@ export class ChartAgeGroup {
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
-                let label = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
+                let label = value && ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
                 let gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
 
                 let color: string;
@@ -1774,29 +1875,56 @@ export class ChartAgeGroup {
 
         }
 
-        const chartData = [...plotData, ...heatData];
+        this.seriesAgeGroupSusceptible.getSeries().data = plotData;
+        this.seriesAgeGroupExposed.getSeries().data = plotData;
+        this.seriesAgeGroupInfectious.getSeries().data = plotData;
+        this.seriesAgeGroupRemovedID.getSeries().data = plotData;
+        this.seriesAgeGroupRemovedIU.getSeries().data = plotData;
+        this.seriesAgeGroupRemovedVI.getSeries().data = plotData;
+        this.seriesAgeGroupRemovedVU.getSeries().data = plotData;
+        this.seriesAgeGroupRemovedV2.getSeries().data = plotData;
+        this.seriesAgeGroupIncidence.getSeries().data = plotData;
+        this.seriesAgeGroupIncidence95L.getSeries().data = plotData;
+        this.seriesAgeGroupIncidence95U.getSeries().data = plotData;
+        this.seriesAgeGroupIncidence68L.getSeries().data = plotData;
+        this.seriesAgeGroupIncidence68U.getSeries().data = plotData;
+        this.seriesAgeGroupCasesP.getSeries().data = plotData;
+        this.seriesAgeGroupCasesN.getSeries().data = plotData;
+        this.seriesSeasonality.getSeries().data = plotData;
+        this.seriesReproductionP.getSeries().data = plotData;
 
-        this.applyMaxHeat(maxGamma);
-
-        // console.log('heatData', heatData);
-
-        if (this.chart.data.length === chartData.length && !QueryUtil.getInstance().isDiffDisplay()) {
-            for (let i = 0; i < chartData.length; i++) {
-                for (const key of Object.keys(chartData[i])) { // const key in chartData[i]
-                    this.chart.data[i][key] = chartData[i][key];
+        requestAnimationFrame(() => {
+            this.applyMaxHeat(maxGamma);
+            const keys = Object.keys(heatData[0]);
+            for (let i = 0; i < heatData.length; i++) {
+                for (const key of keys) { // const key in chartData[i]
+                    this.chart.data[i][key] = heatData[i]?.[key];
                 }
             }
             this.chart.invalidateRawData();
-        } else {
-            this.chart.data = chartData;
-            this.renderBaseData();
-        }
+        });
+
+        // // console.log('heatData', heatData);
+        // const keys = Object.keys(chartData[0]);
+
+        // if (this.chart.data.length === chartData.length && !QueryUtil.getInstance().isDiffDisplay()) {
+        //     for (let i = 0; i < chartData.length; i++) {
+        //         for (const key of keys) { // const key in chartData[i]
+        //             this.chart.data[i][key] = chartData[i][key];
+        //         }
+        //     }
+        //     this.chart.invalidateRawData();
+        // } else {
+        //     this.chart.data = chartData;
+        //     this.renderBaseData();
+        // }
 
     }
 
     async renderBaseData(): Promise<void> {
 
-        const plotData: any[] = [];
+        const baseData: any[] = [];
+        const chartData: any[] = [];
 
         const _ageGroupIndex = this.getAgeGroupIndex();
 
@@ -1850,20 +1978,50 @@ export class ChartAgeGroup {
                 ageGroupCasesR,
                 reproductionR
             }
-            plotData.push(item);
+            baseData.push(item);
+
+            chartData.push({
+                categoryX
+            })
 
         }
 
-        /**
-         * chart data must have been set at least once, or this will fail
-         */
-        for (let i = 0; i < plotData.length; i++) {
-            for (const key of Object.keys(plotData[i])) { // const key in chartData[i]
-                this.chart.data[i][key] = plotData[i][key];
+        if (this.chart.data.length === 0) {
+            const initialChartData: any[] = [];
+            for (let i = 0; i < baseData.length; i++) {
+                Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {
+                    initialChartData.push({
+                        categoryX: baseData[i].categoryX,
+                        categoryY: ageGroupHeat.getName(),
+                        gamma: 0
+                    });
+                });
             }
+            this.chart.data = initialChartData;
         }
-        this.chart.invalidateRawData();
 
+        this.seriesAgeGroupRemovedVR1.getSeries().data = baseData;
+        this.seriesAgeGroupRemovedVR2.getSeries().data = baseData;
+        this.seriesAgeGroupIncidenceR.getSeries().data = baseData;
+        this.seriesAgeGroupAverageCasesR.getSeries().data = baseData;
+        this.seriesPositivityRateR.getSeries().data = baseData;
+        this.seriesAgeGroupCasesR.getSeries().data = baseData;
+        this.seriesReproductionR.getSeries().data = baseData;
+
+        // /**
+        //  * chart data must have been set at least once, or this will fail
+        //  */
+        // if (this.chart.data.length === plotData.length) {
+        //     for (let i = 0; i < plotData.length; i++) {
+        //         for (const key of Object.keys(plotData[i])) { // const key in chartData[i]
+        //             this.chart.data[i][key] = plotData[i][key];
+        //         }
+        //     }
+        // } else {
+        //     this.chart.data = plotData;
+        //     this.renderBaseData();
+        // }
+        // this.chart.invalidateRawData();
 
     }
 
