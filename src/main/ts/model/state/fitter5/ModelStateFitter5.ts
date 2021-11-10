@@ -78,7 +78,8 @@ export class ModelStateFitter5 {
             let loggableRange = `${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modB.getInstant())}`;
 
             const maxAbsErrorViolationsAllowed = 10;
-            const maxAbsErrorTolerance = 0.05; // 0.5%
+            const maxAbsErrorTolerance = 0.01; // 0.5%
+            const maxViolatableGroupCount = 2;
 
             let maxAbsErrorLast = Number.MAX_VALUE;
             let maxAbsErrorGroup: string;
@@ -123,8 +124,8 @@ export class ModelStateFitter5 {
                     if (maxAbsErrorViolations >= maxAbsErrorViolationsAllowed) {
 
                         violationIgnoreGroups.add(maxAbsErrorGroup);
-                        if (violationIgnoreGroups.size >= 3) {
-                            // single group allowed to be violation
+                        if (violationIgnoreGroups.size > maxViolatableGroupCount) {
+                            // single group allowed to be violated
                             // too many ignore groups already
                             console.log(iterationIndex.toString().padStart(4, '0'), '|', loggableRange, maxAbsErrorCurr.toFixed(4).padStart(7, ' '), maxAbsErrorGroup, 'aborting ...');
                             break;
