@@ -26,11 +26,15 @@ export class ModelStateFitter9Reg1 {
 
         // find the regression modification
         const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
-        const maxPredictionInstant = Math.min(maxInstant, modificationRegression.getInstantA() + 2 * TimeUtil.MILLISECONDS_PER___WEEK);
+        const maxRegressionInstant = Math.min(maxInstant, modificationRegression.getInstantA() + 11 * TimeUtil.MILLISECONDS_PER____DAY);
 
+        const minRegressionInstant = modificationRegression.getInstantA();
 
-        let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationRegression.getInstantA())}`;
-        const prevDataset = await modelStateIntegrator.buildModelData(modificationRegression.getInstantA(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        /**
+         * build model up to regression instant
+         */
+        let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(minRegressionInstant)}`;
+        const prevDataset = await modelStateIntegrator.buildModelData(minRegressionInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio,
                 fitterParams
@@ -44,18 +48,21 @@ export class ModelStateFitter9Reg1 {
         const predictionStats: { [K in string]: { [K in string]: Statistics }} = {};
         const incidenceKeys: Set<string> = new Set();
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-            predictionStats[ageGroup.getName()] = {}; // new Statistics();
+            predictionStats[ageGroup.getName()] = {};
         });
 
-        const iterations = 25;
+        const iterations = 20;
         for (let i = 0; i < iterations; i++) {
 
             console.log('iteration', i);
 
+            /**
+             * randomize each iteration
+             */
             modificationRegression.randomize();
 
             modelStateIntegrator.checkpoint();
-            const randomDataset = await modelStateIntegrator.buildModelData(maxPredictionInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+            const predictionDataset = await modelStateIntegrator.buildModelData(maxRegressionInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
                 progressCallback({
                     ratio: modelProgress.ratio,
                     fitterParams
@@ -63,9 +70,9 @@ export class ModelStateFitter9Reg1 {
             });
             modelStateIntegrator.rollback();
 
-            randomDataset.forEach(randomData => {
+            predictionDataset.forEach(randomData => {
 
-                if (randomData.instant > (modificationRegression.getInstantA() + TimeUtil.MILLISECONDS_PER____DAY)) {
+                // if (randomData.instant > (modificationRegression.getInstantA() + TimeUtil.MILLISECONDS_PER____DAY)) {
 
                     // be sure to have a container for this day
                     const incidenceKey = TimeUtil.formatCategoryDateFull(randomData.instant);
@@ -85,7 +92,7 @@ export class ModelStateFitter9Reg1 {
 
                     });
 
-                }
+                // }
 
             });
 
@@ -94,7 +101,7 @@ export class ModelStateFitter9Reg1 {
         modificationRegression.normalize();
 
         loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(maxInstant)}`;
-        const normalizedDataset = await modelStateIntegrator.buildModelData(maxPredictionInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+        const normalizedDataset = await modelStateIntegrator.buildModelData(maxRegressionInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
             progressCallback({
                 ratio: modelProgress.ratio,
                 fitterParams
@@ -108,7 +115,6 @@ export class ModelStateFitter9Reg1 {
         normalizedDataset.forEach(normalizedData => {
             const incidenceKey = TimeUtil.formatCategoryDateFull(normalizedData.instant);
             if (predictionStats[incidenceKey]) {
-
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                     const ageGroupStats = predictionStats[incidenceKey][ageGroup.getName()];
                     normalizedData.valueset[ageGroup.getName()].PREDICTION = {
@@ -116,6 +122,7 @@ export class ModelStateFitter9Reg1 {
                         std: ageGroupStats.getStandardDeviation(),
                         num: ageGroupStats.size()
                     }
+                    console.log('prediction', ageGroup.getName(), TimeUtil.formatCategoryDateFull(normalizedData.instant), 'std', ageGroupStats.getStandardDeviation().toFixed(4));
                 });
 
             }
@@ -123,15 +130,6 @@ export class ModelStateFitter9Reg1 {
 
         dataset.push(...normalizedDataset);
         console.log(loggableRange, '++', normalizedDataset.length);
-
-
-        // const emptyDataset = await modelStateIntegrator.emptyModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-        //     progressCallback({
-        //         ratio: modelProgress.ratio,
-        //         fitterParams
-        //     });
-        // });
-        // dataset.push(...emptyDataset);
 
         return {
             ratio: 1,

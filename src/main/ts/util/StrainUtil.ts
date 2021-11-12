@@ -43,6 +43,8 @@ export class StrainUtil {
         // instant ratio
         const instantR = (instantB - instantA) / TimeUtil.MILLISECONDS_PER____DAY / serialInterval;
 
+        // console.log('Math.pow(r0, instantR)', instantR, r0, Math.pow(r0, instantR));
+
         return valueA * Math.pow(r0, instantR);
 
     }

@@ -8,7 +8,7 @@ export class SliderRegression extends Slider {
 
     static readonly CLASS_CORRECTION_LABEL = 'correction-label';
 
-    constructor(title: string, range: number[], ...values: number[]) {
+    constructor(title: string, step: number, range: number[], ...values: number[]) {
 
         const container = document.createElement('div');
         container.classList.add('slider-modification');
@@ -31,7 +31,7 @@ export class SliderRegression extends Slider {
             container,
             min: Math.min(...range),
             max: Math.max(...range),
-            step: 0.01,
+            step,
             values,
             ticks: range,
             label: title,

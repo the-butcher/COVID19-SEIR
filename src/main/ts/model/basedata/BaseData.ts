@@ -25,7 +25,7 @@ export interface IBaseDataItemConfig {
     /**
      * age-group key, and age group data
      */
-    [K : string]: number[];
+    [K: string]: number[];
 
 }
 
@@ -81,9 +81,9 @@ export class BaseData {
         return this.baseDataset;
     }
 
-    findBaseDataItem(instant: number): IBaseDataItem {
+    findBaseDataItem(instant: number, allowExtrapolation?: boolean): IBaseDataItem {
         const normalizedInstant = instant - instant % TimeUtil.MILLISECONDS_PER____DAY;
-        return this.baseDataItems[normalizedInstant] || this.buildBaseDataItem(normalizedInstant);
+        return this.baseDataItems[normalizedInstant] || this.buildBaseDataItem(normalizedInstant, allowExtrapolation);
     }
 
 
@@ -104,21 +104,21 @@ export class BaseData {
 
         const instantMin = instantPre; // - TimeUtil.MILLISECONDS_PER___WEEK * 5;
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const dataItem = this.findBaseDataItem(instant);
+            const dataItem = this.findBaseDataItem(instant, false);
             if (dataItem) {
                 (dataItem as BaseDataItem).calculatePrimaryValues();
             }
         }
 
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const dataItem = this.findBaseDataItem(instant);
+            const dataItem = this.findBaseDataItem(instant, false);
             if (dataItem) {
                 (dataItem as BaseDataItem).calculateAverageValues();
             }
         }
 
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const dataItem = this.findBaseDataItem(instant);
+            const dataItem = this.findBaseDataItem(instant, false);
             if (dataItem) {
                 (dataItem as BaseDataItem).calculateAverageDerivates();
             }
@@ -129,7 +129,7 @@ export class BaseData {
          */
         for (let instant = instantMax; instant > instantMin; instant -= TimeUtil.MILLISECONDS_PER____DAY) {
 
-            const dataItem = this.findBaseDataItem(instant);
+            const dataItem = this.findBaseDataItem(instant, false);
 
             // keep setting offset limit until a data item is found
             if (dataItem) {
@@ -159,9 +159,10 @@ export class BaseData {
 
         }
 
+
         const reproductionMarkers: IBaseDataMarker[] = [];
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const dataItem = this.findBaseDataItem(instant);
+            const dataItem = this.findBaseDataItem(instant, false);
             if (dataItem) {
                 const value = dataItem.getReproduction(Demographics.getInstance().getAgeGroups().length);
                 if (value && !Number.isNaN(value)) {
@@ -185,9 +186,9 @@ export class BaseData {
             });
             multipliers['school'] = 0.4;
             multipliers['nursing'] = 0.5;
-            multipliers['family'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityHome() * 0.60;
-            multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityWork() * 0.60;
-            multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant).getAverageMobilityOther() * 0.60;
+            multipliers['family'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityHome() * 0.60;
+            multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityWork() * 0.60;
+            multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityOther() * 0.60;
 
             if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
@@ -212,7 +213,7 @@ export class BaseData {
         // testing does not
         let positivityMarkers: IBaseDataMarker[] = [];
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const dataItem = this.findBaseDataItem(instant);
+            const dataItem = this.findBaseDataItem(instant, false);
             if (dataItem) {
                 const value = dataItem.getDerivedPositivity();
                 if (value && !Number.isNaN(value)) {
@@ -263,6 +264,20 @@ export class BaseData {
 
         });
 
+        // const deletableInstants: string[] = [];
+        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        //     let dataItem = this.findBaseDataItem(instant, false);
+        //     if (!dataItem) {
+        //         dataItem = this.findBaseDataItem(instant, true);
+        //         if (dataItem) {
+        //             deletableInstants.push(instant.toString());
+        //         }
+        //     }
+        // }
+        // deletableInstants.forEach(instant => {
+        //     delete this.baseDataItems[instant];
+        // })
+
     }
 
     getAverageOffset(ageGroupIndex: number, instant: number): number | undefined {
@@ -271,14 +286,48 @@ export class BaseData {
         }
     }
 
-    private buildBaseDataItem(instant: number): IBaseDataItem {
+    private buildBaseDataItem(instant: number, allowExtrapolation?: boolean): IBaseDataItem {
         const categoryX = TimeUtil.formatCategoryDateFull(instant);
         const baseDataItemConfig = this.baseDataset[categoryX];
         if (baseDataItemConfig) {
             this.baseDataItems[instant] = new BaseDataItem(instant, baseDataItemConfig);
             return this.baseDataItems[instant];
-        } else {
+        } else if (allowExtrapolation) {
+
+            // // static readonly BASE_DATA_INDEX_EXPOSED = 0;
+            // // static readonly BASE_DATA_INDEX_REMOVED = 1;
+            // // static readonly BASE_DATA_INDEX_VACC1ST = 2;
+            // // static readonly BASE_DATA_INDEX_VACC2ND = 3;
+            // // static readonly BASE_DATA_INDEX___TESTS = 4;
+            // // static readonly BASE_DATA_INDEX__MOBI_O = 5;
+            // // static readonly BASE_DATA_INDEX__MOBI_W = 6;
+            // // static readonly BASE_DATA_INDEX__MOBI_H = 7;
+
+            // // build a hypothetical "P4" item
+            const dataItemM4 = BaseData.getInstance().findBaseDataItem(instant - TimeUtil.MILLISECONDS_PER____DAY * 4, false);
+            if (dataItemM4) {
+
+                const baseDataItemConfig: IBaseDataItemConfig = dataItemM4.extrapolateBaseDataItemConfig();
+                if (baseDataItemConfig) {
+                    // console.log(TimeUtil.formatCategoryDateFull(instant), 'missing config, using m4 config for help', baseDataItemConfig);
+                    // this.baseDataItems[instant]
+                    const dataItem00 = new BaseDataItem(instant, baseDataItemConfig);
+                    dataItem00.calculatePrimaryValues();
+                    this.baseDataItems[instant] = dataItem00; // have the item ready for retrieval
+
+                    // should now be possible to calculate that item's average values
+                    dataItemM4.calculateAverageValues();
+
+                    const dataItemM3 = BaseData.getInstance().findBaseDataItem(instant - TimeUtil.MILLISECONDS_PER____DAY * 3, false);
+                    dataItemM3.calculateAverageValues();
+
+                    return this.baseDataItems[instant];
+
+                }
+
+            }
             return undefined;
+
         }
     }
 

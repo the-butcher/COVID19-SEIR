@@ -118,12 +118,6 @@ export class ModelActions {
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
-            label: 'EXPOSED',
-            iconKey: 'EXPOSED',
-            handleClick: () => ModelActions.getInstance().toggleChartMode('EXPOSED')
-        }));
-        this.chartModeIcons.push(new IconChartMode({
-            container: 'charttoggleDiv',
             label: 'TESTING',
             iconKey: 'TESTING',
             handleClick: () => ModelActions.getInstance().toggleChartMode('TESTING')

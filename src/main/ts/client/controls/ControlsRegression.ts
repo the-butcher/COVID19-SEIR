@@ -39,8 +39,8 @@ export class ControlsRegression {
     private regressionPointer: IRegressionPointer;
 
     constructor() {
-        this.sliderBackDays = new SliderRegression("back days", ModelConstants.RANGE_________BACK_DAYS, -10, -5);
-        this.sliderPolyWeight = new SliderRegression("poly weight", ModelConstants.RANGE____PERCENTAGE_100, 0.1);
+        this.sliderBackDays = new SliderRegression("back days", 1, ModelConstants.RANGE_________BACK_DAYS, -10, -5);
+        this.sliderPolyWeight = new SliderRegression("poly weight", 0.05, ModelConstants.RANGE____PERCENTAGE_100, 0.1);
         this.modification = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
     }
 

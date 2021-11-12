@@ -1,15 +1,11 @@
-import { IDataCompare } from './../../../util/StrainUtil';
-import { AgeGroup } from './../../../common/demographics/AgeGroup';
-import { BaseData } from './../../basedata/BaseData';
-import { Regression } from '../../regression/_Regression';
-import { Demographics } from '../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
+import { StrainUtil } from '../../../util/StrainUtil';
 import { TimeUtil } from '../../../util/TimeUtil';
 import { IModificationSet } from '../fitter/IModificationSet';
 import { IDataItem, IFitterParams, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
+import { AgeGroup } from './../../../common/demographics/AgeGroup';
+import { IDataCompare } from './../../../util/StrainUtil';
 import { ModificationAdaptor5 } from './ModificationAdaptor5';
-import { isConstructSignatureDeclaration } from 'typescript';
-import { StrainUtil } from '../../../util/StrainUtil';
 
 /**
  * model-fitter trying to lay an already pre-fitted curve on the averaged model's base curve

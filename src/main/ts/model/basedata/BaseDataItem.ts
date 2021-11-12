@@ -5,10 +5,14 @@ import { ModelConstants } from '../ModelConstants';
 import { BaseData, IBaseDataItemConfig } from './BaseData';
 import regression, { DataPoint } from 'regression';
 import { DataParser } from '@amcharts/amcharts4/core';
+import { ValueRegressionBase } from '../regression/ValueRegressionBase';
 
 export interface IBaseDataItem {
 
     getInstant(): number;
+
+    calculateAverageValues(): void;
+    calculatePrimaryValues(): void;
 
     getExposed(ageGroupName: string): number;
     getRemoved(ageGroupName: string): number;
@@ -26,12 +30,18 @@ export interface IBaseDataItem {
     getDerivedPositivity(): number;
 
     getCasesM1(ageGroupIndex: number): number;
+    getCasesM6(ageGroupIndex: number): number;
+    getCasesM7(ageGroupIndex: number): number;
     getAverageCases(ageGroupIndex: number): number;
+    getAverageHelp1(ageGroupIndex: number): number;
+    getAverageHelp2(ageGroupIndex: number): number;
     getReproduction(ageGroupIndex: number): number;
 
     getAverageMobilityOther(): number;
     getAverageMobilityWork(): number;
     getAverageMobilityHome(): number;
+
+    extrapolateBaseDataItemConfig(): IBaseDataItemConfig;
 
 }
 
@@ -47,7 +57,11 @@ export class BaseDataItem implements IBaseDataItem {
     private derivedPositivity: number;
 
     private readonly casesM1: number[];
+    private readonly casesM6: number[];
+    private readonly casesM7: number[];
     private readonly averageCases: number[];
+    private readonly averageHelp1: number[];
+    private readonly averageHelp2: number[];
     private readonly reproductions: number[];
 
     private averageMobilityOther: number;
@@ -60,7 +74,11 @@ export class BaseDataItem implements IBaseDataItem {
         this.itemConfig = itemConfig;
         this.incidences = [];
         this.averageCases = [];
+        this.averageHelp1 = [];
+        this.averageHelp2 = [];
         this.casesM1 = [];
+        this.casesM6 = [];
+        this.casesM7 = [];
         this.reproductions = [];
     }
 
@@ -111,13 +129,64 @@ export class BaseDataItem implements IBaseDataItem {
         // console.log('load-data', new Date(this.instant));
 
         const dataItemM1 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 1);
+        const dataItemM6 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 6);
         const dataItemM7 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 7);
 
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-            this.incidences[ageGroup.getIndex()] = (this.getExposed(ageGroup.getName()) - dataItemM7.getExposed(ageGroup.getName())) * 100000 / ageGroup.getAbsValue();
             this.casesM1[ageGroup.getIndex()] = this.getExposed(ageGroup.getName()) - dataItemM1.getExposed(ageGroup.getName());
+            this.casesM6[ageGroup.getIndex()] = this.getExposed(ageGroup.getName()) - dataItemM6.getExposed(ageGroup.getName());
+            this.casesM7[ageGroup.getIndex()] = this.getExposed(ageGroup.getName()) - dataItemM7.getExposed(ageGroup.getName());
+            this.incidences[ageGroup.getIndex()] = this.casesM7[ageGroup.getIndex()] * 100000 / ageGroup.getAbsValue();
         });
         this.testsM7 = (this.getTests() - dataItemM7.getTests());
+
+    }
+
+    extrapolateBaseDataItemConfig(): IBaseDataItemConfig {
+
+        // look ahead 2,3
+        const dataItemP2 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 2);
+        const dataItemP3 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 3);
+        if (dataItemP2 && dataItemP3) {
+
+            const dataItemM1 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 1);
+            const dataItemM7 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 7);
+            const dataItemM8 = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY * 8);
+
+            const baseDateItemConfig: IBaseDataItemConfig = {};
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+
+                /**
+                 * find ratios for 1 and 8 to have an idea how it developed over the week
+                 */
+                const averageHelp1M1 = dataItemM1.getAverageHelp1(ageGroup.getIndex());
+                const averageHelp2M1 = dataItemM1.getAverageHelp2(ageGroup.getIndex());
+                const ratioHelpM1 = averageHelp1M1 / averageHelp2M1;
+
+                const averageHelp1M8 = dataItemM8.getAverageHelp1(ageGroup.getIndex());
+                const averageHelp2M8 = dataItemM8.getAverageHelp2(ageGroup.getIndex());
+                const ratioHelpM8 = averageHelp1M8 / averageHelp2M8;
+                const ratioHelpM81 = ratioHelpM8 / ratioHelpM1;
+
+                /**
+                 * apply the 1-8 ratio to the ratio 7 days ago
+                 */
+                const averageHelp1M7 = dataItemM7.getAverageHelp1(ageGroup.getIndex());
+                const averageHelp2M7 = dataItemM7.getAverageHelp2(ageGroup.getIndex());
+                const ratioHelpM7 = averageHelp1M7 / averageHelp2M7;
+
+                const ratioHelp00 = ratioHelpM7 / ratioHelpM81;
+
+                // this.averageHelp2[ageGroup.getIndex()] = this.averageHelp1[ageGroup.getIndex()] / ratioHelp00;
+                // this.averageCases[ageGroup.getIndex()] = (this.averageHelp1[ageGroup.getIndex()] + this.averageHelp2[ageGroup.getIndex()]) / 7;
+
+                baseDateItemConfig[ageGroup.getName()] = [dataItemP3.getExposed(ageGroup.getName()) + this.averageHelp1[ageGroup.getIndex()] * 4 / ratioHelp00];
+
+            });
+
+            return baseDateItemConfig;
+
+        }
 
     }
 
@@ -128,18 +197,22 @@ export class BaseDataItem implements IBaseDataItem {
         const dataItemP3 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 3);
         const dataItemP4 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 4);
 
-        if (dataItemP2 && dataItemP3) { //  && dataItemP3 && dataItemP4
+        if (dataItemP2 && dataItemP3) {
 
             const ageGroupIndexTotal = Demographics.getInstance().getAgeGroups().length;
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-                const incidenceP2 = dataItemP2.getIncidence(ageGroup.getIndex());
-                const incidenceP3 = dataItemP3.getIncidence(ageGroup.getIndex());
+
+                const casesP2 = dataItemP2.getCasesM7(ageGroup.getIndex());
+                const casesP3 = dataItemP3.getCasesM7(ageGroup.getIndex());
+
+                this.averageHelp1[ageGroup.getIndex()] = casesP2 * 0.25 + casesP3 * 0.50 + dataItemP3.getCasesM6(ageGroup.getIndex()) * 0.25;
+
                 if (dataItemP4) {
-                    const incidenceP4 = dataItemP4.getIncidence(ageGroup.getIndex());
-                    this.averageCases[ageGroup.getIndex()] = (incidenceP2 * 0.25 + incidenceP3 * 0.50 + incidenceP4 * 0.25) * ageGroup.getAbsValue() / 700000;
-                } else {
-                    this.averageCases[ageGroup.getIndex()] = incidenceP3 * ageGroup.getAbsValue() / 700000;
+                    const casesP4 = dataItemP4.getCasesM7(ageGroup.getIndex());
+                    this.averageCases[ageGroup.getIndex()] = (casesP2 * 0.25 + casesP3 * 0.50 + casesP4 * 0.25)  / 7;
+                    this.averageHelp2[ageGroup.getIndex()] = dataItemP4.getCasesM1(ageGroup.getIndex()) * 0.25;
                 }
+
             });
 
             if (dataItemP4) {
@@ -222,6 +295,7 @@ export class BaseDataItem implements IBaseDataItem {
         return this.incidences[ageGroupIndex];
     }
 
+
     getTestsM7(): number {
         return this.testsM7;
     }
@@ -250,8 +324,24 @@ export class BaseDataItem implements IBaseDataItem {
         return this.casesM1[ageGroupIndex];
     }
 
+    getCasesM6(ageGroupIndex: number): number {
+        return this.casesM6[ageGroupIndex];
+    }
+
+    getCasesM7(ageGroupIndex: number): number {
+        return this.casesM7[ageGroupIndex];
+    }
+
     getAverageCases(ageGroupIndex: number): number {
         return this.averageCases[ageGroupIndex];
+    }
+
+    getAverageHelp1(ageGroupIndex: number): number {
+        return this.averageHelp1[ageGroupIndex];
+    }
+
+    getAverageHelp2(ageGroupIndex: number): number {
+        return this.averageHelp2[ageGroupIndex];
     }
 
     getReproduction(ageGroupIndex: number) {

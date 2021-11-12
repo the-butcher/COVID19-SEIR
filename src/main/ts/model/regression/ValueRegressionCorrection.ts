@@ -1,3 +1,4 @@
+import { Demographics } from './../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { IRegressionParams } from './IRegressionParams';
 import { ValueRegressionBase } from './ValueRegressionBase';
@@ -14,6 +15,10 @@ export class ValueRegressionCorrection extends ValueRegressionBase {
         super(params);
         this.ageGroupIndex = params.ageGroupIndex;
         this.setup();
+    }
+
+    getName(): string {
+        return Demographics.getInstance().getAgeGroups()[this.ageGroupIndex].getName();
     }
 
     toValueY(modificationContact: ModificationContact): number {

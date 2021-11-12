@@ -11,7 +11,7 @@ import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { FDistribution } from './model/regression/FDistribution';
 import { Logger } from './util/Logger';
-
+import { stringifyConfiguration } from 'tslint/lib/configuration';
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {

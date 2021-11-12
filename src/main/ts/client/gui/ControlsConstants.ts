@@ -64,7 +64,7 @@ export interface ILabellingDefinition {
     format(value: number): string;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'EXPOSED' | 'TESTING' | 'CONTACT' | 'REPRODUCTION';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'TESTING' | 'CONTACT' | 'REPRODUCTION';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'IMMUNIZING' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
@@ -172,22 +172,6 @@ export class ControlsConstants {
                 chart.setSeriesReproductionVisible(false);
                 chart.setSeriesEIVisible(true, true);
                 chart.setSeriesSRVisible(true);
-            }
-        },
-        'EXPOSED': {
-            id: ObjectUtil.createId(),
-            title: 'Exposed',
-            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].EXPOSED[ModelConstants.STRAIN_ID___________ALL],
-            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
-            getHeatMax: (maxValue) => maxValue,
-            visitChart: (chart) => {
-                chart.setSeriesIncidenceVisible(false);
-                chart.setSeriesSRVisible(false);
-                chart.setSeriesTestingVisible(false);
-                chart.setSeriesContactVisible(false);
-                chart.setSeriesReproductionVisible(false);
-                chart.setSeriesEIVisible(true, false);
             }
         },
         'TESTING': {

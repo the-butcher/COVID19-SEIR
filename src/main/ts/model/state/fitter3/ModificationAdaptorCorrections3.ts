@@ -46,13 +46,7 @@ export class ModificationAdaptorCorrections3 implements IModificationAdaptor {
         });
 
         modificationSet.modA.acceptUpdate({
-            corrections: {
-                'family': correctionsA,
-                'school': correctionsA,
-                'nursing': correctionsA,
-                'work': correctionsA,
-                'other': correctionsA
-            }
+            corrections: correctionsA
         });
 
         modelStateIntegrator.rollback();

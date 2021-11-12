@@ -61,9 +61,20 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     }
 
+    getMinInstant(): number {
+        let minInstant: number = Number.MAX_VALUE;
+        Demographics.getInstance().getCategories().forEach(category => {
+            minInstant = Math.min(minInstant, this.getInstantA() + this.modificationValues.multiplier_configs[category.getName()].back_days_a * TimeUtil.MILLISECONDS_PER____DAY);
+        });
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            minInstant = Math.min(minInstant, this.getInstantA() + this.modificationValues.correction_configs[ageGroup.getName()].back_days_a * TimeUtil.MILLISECONDS_PER____DAY);
+        });
+        return minInstant;
+    }
+
     getMultiplierConfig(category: string): IRegressionConfig {
         // return {
-        //     back_days_a: -35,
+        //     back_days_a: -21,
         //     back_days_b: 0,
         //     poly_weight: 0.1
         // };
@@ -72,7 +83,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     getCorrectionConfig(ageGroupName: string): IRegressionConfig {
         // return {
-        //     back_days_a: -35,
+        //     back_days_a: -21,
         //     back_days_b: 0,
         //     poly_weight: 0.1
         // };
@@ -87,23 +98,27 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      */
     getMultiplierRegression(instant: number, contactCategory: string): IRegressionResult {
 
-        if (!this.multiplierRegressions[contactCategory]) {
-            const multiplier_configs: { [K in string]: IRegressionConfig } = {};
-            multiplier_configs[contactCategory] = {
-                back_days_a: -20,
-                back_days_b: 0,
-                poly_weight: 0.1
-            }
-            this.acceptUpdate({
-                multiplier_configs
-            });
-        }
+        // if (!this.multiplierRegressions[contactCategory]) {
+        //     const multiplier_configs: { [K in string]: IRegressionConfig } = {};
+        //     multiplier_configs[contactCategory] = {
+        //         back_days_a: -20,
+        //         back_days_b: 0,
+        //         poly_weight: 0.1
+        //     }
+        //     this.acceptUpdate({
+        //         multiplier_configs
+        //     });
+        // }
 
         const result = this.multiplierRegressions[contactCategory].getRegressionResult(instant);
         if (result.regression && result.ci95Dim) {
+            let regression = result.regression + result.ci95Dim * this.modificationValues.multiplier_randoms[contactCategory]
+            if (regression < 0) {
+                regression = 0;
+            }
             return {
                 ...result,
-                regression: result.regression + result.ci95Dim * this.modificationValues.multiplier_randoms[contactCategory]
+                regression
             }
         } else {
             return result;
@@ -119,23 +134,27 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      */
      getCorrectionRegression(instant: number, ageGroupName: string): IRegressionResult {
 
-        if (!this.correctionRegressions[ageGroupName]) {
-            const correction_configs: { [K in string]: IRegressionConfig } = {};
-            correction_configs[ageGroupName] = {
-                back_days_a: -20,
-                back_days_b: 0,
-                poly_weight: 0.1
-            }
-            this.acceptUpdate({
-                correction_configs
-            });
-        }
+        // if (!this.correctionRegressions[ageGroupName]) {
+        //     const correction_configs: { [K in string]: IRegressionConfig } = {};
+        //     correction_configs[ageGroupName] = {
+        //         back_days_a: -20,
+        //         back_days_b: 0,
+        //         poly_weight: 0.1
+        //     }
+        //     this.acceptUpdate({
+        //         correction_configs
+        //     });
+        // }
 
         const result = this.correctionRegressions[ageGroupName].getRegressionResult(instant);
         if (result.regression && result.ci95Dim) {
+            let regression = result.regression + result.ci95Dim * this.modificationValues.correction_randoms[ageGroupName];
+            if (regression < 0) {
+                regression = 0;
+            }
             return {
                 ...result,
-                regression: result.regression + result.ci95Dim * this.modificationValues.correction_randoms[ageGroupName]
+                regression
             }
         } else {
             return result;
@@ -172,7 +191,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 instantA,
                 instantB,
                 polyWeight: regressionConfig.poly_weight,
-                modificationsContact:  new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
+                modificationsContact: new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
             });
         }
 
@@ -186,7 +205,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 instantA,
                 instantB,
                 polyWeight: regressionConfig.poly_weight,
-                modificationsContact:  new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
+                modificationsContact: new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
             });
         }
 

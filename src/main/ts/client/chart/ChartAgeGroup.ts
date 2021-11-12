@@ -284,7 +284,7 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.rangeChangeDuration = 0;
         this.yAxisPlotPercent.strictMinMax = true;
         this.yAxisPlotPercent.min = 0.00;
-        this.yAxisPlotPercent.max = 1.00; // some extra required, or 100% label will not show
+        this.yAxisPlotPercent.max = 1.00;
 
         this.yAxisPlotPercent.renderer.labels.template.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
@@ -834,7 +834,7 @@ export class ChartAgeGroup {
             title: 'contact estimation',
             baseLabel: 'contact estimation',
             valueField: 'contactValue95L',
-            colorKey: 'CASES',
+            colorKey: 'SEASONALITY',
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.20,
@@ -855,7 +855,7 @@ export class ChartAgeGroup {
             title: 'contact estimation',
             baseLabel: 'contact estimation',
             valueField: 'contactValue95U',
-            colorKey: 'CASES',
+            colorKey: 'SEASONALITY',
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.20,
@@ -1536,7 +1536,7 @@ export class ChartAgeGroup {
     }
 
     setAxisPercentBounds(min: number, max: number): void {
-        this.yAxisPlotPercent.min = min;
+        this.yAxisPlotPercent.min = -0.1; // min;
         this.yAxisPlotPercent.max = max;
     }
 
@@ -1575,12 +1575,14 @@ export class ChartAgeGroup {
 
     applyMaxYAxisValue(): void {
 
-        if (ObjectUtil.isNotEmpty(this.modelData)) {
+        if (ObjectUtil.isNotEmpty(this.modelData) && this.chartMode === 'INCIDENCE') {
 
             const minCategory = this.xAxis.positionToCategory(this.xAxis.start);
             const maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
             const minInstant = TimeUtil.parseCategoryDateFull(minCategory); // this.findDataItemByCategory(minCategory).instant;
             const maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
+
+
 
             let maxIncidence = 0;
             let maxInfectious = 0;
@@ -1594,16 +1596,12 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = maxIncidence * 1.25;
+            this.yAxisPlotIncidence.max = 1500; // maxIncidence * 1.25;
 
             this.yAxisPlotPercent.min = 0;
             this.yAxisPlotPercent.max = maxInfectious * 1.00;
 
-            if (this.chartMode === 'INCIDENCE') {
-                this.applyMaxHeat(maxIncidence);
-            } else {
-                this.applyMaxHeat(maxInfectious);
-            }
+            this.applyMaxHeat(maxIncidence);
 
         }
 
@@ -1702,13 +1700,16 @@ export class ChartAgeGroup {
         for (const dataItem of this.modelData) {
 
             const renderableRegressionResult = ControlsRegression.getInstance().getRenderableRegressionResult(dataItem.instant);
+
             const contactValue = renderableRegressionResult.regression;
             const contactValue95L = renderableRegressionResult.ci95Min;
             const contactValue95U = renderableRegressionResult.ci95Max && renderableRegressionResult.ci95Max - renderableRegressionResult.ci95Min;
-            const contactValueM = renderableRegressionResult.model;
+
+            const contactValueM = renderableRegressionResult.loess && renderableRegressionResult.loess.m;
+
             const contactValueL = renderableRegressionResult.loess && renderableRegressionResult.loess.y;
-            const contactValueLL = renderableRegressionResult.loess && renderableRegressionResult.loess.y - renderableRegressionResult.loess.semiOff;
-            const contactValueLU = renderableRegressionResult.loess && 2 * renderableRegressionResult.loess.semiOff;
+            const contactValueLL = renderableRegressionResult.loess && renderableRegressionResult.loess.o && renderableRegressionResult.loess.y - renderableRegressionResult.loess.o;
+            const contactValueLU = renderableRegressionResult.loess && renderableRegressionResult.loess.o && 2 * renderableRegressionResult.loess.o;
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1840,12 +1841,6 @@ export class ChartAgeGroup {
                     else {
                         r = caseValue * - 5;
                     }
-                    // if (value > 0) {
-                    //     g = value / 20;
-                    // }
-                    // else {
-                    //     r = value / -20;
-                    // }
 
                     const rgb = [Math.min(1, r), Math.min(1, g), b];
 
@@ -1875,6 +1870,24 @@ export class ChartAgeGroup {
 
         }
 
+        if (!QueryUtil.getInstance().isDiffDisplay()) {
+            this.applyMaxHeat(maxGamma);
+            const keys = Object.keys(heatData[0]);
+            for (let i = 0; i < heatData.length; i++) {
+                for (const key of keys) { // const key in chartData[i]
+                    this.chart.data[i][key] = heatData[i][key];
+                }
+            }
+            // when there is an "early prediction", the right part of the heatmap needs to be black
+            for (let i = heatData.length; i < this.chart.data.length; i++) {
+                this.chart.data[i].value = 0;
+                this.chart.data[i].gamma = 0;
+            }
+            this.chart.invalidateRawData();
+        } else {
+            this.chart.data = heatData;
+        }
+
         this.seriesAgeGroupSusceptible.getSeries().data = plotData;
         this.seriesAgeGroupExposed.getSeries().data = plotData;
         this.seriesAgeGroupInfectious.getSeries().data = plotData;
@@ -1893,16 +1906,9 @@ export class ChartAgeGroup {
         this.seriesSeasonality.getSeries().data = plotData;
         this.seriesReproductionP.getSeries().data = plotData;
 
-        requestAnimationFrame(() => {
-            this.applyMaxHeat(maxGamma);
-            const keys = Object.keys(heatData[0]);
-            for (let i = 0; i < heatData.length; i++) {
-                for (const key of keys) { // const key in chartData[i]
-                    this.chart.data[i][key] = heatData[i]?.[key];
-                }
-            }
-            this.chart.invalidateRawData();
-        });
+
+
+        // });
 
         // // console.log('heatData', heatData);
         // const keys = Object.keys(chartData[0]);
@@ -1987,6 +1993,7 @@ export class ChartAgeGroup {
         }
 
         if (this.chart.data.length === 0) {
+            console.log('primary heat value setup');
             const initialChartData: any[] = [];
             for (let i = 0; i < baseData.length; i++) {
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {

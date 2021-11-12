@@ -71,7 +71,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
          * iterate
          */
 
-        new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+        new ModelStateFitter9Reg1().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
             ctx.postMessage(modelProgress);
         }).then(data => {
             data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());

@@ -135,9 +135,9 @@ export class ChartAgeGroupSeries {
             });
         });
 
-        this.series.events.on('ready', () => {
-            // do nothing, but keep handler to know where to find it
-        });
+        // this.series.events.on('ready', () => {
+        //     // do nothing, but keep handler to know where to find it
+        // });
 
         this.series.name = params.title;
 

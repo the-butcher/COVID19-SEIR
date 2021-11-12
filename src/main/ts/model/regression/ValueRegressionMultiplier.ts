@@ -16,6 +16,10 @@ export class ValueRegressionMultiplier extends ValueRegressionBase {
         this.setup();
     }
 
+    getName(): string {
+        return this.contactCategory;
+    }
+
     toValueY(modificationContact: ModificationContact): number {
         return modificationContact.getCategoryValue(this.contactCategory);
     }

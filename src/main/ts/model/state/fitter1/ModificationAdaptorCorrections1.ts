@@ -57,22 +57,10 @@ export class ModificationAdaptorCorrections1 implements IModificationAdaptor {
         // console.log(loggableRange, 'correctA', correctionsA);
 
         modificationSet.modA.acceptUpdate({
-            corrections: {
-                'family': correctionsA,
-                'school': correctionsA,
-                'nursing': correctionsA,
-                'work': correctionsA,
-                'other': correctionsA
-            }
+            corrections: correctionsA
         });
         modificationSet.modB.acceptUpdate({
-            corrections: {
-                'family': correctionsB,
-                'school': correctionsB,
-                'nursing': correctionsB,
-                'work': correctionsB,
-                'other': correctionsB
-            }
+            corrections: correctionsB
         });
 
         modelStateIntegrator.rollback();

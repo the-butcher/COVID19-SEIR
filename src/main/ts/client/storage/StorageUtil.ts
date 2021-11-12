@@ -36,7 +36,7 @@ export class StorageUtil {
     constructor() {
         this.storageEnabled = this.evalStorageEnabled();
         this.setSaveRequired(false);
-        window.onbeforeunload = (e) => {
+        window.onbeforeunload = (e: BeforeUnloadEvent) => {
             if (this.saveRequired) {
                 (e || window.event).returnValue = 'leave without saving?';
             }

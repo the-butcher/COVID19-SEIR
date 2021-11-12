@@ -19,6 +19,11 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         super('CONTACT');
     }
 
+    /**
+     * create a new instance of modification value from values provided by regression
+     * @param instant
+     * @returns
+     */
     createRegressionModification(instant: number): IModificationValuesContact {
 
         const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
