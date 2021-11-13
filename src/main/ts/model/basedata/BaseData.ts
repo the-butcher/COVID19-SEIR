@@ -264,19 +264,19 @@ export class BaseData {
 
         });
 
-        // const deletableInstants: string[] = [];
-        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-        //     let dataItem = this.findBaseDataItem(instant, false);
-        //     if (!dataItem) {
-        //         dataItem = this.findBaseDataItem(instant, true);
-        //         if (dataItem) {
-        //             deletableInstants.push(instant.toString());
-        //         }
-        //     }
-        // }
-        // deletableInstants.forEach(instant => {
-        //     delete this.baseDataItems[instant];
-        // })
+        const deletableInstants: string[] = [];
+        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+            let dataItem = this.findBaseDataItem(instant, false);
+            if (!dataItem) {
+                dataItem = this.findBaseDataItem(instant, true);
+                if (dataItem) {
+                    deletableInstants.push(instant.toString());
+                }
+            }
+        }
+        deletableInstants.forEach(instant => {
+            delete this.baseDataItems[instant];
+        })
 
     }
 

@@ -809,6 +809,91 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
+
+
+        this.seriesContactValueM = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'contact settings',
+            baseLabel: 'contact settings',
+            valueField: 'contactValueM',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.40,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesContactValueL = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'contact smoothed',
+            baseLabel: 'contact smoothed',
+            valueField: 'contactValueL',
+            colorKey: 'CASES',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.40,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactValueLL = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'contact loess off',
+            baseLabel: 'contact loess off',
+            valueField: 'contactValueLL',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactValueLL.getSeries().strokeOpacity = 0.5;
+        this.seriesContactValueL.bindToLegend(this.seriesContactValueLL);
+        this.seriesContactValueLU = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'contact loess off',
+            baseLabel: 'contact loess off',
+            valueField: 'contactValueLU',
+            colorKey: 'CASES',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.20,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: true,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesContactValueLU.getSeries().strokeOpacity = 0.5;
+        this.seriesContactValueLU.getSeries().fillOpacity = 0.2;
+        this.seriesContactValueL.bindToLegend(this.seriesContactValueLU);
+
         this.seriesContactValue = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
@@ -871,89 +956,6 @@ export class ChartAgeGroup {
         this.seriesContactValue95U.getSeries().strokeOpacity = 0.5;
         this.seriesContactValue95U.getSeries().fillOpacity = 0.2;
         this.seriesContactValue.bindToLegend(this.seriesContactValue95U);
-
-        this.seriesContactValueM = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'contact settings',
-            baseLabel: 'contact settings',
-            valueField: 'contactValueM',
-            colorKey: 'CASES',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.40,
-            labels: {
-                tooltip: true,
-                pathtip: true
-            },
-            stacked: false,
-            legend: false,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-
-        this.seriesContactValueL = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'contact smoothed',
-            baseLabel: 'contact smoothed',
-            valueField: 'contactValueL',
-            colorKey: 'CASES',
-            strokeWidth: 2,
-            dashed: false,
-            locationOnPath: 0.40,
-            labels: {
-                tooltip: true,
-                pathtip: true
-            },
-            stacked: false,
-            legend: false,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesContactValueLL = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'contact loess off',
-            baseLabel: 'contact loess off',
-            valueField: 'contactValueLL',
-            colorKey: 'CASES',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.20,
-            labels: {
-                tooltip: false,
-                pathtip: false
-            },
-            stacked: false,
-            legend: false,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesContactValueLL.getSeries().strokeOpacity = 0.5;
-        this.seriesContactValue.bindToLegend(this.seriesContactValueLL);
-        this.seriesContactValueLU = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'contact loess off',
-            baseLabel: 'contact loess off',
-            valueField: 'contactValueLU',
-            colorKey: 'CASES',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.20,
-            labels: {
-                tooltip: false,
-                pathtip: false
-            },
-            stacked: true,
-            legend: false,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesContactValueLU.getSeries().strokeOpacity = 0.5;
-        this.seriesContactValueLU.getSeries().fillOpacity = 0.2;
-        this.seriesContactValue.bindToLegend(this.seriesContactValueLU);
 
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
@@ -1677,7 +1679,6 @@ export class ChartAgeGroup {
 
         const _ageGroupIndex = this.getAgeGroupIndex();
         const ageGroupName = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex].getName();
-
 
         const instantA = instant - TimeUtil.MILLISECONDS_PER____DAY * 2;
         const instantB = instant + TimeUtil.MILLISECONDS_PER____DAY * 2;

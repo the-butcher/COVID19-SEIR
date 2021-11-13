@@ -54,10 +54,14 @@ export class ChartAgeGroupSeries {
     private hasLegend: boolean;
     private boundSeries: ChartAgeGroupSeries[];
 
+    private visible: boolean;
+
     constructor(params: IChartAgeGroupSeriesParams) {
 
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
+
+        this.visible = true;
 
         this.baseLabel = params.baseLabel;
         this.valueField = params.valueField;
@@ -104,7 +108,6 @@ export class ChartAgeGroupSeries {
                 if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
                     const itemCurr = target.dataItems.values[indexCurr];
                     const valueCurr = itemCurr.dataContext[this.valueField];
-// ''                    console.log('indexCurr', this.series.name, indexCurr, valueCurr);
                     return valueCurr ? `${this.seriesLabel.text}: ${this.labellingDefinition.format(valueCurr)}` : undefined;
                 } else {
                     // console.log('no index found', this.series.name);
@@ -125,11 +128,15 @@ export class ChartAgeGroupSeries {
         this.seriesLabel.disabled =  !params.labels.pathtip;
 
         this.getSeries().events.on('hidden', () => {
+            // console.log('hiding', this.seriesLabel);
+            this.visible = false;
             this.boundSeries.forEach(series => {
                 series.getSeries().hide();
             });
         });
         this.getSeries().events.on('shown', () => {
+            // console.log('showing', this.seriesLabel);
+            this.visible = true;
             this.boundSeries.forEach(series => {
                 series.getSeries().show();
             });
@@ -156,7 +163,7 @@ export class ChartAgeGroupSeries {
      */
     setVisible(visible: boolean): void {
         this.series.hiddenInLegend = !visible || !this.hasLegend;
-        this.series.visible = visible;
+        this.series.visible = visible ? this.visible : false;
     }
 
     setStacked(stacked: boolean): void {

@@ -122,7 +122,7 @@ export class ModelStateFitter9Reg1 {
                         std: ageGroupStats.getStandardDeviation(),
                         num: ageGroupStats.size()
                     }
-                    console.log('prediction', ageGroup.getName(), TimeUtil.formatCategoryDateFull(normalizedData.instant), 'std', ageGroupStats.getStandardDeviation().toFixed(4));
+                    // console.log('prediction', ageGroup.getName(), TimeUtil.formatCategoryDateFull(normalizedData.instant), 'std', ageGroupStats.getStandardDeviation().toFixed(4));
                 });
 
             }
