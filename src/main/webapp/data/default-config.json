@@ -5120,40 +5120,40 @@
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "family": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "school": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "nursing": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "work": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         }
       },
@@ -5162,80 +5162,80 @@
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "05-14": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "15-24": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "25-34": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "35-44": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "45-54": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "55-64": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "65-74": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         "75-84": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         },
         ">= 85": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.70,
-            0.90
+            0.5,
+            0.75
           ]
         }
       }

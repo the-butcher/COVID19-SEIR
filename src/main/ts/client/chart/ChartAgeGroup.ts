@@ -1598,7 +1598,7 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = 1500; // maxIncidence * 1.25;
+            this.yAxisPlotIncidence.max = 1700; // maxIncidence * 1.25;
 
             this.yAxisPlotPercent.min = 0;
             this.yAxisPlotPercent.max = maxInfectious * 1.00;
