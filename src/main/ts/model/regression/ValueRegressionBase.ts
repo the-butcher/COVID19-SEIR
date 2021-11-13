@@ -120,7 +120,7 @@ export abstract class ValueRegressionBase {
              band: 0.50
         });
         this.loessModel00500 = new Loess.default(loessModelInput, {
-            span: 0.25,
+            span: 0.5,
              band: 0.50
         });
         this.loessModel00250 = new Loess.default(loessModelInput, {

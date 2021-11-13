@@ -396,7 +396,7 @@ export class ChartAgeGroup {
             colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.40,
+            locationOnPath: 0.41,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -415,7 +415,7 @@ export class ChartAgeGroup {
             colorKey: 'CASES',
             strokeWidth: 1,
             dashed: true,
-            locationOnPath: 0.35,
+            locationOnPath: 0.3,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -477,7 +477,7 @@ export class ChartAgeGroup {
             colorKey: 'INCIDENCE',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.8,
+            locationOnPath: 0.16,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -498,7 +498,7 @@ export class ChartAgeGroup {
             colorKey: 'STRAIN',
             strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.35,
+            locationOnPath: 0.05,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -523,7 +523,7 @@ export class ChartAgeGroup {
             colorKey: 'VACCINATION',
             strokeWidth: 1,
             dashed: false,
-            locationOnPath: 0.15,
+            locationOnPath: 0.05,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -542,7 +542,7 @@ export class ChartAgeGroup {
             colorKey: 'VACCINATION',
             strokeWidth: 1,
             dashed: false,
-            locationOnPath: 0.25,
+            locationOnPath: 0.20,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -563,7 +563,7 @@ export class ChartAgeGroup {
             colorKey: 'IMMUNIZING',
             strokeWidth: 1,
             dashed: false,
-            locationOnPath: 0.1,
+            locationOnPath: 0.05,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -587,7 +587,7 @@ export class ChartAgeGroup {
             colorKey: 'REMOVED',
             strokeWidth: 1,
             dashed: false,
-            locationOnPath: 0.1,
+            locationOnPath: 0.15,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -610,7 +610,7 @@ export class ChartAgeGroup {
             colorKey: 'REMOVED',
             strokeWidth: 1,
             dashed: false,
-            locationOnPath: 0.1,
+            locationOnPath: 0.41,
             labels: {
                 tooltip: true,
                 pathtip: true
