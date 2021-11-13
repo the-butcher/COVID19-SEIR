@@ -1702,14 +1702,19 @@ export class ChartAgeGroup {
             const renderableRegressionResult = ControlsRegression.getInstance().getRenderableRegressionResult(dataItem.instant);
 
             const contactValue = renderableRegressionResult.regression;
-            const contactValue95L = renderableRegressionResult.ci95Min;
-            const contactValue95U = renderableRegressionResult.ci95Max && renderableRegressionResult.ci95Max - renderableRegressionResult.ci95Min;
+            const contactValue95L = renderableRegressionResult.ci95Min && Math.max(0, renderableRegressionResult.ci95Min);
+            const contactValue95U = renderableRegressionResult.ci95Max && renderableRegressionResult.ci95Max - contactValue95L;
 
             const contactValueM = renderableRegressionResult.loess && renderableRegressionResult.loess.m;
 
-            const contactValueL = renderableRegressionResult.loess && renderableRegressionResult.loess.y;
-            const contactValueLL = renderableRegressionResult.loess && renderableRegressionResult.loess.o && renderableRegressionResult.loess.y - renderableRegressionResult.loess.o;
-            const contactValueLU = renderableRegressionResult.loess && renderableRegressionResult.loess.o && 2 * renderableRegressionResult.loess.o;
+            let contactValueL: number;
+            let contactValueLL: number;
+            let contactValueLU: number;
+            if (renderableRegressionResult.loess && renderableRegressionResult.loess.o && renderableRegressionResult.loess.y) {
+                contactValueL = renderableRegressionResult.loess.y;
+                contactValueLL = renderableRegressionResult.loess.y - renderableRegressionResult.loess.o;
+                contactValueLU = renderableRegressionResult.loess.y + renderableRegressionResult.loess.o - contactValueLL;
+            }
 
             const item = {
                 categoryX: dataItem.categoryX,
@@ -1721,6 +1726,8 @@ export class ChartAgeGroup {
                 contactValueLL,
                 contactValueLU
             }
+
+            // console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), item);
 
             plotData.push(item);
 
@@ -1782,9 +1789,9 @@ export class ChartAgeGroup {
             let ageGroupIncidence68L: number;
             let ageGroupIncidence68U: number;
             if (dataItem.valueset[ageGroupPlot.getName()].PREDICTION) {
-                ageGroupIncidence95L = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg - dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1.96; // magic number -- formalize
+                ageGroupIncidence95L = Math.max(0, dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg - dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1.96); // magic number -- formalize
                 ageGroupIncidence95U = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg + dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1.96 - ageGroupIncidence95L; // magic number -- formalize
-                ageGroupIncidence68L = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg - dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1; // magic number -- formalize
+                ageGroupIncidence68L = Math.max(0, dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg - dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1); // magic number -- formalize
                 ageGroupIncidence68U = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg + dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1 - ageGroupIncidence68L; // magic number -- formalize
             }
 
@@ -1993,7 +2000,7 @@ export class ChartAgeGroup {
         }
 
         if (this.chart.data.length === 0) {
-            console.log('primary heat value setup');
+            // console.log('primary heat value setup');
             const initialChartData: any[] = [];
             for (let i = 0; i < baseData.length; i++) {
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {

@@ -151,7 +151,7 @@ export class ModelConstants {
     static readonly RANGE___SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
     static readonly RANGE________________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     static readonly RANGE________UNDETECTED = [0, 1, 2, 3];
-    static readonly RANGE_________BACK_DAYS = [-80, -60, -40, -20, 0];
+    static readonly RANGE_________BACK_DAYS = [-35, -28, -21, -14, -7, 0];
 
 }
 

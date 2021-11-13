@@ -14,7 +14,12 @@ export interface IWorkingHotellingParams {
     tss: number;
     wh2: number;
     off: number;
+
+    /**
+     * instant of the narrowest part in the prediction
+     */
     nro: number;
+
 }
 
 export interface ILoessInput {
@@ -71,41 +76,40 @@ export abstract class ValueRegressionBase {
 
     collectLoessInterpolationInput(): ILoessInput {
 
-        const minInstant = this.modificationsContact[0].getInstant(); // first modification instance
-        const maxInstant = this.modificationsContact[this.modificationsContact.length - 1].getInstant(); // last modification instance
-
         const xValues: number[] = [];
         const iValues: number[] = [];
         const mValues: number[] = [];
-        // for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY) {
 
-        //     const modificationA = this.modificationsContact.find(m => m.getInstantB() > instant);
-        //     const modificationB = this.modificationsContact.find(m => m.getInstantA() >= instant);
+        for (let i=1; i<this.modificationsContact.length; i++) {
 
-        //     const fraction = modificationB.getInstantA() !== modificationA.getInstantA() ? (instant - modificationA.getInstantA()) / (modificationB.getInstantA() - modificationA.getInstantA()) : 0;
-        //     const valueYA = this.toValueY(modificationA);
-        //     const valueYB = this.toValueY(modificationB);
-        //     const valueY = valueYA + (valueYB - valueYA) * fraction;
+            const modificationContactA = this.modificationsContact[i - 1];
+            const modificationContactB = this.modificationsContact[i - 1];
 
+            const instantA = modificationContactA.getInstantA();
+            const instantB = modificationContactB.getInstantA();
+
+            const valueXA = ValueRegressionBase.toRegressionX(instantA);
+            const valueXB = ValueRegressionBase.toRegressionX(instantB);
+
+            const valueYA = this.toValueY(modificationContactA);
+            const valueYB = this.toValueY(modificationContactB);
+
+            iValues.push((instantA + instantB) / 2);
+            xValues.push((valueXA + valueXB) / 2);
+            mValues.push((valueYA + valueYB) / 2);
+
+        }
+        // this.modificationsContact.forEach(modificationContact => {
+
+        //     const instant = modificationContact.getInstantA();
         //     const valueX = ValueRegressionBase.toRegressionX(instant);
+        //     const valueY = this.toValueY(modificationContact);
 
         //     iValues.push(instant);
         //     xValues.push(valueX);
         //     mValues.push(valueY);
 
-        // }
-
-        this.modificationsContact.forEach(modificationContact => {
-
-            const instant = modificationContact.getInstantA();
-            const valueX = ValueRegressionBase.toRegressionX(instant);
-            const valueY = this.toValueY(modificationContact);
-
-            iValues.push(instant);
-            xValues.push(valueX);
-            mValues.push(valueY);
-
-        });
+        // });
 
         return {
             x: xValues,
@@ -123,7 +127,7 @@ export abstract class ValueRegressionBase {
         var Loess = require('loess')
 
         const loessModelInput = this.collectLoessModelInput();
-        const loessOptions = {span: 0.25, band: 0.5} // , degree: 1
+        const loessOptions = {span: 0.2, band: 0.5} // , degree: 1
         const loessModel = new Loess.default(loessModelInput, loessOptions);
 
         const loessInterpolationInput = this.collectLoessInterpolationInput();
@@ -229,7 +233,7 @@ export abstract class ValueRegressionBase {
         this.whParams.off = loessValue.o - nroCi95;
         this.whParams.nro = nroInstant;
 
-        // console.log('adjusted wh2', TimeUtil.formatCategoryDateFull(nroInstant), this.getName(), this.whParams, loessValue.o, nroCi95);
+        // console.log('adjusted wh2', TimeUtil.formatCategoryDateFull(nroInstant), this.getName(), 'off', this.whParams.off, 'nro', TimeUtil.formatCategoryDateFull(this.whParams.nro));
 
     }
 
@@ -273,6 +277,7 @@ export abstract class ValueRegressionBase {
     getRegressionResult(instant: number): IRegressionResult {
 
         // within regression range?
+        const lastLoessInstant = this.loessValues[this.loessValues.length - 1].i;
         if (instant >= this.instantA) {
 
             // put instant into regressions space
@@ -298,9 +303,9 @@ export abstract class ValueRegressionBase {
                 regression = loessValue.y;
                 ci95 = loessValue.o;
 
-            } else if (instant < this.instantB) {
+            } else if (instant <= lastLoessInstant) {
 
-                const fraction = (instant - this.whParams.nro) / (this.instantB - this.whParams.nro);
+                const fraction = (instant - this.whParams.nro) / (lastLoessInstant - this.whParams.nro);
                 regression = loessValue.y * (1 - fraction) + regression * fraction;
 
             }
