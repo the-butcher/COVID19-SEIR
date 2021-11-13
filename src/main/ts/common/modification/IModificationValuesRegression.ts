@@ -3,7 +3,8 @@ import { IModificationValues } from './IModificationValues';
 export interface IRegressionConfig {
     back_days_a: number;
     back_days_b: number;
-    poly_weight: number;
+    // poly_weight: number;
+    poly_shares: number[];
 }
 
 /**

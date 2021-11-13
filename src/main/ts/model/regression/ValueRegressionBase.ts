@@ -33,7 +33,7 @@ export abstract class ValueRegressionBase {
     // private readonly instant: number;
     private readonly instantA: number;
     private readonly instantB: number;
-    private readonly polyWeight: number;
+    private readonly polyShares: number[];
 
 
     private readonly modificationsContact: ModificationContact[];
@@ -50,7 +50,7 @@ export abstract class ValueRegressionBase {
 
         this.instantA = params.instantA;
         this.instantB = params.instantB;
-        this.polyWeight = params.polyWeight;
+        this.polyShares = params.polyShares;
         this.loessValues01000 = [];
         this.loessValues00500 = [];
         this.loessValues00250 = [];
@@ -270,10 +270,51 @@ export abstract class ValueRegressionBase {
     }
 
     findLoessValue(instant: number): ILoessResult {
+
         const loessValue01000 = this.findOrInterpolateLoessValue(instant, this.loessValues01000);
+        const loessValue00500 = this.findOrInterpolateLoessValue(instant, this.loessValues00500);
         const loessValue00250 = this.findOrInterpolateLoessValue(instant, this.loessValues00250);
-        return this.interpolateLoessValue(1 - this.polyWeight, loessValue01000, loessValue00250);
+
+        const share01000 = this.polyShares[0];
+        const share00500 = this.polyShares[1] - this.polyShares[0];
+        const share00250 = 1 - this.polyShares[1];
+
+        // console.log(share01000, share00500, share00250);
+
+        let m: number;
+        if (loessValue01000.m && loessValue00500.m && loessValue00250.m) {
+            m = loessValue01000.m * share01000 + loessValue00500.m * share00500 + loessValue00250.m * share00250;
+        }
+        const x = loessValue01000.x * share01000 + loessValue00500.x * share00500 + loessValue00250.x * share00250;
+        const y = loessValue01000.y * share01000 + loessValue00500.y * share00500 + loessValue00250.y * share00250;
+        const i = loessValue01000.i * share01000 + loessValue00500.i * share00500 + loessValue00250.i * share00250;
+        const o = loessValue01000.o * share01000 + loessValue00500.o * share00500 + loessValue00250.o * share00250;
+
+        return {
+            x,
+            y,
+            i,
+            o,
+            m
+        }
+
     }
+
+    // interpolateLoessValue(ratio: number, loessValueA: ILoessResult, loessValueB: ILoessResult): ILoessResult {
+
+    //     let m: number;
+    //     if (loessValueA.m && loessValueB.m) {
+    //         m = loessValueA.m && loessValueA.m * ratio + loessValueB.m * (1 - ratio);
+    //     }
+    //     return {
+    //         x: loessValueA.x * ratio + loessValueB.x * (1 - ratio),
+    //         y: loessValueA.y * ratio + loessValueB.y * (1 - ratio),
+    //         i: loessValueA.i * ratio + loessValueB.i * (1 - ratio),
+    //         o: loessValueA.o * ratio + loessValueB.o * (1 - ratio),
+    //         m
+    //     }
+
+    // }
 
     findOrInterpolateLoessValue(instant: number, loessValues: ILoessResult[]): ILoessResult {
 
@@ -303,21 +344,7 @@ export abstract class ValueRegressionBase {
 
     }
 
-    interpolateLoessValue(ratio: number, loessValueA: ILoessResult, loessValueB: ILoessResult): ILoessResult {
 
-        let m: number;
-        if (loessValueA.m && loessValueB.m) {
-            m = loessValueA.m && loessValueA.m * ratio + loessValueB.m * (1 - ratio);
-        }
-        return {
-            x: loessValueA.x * ratio + loessValueB.x * (1 - ratio),
-            y: loessValueA.y * ratio + loessValueB.y * (1 - ratio),
-            i: loessValueA.i * ratio + loessValueB.i * (1 - ratio),
-            o: loessValueA.o * ratio + loessValueB.o * (1 - ratio),
-            m
-        }
-
-    }
 
     getRegressionResult(instant: number): IRegressionResult {
 

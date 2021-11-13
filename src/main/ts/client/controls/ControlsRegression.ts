@@ -29,7 +29,7 @@ export class ControlsRegression {
     private static instance: ControlsRegression;
 
     private sliderBackDays: SliderRegression;
-    private sliderPolyWeight: SliderRegression;
+    private sliderPolyShares: SliderRegression;
 
     private modification: ModificationRegression;
 
@@ -40,7 +40,7 @@ export class ControlsRegression {
 
     constructor() {
         this.sliderBackDays = new SliderRegression("back days", 1, ModelConstants.RANGE_________BACK_DAYS, -10, -5);
-        this.sliderPolyWeight = new SliderRegression("poly weight", 0.05, ModelConstants.RANGE____PERCENTAGE_100, 0.1);
+        this.sliderPolyShares = new SliderRegression("poly shares", 0.05, ModelConstants.RANGE____PERCENTAGE_100, 0.5, 0.75);
         this.modification = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
     }
 
@@ -64,7 +64,7 @@ export class ControlsRegression {
         const regressionConfig: IRegressionConfig = {
             back_days_a: this.sliderBackDays.getValue(0),
             back_days_b: this.sliderBackDays.getValue(1),
-            poly_weight: this.sliderPolyWeight.getValue(0)
+            poly_shares: [this.sliderPolyShares.getValue(0), this.sliderPolyShares.getValue(1)]
         }
         const multiplier_configs: { [K in string]: IRegressionConfig } = {};
         const correction_configs: { [K in string]: IRegressionConfig } = {};
@@ -110,10 +110,11 @@ export class ControlsRegression {
 
             if (regressionConfig) {
                 this.sliderBackDays.setLabel(this.regressionPointer.value);
-                this.sliderPolyWeight.setLabel(this.regressionPointer.value);
+                this.sliderPolyShares.setLabel(this.regressionPointer.value);
                 this.sliderBackDays.setValue(0, regressionConfig.back_days_a);
                 this.sliderBackDays.setValue(1, regressionConfig.back_days_b);
-                this.sliderPolyWeight.setValue(0, regressionConfig.poly_weight);
+                this.sliderPolyShares.setValue(0, regressionConfig.poly_shares[0]);
+                this.sliderPolyShares.setValue(1, regressionConfig.poly_shares[1]);
             }
 
         }
@@ -129,7 +130,7 @@ export class ControlsRegression {
 
         requestAnimationFrame(() => {
             this.sliderBackDays.handleResize();
-            this.sliderPolyWeight.handleResize();
+            this.sliderPolyShares.handleResize();
         });
 
         this.modification = modification;

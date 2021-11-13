@@ -73,20 +73,10 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     }
 
     getMultiplierConfig(category: string): IRegressionConfig {
-        // return {
-        //     back_days_a: -21,
-        //     back_days_b: 0,
-        //     poly_weight: 0.1
-        // };
         return this.modificationValues.multiplier_configs[category];
     }
 
     getCorrectionConfig(ageGroupName: string): IRegressionConfig {
-        // return {
-        //     back_days_a: -21,
-        //     back_days_b: 0,
-        //     poly_weight: 0.1
-        // };
         return this.modificationValues.correction_configs[ageGroupName];
     }
 
@@ -97,18 +87,6 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      * @returns
      */
     getMultiplierRegression(instant: number, contactCategory: string): IRegressionResult {
-
-        // if (!this.multiplierRegressions[contactCategory]) {
-        //     const multiplier_configs: { [K in string]: IRegressionConfig } = {};
-        //     multiplier_configs[contactCategory] = {
-        //         back_days_a: -20,
-        //         back_days_b: 0,
-        //         poly_weight: 0.1
-        //     }
-        //     this.acceptUpdate({
-        //         multiplier_configs
-        //     });
-        // }
 
         const result = this.multiplierRegressions[contactCategory].getRegressionResult(instant);
         if (result.regression && result.ci95Dim) {
@@ -133,18 +111,6 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      * @returns
      */
      getCorrectionRegression(instant: number, ageGroupName: string): IRegressionResult {
-
-        // if (!this.correctionRegressions[ageGroupName]) {
-        //     const correction_configs: { [K in string]: IRegressionConfig } = {};
-        //     correction_configs[ageGroupName] = {
-        //         back_days_a: -20,
-        //         back_days_b: 0,
-        //         poly_weight: 0.1
-        //     }
-        //     this.acceptUpdate({
-        //         correction_configs
-        //     });
-        // }
 
         const result = this.correctionRegressions[ageGroupName].getRegressionResult(instant);
         if (result.regression && result.ci95Dim) {
@@ -184,19 +150,25 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
         for (const key of Object.keys(multiplierConfigs)) {
             const regressionConfig = multiplierConfigs[key];
+            if (!regressionConfig.poly_shares) {
+                regressionConfig.poly_shares = [0.5, 0.75];
+            }
             const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
             const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
             this.multiplierRegressions[key] = new ValueRegressionMultiplier({
                 contactCategory: key,
                 instantA,
                 instantB,
-                polyWeight: regressionConfig.poly_weight,
+                polyShares: regressionConfig.poly_shares,
                 modificationsContact: new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
             });
         }
 
         for (const key of Object.keys(correctionConfigs)) {
             const regressionConfig = correctionConfigs[key];
+            if (!regressionConfig.poly_shares) {
+                regressionConfig.poly_shares = [0.5, 0.75];
+            }
             const ageGroupIndex = Demographics.getInstance().findAgeGroupByName(key).getIndex();
             const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
             const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
@@ -204,7 +176,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 ageGroupIndex,
                 instantA,
                 instantB,
-                polyWeight: regressionConfig.poly_weight,
+                polyShares: regressionConfig.poly_shares,
                 modificationsContact: new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
             });
         }

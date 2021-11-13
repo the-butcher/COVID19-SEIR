@@ -17,7 +17,7 @@ export interface IRegressionParams {
      */
     instantB: number;
 
-    polyWeight: number;
+    polyShares: number[];
 
     modificationsContact: ModificationContact[];
 
