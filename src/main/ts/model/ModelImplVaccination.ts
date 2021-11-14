@@ -30,6 +30,11 @@ export class ModelImplVaccination implements IModelSeir {
     private readonly compartmentI: CompartmentBase;
 
     /**
+     * pure model based --> amount of re-immunizing at given time
+     */
+     private readonly compartmentR: CompartmentBase;
+
+    /**
      * pure model based --> people fully vaccinated, should be configured to match the vacc_2 curve
      */
     private readonly compartmentV: CompartmentBase;
@@ -66,6 +71,7 @@ export class ModelImplVaccination implements IModelSeir {
 
         // this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
         this.compartmentI = new CompartmentBase(ECompartmentType.R__REMOVED_VI, this.absTotal, absValueVI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
+        this.compartmentR = new CompartmentBase(ECompartmentType.R__REMOVED_VI, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(3 * TimeUtil.MILLISECONDS_PER___WEEK), '');
         this.compartmentU = new CompartmentBase(ECompartmentType.R__REMOVED_VU, this.absTotal, absValueVU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
         this.compartmentV = new CompartmentBase(ECompartmentType.R__REMOVED_V2, this.absTotal, absValueV2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
 
@@ -77,6 +83,10 @@ export class ModelImplVaccination implements IModelSeir {
 
     getCompartmentI(): CompartmentBase {
         return this.compartmentI;
+    }
+
+    getCompartmentR(): CompartmentBase {
+        return this.compartmentR;
     }
 
     getCompartmentU(): CompartmentBase {
@@ -122,9 +132,9 @@ export class ModelImplVaccination implements IModelSeir {
     getInitialState(): IModelState {
         const initialState = ModelState.empty();
         initialState.addNrmValue(this.compartmentI.getNrmValue(), this.compartmentI);
+        initialState.addNrmValue(this.compartmentR.getNrmValue(), this.compartmentR);
         initialState.addNrmValue(this.compartmentU.getNrmValue(), this.compartmentU);
         initialState.addNrmValue(this.compartmentV.getNrmValue(), this.compartmentV);
-        // initialState.addNrmValue(this.compartmentC.getNrmValue(), this.compartmentC);
         return initialState;
     }
 

@@ -231,7 +231,7 @@ export class ModelStateIntegrator {
         const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I__INFECTIOUS));
         const compartmentFilterRemovedIDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID));
         const compartmentFilterRemovedIUTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU));
-        const compartmentFilterRemovedVITotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI));
+        const compartmentFilterRemovedVITotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI || c.getCompartmentType() === ECompartmentType.R__REMOVED_VR));
         const compartmentFilterRemovedVUTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VU));
         const compartmentFilterRemovedV2Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2));
         const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0);
@@ -314,16 +314,16 @@ export class ModelStateIntegrator {
                     const compartmentFilterInfectious = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.I__INFECTIOUS && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedID = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedIU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU) && c.getAgeGroupIndex() === ageGroup.getIndex());
-                    const compartmentFilterRemovedV1 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI && c.getAgeGroupIndex() === ageGroup.getIndex()));
-                    const compartmentFilterRemovedVU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VU && c.getAgeGroupIndex() === ageGroup.getIndex()));
-                    const compartmentFilterRemovedV2 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2 && c.getAgeGroupIndex() === ageGroup.getIndex()));
+                    const compartmentFilterRemovedVI = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI || c.getCompartmentType() === ECompartmentType.R__REMOVED_VR) && c.getAgeGroupIndex() === ageGroup.getIndex());
+                    const compartmentFilterRemovedVU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VU) && c.getAgeGroupIndex() === ageGroup.getIndex());
+                    const compartmentFilterRemovedV2 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterCases = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterIncidence = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterAgeGroupTotal = new CompartmentFilter(c => (c.getCompartmentType() !== ECompartmentType.X__INCUBATE_0 && c.getCompartmentType() !== ECompartmentType.X__INCUBATE_N) && c.getAgeGroupIndex() === ageGroup.getIndex());
 
                     const removedID = this.modelState.getNrmValueSum(compartmentFilterRemovedID) * groupNormalizer;
                     const removedIU = this.modelState.getNrmValueSum(compartmentFilterRemovedIU) * groupNormalizer;
-                    const removedVI = this.modelState.getNrmValueSum(compartmentFilterRemovedV1) * groupNormalizer;
+                    const removedVI = this.modelState.getNrmValueSum(compartmentFilterRemovedVI) * groupNormalizer;
                     const removedVU = this.modelState.getNrmValueSum(compartmentFilterRemovedVU) * groupNormalizer;
                     const removedV2 = this.modelState.getNrmValueSum(compartmentFilterRemovedV2) * groupNormalizer;
                     const discovery = modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;

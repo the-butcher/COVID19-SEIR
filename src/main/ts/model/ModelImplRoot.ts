@@ -344,7 +344,14 @@ export class ModelImplRoot implements IModelSeir {
 
             // v3 (TODO: find out if the time to re-gain immunity is significant and needs to be modelled)
             result.addNrmValue(-nrmJab3T, this.compartmentsSusceptible[i]);
-            result.addNrmValue(+nrmJab3T, this.vaccinationModels[i].getCompartmentV());
+            result.addNrmValue(+nrmJab3T, this.vaccinationModels[i].getCompartmentR());
+
+            const compartmentVR = this.vaccinationModels[i].getCompartmentR();
+            const nrmRegainedImmunity = compartmentVR.getContinuationRatio().getRate(dT, tT) * state.getNrmValue(compartmentVR);
+
+            // subtract from compartment
+            result.addNrmValue(-nrmRegainedImmunity, compartmentVR);
+            result.addNrmValue(+nrmRegainedImmunity, this.vaccinationModels[i].getCompartmentV());
 
         }
 
