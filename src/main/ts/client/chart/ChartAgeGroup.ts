@@ -1,3 +1,4 @@
+import { ControlsContact } from './../controls/ControlsContact';
 import { CategoryAxis, CategoryAxisDataItem, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -178,6 +179,8 @@ export class ChartAgeGroup {
     private absValue: number; // the absolute value of the age-group currently displayed
     private ageGroupIndex: number;
     private categoryName: string;
+    private contactNote: string;
+
     private modelData: IDataItem[];
     private chartMode: CHART_MODE______KEY;
 
@@ -1086,15 +1089,19 @@ export class ChartAgeGroup {
 
         });
 
+        this.yAxisPlotPercent.adapter.add('max', (value, target) => {
+            requestAnimationFrame(() => {
+                this.updateSeriesNotes();
+            });
+            return value;
+        });
+
         this.yAxisPlotIncidence.adapter.add('min', (value, target) => {
-            // console.log('min', value);
             value = 0;
             this.yAxisPlotAbsolute.min = value * this.absValue / 700000;
             return value;
         });
         this.yAxisPlotIncidence.adapter.add('max', (value, target) => {
-            // console.log('max', value);
-            // value = 1000;
             this.yAxisPlotAbsolute.max = value * this.absValue / 700000;
             return value;
         });
@@ -1186,6 +1193,8 @@ export class ChartAgeGroup {
 
     async setAgeGroupIndex(ageGroupIndex: number): Promise<void> {
 
+        console.warn('set age group index');
+
         const requiresBaseDataRender = this.ageGroupIndex !== ageGroupIndex;
         const requiresRegressionData = this.getChartMode() === 'CONTACT';
 
@@ -1193,6 +1202,7 @@ export class ChartAgeGroup {
         this.updateTitle();
 
         const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
+        this.contactNote = ageGroup.getName();
         this.absValue = ageGroup.getAbsValue();
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
@@ -1229,8 +1239,6 @@ export class ChartAgeGroup {
                 }
             }, 100);
 
-
-
             const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
             modificationValuesStrain.forEach(strainValues => {
                 // this call implicitly updates the base label, explicity updates series label
@@ -1238,6 +1246,14 @@ export class ChartAgeGroup {
             });
 
         }
+
+
+
+    }
+
+    updateSeriesNotes(): void {
+
+        const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
 
         this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupIncidence95L.setSeriesNote(ageGroup.getName());
@@ -1266,13 +1282,13 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR3.setSeriesNote(ageGroup.getName());
 
-        this.seriesContactValue.setSeriesNote(ageGroup.getName());
-        this.seriesContactValue95L.setSeriesNote(ageGroup.getName());
-        this.seriesContactValue95U.setSeriesNote(ageGroup.getName());
-        this.seriesContactValueM.setSeriesNote(ageGroup.getName());
-        this.seriesContactValueL.setSeriesNote(ageGroup.getName());
-        this.seriesContactValueLL.setSeriesNote(ageGroup.getName());
-        this.seriesContactValueLU.setSeriesNote(ageGroup.getName());
+        this.seriesContactValue.setSeriesNote(this.contactNote);
+        this.seriesContactValue95L.setSeriesNote(this.contactNote);
+        this.seriesContactValue95U.setSeriesNote(this.contactNote);
+        this.seriesContactValueM.setSeriesNote(this.contactNote);
+        this.seriesContactValueL.setSeriesNote(this.contactNote);
+        this.seriesContactValueLL.setSeriesNote(this.contactNote);
+        this.seriesContactValueLU.setSeriesNote(this.contactNote);
 
         this.seriesReproductionP.setSeriesNote(ageGroup.getName());
         this.seriesReproductionR.setSeriesNote(ageGroup.getName());
@@ -1282,14 +1298,15 @@ export class ChartAgeGroup {
     async setContactCategory(categoryName: string): Promise<void> {
 
         this.categoryName = categoryName;
+        this.contactNote = categoryName;
 
-        this.seriesContactValue.setSeriesNote(this.categoryName);
-        this.seriesContactValue95L.setSeriesNote(this.categoryName);
-        this.seriesContactValue95U.setSeriesNote(this.categoryName);
-        this.seriesContactValueM.setSeriesNote(this.categoryName);
-        this.seriesContactValueL.setSeriesNote(this.categoryName);
-        this.seriesContactValueLL.setSeriesNote(this.categoryName);
-        this.seriesContactValueLU.setSeriesNote(this.categoryName);
+        this.seriesContactValue.setSeriesNote(this.contactNote);
+        this.seriesContactValue95L.setSeriesNote(this.contactNote);
+        this.seriesContactValue95U.setSeriesNote(this.contactNote);
+        this.seriesContactValueM.setSeriesNote(this.contactNote);
+        this.seriesContactValueL.setSeriesNote(this.contactNote);
+        this.seriesContactValueLL.setSeriesNote(this.contactNote);
+        this.seriesContactValueLU.setSeriesNote(this.contactNote);
 
         if (this.getChartMode() === 'CONTACT') {
             this.renderRegressionData();
@@ -1298,7 +1315,6 @@ export class ChartAgeGroup {
         if (ObjectUtil.isNotEmpty(this.modelData)) {
             this.requestRenderModelData();
         }
-
 
     }
 
@@ -1544,6 +1560,9 @@ export class ChartAgeGroup {
     }
 
     setChartMode(chartMode: CHART_MODE______KEY): void {
+
+        console.warn('set chart mode');
+
         this.chartMode = chartMode;
         ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
         this.updateTitle();
@@ -1565,7 +1584,6 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.min = min; // min;
         this.yAxisPlotPercent.max = max;
     }
-
 
     findDataItemByInstant(instant: number): IDataItem {
         if (ObjectUtil.isNotEmpty(this.modelData)) {
@@ -1607,8 +1625,6 @@ export class ChartAgeGroup {
             const maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
             const minInstant = TimeUtil.parseCategoryDateFull(minCategory); // this.findDataItemByCategory(minCategory).instant;
             const maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
-
-
 
             let maxIncidence = 0;
             let maxInfectious = 0;

@@ -23,10 +23,11 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
 
         const modificationValuesA = modificationA.getModificationValues();
         const modificationValuesB = modificationB.getModificationValues();
+
         const daysAB = (modificationValuesB.instant - modificationValuesA.instant) / TimeUtil.MILLISECONDS_PER____DAY; // fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
 
         const vaccinations: { [K: string]: IVaccinationConfig2 } = {};
-        const ageGroups = Demographics.getInstance().getAgeGroupsWithTotal();
+        const ageGroups = Demographics.getInstance().getAgeGroups();
         ageGroups.forEach(ageGroup => {
             const vaccinationsA = modificationValuesA.vaccinations[ageGroup.getName()];
             const vaccinationsB = modificationValuesB.vaccinations[ageGroup.getName()];
@@ -58,7 +59,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
         const modificationValuesA = modificationA.getModificationValues();
 
         const vaccinations: { [K: string]: IVaccinationConfig2 } = {};
-        const ageGroups = Demographics.getInstance().getAgeGroupsWithTotal();
+        const ageGroups = Demographics.getInstance().getAgeGroups();
         ageGroups.forEach(ageGroup => {
             const vaccinationsA = modificationValuesA.vaccinations[ageGroup.getName()];
             vaccinations[ageGroup.getName()] = {

@@ -471,6 +471,10 @@ export class Slider {
         const elementContainer = sliderElement.getContainer();
         elementContainer.style.transition = animated ? 'transform 250ms ease-in-out' : '';
         elementContainer.style.transform = `translate(${trackBounds.width * ratio - elementContainer.offsetWidth / 2}px, ${topOffset}px)`;
+        if (ratio === 1 && sliderElement.getIndex() < this.sliderThumbs.length - 1) {
+            // another slider element that's further down the index at position 1 -- current slider element would no be draggable
+            elementContainer.style.zIndex = '100';
+        }
         if (ratio >= 0 && ratio <= 1) {
             elementContainer.style.visibility = 'visible';
         } else {
@@ -592,7 +596,7 @@ export class Slider {
     }
 
     /**
-     * transform a position 0-trackElement.clientWidth to value space
+     * transform a position [0, trackElement.clientWidth] to value space
      * @param position
      * @returns
      */

@@ -33,11 +33,6 @@ export class ControlsRegression {
 
     private modification: ModificationRegression;
 
-    /**
-     * points to either a category (multiplier) or an age-group (correction)
-     */
-    private regressionPointer: IRegressionPointer;
-
     constructor() {
         this.sliderBackDays = new SliderRegression("back days", 1, ModelConstants.RANGE_________BACK_DAYS, -10, -5);
         this.sliderPolyShares = new SliderRegression("poly shares", 0.05, ModelConstants.RANGE____PERCENTAGE_100, 0.5, 0.75);
@@ -50,10 +45,11 @@ export class ControlsRegression {
      * @returns
      */
     getRenderableRegressionResult(instant: number): IRegressionResult {
-        if (this.regressionPointer.type === 'MULTIPLIER') {
-            return this.modification.getMultiplierRegression(instant, this.regressionPointer.value);
-        } else if (this.regressionPointer.type === 'CORRECTION') {
-            return this.modification.getCorrectionRegression(instant, this.regressionPointer.value);
+        const regressionPointer = ModelActions.getInstance().getRegressionPointer();
+        if (regressionPointer.type === 'MULTIPLIER') {
+            return this.modification.getMultiplierRegression(instant, regressionPointer.value);
+        } else if (regressionPointer.type === 'CORRECTION') {
+            return this.modification.getCorrectionRegression(instant, regressionPointer.value);
         } else {
             throw new Error('neither category nor agegroup set in regression controls');
         }
@@ -69,10 +65,11 @@ export class ControlsRegression {
         const multiplier_configs: { [K in string]: IRegressionConfig } = {};
         const correction_configs: { [K in string]: IRegressionConfig } = {};
 
-        if (this.regressionPointer.type === 'MULTIPLIER') {
-            multiplier_configs[this.regressionPointer.value] = regressionConfig;
-        } else if (this.regressionPointer.type === 'CORRECTION') {
-            correction_configs[this.regressionPointer.value] = regressionConfig;
+        const regressionPointer = ModelActions.getInstance().getRegressionPointer();
+        if (regressionPointer.type === 'MULTIPLIER') {
+            multiplier_configs[regressionPointer.value] = regressionConfig;
+        } else if (regressionPointer.type === 'CORRECTION') {
+            correction_configs[regressionPointer.value] = regressionConfig;
         }
 
         this.modification.acceptUpdate({
@@ -90,7 +87,6 @@ export class ControlsRegression {
     }
 
     handleRegressionPointerChange(): void {
-        this.regressionPointer = ModelActions.getInstance().getRegressionPointer();
         this.updateSliderValues();
     }
 
@@ -99,22 +95,30 @@ export class ControlsRegression {
         // console.log('this.regressionPointer', this.regressionPointer, this.modification);
         if (this.modification) {
 
+            const regressionPointer = ModelActions.getInstance().getRegressionPointer();
             let regressionConfig: IRegressionConfig;
-            if (this.regressionPointer.type === 'MULTIPLIER') {
-                regressionConfig = this.modification.getMultiplierConfig(this.regressionPointer.value);
-                ChartAgeGroup.getInstance().setAxisPercentBounds(0, 1);
-            } else if (this.regressionPointer.type === 'CORRECTION') {
-                regressionConfig = this.modification.getCorrectionConfig(this.regressionPointer.value);
-                ChartAgeGroup.getInstance().setAxisPercentBounds(0, 2);
+            if (regressionPointer.type === 'MULTIPLIER') {
+                regressionConfig = this.modification.getMultiplierConfig(regressionPointer.value);
+            } else if (regressionPointer.type === 'CORRECTION') {
+                regressionConfig = this.modification.getCorrectionConfig(regressionPointer.value);
             }
 
             if (regressionConfig) {
-                this.sliderBackDays.setLabel(this.regressionPointer.value);
-                this.sliderPolyShares.setLabel(this.regressionPointer.value);
+                this.sliderBackDays.setLabel(regressionPointer.value);
+                this.sliderPolyShares.setLabel(regressionPointer.value);
                 this.sliderBackDays.setValue(0, regressionConfig.back_days_a);
                 this.sliderBackDays.setValue(1, regressionConfig.back_days_b);
                 this.sliderPolyShares.setValue(0, regressionConfig.poly_shares[0]);
                 this.sliderPolyShares.setValue(1, regressionConfig.poly_shares[1]);
+            }
+
+            if (ChartAgeGroup.getInstance().getChartMode() === 'CONTACT') {
+                const regressionPointer = ModelActions.getInstance().getRegressionPointer();
+                if (regressionPointer.type === 'MULTIPLIER') {
+                    ChartAgeGroup.getInstance().setAxisPercentBounds(0, 1);
+                } else if (regressionPointer.type === 'CORRECTION') {
+                    ChartAgeGroup.getInstance().setAxisPercentBounds(0, 2);
+                }
             }
 
         }

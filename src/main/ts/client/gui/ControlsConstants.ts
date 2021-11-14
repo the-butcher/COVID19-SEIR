@@ -315,7 +315,7 @@ export class ControlsConstants {
             },
             showInEditor: modification => {
                 ControlsSeasonality.getInstance().acceptModification(modification as ModificationSeasonality);
-                ChartAgeGroup.getInstance().setChartMode('CONTACT');
+                ChartAgeGroup.getInstance().setChartMode('REPRODUCTION');
             },
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -329,7 +329,10 @@ export class ControlsConstants {
                 return new ModificationResolverRegression();
             },
             handleModificationDrag: () => {},
-            showInEditor: modification => ControlsRegression.getInstance().acceptModification(modification as ModificationRegression),
+            showInEditor: modification => {
+                ChartAgeGroup.getInstance().setChartMode('CONTACT');
+                ControlsRegression.getInstance().acceptModification(modification as ModificationRegression);
+            },
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         },
         'SETTINGS': {

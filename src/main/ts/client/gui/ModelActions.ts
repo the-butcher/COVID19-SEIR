@@ -1,3 +1,4 @@
+import { ControlsContact } from './../controls/ControlsContact';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
 import { IRegressionResult } from '../../model/regression/IRegressionResult';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -126,13 +127,17 @@ export class ModelActions {
             container: 'charttoggleDiv',
             label: 'CONTACT',
             iconKey: 'CONTACT',
-            handleClick: () => ModelActions.getInstance().toggleChartMode('CONTACT')
+            handleClick: () => {
+                ModelActions.getInstance().toggleChartMode('CONTACT');
+            }
         }));
         this.chartModeIcons.push(new IconChartMode({
             container: 'charttoggleDiv',
             label: 'REPRODUCTION',
             iconKey: 'REPRODUCTION',
-            handleClick: () => ModelActions.getInstance().toggleChartMode('REPRODUCTION')
+            handleClick: () => {
+                ModelActions.getInstance().toggleChartMode('REPRODUCTION');
+            }
         }));
 
         const ageGroups = [...Demographics.getInstance().getAgeGroups()].reverse();
