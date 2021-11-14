@@ -33,7 +33,7 @@
       "r0": 4.4,
       "serialInterval": 4.8,
       "intervalScale": 1,
-      "dstIncidence": 152.30091439759224,
+      "dstIncidence": 152.30091439921978,
       "deletable": false,
       "draggable": false,
       "primary": true
@@ -143,7 +143,7 @@
       "id": "b5e8",
       "key": "TIME",
       "name": "initial state",
-      "instant": 1619827200000,
+      "instant": 1635724800000,
       "deletable": false,
       "draggable": true
     },
@@ -5120,40 +5120,40 @@
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.65,
+            1
           ]
         },
         "family": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.9,
+            1
           ]
         },
         "school": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            1,
+            1
           ]
         },
         "nursing": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            1,
+            1
           ]
         },
         "work": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.7000000000000001,
+            1
           ]
         }
       },
@@ -5170,40 +5170,40 @@
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.7000000000000001,
+            0.9500000000000001
           ]
         },
         "15-24": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.7000000000000001,
+            1
           ]
         },
         "25-34": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.75,
+            0.9500000000000001
           ]
         },
         "35-44": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.75,
+            0.9500000000000001
           ]
         },
         "45-54": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.6000000000000001,
+            0.9
           ]
         },
         "55-64": {
@@ -5211,31 +5211,31 @@
           "back_days_b": 0,
           "poly_shares": [
             0.5,
-            0.75
+            1
           ]
         },
         "65-74": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.75,
+            1
           ]
         },
         "75-84": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.6000000000000001,
+            1
           ]
         },
         ">= 85": {
           "back_days_a": -35,
           "back_days_b": 0,
           "poly_shares": [
-            0.5,
-            0.75
+            0.75,
+            1
           ]
         }
       }

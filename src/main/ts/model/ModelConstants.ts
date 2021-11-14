@@ -96,7 +96,8 @@ export class ModelConstants {
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                     vaccinations[ageGroup.getName()] = {
                         v1: 0,
-                        v2: 0
+                        v2: 0,
+                        v3: 0
                     }
                 });
                 return new ModificationVaccination({
@@ -135,16 +136,17 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_REMOVED = 1;
     static readonly BASE_DATA_INDEX_VACC1ST = 2;
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
-    static readonly BASE_DATA_INDEX___TESTS = 4;
-    static readonly BASE_DATA_INDEX__MOBI_O = 5;
-    static readonly BASE_DATA_INDEX__MOBI_W = 6;
-    static readonly BASE_DATA_INDEX__MOBI_H = 7;
+    static readonly BASE_DATA_INDEX_VACC3RD = 4;
+    static readonly BASE_DATA_INDEX___TESTS = 5;
+    static readonly BASE_DATA_INDEX__MOBI_O = 6;
+    static readonly BASE_DATA_INDEX__MOBI_W = 7;
+    static readonly BASE_DATA_INDEX__MOBI_H = 8;
 
     // static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00];
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
-    static readonly RANGE________REEXPOSURE = [6, 9, 12, 15, 18, 21, 24];
+    static readonly RANGE________REEXPOSURE = [3, 6, 9, 12];
     static readonly RANGE________INCUBATION = [1, 7, 14];
     static readonly RANGE____INCIDENCE_1000 = [0, 250, 500, 750, 1000];
     static readonly RANGE_____INCIDENCE__10 = [0, 2, 4, 6, 8, 10];

@@ -120,22 +120,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const modificationResolverVaccination = new ModificationResolverVaccination();
         this.modificationVaccination = modificationResolverVaccination.getModification(this.getInstantA(), 'INTERPOLATE');
 
-        // const modificationVaccinationM1 = modificationResolverVaccination.getModification(this.getInstantA() - TimeUtil.MILLISECONDS_PER____DAY, 'INTERPOLATE');
-        // Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-        //     const vaccConfigM1 = modificationVaccinationM1.getVaccinationConfig2(ageGroup.getName());
-        //     const vaccConfig00 = this.modificationVaccination.getVaccinationConfig2(ageGroup.getName());
-        //     this.vaccinationsPerDay[ageGroup.getName()] = {
-        //         d1: vaccConfig00.v1 - vaccConfigM1.v1,
-        //         d2: vaccConfig00.v2 - vaccConfigM1.v2,
-
-        //     }
-        //     // if (instantA % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-        //     //     console.log(ageGroup.getName(), this.vaccinationsPerDay[ageGroup.getName()]);
-        //     // }
-        // });
-
-        // this.modificationVaccination0 = Modifications.getInstance().findModificationsByType('VACCINATION')[0] as ModificationVaccination; // not mutable, thus reusable
-
         this.modificationSeasonality = new ModificationResolverSeasonality().getModification(this.getInstantA(), 'INTERPOLATE');
         this.modificationSettings = Modifications.getInstance().findModificationsByType('SETTINGS')[0] as ModificationSettings;
         this.resetValues();

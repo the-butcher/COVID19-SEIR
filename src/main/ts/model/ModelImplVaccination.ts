@@ -36,6 +36,7 @@ export class ModelImplVaccination implements IModelSeir {
 
     /**
      * people immunized after previously having been infected unknowingly
+     * an interim stage to simulate 2-vaccinations after unknown infection
      */
     private readonly compartmentU: CompartmentBase;
 
@@ -85,10 +86,6 @@ export class ModelImplVaccination implements IModelSeir {
     getCompartmentV(): CompartmentBase {
         return this.compartmentV;
     }
-
-    // getCompartmentC(): CompartmentBase {
-    //     return this.compartmentC;
-    // }
 
     getNrmValueGroup(ageGroupIndex: number): number {
         return ageGroupIndex === this.ageGroupIndex ? this.getNrmValue() : 0;

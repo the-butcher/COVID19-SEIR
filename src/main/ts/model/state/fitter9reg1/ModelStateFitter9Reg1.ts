@@ -26,7 +26,7 @@ export class ModelStateFitter9Reg1 {
 
         // find the regression modification
         const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
-        const maxRegressionInstant = Math.min(maxInstant, modificationRegression.getInstantA() + 11 * TimeUtil.MILLISECONDS_PER____DAY);
+        const maxRegressionInstant = Math.min(maxInstant, modificationRegression.getInstantA() + 100 * TimeUtil.MILLISECONDS_PER____DAY); // 11
 
         const minRegressionInstant = modificationRegression.getInstantA();
 
@@ -51,7 +51,7 @@ export class ModelStateFitter9Reg1 {
             predictionStats[ageGroup.getName()] = {};
         });
 
-        const iterations = 200;
+        const iterations = 5;
         for (let i = 0; i < iterations; i++) {
 
             console.log('iteration', i);

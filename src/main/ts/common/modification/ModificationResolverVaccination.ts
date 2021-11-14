@@ -33,8 +33,10 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
             vaccinations[ageGroup.getName()] = {
                 v1: vaccinationsA.v1,
                 v2: vaccinationsA.v2,
+                v3: vaccinationsA.v3,
                 d1: (vaccinationsB.v1 - vaccinationsA.v1) / daysAB,
-                d2: (vaccinationsB.v2 - vaccinationsA.v2) / daysAB
+                d2: (vaccinationsB.v2 - vaccinationsA.v2) / daysAB,
+                d3: (vaccinationsB.v3 - vaccinationsA.v3) / daysAB
             }
         });
 
@@ -62,8 +64,10 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
             vaccinations[ageGroup.getName()] = {
                 v1: vaccinationsA.v1,
                 v2: vaccinationsA.v2,
+                v3: vaccinationsA.v3,
                 d1: 0,
-                d2: 0
+                d2: 0,
+                d3: 0
             }
         });
 

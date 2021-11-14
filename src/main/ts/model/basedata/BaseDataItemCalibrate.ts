@@ -1,5 +1,58 @@
+import { IBaseDataItemConfig } from './BaseData';
 import { IBaseDataItem } from './BaseDataItem';
 export class BaseDataItemCalibrate implements IBaseDataItem {
+
+    calculateAverageValues(): void {
+        // do nothing
+    }
+
+    calculatePrimaryValues(): void {
+        // do nothing
+    }
+
+    getMobilityOther(): number {
+        return 0;
+    }
+
+    getMobilityWork(): number {
+        return 0;
+    }
+
+    getMobilityHome(): number {
+        return 0;
+    }
+
+    getCasesM6(ageGroupIndex: number): number {
+        return 0;
+    }
+
+    getCasesM7(ageGroupIndex: number): number {
+        return 0;
+    }
+
+    getAverageHelp1(ageGroupIndex: number): number {
+        return 0;
+    }
+
+    getAverageHelp2(ageGroupIndex: number): number {
+        return 0;
+    }
+
+    getAverageMobilityOther(): number {
+        return 0;
+    }
+
+    getAverageMobilityWork(): number {
+        return 0;
+    }
+
+    getAverageMobilityHome(): number {
+        return 0;
+    }
+
+    extrapolateBaseDataItemConfig(): IBaseDataItemConfig {
+        return undefined;
+    }
 
     getDerivedPositivity(): number {
         return 0;
@@ -42,6 +95,10 @@ export class BaseDataItemCalibrate implements IBaseDataItem {
     }
 
     getVacc2(ageGroupName: string): number {
+        return 0;
+    }
+
+    getVacc3(ageGroupName: string): number {
         return 0;
     }
 

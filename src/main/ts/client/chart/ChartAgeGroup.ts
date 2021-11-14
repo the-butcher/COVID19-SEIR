@@ -162,6 +162,7 @@ export class ChartAgeGroup {
      */
     protected readonly seriesAgeGroupRemovedVR1: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupRemovedVR2: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupRemovedVR3: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupIncidenceR: ChartAgeGroupSeries; // real incidence
     protected readonly seriesPositivityRateR: ChartAgeGroupSeries; // real test numbers
 
@@ -725,6 +726,26 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
         this.seriesAgeGroupRemovedVR1.bindToLegend(this.seriesAgeGroupRemovedVR2);
+        this.seriesAgeGroupRemovedVR3 = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'vaccinated',
+            baseLabel: 'vaccinated, booster (ages)',
+            valueField: 'ageGroupRemovedVR3',
+            colorKey: 'SEASONALITY',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.00,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupRemovedVR1.bindToLegend(this.seriesAgeGroupRemovedVR3);
 
 
         this.seriesPositivityRateR = new ChartAgeGroupSeries({
@@ -1243,6 +1264,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVU.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR1.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupRemovedVR3.setSeriesNote(ageGroup.getName());
 
         this.seriesContactValue.setSeriesNote(ageGroup.getName());
         this.seriesContactValue95L.setSeriesNote(ageGroup.getName());
@@ -1418,6 +1440,7 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.visible = visible;
         this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
         this.yAxisPlotPercent.tooltip.disabled = !visible;
+        this.setAxisPercentBounds(0, 1);
 
 
         this.seriesAgeGroupSusceptible.setVisible(visible);
@@ -1429,6 +1452,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVU.setVisible(visible);
         this.seriesAgeGroupRemovedVR1.setVisible(visible);
         this.seriesAgeGroupRemovedVR2.setVisible(visible);
+        this.seriesAgeGroupRemovedVR3.setVisible(visible);
 
     }
 
@@ -1538,7 +1562,7 @@ export class ChartAgeGroup {
     }
 
     setAxisPercentBounds(min: number, max: number): void {
-        this.yAxisPlotPercent.min = -0.1; // min;
+        this.yAxisPlotPercent.min = min; // min;
         this.yAxisPlotPercent.max = max;
     }
 
@@ -1953,6 +1977,7 @@ export class ChartAgeGroup {
 
             let ageGroupRemovedVR1 = null;
             let ageGroupRemovedVR2 = null;
+            let ageGroupRemovedVR3 = null;
             let ageGroupIncidenceR = null;
             let ageGroupAverageCasesR: number;
             let positivityRateR = null;
@@ -1963,6 +1988,7 @@ export class ChartAgeGroup {
 
                 ageGroupRemovedVR1 = dataItem00.getVacc1(ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupRemovedVR2 = dataItem00.getVacc2(ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
+                ageGroupRemovedVR3 = dataItem00.getVacc3(ageGroupPlot.getName()) / ageGroupPlot.getAbsValue();
                 ageGroupIncidenceR = dataItem00.getIncidence(ageGroupPlot.getIndex());
                 if (ageGroupIncidenceR && !Number.isNaN(ageGroupIncidenceR)) {
                     incidenceMax = Math.max(incidenceMax, ageGroupIncidenceR);
@@ -1986,6 +2012,7 @@ export class ChartAgeGroup {
                 categoryX,
                 ageGroupRemovedVR1,
                 ageGroupRemovedVR2,
+                ageGroupRemovedVR3,
                 ageGroupIncidenceR,
                 ageGroupAverageCasesR,
                 positivityRateR,
@@ -2017,6 +2044,7 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupRemovedVR1.getSeries().data = baseData;
         this.seriesAgeGroupRemovedVR2.getSeries().data = baseData;
+        this.seriesAgeGroupRemovedVR3.getSeries().data = baseData;
         this.seriesAgeGroupIncidenceR.getSeries().data = baseData;
         this.seriesAgeGroupAverageCasesR.getSeries().data = baseData;
         this.seriesPositivityRateR.getSeries().data = baseData;

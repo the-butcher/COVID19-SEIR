@@ -29,7 +29,7 @@ export class SliderVaccination extends Slider {
             min: Math.min(...range),
             max: Math.max(...range),
             step: 0.01,
-            values: [0.0, 0.0],
+            values: [0.0, 0.0, 0.0],
             ticks: [...range],
             label: ageGroupName,
             thumbCreateFunction: (index: number) => {

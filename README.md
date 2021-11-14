@@ -110,6 +110,8 @@ A higher discovery rate means:
 * no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
 
 #### Issues
+* when TIME is saved later than regression, things happen in the wrong order and regression will not be ready upon first call to get a regression
+* regression slider collapsed at 1,1 and can not be moved afterwards
 * ~~review the breakthrough mechanism~~
 * rename "VACCINATED" chart to a more general term (i.e. STATE)
 * add by age group R rate to the model output >> exportable and can be added to chart (define which chart view that would be)

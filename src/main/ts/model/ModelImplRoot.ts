@@ -103,9 +103,11 @@ export class ModelImplRoot implements IModelSeir {
             const vaccinationConfig = modificationTime.getVaccinationConfig2(ageGroup.getName());
             const grpValueV1 = vaccinationConfig.v1; // - vaccinationConfig.v2; // subtract v2 to have a v1 status
             const grpValueV2 = vaccinationConfig.v2;
+            // const grpValueV3 = vaccinationConfig.v2;
 
             let absValueV1 = grpValueV1 * ageGroup.getAbsValue();
             let absValueV2 = grpValueV2 * ageGroup.getAbsValue();
+            // let absValueV3 = grpValueV2 * ageGroup.getAbsValue();
 
             // console.log(ageGroup.getName(), absValueV1.toFixed(2).padStart(10, ' '), absValueSC.toFixed(2).padStart(10, ' '), absValueID.toFixed(2).padStart(10, ' '), absValueIU.toFixed(2).padStart(10, ' '));
 
@@ -298,8 +300,10 @@ export class ModelImplRoot implements IModelSeir {
              */
             const grpJab1T = vaccinationsPerDay.d1 * dT / TimeUtil.MILLISECONDS_PER____DAY;
             const grpJab2T = vaccinationsPerDay.d2 * dT / TimeUtil.MILLISECONDS_PER____DAY;
+            const grpJab3T = vaccinationsPerDay.d3 * dT / TimeUtil.MILLISECONDS_PER____DAY;
             const nrmJab1T = grpJab1T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
             const nrmJab2T = grpJab2T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
+            const nrmJab3T = grpJab3T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
 
             /**
              * assumptions about 1st dose
@@ -337,6 +341,10 @@ export class ModelImplRoot implements IModelSeir {
 
             result.addNrmValue(-nrmJabUV, this.vaccinationModels[i].getCompartmentU());
             result.addNrmValue(+nrmJabUV, this.vaccinationModels[i].getCompartmentV());
+
+            // v3 (TODO: find out if the time to re-gain immunity is significant and needs to be modelled)
+            result.addNrmValue(-nrmJab3T, this.compartmentsSusceptible[i]);
+            result.addNrmValue(+nrmJab3T, this.vaccinationModels[i].getCompartmentV());
 
         }
 

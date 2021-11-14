@@ -16,8 +16,11 @@ export interface IBaseDataItem {
 
     getExposed(ageGroupName: string): number;
     getRemoved(ageGroupName: string): number;
+
     getVacc1(ageGroupName: string): number;
     getVacc2(ageGroupName: string): number;
+    getVacc3(ageGroupName: string): number;
+
     getTests(): number;
     getMobilityOther(): number;
     getMobilityWork(): number;
@@ -100,6 +103,10 @@ export class BaseDataItem implements IBaseDataItem {
 
     getVacc2(ageGroupName: string): number {
         return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+    }
+
+    getVacc3(ageGroupName: string): number {
+        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC3RD];
     }
 
     getTests(): number {
