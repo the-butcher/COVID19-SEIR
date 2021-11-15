@@ -22,6 +22,8 @@ export interface IBaseDataItem {
     getVacc3(ageGroupName: string): number;
 
     getTests(): number;
+    getHospitalization(): number;
+    getIcu(): number;
     getMobilityOther(): number;
     getMobilityWork(): number;
     getMobilityHome(): number;
@@ -111,6 +113,14 @@ export class BaseDataItem implements IBaseDataItem {
 
     getTests(): number {
         return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX___TESTS];
+    }
+
+    getHospitalization(): number {
+        return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX____HOSP];
+    }
+
+    getIcu(): number {
+        return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX_____ICU];
     }
 
     getMobilityOther(): number {

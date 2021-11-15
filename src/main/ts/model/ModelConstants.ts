@@ -42,6 +42,9 @@ export class ModelConstants {
     static readonly CONFIG_VERSION = 'AT_0_00_06';
 
     static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IModificationDefinitions} = {
+        'REGRESSION': {
+            createValuesModification: (modificationValues) => new ModificationRegression(modificationValues as IModificationValuesRegression),
+        },
         'TIME': {
             createValuesModification: (modificationValues) => new ModificationTime(modificationValues as IModificationValuesTime),
         },
@@ -116,9 +119,6 @@ export class ModelConstants {
         },
         'SETTINGS': {
             createValuesModification: (modificationValues) => new ModificationSettings(modificationValues as IModificationValuesSettings),
-        },
-        'REGRESSION': {
-            createValuesModification: (modificationValues) => new ModificationRegression(modificationValues as IModificationValuesRegression),
         }
     };
 
@@ -138,9 +138,11 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
     static readonly BASE_DATA_INDEX_VACC3RD = 4;
     static readonly BASE_DATA_INDEX___TESTS = 5;
-    static readonly BASE_DATA_INDEX__MOBI_O = 6;
-    static readonly BASE_DATA_INDEX__MOBI_W = 7;
-    static readonly BASE_DATA_INDEX__MOBI_H = 8;
+    static readonly BASE_DATA_INDEX____HOSP = 6;
+    static readonly BASE_DATA_INDEX_____ICU = 7;
+    static readonly BASE_DATA_INDEX__MOBI_O = 8;
+    static readonly BASE_DATA_INDEX__MOBI_W = 9;
+    static readonly BASE_DATA_INDEX__MOBI_H = 10;
 
     // static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00];
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];

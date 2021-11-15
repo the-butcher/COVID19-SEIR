@@ -139,6 +139,14 @@ export class ModelActions {
                 ModelActions.getInstance().toggleChartMode('REPRODUCTION');
             }
         }));
+        this.chartModeIcons.push(new IconChartMode({
+            container: 'charttoggleDiv',
+            label: 'HOSPITAL',
+            iconKey: 'HOSPITAL',
+            handleClick: () => {
+                ModelActions.getInstance().toggleChartMode('HOSPITAL');
+            }
+        }));
 
         const ageGroups = [...Demographics.getInstance().getAgeGroups()].reverse();
         this.ageGroupIcons.push(new IconChartMode({
@@ -180,6 +188,7 @@ export class ModelActions {
             categoryIcon.setActive(categoryIcon.getIconKey() === category);
         });
         ControlsRegression.getInstance().handleRegressionPointerChange();
+        ControlsContact.getInstance().handleCategoryChange(category);
         ChartAgeGroup.getInstance().setContactCategory(category);
     }
 

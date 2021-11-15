@@ -129,6 +129,8 @@ export class ModelStateFitter9Reg1 {
         });
 
         dataset.push(...normalizedDataset);
+        ModelStateIntegrator.addReproduction(dataset);
+
         console.log(loggableRange, '++', normalizedDataset.length);
 
         return {

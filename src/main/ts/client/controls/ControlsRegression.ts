@@ -1,4 +1,4 @@
-import { ChartAgeGroup } from './../chart/ChartAgeGroup';
+import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IRegressionResult } from '../../model/regression/IRegressionResult';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -8,9 +8,9 @@ import { SliderRegression } from '../gui/SliderRegression';
 import { StorageUtil } from '../storage/StorageUtil';
 import { IRegressionConfig } from './../../common/modification/IModificationValuesRegression';
 import { ModificationRegression } from './../../common/modification/ModificationRegression';
-import { IRegressionPointer, ModelActions } from './../gui/ModelActions';
+import { ChartAgeGroup } from './../chart/ChartAgeGroup';
+import { ModelActions } from './../gui/ModelActions';
 import { Controls } from './Controls';
-import { Modifications } from '../../common/modification/Modifications';
 
 /**
  * controller for editing regression modification

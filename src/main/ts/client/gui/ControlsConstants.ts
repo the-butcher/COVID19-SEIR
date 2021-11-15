@@ -64,7 +64,7 @@ export interface ILabellingDefinition {
     format(value: number): string;
 }
 
-export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'TESTING' | 'CONTACT' | 'REPRODUCTION';
+export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'TESTING' | 'CONTACT' | 'REPRODUCTION' | 'HOSPITAL';
 export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'IMMUNIZING' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
 
 /**
@@ -154,6 +154,7 @@ export class ControlsConstants {
                 chart.setSeriesTestingVisible(false);
                 chart.setSeriesContactVisible(false);
                 chart.setSeriesReproductionVisible(false);
+                chart.setSeriesHospitalVisible(false);
                 chart.setSeriesIncidenceVisible(true);
                 chart.setSeriesEIVisible(false, true);
             }
@@ -170,6 +171,7 @@ export class ControlsConstants {
                 chart.setSeriesTestingVisible(false);
                 chart.setSeriesContactVisible(false);
                 chart.setSeriesReproductionVisible(false);
+                chart.setSeriesHospitalVisible(false);
                 chart.setSeriesEIVisible(true, true);
                 chart.setSeriesSRVisible(true);
             }
@@ -187,6 +189,7 @@ export class ControlsConstants {
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesContactVisible(false);
                 chart.setSeriesReproductionVisible(false);
+                chart.setSeriesHospitalVisible(false);
                 chart.setSeriesTestingVisible(true);
             }
         },
@@ -203,13 +206,33 @@ export class ControlsConstants {
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(false);
                 chart.setSeriesReproductionVisible(false);
+                chart.setSeriesHospitalVisible(false);
                 chart.setSeriesContactVisible(true);
             }
         },
         'REPRODUCTION': {
             id: ObjectUtil.createId(),
             title: 'Reproduction',
-            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID___________ALL], // TODO add reproduction to model data
+            getHeatValue: (dataItem, ageGroupName) => {
+                return dataItem.valueset[ageGroupName].REPRODUCTION;
+            },
+            getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
+            getHeatColor: (value) => new Color(0.82, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatMax: (maxValue) => 2,
+            visitChart: (chart) => {
+                chart.setSeriesIncidenceVisible(false);
+                chart.setSeriesEIVisible(false, false);
+                chart.setSeriesSRVisible(false);
+                chart.setSeriesTestingVisible(false);
+                chart.setSeriesContactVisible(false);
+                chart.setSeriesHospitalVisible(false);
+                chart.setSeriesReproductionVisible(true);
+            }
+        },
+        'HOSPITAL': {
+            id: ObjectUtil.createId(),
+            title: 'Hospital',
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INCIDENCES[ModelConstants.STRAIN_ID___________ALL], // TODO add hospital to model data
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(0.12, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
@@ -219,7 +242,8 @@ export class ControlsConstants {
                 chart.setSeriesSRVisible(false);
                 chart.setSeriesTestingVisible(false);
                 chart.setSeriesContactVisible(false);
-                chart.setSeriesReproductionVisible(true);
+                chart.setSeriesReproductionVisible(false);
+                chart.setSeriesHospitalVisible(true);
             }
         }
     }

@@ -1,3 +1,4 @@
+import { ModelActions } from './../gui/ModelActions';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
 import { ControlsConstants } from '../gui/ControlsConstants';
@@ -26,7 +27,7 @@ export class ControlsContact {
     private static instance: ControlsContact;
 
     private readonly chartContact: ChartContactMatrix;
-    private readonly slidersCategory: SliderContactCategory[];
+    private readonly sliderCategory: SliderContactCategory;
     private readonly iconReadonly: IconToggle;
 
     private modification: ModificationContact;
@@ -35,7 +36,6 @@ export class ControlsContact {
     constructor() {
 
         this.chartContact = new ChartContactMatrix('chartContactDiv', true);
-        this.slidersCategory = [];
 
         this.iconReadonly = new IconToggle({
             container: 'slidersCategoryDiv',
@@ -46,24 +46,30 @@ export class ControlsContact {
             label: 'readonly'
         });
 
-        Demographics.getInstance().getCategories().forEach(contactCategory => {
-            this.slidersCategory.push(new SliderContactCategory(contactCategory));
-        });
+        // find first category
+        const defaultCategory = Demographics.getInstance().getCategories().find(c => true);
+        this.sliderCategory = new SliderContactCategory(defaultCategory);
 
-        this.setSliderStates();
+        this.setSliderState();
 
     }
 
+    handleCategoryChange(categoryName: string): void {
+        if (this.modification) {
+            const category = Demographics.getInstance().getCategories().find(c => c.getName() === categoryName);
+            this.sliderCategory.setCategory(category);
+            this.sliderCategory.setValue(this.modification.getCategoryValue(this.sliderCategory.getName()));
+            this.setSliderState();
+        }
+    }
 
-    setSliderStates(): void {
+    setSliderState(): void {
 
-        this.slidersCategory.forEach(sliderCategory => {
-            if (this.modification?.isReadonly() || sliderCategory.getName() === 'work' || sliderCategory.getName() === 'family') {
-                sliderCategory.setDisabled(true);
-            } else {
-                sliderCategory.setDisabled(false);
-            }
-        });
+        if (this.modification?.isReadonly() || this.sliderCategory.getName() === 'work' || this.sliderCategory.getName() === 'family') {
+            this.sliderCategory.setDisabled(true);
+        } else {
+            this.sliderCategory.setDisabled(false);
+        }
 
     }
 
@@ -87,9 +93,7 @@ export class ControlsContact {
         // apply current slider settings to the slider-category filter on the modification
         const multipliers: { [K in string] : number } = {};
 
-        this.slidersCategory.forEach(sliderCategory => {
-            multipliers[sliderCategory.getName()] = sliderCategory.getValue();
-        });
+        multipliers[this.sliderCategory.getName()] = this.sliderCategory.getValue();
 
         const readonly = this.iconReadonly.getState();
         this.modification.acceptUpdate({
@@ -97,7 +101,7 @@ export class ControlsContact {
             readonly
         });
 
-        this.setSliderStates();
+        this.setSliderState();
         // console.log('handleChange', corrections, this.modification);
 
         this.applyToChartContact();
@@ -117,18 +121,15 @@ export class ControlsContact {
         Controls.acceptModification(modification);
         this.modification = modification;
 
-        this.slidersCategory.forEach(sliderCategory => {
-            sliderCategory.setValue(modification.getCategoryValue(sliderCategory.getName()));
-            sliderCategory.acceptModification(this.modification);
-        });
+        this.sliderCategory.setValue(modification.getCategoryValue(this.sliderCategory.getName()));
+        this.sliderCategory.acceptModification(this.modification);
+
         this.iconReadonly.toggle(modification.isReadonly());
-        this.setSliderStates();
+        this.setSliderState();
 
         requestAnimationFrame(() => {
             this.applyToChartContact();
-            this.slidersCategory.forEach(sliderCategory => {
-                sliderCategory.handleResize();
-            });
+            this.sliderCategory.handleResize();
         });
 
     }

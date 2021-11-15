@@ -89,38 +89,11 @@ A higher discovery rate means:
 * StrainApproximatorBaseData - manual increase of incidence to correct for awkward data
 * Demographics corrections on the matrices
 
-#### Thoughts
-* process for auto-modeller
-  * let ModelStateFitter5 (which works purely on errors) iterate the model with increasing precision until tolerance met
-  * create some ModificationContact subclass that will not persist with the model (but maybe persisting does not matter), those modifications shall put themselves onto the prediction curves
-  * add confidence interval (find out how the confidence interval expands out from begin of prediction)
-  * do not forget to introduce new testing modifications as more testing information comes with the data - find a way to automate
-* do all of the above in a way that allows to simulate historic predictions in order to validate and improve patterns
-* think about ways to provide repeatable results of presentation
-  * diagram needs an appropriate title containing data source, and twitter account
-  * primary diagram (overall prediction)
-  * secondary diagrams (one per age group?) - how to a arrange on a single sheet? maybe use 5x2 or 4x3 and use extra space for text, secondary diagrams will likely not need to have the heatmap included
-  * find out how to render
-  * long term prediction (?) - probably only makes sense in a set of multiple predictions
-
-* goal is to reliably identify a total share of cases found (the model needs then to make assumptions which age-group gets which share)
-* positivity rate in pcr is influenced by antigen
-* found / tested_antigen = positivity_rate_antigen (the actual amount of positive tests should already reflect sensitivity)
-* There are different shares of PCR and Antigen Tests per province (i.e. Vienna having almost equal shares)
-* no knowledge about how positive Antigen Tests reflect in subsequent PCT positivity rate
-
 #### Issues
-* when TIME is saved later than regression, things happen in the wrong order and ModificationTime will try to create a regression instance that is not ready
-* ~~regression slider collapsed at 1,1 can not be moved afterwards (would likely not happen at 0,0 since z-order would be ok on that end)~~
-* ~~review the breakthrough mechanism~~
 * rename "VACCINATED" chart to a more general term (i.e. STATE)
-* add by age group R rate to the model output >> exportable and can be added to chart (define which chart view that would be)
 * add an age group discovery curve to the testing chart-view
 * acceptModification is called multiple times -> check for performance and streamline
-* ~~NO checkpoints in the model for faster processing (could have some points where there is a calibrated set of strains and a continuable model state)~~
-  * ~~processing must reach back to the previous unchanged modification~~
 * consider corrections when calculating category ratio in ModificationContact (check if that is not the case already)
-* ~~interpolated test rate gives above min and below max~~
 * wiki on github
 
 #### Backlog
@@ -148,6 +121,13 @@ A higher discovery rate means:
   * introduce simple undo/redo
 
 #### Done
+* ~~add by age group R rate to the model output >> exportable and can be added to chart (define which chart view that would be)~~
+* ~~when TIME is saved later than regression, things happen in the wrong order and ModificationTime will try to create a regression instance that is not ready >> ModelConstants.MODIFICATION_PARAMS, REGRESSION moved to before TIME~~
+* ~~regression slider collapsed at 1,1 can not be moved afterwards (would likely not happen at 0,0 since z-order would be ok on that end)~~
+* ~~review the breakthrough mechanism~~
+* ~~NO checkpoints in the model for faster processing (could have some points where there is a calibrated set of strains and a continuable model state)~~
+  * ~~processing must reach back to the previous unchanged modification~~
+* ~~interpolated test rate gives above min and below max~~
 * ~~with modification chart gone, the zoom button needs to be moved up~~
 * ~~order series or find out how to order legend items so associated items sit next to each other~~
 * ~~remove the small modification chart on top~~

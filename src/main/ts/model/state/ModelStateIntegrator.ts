@@ -1,13 +1,15 @@
-import { IModificationValuesRegression } from './../../common/modification/IModificationValuesRegression';
 import { Modifications } from '../../common/modification/Modifications';
 import { TimeUtil } from '../../util/TimeUtil';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
 import { ECompartmentType } from '../compartment/ECompartmentType';
 import { ModelConstants } from '../ModelConstants';
 import { ModelImplRoot } from '../ModelImplRoot';
+import { Demographics } from './../../common/demographics/Demographics';
 import { IModificationValuesContact } from './../../common/modification/IModificationValuesContact';
+import { IModificationValuesRegression } from './../../common/modification/IModificationValuesRegression';
 import { IModificationValuesStrain } from './../../common/modification/IModificationValuesStrain';
 import { ModificationTime } from './../../common/modification/ModificationTime';
+import { StrainUtil } from './../../util/StrainUtil';
 import { ModelInstants } from './../ModelInstants';
 import { IModelState } from './IModelState';
 import { ModelState } from './ModelState';
@@ -53,10 +55,11 @@ export interface IDataValues {
     REMOVED_VU: number;
     REMOVED_V2: number;
     CASES: number;
-    INCIDENCES: { [K: string]: number };
+    INCIDENCES: { [K in string]: number };
     PREDICTION?: IDataForecast;
-    EXPOSED: { [K: string]: number };
-    INFECTIOUS: { [K: string]: number };
+    EXPOSED: { [K in string]: number };
+    INFECTIOUS: { [K in string]: number };
+    REPRODUCTION?: number;
     DISCOVERY: number;
     TOTAL: number;
 }
@@ -231,7 +234,7 @@ export class ModelStateIntegrator {
         const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I__INFECTIOUS));
         const compartmentFilterRemovedIDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID));
         const compartmentFilterRemovedIUTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU));
-        const compartmentFilterRemovedVITotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI || c.getCompartmentType() === ECompartmentType.R__REMOVED_VR));
+        const compartmentFilterRemovedVITotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI));
         const compartmentFilterRemovedVUTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VU));
         const compartmentFilterRemovedV2Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2));
         const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0);
@@ -314,7 +317,7 @@ export class ModelStateIntegrator {
                     const compartmentFilterInfectious = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.I__INFECTIOUS && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedID = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_ID) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedIU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_IU) && c.getAgeGroupIndex() === ageGroup.getIndex());
-                    const compartmentFilterRemovedVI = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI || c.getCompartmentType() === ECompartmentType.R__REMOVED_VR) && c.getAgeGroupIndex() === ageGroup.getIndex());
+                    const compartmentFilterRemovedVI = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VI) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedVU = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_VU) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterRemovedV2 = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R__REMOVED_V2) && c.getAgeGroupIndex() === ageGroup.getIndex());
                     const compartmentFilterCases = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 && c.getAgeGroupIndex() === ageGroup.getIndex());
@@ -384,6 +387,18 @@ export class ModelStateIntegrator {
 
         return dataSet;
 
+    }
+
+    static addReproduction(dataSet: IDataItem[]): void {
+        for (let i=2; i< dataSet.length - 2; i++) {
+            const dataItemM2 = dataSet[i - 2];
+            const dataItemP2 = dataSet[i + 2];
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+                const averageCasesM2 = dataItemM2.valueset[ageGroup.getName()].CASES;
+                const averageCasesP2 = dataItemP2.valueset[ageGroup.getName()].CASES;
+                dataSet[i].valueset[ageGroup.getName()].REPRODUCTION =  StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.instant, dataItemP2.instant, 4);
+            });
+        }
     }
 
 }

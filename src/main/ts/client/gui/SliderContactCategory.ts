@@ -1,9 +1,8 @@
-import { ChartAgeGroup } from './../chart/ChartAgeGroup';
-import { ContactCategory } from '../../common/demographics/ContactCategory';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ControlsContact } from '../controls/ControlsContact';
+import { ContactCategory } from './../../common/demographics/ContactCategory';
 import { ControlsConstants } from './ControlsConstants';
 import { IconSlider } from './IconSlider';
 import { Slider } from './Slider';
@@ -12,14 +11,14 @@ export class SliderContactCategory extends Slider {
 
     static readonly CLASS_CORRECTION_LABEL = 'correction-label';
 
-    private readonly contactCategoryConfig: ContactCategory;
+    private contactCategory: ContactCategory;
     private readonly ageGroupProfileDivs: HTMLDivElement[];
     private readonly ageGroupLabelDivs: HTMLDivElement[];
 
 
     private corrections: { [K in string] : number };
 
-    constructor(contactCategoryConfig: ContactCategory) {
+    constructor(contactCategory: ContactCategory) {
 
         const container = document.createElement('div');
         container.classList.add('slider-modification');
@@ -43,7 +42,7 @@ export class SliderContactCategory extends Slider {
             step: 0.01, // 100
             values: [1.0],
             ticks,
-            label: contactCategoryConfig.getName(),
+            label: contactCategory.getName(),
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
             },
@@ -191,7 +190,7 @@ export class SliderContactCategory extends Slider {
         });
 
         this.setLabelPosition(13);
-        this.contactCategoryConfig = contactCategoryConfig;
+        this.contactCategory = contactCategory;
 
     }
 
@@ -259,6 +258,11 @@ export class SliderContactCategory extends Slider {
 
     }
 
+    setCategory(contactCategory: ContactCategory): void {
+        this.contactCategory = contactCategory;
+        this.setLabel(this.contactCategory.getName());
+    }
+
     redrawCanvas(): void {
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
@@ -267,7 +271,7 @@ export class SliderContactCategory extends Slider {
         ageGroups.forEach(ageGroup => {
 
             const ageGroupProfileDiv = this.ageGroupProfileDivs[ageGroup.getIndex()];
-            const value = this.contactCategoryConfig.getColumnValue(ageGroup.getIndex()) * scale + 1;
+            const value = this.contactCategory.getColumnValue(ageGroup.getIndex()) * scale + 1;
 
             // ageGroupProfileDiv.style.top = `${27 - value}px`;
             ageGroupProfileDiv.style.height = `${value}px`;
@@ -296,7 +300,7 @@ export class SliderContactCategory extends Slider {
     }
 
     getName(): string {
-        return this.contactCategoryConfig.getName();
+        return this.contactCategory.getName();
     }
 
     getValue(): number {
