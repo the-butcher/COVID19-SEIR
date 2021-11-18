@@ -54,9 +54,9 @@ export class ControlsContact {
 
     }
 
-    handleCategoryChange(categoryName: string): void {
+    handleCategoryChange(): void {
         if (this.modification) {
-            const category = Demographics.getInstance().getCategories().find(c => c.getName() === categoryName);
+            const category = Demographics.getInstance().getCategories().find(c => c.getName() === ModelActions.getInstance().getCategory());
             this.sliderCategory.setCategory(category);
             this.sliderCategory.setValue(this.modification.getCategoryValue(this.sliderCategory.getName()));
             this.setSliderState();
@@ -73,10 +73,10 @@ export class ControlsContact {
 
     }
 
-    handleCorrections(categoryCorrections: { [K in string] : number }): void {
+    handleCorrections(corrections: { [K in string] : number }): void {
 
         this.modification.acceptUpdate({
-            corrections: {...categoryCorrections}
+            corrections: {...corrections}
         });
         // console.log('handleChange', corrections, this.modification);
 

@@ -51,7 +51,7 @@ export class ModelStateFitter9Reg1 {
             predictionStats[ageGroup.getName()] = {};
         });
 
-        const iterations = 5;
+        const iterations = 20;
         for (let i = 0; i < iterations; i++) {
 
             console.log('iteration', i);
@@ -72,7 +72,7 @@ export class ModelStateFitter9Reg1 {
 
             predictionDataset.forEach(randomData => {
 
-                // if (randomData.instant > (modificationRegression.getInstantA() + TimeUtil.MILLISECONDS_PER____DAY)) {
+                if (randomData.instant > (modificationRegression.getInstantA() + TimeUtil.MILLISECONDS_PER____DAY * 5)) {
 
                     // be sure to have a container for this day
                     const incidenceKey = TimeUtil.formatCategoryDateFull(randomData.instant);
@@ -92,7 +92,7 @@ export class ModelStateFitter9Reg1 {
 
                     });
 
-                // }
+                }
 
             });
 

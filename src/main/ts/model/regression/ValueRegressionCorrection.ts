@@ -3,11 +3,11 @@ import { ModificationContact } from '../../common/modification/ModificationConta
 import { IRegressionParams } from './IRegressionParams';
 import { ValueRegressionBase } from './ValueRegressionBase';
 
-export interface IRegressionParamsCorrection extends IRegressionParams {
+export interface IRegressionParamsCorrection extends IRegressionParams<ModificationContact> {
     ageGroupIndex: number;
 }
 
-export class ValueRegressionCorrection extends ValueRegressionBase {
+export class ValueRegressionCorrection extends ValueRegressionBase<ModificationContact> {
 
     private readonly ageGroupIndex: number;
 

@@ -53,7 +53,7 @@ export interface IBaseDataItem {
 export class BaseDataItem implements IBaseDataItem {
 
     private readonly instant: number;
-    private readonly itemConfig: IBaseDataItemConfig;
+    readonly itemConfig: IBaseDataItemConfig;
 
     private readonly incidences: number[];
 
@@ -116,6 +116,10 @@ export class BaseDataItem implements IBaseDataItem {
     }
 
     getHospitalization(): number {
+        // const delayedItem = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 7);
+        // if (delayedItem) {
+        //     return (delayedItem as BaseDataItem).itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX____HOSP] * 850;
+        // }
         return this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX____HOSP];
     }
 

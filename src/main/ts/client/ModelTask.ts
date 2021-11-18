@@ -87,8 +87,14 @@ export class ModelTask {
                     });
                     StorageUtil.getInstance().setSaveRequired(true);
                 });
-                const modificationRegression = Modifications.getInstance().findModificationById(modelProgress.modificationValuesRegression.id) as ModificationRegression;
-                modificationRegression.acceptUpdate(modelProgress.modificationValuesRegression);
+
+                // if (modelProgress.modificationValuesRegression) {
+                //     const modificationRegression = Modifications.getInstance().findModificationById(modelProgress.modificationValuesRegression.id) as ModificationRegression;
+                //     modificationRegression.acceptUpdate({
+                //         ...modelProgress.modificationValuesRegression,
+                //         vaccination_configs: {} // omit vacc configs, these dont change doring model build
+                //     });
+                // }
 
                 // setTimeout(() => {
                 //     // ChartAgeGroup.getInstance().exportToPng().then(() => {

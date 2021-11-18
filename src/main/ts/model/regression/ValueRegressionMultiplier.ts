@@ -2,11 +2,11 @@ import { ModificationContact } from './../../common/modification/ModificationCon
 import { IRegressionParams } from './IRegressionParams';
 import { ValueRegressionBase } from './ValueRegressionBase';
 
-export interface IRegressionParamsMultiplier extends IRegressionParams {
+export interface IRegressionParamsMultiplier extends IRegressionParams<ModificationContact> {
     contactCategory: string;
 }
 
-export class ValueRegressionMultiplier extends ValueRegressionBase {
+export class ValueRegressionMultiplier extends ValueRegressionBase<ModificationContact> {
 
     private readonly contactCategory: string;
 

@@ -5,6 +5,8 @@ import { TimeUtil } from './../../util/TimeUtil';
 import { IVaccinationConfig2 } from './../demographics/IVaccinationConfig2';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
+import { ModificationRegression } from './ModificationRegression';
+import { Modifications } from './Modifications';
 import { ModificationVaccination } from './ModificationVaccination';
 
 /**
@@ -18,6 +20,52 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
     constructor() {
         super('VACCINATION');
     }
+
+    createRegressionModification(instantB: number, modificationRegression: ModificationRegression): IModificationValuesVaccination {
+
+        const instantA = instantB - TimeUtil.MILLISECONDS_PER____DAY;
+
+        const vaccinations: { [K: string]: IVaccinationConfig2 } = {};
+        const ageGroups = Demographics.getInstance().getAgeGroups();
+        ageGroups.forEach(ageGroup => {
+
+            const v1A = modificationRegression.getVaccinationRegression(instantA, ageGroup.getName(), 'v1').regression;
+            const v2A = modificationRegression.getVaccinationRegression(instantA, ageGroup.getName(), 'v2').regression;
+            const v3A = modificationRegression.getVaccinationRegression(instantA, ageGroup.getName(), 'v3').regression;
+
+            const v1B = modificationRegression.getVaccinationRegression(instantB, ageGroup.getName(), 'v1').regression;
+            const v2B = modificationRegression.getVaccinationRegression(instantB, ageGroup.getName(), 'v2').regression;
+            const v3B = modificationRegression.getVaccinationRegression(instantB, ageGroup.getName(), 'v3').regression;
+
+            vaccinations[ageGroup.getName()] = {
+                v1: v1A,
+                v2: v2A,
+                v3: v3A,
+                d1: v1B - v1A,
+                d2: v2B - v2A,
+                d3: v3B - v3A
+            }                
+
+        });        
+
+        const id = ObjectUtil.createId();
+        const modificationValues: IModificationValuesVaccination = {
+            id,
+            key: 'REGRESSION',
+            name: `regression (${id})`,
+            instant: instantA,
+            deletable: true,
+            draggable: true,
+            vaccinations
+        };
+
+        // if (instantB % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        //     console.log('modificationValues', TimeUtil.formatCategoryDateFull(instantB), modificationValues);
+        // }
+
+        return modificationValues;
+
+    }    
 
     createInterpolatedInstance(instant: number, modificationA: ModificationVaccination, modificationB: ModificationVaccination): IModificationValuesVaccination {
 
@@ -92,17 +140,10 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
 
         let modificationValues: IModificationValuesVaccination;
 
-        // use this to find future values
-        // const modificationRegression = Modifications.getInstance().findModificationsByType('VACCINATION').find(m => true) as ModificationRegression;
-
-        // if (modificationRegression && instant > modificationRegression.getInstantA()) { // in the prediction range?
-
-        //     modificationValues = this.createRegressionModification(instant);
-        //     // console.log(TimeUtil.formatCategoryDate(instant), modificationValues)
-
-        // } else
-
-        if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) { // fetchType === 'CREATE' &&
+        const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
+        if (modificationRegression && instant > modificationRegression.getInstantA()) { // in the prediction range?
+            modificationValues = this.createRegressionModification(instant, modificationRegression);        
+        } else if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) { // fetchType === 'CREATE' &&
             modificationValues = this.createInterpolatedInstance(instant, modificationA, modificationB);
         } else {
             modificationValues = this.createCopy(instant, modificationA);

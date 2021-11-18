@@ -1,6 +1,8 @@
+import { IModification } from '../../common/modification/IModification';
+import { IModificationValues } from '../../common/modification/IModificationValues';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 
-export interface IRegressionParams {
+export interface IRegressionParams<M extends IModification<IModificationValues>> {
 
     // /**
     //  * the point where regression values start
@@ -19,6 +21,6 @@ export interface IRegressionParams {
 
     polyShares: number[];
 
-    modificationsContact: ModificationContact[];
+    modifications: M[];
 
 }

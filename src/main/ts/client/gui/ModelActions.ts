@@ -11,11 +11,10 @@ import { IconAction } from './IconAction';
 import { IconChartMode } from './IconChartMode';
 import { IconModelMode } from './IconModelMode';
 import { SliderModification } from './SliderModification';
+import { ModificationRegression } from '../../common/modification/ModificationRegression';
+import { AgeGroup } from '../../common/demographics/AgeGroup';
+import { ContactCategory } from '../../common/demographics/ContactCategory';
 
-export interface IRegressionPointer {
-    value: string,
-    type: 'MULTIPLIER' | 'CORRECTION';
-}
 
 export interface IIconActionParams {
     container: string;
@@ -28,6 +27,8 @@ export interface IChartModeParams {
     iconKey: any;
     handleClick: (e: MouseEvent) => void;
 }
+
+export type TRegressionType = 'MULTIPLIER' | 'CORRECTION' | 'VACCKEY';
 
 /**
  * this class controls model-mode, which defines the type of modification currently edited in the model
@@ -47,12 +48,16 @@ export class ModelActions {
 
     private key: MODIFICATION____KEY;
 
-    private regressionPointer: IRegressionPointer;
+    private lastRegressionType: TRegressionType;
+    private ageGroup: AgeGroup;
+    private category: string;
+    private vaccKey: string;
 
     private readonly modelModeIcons: IconModelMode[];
     private readonly chartModeIcons: IconChartMode[];
     private readonly ageGroupIcons: IconChartMode[];
     private readonly categoryIcons: IconChartMode[];
+    private readonly vaccKeyIcons: IconChartMode[];
 
     private readonly actionIcons: IconAction[];
 
@@ -62,6 +67,8 @@ export class ModelActions {
         this.chartModeIcons = [];
         this.ageGroupIcons = [];
         this.categoryIcons = [];
+        this.vaccKeyIcons = [];
+
         this.actionIcons = [];
 
         Object.keys(ModelConstants.MODIFICATION_PARAMS).forEach((key: MODIFICATION____KEY) => {
@@ -153,14 +160,14 @@ export class ModelActions {
             container: 'agetoggleDiv',
             label: ModelConstants.AGEGROUP_NAME_______ALL,
             iconKey: ageGroups.length,
-            handleClick: () => this.toggleAgeGroup(ageGroups.length)
+            handleClick: () => this.toggleAgeGroup(ageGroups.length, true)
         }));
         ageGroups.forEach(ageGroup => {
             this.ageGroupIcons.push(new IconChartMode({
                 container: 'agetoggleDiv',
                 label: ageGroup.getName(),
                 iconKey: ageGroup.getIndex(),
-                handleClick: () => this.toggleAgeGroup(ageGroup.getIndex())
+                handleClick: () => this.toggleAgeGroup(ageGroup.getIndex(), true)
             }));
         });
 
@@ -169,40 +176,72 @@ export class ModelActions {
                 container: 'categorytoggleDiv',
                 label: category.getName().toUpperCase(),
                 iconKey: category.getName(),
-                handleClick: () => this.toggleCategory(category.getName())
+                handleClick: () => this.toggleCategory(category.getName(), true)
+            }));
+        });
+
+        ModificationRegression.VACC_KEYS.forEach(vaccKey => {
+            this.vaccKeyIcons.push(new IconChartMode({
+                container: 'vacctoggleDiv',
+                label: vaccKey.toUpperCase(),
+                iconKey: vaccKey,
+                handleClick: () => this.toggleVaccKey(vaccKey, true)
             }));
         })
 
     }
 
-    getRegressionPointer(): IRegressionPointer {
-        return this.regressionPointer;
+    getLastRegressionType(): TRegressionType {
+        return this.lastRegressionType;
     }
 
-    toggleCategory(category: string): void {
-        this.regressionPointer = {
-            value: category,
-            type: 'MULTIPLIER'
+    getAgeGroup(): AgeGroup {
+        return this.ageGroup;
+    }
+
+    getCategory(): string {
+        return this.category;
+    }
+
+    getVaccKey(): string {
+        return this.vaccKey;
+    }
+    
+    toggleVaccKey(vaccKey: string, updateChart: boolean): void {
+        this.lastRegressionType = 'VACCKEY';
+        this.vaccKey = vaccKey;
+        this.vaccKeyIcons.forEach(vaccKeyIcon => {
+            vaccKeyIcon.setActive(vaccKeyIcon.getIconKey() === vaccKey);
+        });
+        if (updateChart) {
+            ControlsRegression.getInstance().handleRegressionPointerChange();
+            ChartAgeGroup.getInstance().handleVaccKeyChange();
         }
+    }
+
+    toggleCategory(category: string, updateChart: boolean): void {
+        this.lastRegressionType = 'MULTIPLIER';
+        this.category = category;
         this.categoryIcons.forEach(categoryIcon => {
             categoryIcon.setActive(categoryIcon.getIconKey() === category);
         });
-        ControlsRegression.getInstance().handleRegressionPointerChange();
-        ControlsContact.getInstance().handleCategoryChange(category);
-        ChartAgeGroup.getInstance().setContactCategory(category);
+        if (updateChart) {
+            ControlsRegression.getInstance().handleRegressionPointerChange();
+            ControlsContact.getInstance().handleCategoryChange();
+            ChartAgeGroup.getInstance().handleCategoryChange();
+        }
     }
 
-    toggleAgeGroup(ageGroupIndex: number): void {
-        const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
-        this.regressionPointer = {
-            value: ageGroup.getName(),
-            type: 'CORRECTION'
-        }
+    toggleAgeGroup(ageGroupIndex: number, updateChart: boolean): void {
+        this.lastRegressionType = 'CORRECTION';
+        this.ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
         this.ageGroupIcons.forEach(ageGroupIcon => {
             ageGroupIcon.setActive(ageGroupIcon.getIconKey() === ageGroupIndex);
         });
-        ControlsRegression.getInstance().handleRegressionPointerChange();
-        ChartAgeGroup.getInstance().setAgeGroupIndex(ageGroupIndex);
+        if (updateChart) {
+            ControlsRegression.getInstance().handleRegressionPointerChange();
+            ChartAgeGroup.getInstance().handleAgeGroupChange();
+        }
     }
 
     toggleChartMode(chartMode: CHART_MODE______KEY): void {

@@ -95,13 +95,13 @@ export class ChartAgeGroup {
     /**
      * visualize multipliers and/or corrections (for readability and plausibility)
      */
-    protected readonly seriesContactValue: ChartAgeGroupSeries;
-    protected readonly seriesContactValue95U: ChartAgeGroupSeries;
-    protected readonly seriesContactValue95L: ChartAgeGroupSeries;
-    protected readonly seriesContactValueM: ChartAgeGroupSeries;
-    protected readonly seriesContactValueL: ChartAgeGroupSeries;
-    protected readonly seriesContactValueLL: ChartAgeGroupSeries;
-    protected readonly seriesContactValueLU: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValue: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValue95U: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValue95L: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValueM: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValueL: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValueLL: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValueLU: ChartAgeGroupSeries;
 
     protected readonly seriesSeasonality: ChartAgeGroupSeries;
 
@@ -176,8 +176,6 @@ export class ChartAgeGroup {
     protected readonly seriesHeat: ColumnSeries;
 
     private absValue: number; // the absolute value of the age-group currently displayed
-    private ageGroupIndex: number;
-    private categoryName: string;
     private contactNote: string;
 
     private modelData: IDataItem[];
@@ -195,8 +193,7 @@ export class ChartAgeGroup {
         useTheme(am4themes_animated);
 
         this.absValue = 0;
-        this.ageGroupIndex = -1;
-        this.categoryName = 'other';
+        // this.ageGroupIndex = -1;
         this.chartMode = 'INCIDENCE';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
@@ -874,12 +871,12 @@ export class ChartAgeGroup {
 
 
 
-        this.seriesContactValueM = new ChartAgeGroupSeries({
+        this.seriesEstimationValueM = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'contact settings',
-            baseLabel: 'contact settings',
-            valueField: 'contactValueM',
+            title: 'estimation settings',
+            baseLabel: 'estimation settings',
+            valueField: 'estimationValueM',
             colorKey: 'CASES',
             strokeWidth: 1,
             dashed: false,
@@ -894,12 +891,12 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
-        this.seriesContactValueL = new ChartAgeGroupSeries({
+        this.seriesEstimationValueL = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'contact smoothed',
-            baseLabel: 'contact smoothed',
-            valueField: 'contactValueL',
+            title: 'estimation smoothed',
+            baseLabel: 'estimation smoothed',
+            valueField: 'estimationValueL',
             colorKey: 'CASES',
             strokeWidth: 2,
             dashed: false,
@@ -913,12 +910,12 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactValueLL = new ChartAgeGroupSeries({
+        this.seriesEstimationValueLL = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'contact loess off',
-            baseLabel: 'contact loess off',
-            valueField: 'contactValueLL',
+            title: 'estimation loess off',
+            baseLabel: 'estimation loess off',
+            valueField: 'estimationValueLL',
             colorKey: 'CASES',
             strokeWidth: 1,
             dashed: false,
@@ -932,14 +929,14 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactValueLL.getSeries().strokeOpacity = 0.5;
-        this.seriesContactValueL.bindToLegend(this.seriesContactValueLL);
-        this.seriesContactValueLU = new ChartAgeGroupSeries({
+        this.seriesEstimationValueLL.getSeries().strokeOpacity = 0.5;
+        this.seriesEstimationValueL.bindToLegend(this.seriesEstimationValueLL);
+        this.seriesEstimationValueLU = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'contact loess off',
-            baseLabel: 'contact loess off',
-            valueField: 'contactValueLU',
+            title: 'estimation loess off',
+            baseLabel: 'estimation loess off',
+            valueField: 'estimationValueLU',
             colorKey: 'CASES',
             strokeWidth: 1,
             dashed: false,
@@ -953,16 +950,16 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactValueLU.getSeries().strokeOpacity = 0.5;
-        this.seriesContactValueLU.getSeries().fillOpacity = 0.2;
-        this.seriesContactValueL.bindToLegend(this.seriesContactValueLU);
+        this.seriesEstimationValueLU.getSeries().strokeOpacity = 0.5;
+        this.seriesEstimationValueLU.getSeries().fillOpacity = 0.2;
+        this.seriesEstimationValueL.bindToLegend(this.seriesEstimationValueLU);
 
-        this.seriesContactValue = new ChartAgeGroupSeries({
+        this.seriesEstimationValue = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'contact estimation',
-            baseLabel: 'contact estimation',
-            valueField: 'contactValue',
+            title: 'estimation',
+            baseLabel: 'estimation',
+            valueField: 'estimationValue',
             colorKey: 'SEASONALITY',
             strokeWidth: 1,
             dashed: true,
@@ -976,12 +973,12 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactValue95L = new ChartAgeGroupSeries({
+        this.seriesEstimationValue95L = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'contact estimation',
-            baseLabel: 'contact estimation',
-            valueField: 'contactValue95L',
+            title: 'estimation',
+            baseLabel: 'estimation',
+            valueField: 'estimationValue95L',
             colorKey: 'SEASONALITY',
             strokeWidth: 1,
             dashed: false,
@@ -995,14 +992,14 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactValue95L.getSeries().strokeOpacity = 0.5;
-        this.seriesContactValue.bindToLegend(this.seriesContactValue95L);
-        this.seriesContactValue95U = new ChartAgeGroupSeries({
+        this.seriesEstimationValue95L.getSeries().strokeOpacity = 0.5;
+        this.seriesEstimationValue.bindToLegend(this.seriesEstimationValue95L);
+        this.seriesEstimationValue95U = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'contact estimation',
-            baseLabel: 'contact estimation',
-            valueField: 'contactValue95U',
+            title: 'estimation',
+            baseLabel: 'estimation',
+            valueField: 'estimationValue95U',
             colorKey: 'SEASONALITY',
             strokeWidth: 1,
             dashed: false,
@@ -1016,9 +1013,9 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesContactValue95U.getSeries().strokeOpacity = 0.5;
-        this.seriesContactValue95U.getSeries().fillOpacity = 0.2;
-        this.seriesContactValue.bindToLegend(this.seriesContactValue95U);
+        this.seriesEstimationValue95U.getSeries().strokeOpacity = 0.5;
+        this.seriesEstimationValue95U.getSeries().fillOpacity = 0.2;
+        this.seriesEstimationValue.bindToLegend(this.seriesEstimationValue95U);
 
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
@@ -1030,9 +1027,10 @@ export class ChartAgeGroup {
             const position = this.xAxis.pointToPosition(e.target.point);
             const category = this.xAxis.positionToCategory(position);
             const chartDataItem = this.findDataItemByCategory(category);
+            const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
             if (chartDataItem) {
                 const baseDataItem = BaseData.getInstance().findBaseDataItem(chartDataItem.instant);
-                if (baseDataItem && baseDataItem.getIncidence(this.ageGroupIndex)) {
+                if (baseDataItem && baseDataItem.getIncidence(ageGroupIndex)) {
                     // this.seriesAgeGroupCasesR.getSeries().tooltip.disabled = false;
                     this.seriesAgeGroupIncidenceR.getSeries().tooltip.disabled = false;
                 } else {
@@ -1094,7 +1092,7 @@ export class ChartAgeGroup {
         this.columnTemplate.height = percent(100);
         this.columnTemplate.events.on('hit', e => {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
-            ModelActions.getInstance().toggleAgeGroup(index);
+            ModelActions.getInstance().toggleAgeGroup(index, true);
         });
         if (QueryUtil.getInstance().isDiffDisplay()) {
             this.columnTemplate.propertyFields.fill = 'color';
@@ -1205,13 +1203,14 @@ export class ChartAgeGroup {
 
     }
 
-    getAgeGroupName(): string {
-        return Demographics.getInstance().getAgeGroupsWithTotal()[this.getAgeGroupIndex()].getName()
-    }
+    // getAgeGroupName(): string {
+    //     const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
+    //     return Demographics.getInstance().getAgeGroupsWithTotal()[a].getName()
+    // }
 
-    getAgeGroupIndex(): number {
-        return this.ageGroupIndex >= 0 ? this.ageGroupIndex : Demographics.getInstance().getAgeGroups().length;
-    }
+    // getAgeGroupIndex(): number {
+    //     return this.ageGroupIndex >= 0 ? this.ageGroupIndex : Demographics.getInstance().getAgeGroups().length;
+    // }
 
     getAbsValue(): number {
         return this.absValue;
@@ -1230,26 +1229,24 @@ export class ChartAgeGroup {
         StorageUtil.getInstance().exportJson(this.modelData);
     }
 
-    async setAgeGroupIndex(ageGroupIndex: number): Promise<void> {
+    async handleAgeGroupChange(): Promise<void> {
 
         // console.warn('set age group index');
+        const requiresRegressionDataRender = this.getChartMode() === 'CONTACT';
 
-        const requiresBaseDataRender = this.ageGroupIndex !== ageGroupIndex;
-        const requiresRegressionData = this.getChartMode() === 'CONTACT';
-
-        this.ageGroupIndex = ageGroupIndex;
+        const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
         this.updateTitle();
 
-        const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
+        const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
         this.contactNote = ageGroup.getName();
         this.absValue = ageGroup.getAbsValue();
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
 
-            if (requiresBaseDataRender) {
+            // if (requiresBaseDataRender) {
                 this.renderBaseData();
-            }
-            if (requiresRegressionData) {
+            // }
+            if (requiresRegressionDataRender) {
                 this.renderRegressionData();
             }
             this.requestRenderModelData();
@@ -1292,7 +1289,7 @@ export class ChartAgeGroup {
 
     updateSeriesNotes(): void {
 
-        const ageGroup = Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
+        const ageGroup = ModelActions.getInstance().getAgeGroup(); // Demographics.getInstance().getAgeGroupsWithTotal()[this.ageGroupIndex];
 
         this.seriesAgeGroupIncidence.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupIncidence95L.setSeriesNote(ageGroup.getName());
@@ -1324,31 +1321,24 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR3.setSeriesNote(ageGroup.getName());
 
-        this.seriesContactValue.setSeriesNote(this.contactNote);
-        this.seriesContactValue95L.setSeriesNote(this.contactNote);
-        this.seriesContactValue95U.setSeriesNote(this.contactNote);
-        this.seriesContactValueM.setSeriesNote(this.contactNote);
-        this.seriesContactValueL.setSeriesNote(this.contactNote);
-        this.seriesContactValueLL.setSeriesNote(this.contactNote);
-        this.seriesContactValueLU.setSeriesNote(this.contactNote);
+        this.seriesEstimationValue.setSeriesNote(this.contactNote);
+        this.seriesEstimationValue95L.setSeriesNote(this.contactNote);
+        this.seriesEstimationValue95U.setSeriesNote(this.contactNote);
+        this.seriesEstimationValueM.setSeriesNote(this.contactNote);
+        this.seriesEstimationValueL.setSeriesNote(this.contactNote);
+        this.seriesEstimationValueLL.setSeriesNote(this.contactNote);
+        this.seriesEstimationValueLU.setSeriesNote(this.contactNote);
 
         this.seriesReproductionP.setSeriesNote(ageGroup.getName());
         this.seriesReproductionR.setSeriesNote(ageGroup.getName());
 
     }
 
-    async setContactCategory(categoryName: string): Promise<void> {
+    async handleCategoryChange(): Promise<void> {
 
-        this.categoryName = categoryName;
-        this.contactNote = categoryName;
+        this.contactNote = ModelActions.getInstance().getCategory();
 
-        this.seriesContactValue.setSeriesNote(this.contactNote);
-        this.seriesContactValue95L.setSeriesNote(this.contactNote);
-        this.seriesContactValue95U.setSeriesNote(this.contactNote);
-        this.seriesContactValueM.setSeriesNote(this.contactNote);
-        this.seriesContactValueL.setSeriesNote(this.contactNote);
-        this.seriesContactValueLL.setSeriesNote(this.contactNote);
-        this.seriesContactValueLU.setSeriesNote(this.contactNote);
+        this.updateSeriesNotes();
 
         if (this.getChartMode() === 'CONTACT') {
             this.renderRegressionData();
@@ -1356,6 +1346,19 @@ export class ChartAgeGroup {
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
             this.requestRenderModelData();
+        }
+
+    }
+
+    async handleVaccKeyChange(): Promise<void> {
+
+        const modelActions = ModelActions.getInstance();
+        this.contactNote = `${modelActions.getAgeGroup().getName()}-${modelActions.getVaccKey()}`;
+
+        this.updateSeriesNotes();
+
+        if (this.getChartMode() === 'CONTACT') {
+            this.renderRegressionData();
         }
 
     }
@@ -1576,13 +1579,13 @@ export class ChartAgeGroup {
             this.yAxisPlotPercent.tooltip.disabled = !visible;
         }
 
-        this.seriesContactValue.setVisible(visible);
-        this.seriesContactValue95L.setVisible(visible);
-        this.seriesContactValue95U.setVisible(visible);
-        this.seriesContactValueM.setVisible(visible);
-        this.seriesContactValueL.setVisible(visible);
-        this.seriesContactValueLL.setVisible(visible);
-        this.seriesContactValueLU.setVisible(visible);
+        this.seriesEstimationValue.setVisible(visible);
+        this.seriesEstimationValue95L.setVisible(visible);
+        this.seriesEstimationValue95U.setVisible(visible);
+        this.seriesEstimationValueM.setVisible(visible);
+        this.seriesEstimationValueL.setVisible(visible);
+        this.seriesEstimationValueLL.setVisible(visible);
+        this.seriesEstimationValueLU.setVisible(visible);
 
     }
 
@@ -1633,7 +1636,9 @@ export class ChartAgeGroup {
     }
 
     private updateTitle(): void {
-        this.chartTitle.text = `${ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].title} [font-size: 12px](age: ${this.getAgeGroupName()})[/]`;
+        const charModeName = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].title;
+        const ageGroupName = ModelActions.getInstance().getAgeGroup().getName();
+        this.chartTitle.text = `${charModeName} [font-size: 12px](age: ${ageGroupName})[/]`;
     }
 
     getChartMode(): CHART_MODE______KEY {
@@ -1661,7 +1666,7 @@ export class ChartAgeGroup {
 
     async acceptModelData(modelData: IDataItem[]): Promise<void> {
 
-        console.log('modelData', modelData);
+        // console.log('modelData', modelData);
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
         modificationValuesStrain.forEach(strainValues => {
@@ -1698,7 +1703,7 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = 1700; // maxIncidence * 1.25;
+            this.yAxisPlotIncidence.max = 2500; // maxIncidence * 1.25;
 
             this.yAxisPlotPercent.min = 0;
             this.yAxisPlotPercent.max = maxInfectious * 1.00;
@@ -1740,30 +1745,30 @@ export class ChartAgeGroup {
 
             const renderableRegressionResult = ControlsRegression.getInstance().getRenderableRegressionResult(dataItem.instant);
 
-            const contactValue = renderableRegressionResult.regression;
-            const contactValue95L = renderableRegressionResult.ci95Min && Math.max(0, renderableRegressionResult.ci95Min);
-            const contactValue95U = renderableRegressionResult.ci95Max && renderableRegressionResult.ci95Max - contactValue95L;
+            const estimationValue = renderableRegressionResult.regression;
+            const estimationValue95L = renderableRegressionResult.ci95Min && Math.max(0, renderableRegressionResult.ci95Min);
+            const estimationValue95U = renderableRegressionResult.ci95Max && renderableRegressionResult.ci95Max - estimationValue95L;
 
-            const contactValueM = renderableRegressionResult.loess && renderableRegressionResult.loess.m;
+            const estimationValueM = renderableRegressionResult.loess && renderableRegressionResult.loess.m;
 
-            let contactValueL: number;
-            let contactValueLL: number;
-            let contactValueLU: number;
+            let estimationValueL: number;
+            let estimationValueLL: number;
+            let estimationValueLU: number;
             if (renderableRegressionResult.loess && renderableRegressionResult.loess.o && renderableRegressionResult.loess.y) {
-                contactValueL = renderableRegressionResult.loess.y;
-                contactValueLL = renderableRegressionResult.loess.y - renderableRegressionResult.loess.o;
-                contactValueLU = renderableRegressionResult.loess.y + renderableRegressionResult.loess.o - contactValueLL;
+                estimationValueL = renderableRegressionResult.loess.y;
+                estimationValueLL = renderableRegressionResult.loess.y - renderableRegressionResult.loess.o;
+                estimationValueLU = renderableRegressionResult.loess.y + renderableRegressionResult.loess.o - estimationValueLL;
             }
 
             const item = {
                 categoryX: dataItem.categoryX,
-                contactValue,
-                contactValue95L,
-                contactValue95U,
-                contactValueM,
-                contactValueL,
-                contactValueLL,
-                contactValueLU
+                estimationValue,
+                estimationValue95L,
+                estimationValue95U,
+                estimationValueM,
+                estimationValueL,
+                estimationValueLL,
+                estimationValueLU
             }
 
             // console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), item);
@@ -1774,13 +1779,13 @@ export class ChartAgeGroup {
 
         const chartData = [...plotData];
 
-        this.seriesContactValue.getSeries().data = chartData;
-        this.seriesContactValue95L.getSeries().data = chartData;
-        this.seriesContactValue95U.getSeries().data = chartData;
-        this.seriesContactValueM.getSeries().data = chartData;
-        this.seriesContactValueL.getSeries().data = chartData;
-        this.seriesContactValueLL.getSeries().data = chartData;
-        this.seriesContactValueLU.getSeries().data = chartData;
+        this.seriesEstimationValue.getSeries().data = chartData;
+        this.seriesEstimationValue95L.getSeries().data = chartData;
+        this.seriesEstimationValue95U.getSeries().data = chartData;
+        this.seriesEstimationValueM.getSeries().data = chartData;
+        this.seriesEstimationValueL.getSeries().data = chartData;
+        this.seriesEstimationValueLL.getSeries().data = chartData;
+        this.seriesEstimationValueLU.getSeries().data = chartData;
 
     }
 
@@ -1788,7 +1793,7 @@ export class ChartAgeGroup {
 
         clearTimeout(this.renderTimeout);
 
-        const _ageGroupIndex = this.getAgeGroupIndex();
+        const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
 
         const plotData: any[] = [];
         const heatData: any[] = [];
@@ -1800,7 +1805,7 @@ export class ChartAgeGroup {
 
         // console.log('modelData', this.modelData);
 
-        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex];
+        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
         for (const dataItem of this.modelData) {
 
             // data independent from sub-strains
@@ -1959,9 +1964,7 @@ export class ChartAgeGroup {
         const baseData: any[] = [];
         const chartData: any[] = [];
 
-        const _ageGroupIndex = this.getAgeGroupIndex();
-
-        const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[_ageGroupIndex];
+        const ageGroupPlot = ModelActions.getInstance().getAgeGroup();
 
         const instantMin = ModelInstants.getInstance().getMinInstant();
         const instantMax = ModelInstants.getInstance().getMaxInstant();

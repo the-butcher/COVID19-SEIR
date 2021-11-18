@@ -14,16 +14,19 @@ export class StrainUtil {
     /**
      * calculate a discovery rate for a given day
      * assumptions / simplifications made:
-     * -- base discovery rate (i.e. 30% matches a given positivity rate, i.e. 0.05)
-     * -- an exponent is calculated that produce 100
+     * 0.0000      0.9413
+     * 0.0100      0.9092
+     * 0.0200      0.3964
+     * 0.0400      0.2499
+     * 0.3000      0.1530
      * @param baseDiscoveryRate
      * @param basePositivityRate
      * @param positivityRate
      * @returns
      */
-    static calculateDiscoveryRate(baseDiscoveryRate: number, basePositivityRate: number, positivityRate: number): number {
-        return 0.01 / (positivityRate + 0.01) - 0.01;
-        // return  Math.pow(1 - positivityRate, Math.log(baseDiscoveryRate) / Math.log(1 - basePositivityRate));
+    static calculateDiscoveryRate(positivityRate: number): number {
+        const trimmedPositivityRate = Math.max(0.0098, positivityRate); // will produce max discovery rate ~0.94
+        return 1 / (trimmedPositivityRate * 260 - 1.3) + 0.14;
     }
 
     static calculateLatency(serialInterval: number, intervalScale: number) {

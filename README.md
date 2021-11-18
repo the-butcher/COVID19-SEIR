@@ -90,6 +90,9 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 
 #### Issues
+* detect duplicate modifications
+  * errors are hard to find
+  * would help with creation of i.e. auto testing modifications
 * rename "VACCINATED" chart to a more general term (i.e. STATE)
 * add an age group discovery curve to the testing chart-view
 * acceptModification is called multiple times -> check for performance and streamline

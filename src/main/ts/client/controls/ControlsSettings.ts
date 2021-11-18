@@ -35,7 +35,7 @@ export class ControlsSettings {
 
         this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false);
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true);
-        this.sliderReexposure = new SliderSetting("reexposure (months)", ModelConstants.RANGE________REEXPOSURE, 1, false);
+        this.sliderReexposure = new SliderSetting("reexposure (months)", ModelConstants.RANGE________REEXPOSURE, 0.1, false);
         // this.sliderDead = new SliderSetting("deceased", ModelConstants.RANGE__PERCENTAGE__10, 0.001);
 
     }

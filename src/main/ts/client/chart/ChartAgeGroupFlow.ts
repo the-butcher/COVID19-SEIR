@@ -14,12 +14,12 @@ import { ControlsConstants } from './../gui/ControlsConstants';
 
 export interface IChartData {
     contact: string;
-    participant: string;
-    contactLabel: string;
-    participantLabel: string;
-    value: number;
-    sumContact: number;
-    sumParticipant: number;
+    participant?: string;
+    contactLabel?: string;
+    participantLabel?: string;
+    value?: number;
+    sumContact?: number;
+    sumParticipant?: number;
     color: string;
 }
 
@@ -115,12 +115,12 @@ export class ChartAgeGroupFlow {
         this.chart.nodes.template.nameLabel.label.fontFamily = ControlsConstants.FONT_FAMILY;
         this.chart.nodes.template.nameLabel.label.fontSize = ControlsConstants.FONT_SIZE - 3;
         this.chart.nodes.template.nameLabel.label.fill = color(ControlsConstants.COLOR____FONT);
+
         this.chart.nodes.template.nameLabel.label.adapter.add('dx', (value, target) => {
             return target.parent.parent.pixelX > 0 ? -52 : value;
         });
 
 
-        // this.chart.links.template.colorMode = "gradient";
         this.chart.links.template.events.on("over", e => {
 
             const relativeX = e.pointer.point.x - document.getElementById('chartDivAgeGroupFlow').getBoundingClientRect().left;
@@ -156,9 +156,25 @@ export class ChartAgeGroupFlow {
         // this.chart.links.template.tooltip.background.tooltipColorSource
         this.chart.links.template.tooltip.background.fill = color(ControlsConstants.COLOR______BG);
         this.chart.links.template.tooltip.getFillFromObject = false;
+
+        // this.chart.links.template.colorMode = "solid";
+        // this.chart.links.template.propertyFields.fill = "color";
+
         this.chart.links.template.adapter.add('tooltipText', (value, target) => {
             const dataItem = target.dataItem.dataContext as IChartData;
-            return `${dataItem.contactLabel} > ${dataItem.participantLabel}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.value * this.absTotal).padStart(5, '\u00A0')}\n${dataItem.contactLabel} > OTHER: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.sumContact * this.absTotal).padStart(5, '\u00A0')}\nOTHER > ${dataItem.contactLabel}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.sumParticipant * this.absTotal).padStart(5, '\u00A0')}`
+            let formatContact: string = '-';
+            let formatParticipant: string = '-';
+            if (dataItem.sumContact > dataItem.sumParticipant) {
+                formatContact = '>';
+            } else if (dataItem.sumParticipant > dataItem.sumContact) {
+                formatParticipant = '<';
+            }
+            return `${dataItem.contactLabel} > ${dataItem.participantLabel}: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.value * this.absTotal).padStart(5, '\u00A0')}\n${dataItem.contactLabel} ${formatContact} OTHER: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.sumContact * this.absTotal).padStart(5, '\u00A0')}\n${dataItem.contactLabel} ${formatParticipant} OTHER: ${ControlsConstants.LABEL_ABSOLUTE_FIXED.format(dataItem.sumParticipant * this.absTotal).padStart(5, '\u00A0')}`
+        });
+
+        this.chart.links.template.adapter.add('fill', (value, target) => {
+            // console.log(target.dataItem.fromName, target.dataItem);
+            return value;
         });
 
         this.chart.links.template.tooltip.label.fontFamily = ControlsConstants.FONT_FAMILY;
@@ -230,8 +246,11 @@ export class ChartAgeGroupFlow {
 
                 let values: number[] = [];
                 let totalValue = 0;
+
+
                 let totalByContact: number[] = [];
                 let totalByParticipant: number[] = [];
+
                 Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
                     totalByContact[ageGroupContact.getIndex()] = 0;
                     totalByParticipant[ageGroupContact.getIndex()] = 0;
@@ -245,26 +264,45 @@ export class ChartAgeGroupFlow {
                         totalByParticipant[ageGroupParticipant.getIndex()] = totalByParticipant[ageGroupParticipant.getIndex()] + value;
                     });
                 });
+                // let totalContact = totalByContact.reduce((a, b) => a + b, 0);
+                // let totalParticitpant = totalByParticipant.reduce((a, b) => a + b, 0);
+                // console.log('c-p', totalContact, totalParticitpant);
+
                 values = values.sort((a,b) => b - a);
                 const minValue = values[Math.min(200, values.length - 1)]; // show the 20 largest connections
                 // console.log('totalValue', totalValue);
                 // document.getElementById('chartDivAgeGroupFlow').style.height = Math.floor(totalValue * 300000) + 'px';
 
+                const colorDriving = '#3e5c6e';
+                const colorDriven = '#1b2830';
+
                 Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
+
+                    const barColor = totalByContact[ageGroupContact.getIndex()] < totalByParticipant[ageGroupContact.getIndex()] ? colorDriving : colorDriven;
+                    chartData.push({
+                        contact: ` ${ageGroupContact.getName()}`,
+                        color: barColor
+                    });
+
+                });
+
+                Demographics.getInstance().getAgeGroups().forEach(ageGroupContact => {
+
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupParticipant => {
 
                         const value = dataItem.exposure[ageGroupContact.getIndex()][ageGroupParticipant.getIndex()];
                         if (value >= minValue) {
                             // console.log('adding', value, minValue);
+                            const barColor = totalByContact[ageGroupContact.getIndex()] > totalByParticipant[ageGroupContact.getIndex()] ? colorDriving : colorDriven;
                             chartData.push({
                                 contact: `${ageGroupContact.getName()}`,
-                                participant: ` ${ageGroupParticipant.getName()}`,
+                                participant: ` ${ageGroupParticipant.getName()}`, // note the blank
                                 contactLabel: `${ageGroupContact.getName()}`,
                                 participantLabel: `${ageGroupParticipant.getName()}`,
                                 value,
                                 sumContact: totalByContact[ageGroupContact.getIndex()],
                                 sumParticipant: totalByParticipant[ageGroupContact.getIndex()],
-                                color: '#3e5c6e' // ControlsConstants.COLOR____FONT
+                                color: barColor
                             });
                             groupNames.add(ageGroupContact.getName());
                             groupNames.add(ageGroupParticipant.getName());
@@ -277,21 +315,24 @@ export class ChartAgeGroupFlow {
                                 value: 0,
                                 sumContact: 0,
                                 sumParticipant: 0,
-                                color: '#3e5c6e' // ControlsConstants.COLOR____FONT
+                                color: '#3e5c6e'
                             });
                         }
 
                     });
                 });
+
                 break;
 
             }
 
         }
 
-        chartData = chartData.filter(c => {
-            return groupNames.has(c.contactLabel) && groupNames.has(c.participantLabel);
-        });
+        // console.log('chartData (flow)', chartData);
+
+        // chartData = chartData.filter(c => {
+        //     return groupNames.has(c.contactLabel) && groupNames.has(c.participantLabel);
+        // });
 
         if (this.chart.data.length === chartData.length) {
             for (let i = 0; i < chartData.length; i++) {

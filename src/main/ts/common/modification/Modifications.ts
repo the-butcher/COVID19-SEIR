@@ -24,7 +24,9 @@ export class Modifications {
     static setInstanceFromValues(modificationValues: IModificationValues[]): void {
         this.instance = new Modifications();
         modificationValues.forEach(modificationValue => {
-            this.instance.addModification(ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue));
+            // if (modificationValue.key !== 'TESTING') {
+                this.instance.addModification(ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue));
+            // }
         });
         this.instance.updateModificationInstants();
     }

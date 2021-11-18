@@ -32,7 +32,7 @@ export class ModificationAdaptor5 {
             });
         });
 
-        const errorRatio = 0.03;
+        const errorRatio = 0.05;
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
@@ -52,7 +52,7 @@ export class ModificationAdaptor5 {
         const corrections: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             const prevCorrG = modificationSet.modA.getCorrectionValue(ageGroup.getIndex());
-            const currCorrG = Math.max(0.01, Math.min(4, prevCorrG - errorsG[ageGroup.getName()] * errorRatio * 0.25));
+            const currCorrG = Math.max(0.01, Math.min(4, prevCorrG - errorsG[ageGroup.getName()] * errorRatio * 0.10));
             corrections[ageGroup.getName()] = currCorrG;
         });
 

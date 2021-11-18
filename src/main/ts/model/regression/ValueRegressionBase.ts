@@ -1,4 +1,6 @@
 import regression, { DataPoint } from 'regression';
+import { IModification } from '../../common/modification/IModification';
+import { IModificationValues } from '../../common/modification/IModificationValues';
 import { ModificationContact } from '../../common/modification/ModificationContact';
 import { ModelInstants } from '../ModelInstants';
 import { TimeUtil } from './../../util/TimeUtil';
@@ -28,7 +30,7 @@ export interface ILoessInput {
     i?: number[]; // instants
     m?: number[]; // model values
 }
-export abstract class ValueRegressionBase {
+export abstract class ValueRegressionBase<M extends IModification<IModificationValues>> {
 
     // private readonly instant: number;
     private readonly instantA: number;
@@ -36,7 +38,7 @@ export abstract class ValueRegressionBase {
     private readonly polyShares: number[];
 
 
-    private readonly modificationsContact: ModificationContact[];
+    private readonly modifications: M[];
     private whParams: IWorkingHotellingParams;
 
     private loessModel01000: any;
@@ -46,7 +48,7 @@ export abstract class ValueRegressionBase {
     private readonly loessValues00500: ILoessResult[];
     private readonly loessValues00250: ILoessResult[];
 
-    constructor(params: IRegressionParams) {
+    constructor(params: IRegressionParams<M>) {
 
         this.instantA = params.instantA;
         this.instantB = params.instantB;
@@ -54,7 +56,7 @@ export abstract class ValueRegressionBase {
         this.loessValues01000 = [];
         this.loessValues00500 = [];
         this.loessValues00250 = [];
-        this.modificationsContact = params.modificationsContact;
+        this.modifications = params.modifications.filter(m => m.getInstantA() <= this.instantB);
 
     }
 
@@ -63,9 +65,9 @@ export abstract class ValueRegressionBase {
         const xValues: number[] = [];
         const yValues: number[] = [];
 
-        this.modificationsContact.forEach(modificationContact => {
-            xValues.push(ValueRegressionBase.toRegressionX(modificationContact.getInstant()));
-            yValues.push(this.toValueY(modificationContact));
+        this.modifications.forEach(modification => {
+            xValues.push(ValueRegressionBase.toRegressionX(modification.getInstantA()));
+            yValues.push(this.toValueY(modification));
         });
 
         return {
@@ -88,8 +90,8 @@ export abstract class ValueRegressionBase {
 
             const x = ValueRegressionBase.toRegressionX(i);
 
-            const modificationContact = this.modificationsContact.find(m => m.getInstant() === i);
-            const m = modificationContact && this.toValueY(modificationContact);
+            const modification = this.modifications.find(m => m.getInstantA() === i);
+            const m = modification && this.toValueY(modification);
 
             iValues.push(i);
             xValues.push(x);
@@ -120,7 +122,7 @@ export abstract class ValueRegressionBase {
              band: 0.50
         });
         this.loessModel00500 = new Loess.default(loessModelInput, {
-            span: 0.5,
+            span: 0.50,
              band: 0.50
         });
         this.loessModel00250 = new Loess.default(loessModelInput, {
@@ -230,8 +232,8 @@ export abstract class ValueRegressionBase {
     calculateWhParams(): void {
 
         // find narrowest part, so offset can be adjusted to fit loess width
-        const minInstant = this.modificationsContact[0].getInstant(); // first modification instance
-        const maxInstant = this.modificationsContact[this.modificationsContact.length - 1].getInstant(); // last modification instance
+        const minInstant = this.modifications[0].getInstantA(); // first modification instance
+        const maxInstant = this.modifications[this.modifications.length - 1].getInstantA(); // last modification instance
 
         let nroInstant = -1;
         let nroCi95 = Number.MAX_VALUE;
@@ -279,12 +281,10 @@ export abstract class ValueRegressionBase {
         const share00500 = this.polyShares[1] - this.polyShares[0];
         const share00250 = 1 - this.polyShares[1];
 
-        // console.log(share01000, share00500, share00250);
-
         let m: number;
         if (loessValue01000.m && loessValue00500.m && loessValue00250.m) {
             m = loessValue01000.m * share01000 + loessValue00500.m * share00500 + loessValue00250.m * share00250;
-        }
+        } 
         const x = loessValue01000.x * share01000 + loessValue00500.x * share00500 + loessValue00250.x * share00250;
         const y = loessValue01000.y * share01000 + loessValue00500.y * share00500 + loessValue00250.y * share00250;
         const i = loessValue01000.i * share01000 + loessValue00500.i * share00500 + loessValue00250.i * share00250;
@@ -299,22 +299,6 @@ export abstract class ValueRegressionBase {
         }
 
     }
-
-    // interpolateLoessValue(ratio: number, loessValueA: ILoessResult, loessValueB: ILoessResult): ILoessResult {
-
-    //     let m: number;
-    //     if (loessValueA.m && loessValueB.m) {
-    //         m = loessValueA.m && loessValueA.m * ratio + loessValueB.m * (1 - ratio);
-    //     }
-    //     return {
-    //         x: loessValueA.x * ratio + loessValueB.x * (1 - ratio),
-    //         y: loessValueA.y * ratio + loessValueB.y * (1 - ratio),
-    //         i: loessValueA.i * ratio + loessValueB.i * (1 - ratio),
-    //         o: loessValueA.o * ratio + loessValueB.o * (1 - ratio),
-    //         m
-    //     }
-
-    // }
 
     findOrInterpolateLoessValue(instant: number, loessValues: ILoessResult[]): ILoessResult {
 
@@ -391,9 +375,9 @@ export abstract class ValueRegressionBase {
 
     /**
      * let the subclass provide an appropriate value
-     * @param modificationContact
+     * @param modification
      */
-    abstract toValueY(modificationContact: ModificationContact): number;
+    abstract toValueY(modification: M): number;
 
     abstract getName(): string;
 

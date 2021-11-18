@@ -30,7 +30,7 @@ export class ModelStateFitter5 {
 
         const modificationAdapter = new ModificationAdaptor5();
 
-        let modificationIndexStart = 3; // modificationsContact.length - 6; // 2;
+        let modificationIndexStart = 1; // modificationsContact.length - 6; // 2;
 
         const modificationContactOuterB = modificationsContact[modificationIndexStart];
         let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationContactOuterB.getInstant())}`;

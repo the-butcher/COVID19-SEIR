@@ -8,6 +8,12 @@ import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
 import { IModificationValuesRegression, IRegressionConfig } from './IModificationValuesRegression';
 import { ModificationResolverContact } from './ModificationResolverContact';
+import { ValueRegressionVaccination } from '../../model/regression/ValueRegressionVaccination';
+import { ValueRegressionBase } from '../../model/regression/ValueRegressionBase';
+import { ModificationResolverVaccination } from './ModificationResolverVaccination';
+import { ModificationVaccination } from './ModificationVaccination';
+
+
 
 /**
  * implementation of IModification for a specific instant
@@ -18,14 +24,41 @@ import { ModificationResolverContact } from './ModificationResolverContact';
  */
 export class ModificationRegression extends AModification<IModificationValuesRegression> {
 
+    static readonly VACC_KEYS = ['v1', 'v2', 'v3'];
+
     private multiplierRegressions: { [K in string]: ValueRegressionMultiplier };
     private correctionRegressions: { [K in string]: ValueRegressionCorrection };
+    private vaccinationRegressions: { [K in string]: { [K in string]: ValueRegressionVaccination } };
 
     constructor(modificationParams: IModificationValuesRegression) {
+
         super('INSTANT', modificationParams);
         this.multiplierRegressions = {};
         this.correctionRegressions = {};
+        this.vaccinationRegressions = {};
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            this.vaccinationRegressions[ageGroup.getName()] = {};
+        });
+
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            if (!this.modificationValues.vaccination_configs[ageGroup.getName()]) {
+                this.modificationValues.vaccination_configs[ageGroup.getName()] = {};
+            }
+            ModificationRegression.VACC_KEYS.forEach(vaccKey => {
+                if (!this.modificationValues.vaccination_configs[ageGroup.getName()][vaccKey]) {
+                    this.modificationValues.vaccination_configs[ageGroup.getName()][vaccKey] = {
+                        back_days_a: -35,
+                        back_days_b: 0,
+                        poly_shares: [0.0, 0.25]
+                    }
+                }
+            });
+        });
+
         this.normalize();
+
+        this.updateRegressions(this.modificationValues.multiplier_configs, this.modificationValues.correction_configs, this.modificationValues.vaccination_configs);
+
     }
 
     normalize(): void {
@@ -37,6 +70,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             correction_randoms[ageGroup.getName()] = 0;
         });
+
         this.acceptUpdate({
             multiplier_randoms,
             correction_randoms
@@ -68,6 +102,9 @@ export class ModificationRegression extends AModification<IModificationValuesReg
         });
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             minInstant = Math.min(minInstant, this.getInstantA() + this.modificationValues.correction_configs[ageGroup.getName()].back_days_a * TimeUtil.MILLISECONDS_PER____DAY);
+            ModificationRegression.VACC_KEYS.forEach(vaccKey => {
+                minInstant = Math.min(minInstant, this.getInstantA() + this.modificationValues.vaccination_configs[ageGroup.getName()][vaccKey].back_days_a * TimeUtil.MILLISECONDS_PER____DAY);
+            }); 
         });
         return minInstant;
     }
@@ -78,6 +115,10 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     getCorrectionConfig(ageGroupName: string): IRegressionConfig {
         return this.modificationValues.correction_configs[ageGroupName];
+    }
+
+    getVaccinationConfig(ageGroupName: string, vaccKey: string): IRegressionConfig {
+        return this.modificationValues.vaccination_configs[ageGroupName][vaccKey];
     }
 
     /**
@@ -128,27 +169,40 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     }
 
+    getVaccinationRegression(instant: number, ageGroupName: string, vaccKey: string): IRegressionResult {
+        return this.vaccinationRegressions[ageGroupName][vaccKey].getRegressionResult(instant);
+    }    
+
     /**
      * internal regression needs to update when the instant changes
      */
     setInstants(instantA: number, instantB: number): void {
         super.setInstants(instantA, instantB);
-        this.updateRegressions(this.modificationValues.multiplier_configs, this.modificationValues.correction_configs);
+        if (instantA !== this.getInstantA() || instantB !== this.getInstantB()) {
+            this.updateRegressions(this.modificationValues.multiplier_configs, this.modificationValues.correction_configs, this.modificationValues.vaccination_configs);
+        }
     }
 
     /**
      * internal regression needs to update when some value changes
      */
     acceptUpdate(update: Partial<IModificationValuesRegression>): void {
-        this.updateRegressions({...update.multiplier_configs}, {...update.correction_configs});
+        this.updateRegressions({...update.multiplier_configs}, {...update.correction_configs}, {...update.vaccination_configs});
         update.multiplier_configs = {...this.modificationValues.multiplier_configs, ...update.multiplier_configs};
         update.correction_configs = {...this.modificationValues.correction_configs, ...update.correction_configs};
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            if (update.vaccination_configs) {
+                update.vaccination_configs[ageGroup.getName()] = {...this.modificationValues.vaccination_configs[ageGroup.getName()], ...update.vaccination_configs[ageGroup.getName()]};
+            }
+        });
+        update.vaccination_configs = {...this.modificationValues.vaccination_configs, ...update.vaccination_configs};
         super.acceptUpdate(update);
     }
 
-    private updateRegressions(multiplierConfigs: { [K in string]: IRegressionConfig}, correctionConfigs: { [K in string]: IRegressionConfig}): void {
+    private updateRegressions(multiplierConfigs: { [K in string]: IRegressionConfig}, correctionConfigs: { [K in string]: IRegressionConfig}, vaccinationConfigs: { [K in string]: { [K in string]: IRegressionConfig } }): void {
 
         for (const key of Object.keys(multiplierConfigs)) {
+            // console.log('updating m-regression', key);
             const regressionConfig = multiplierConfigs[key];
             if (!regressionConfig.poly_shares) {
                 regressionConfig.poly_shares = [0.5, 0.75];
@@ -160,11 +214,12 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 instantA,
                 instantB,
                 polyShares: regressionConfig.poly_shares,
-                modificationsContact: new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
+                modifications: new ModificationResolverContact().getModifications() // .filter(m => m.getInstant() <= instantB)
             });
         }
 
         for (const key of Object.keys(correctionConfigs)) {
+            // console.log('updating c-regression', key);
             const regressionConfig = correctionConfigs[key];
             if (!regressionConfig.poly_shares) {
                 regressionConfig.poly_shares = [0.5, 0.75];
@@ -177,11 +232,33 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 instantA,
                 instantB,
                 polyShares: regressionConfig.poly_shares,
-                modificationsContact: new ModificationResolverContact().getModifications().filter(m => m.getInstant() <= instantB)
+                modifications: new ModificationResolverContact().getModifications() // .filter(m => m.getInstant() <= instantB)
             });
         }
 
-        // ChartAgeGroup.getInstance().renderRegressionData();
+
+        for (const ageKey of Object.keys(vaccinationConfigs)) {
+            for (const vaccKey of Object.keys(vaccinationConfigs[ageKey])) {
+                // console.log('updating v-regression', ageKey, vaccKey);
+                const regressionConfig = vaccinationConfigs[ageKey][vaccKey]; // by age group
+                if (!regressionConfig.poly_shares) {
+                    regressionConfig.poly_shares = [0.5, 0.75];
+                }
+                // const ageGroupIndex = Demographics.getInstance().findAgeGroupByName(ageKey).getIndex();
+                const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
+                const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+                this.vaccinationRegressions[ageKey][vaccKey] = new ValueRegressionVaccination({
+                    ageGroupName: ageKey,
+                    vaccinationPropertyGetter: (m: ModificationVaccination) => {
+                        return m.getModificationValues().vaccinations[ageKey][vaccKey];
+                    },
+                    instantA,
+                    instantB,
+                    polyShares: regressionConfig.poly_shares,
+                    modifications: new ModificationResolverVaccination().getModifications() // .filter(m => m.getInstantA() <= instantB)
+                });
+            };
+        }        
 
     }
 

@@ -202,7 +202,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const correction = this.modificationDiscovery.getOverall() / this.discoveryRatioOverall;
         this.ageGroups.forEach(ageGroup => {
             let contact = this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].contact * correction;
-            let discovery = this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery * correction;
+            let discovery = Math.min(0.95, this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery * correction);
             this.discoveryRatiosByAgeGroup[ageGroup.getIndex()] = {
                 contact,
                 discovery

@@ -1,3 +1,4 @@
+import { last } from '@amcharts/amcharts4/.internal/core/utils/Array';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IRegressionResult } from '../../model/regression/IRegressionResult';
@@ -45,13 +46,16 @@ export class ControlsRegression {
      * @returns
      */
     getRenderableRegressionResult(instant: number): IRegressionResult {
-        const regressionPointer = ModelActions.getInstance().getRegressionPointer();
-        if (regressionPointer.type === 'MULTIPLIER') {
-            return this.modification.getMultiplierRegression(instant, regressionPointer.value);
-        } else if (regressionPointer.type === 'CORRECTION') {
-            return this.modification.getCorrectionRegression(instant, regressionPointer.value);
+        const lastRegressionType = ModelActions.getInstance().getLastRegressionType();
+        const modelActions = ModelActions.getInstance();
+        if (lastRegressionType === 'MULTIPLIER') {
+            return this.modification.getMultiplierRegression(instant, modelActions.getCategory());
+        } else if (lastRegressionType === 'CORRECTION') {
+            return this.modification.getCorrectionRegression(instant, modelActions.getAgeGroup().getName());
+        } else if (lastRegressionType === 'VACCKEY') {
+            return this.modification.getVaccinationRegression(instant, modelActions.getAgeGroup().getName(), modelActions.getVaccKey());
         } else {
-            throw new Error('neither category nor agegroup set in regression controls');
+            throw new Error('unrecognized regression type: ' + lastRegressionType);
         }
     }
 
@@ -64,17 +68,24 @@ export class ControlsRegression {
         }
         const multiplier_configs: { [K in string]: IRegressionConfig } = {};
         const correction_configs: { [K in string]: IRegressionConfig } = {};
+        const vaccination_configs: { [K in string]: { [K in string]: IRegressionConfig } } = {};
 
-        const regressionPointer = ModelActions.getInstance().getRegressionPointer();
-        if (regressionPointer.type === 'MULTIPLIER') {
-            multiplier_configs[regressionPointer.value] = regressionConfig;
-        } else if (regressionPointer.type === 'CORRECTION') {
-            correction_configs[regressionPointer.value] = regressionConfig;
+        const modelActions = ModelActions.getInstance();
+
+        const lastRegressionPointerType = ModelActions.getInstance().getLastRegressionType();
+        if (lastRegressionPointerType === 'MULTIPLIER') {
+            multiplier_configs[modelActions.getCategory()] = regressionConfig;
+        } else if (lastRegressionPointerType === 'CORRECTION') {
+            correction_configs[modelActions.getAgeGroup().getName()] = regressionConfig;
+        } else if (lastRegressionPointerType === 'VACCKEY') {
+            vaccination_configs[modelActions.getAgeGroup().getName()] = {};
+            vaccination_configs[modelActions.getAgeGroup().getName()][modelActions.getVaccKey()] = regressionConfig;
         }
 
         this.modification.acceptUpdate({
             multiplier_configs,
-            correction_configs
+            correction_configs,
+            vaccination_configs
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
@@ -95,17 +106,25 @@ export class ControlsRegression {
         // console.log('this.regressionPointer', this.regressionPointer, this.modification);
         if (this.modification) {
 
-            const regressionPointer = ModelActions.getInstance().getRegressionPointer();
+            const lastRegressionType = ModelActions.getInstance().getLastRegressionType();
+            const modelActions = ModelActions.getInstance();
             let regressionConfig: IRegressionConfig;
-            if (regressionPointer.type === 'MULTIPLIER') {
-                regressionConfig = this.modification.getMultiplierConfig(regressionPointer.value);
-            } else if (regressionPointer.type === 'CORRECTION') {
-                regressionConfig = this.modification.getCorrectionConfig(regressionPointer.value);
+
+            let label: string;
+            if (lastRegressionType === 'MULTIPLIER') {
+                regressionConfig = this.modification.getMultiplierConfig(modelActions.getCategory());
+                label = modelActions.getCategory();
+            } else if (lastRegressionType === 'CORRECTION') {
+                regressionConfig = this.modification.getCorrectionConfig(modelActions.getAgeGroup().getName());
+                label = modelActions.getAgeGroup().getName();
+            } else if (lastRegressionType === 'VACCKEY') {
+                regressionConfig = this.modification.getVaccinationConfig(modelActions.getAgeGroup().getName(), modelActions.getVaccKey());
+                label = `${modelActions.getAgeGroup().getName()}-${modelActions.getVaccKey()}`;
             }
 
             if (regressionConfig) {
-                this.sliderBackDays.setLabel(regressionPointer.value);
-                this.sliderPolyShares.setLabel(regressionPointer.value);
+                this.sliderBackDays.setLabel(label);
+                this.sliderPolyShares.setLabel(label);
                 this.sliderBackDays.setValue(0, regressionConfig.back_days_a);
                 this.sliderBackDays.setValue(1, regressionConfig.back_days_b);
                 this.sliderPolyShares.setValue(0, regressionConfig.poly_shares[0]);
@@ -113,10 +132,9 @@ export class ControlsRegression {
             }
 
             if (ChartAgeGroup.getInstance().getChartMode() === 'CONTACT') {
-                const regressionPointer = ModelActions.getInstance().getRegressionPointer();
-                if (regressionPointer.type === 'MULTIPLIER') {
+                if (lastRegressionType === 'MULTIPLIER') {
                     ChartAgeGroup.getInstance().setAxisPercentBounds(0, 1);
-                } else if (regressionPointer.type === 'CORRECTION') {
+                } else if (lastRegressionType === 'CORRECTION') {
                     ChartAgeGroup.getInstance().setAxisPercentBounds(0, 2);
                 }
             }

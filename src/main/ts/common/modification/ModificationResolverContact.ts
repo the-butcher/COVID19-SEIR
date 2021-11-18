@@ -24,10 +24,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
      * @param instant
      * @returns
      */
-    createRegressionModification(instant: number): IModificationValuesContact {
-
-        const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
-        // const regression = modificationRegression.getRegression();
+    createRegressionModification(instant: number, modificationRegression: ModificationRegression): IModificationValuesContact {
 
         const multipliers: { [K in string]: number } = {};
         const corrections: { [K in string]: number } = {};
@@ -113,26 +110,17 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         let modificationValues: IModificationValuesContact;
 
         const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
-
         if (modificationRegression && instant > modificationRegression.getInstantA()) { // in the prediction range?
-
-            modificationValues = this.createRegressionModification(instant);
-            // console.log(TimeUtil.formatCategoryDate(instant), modificationValues)
-
+            modificationValues = this.createRegressionModification(instant, modificationRegression);
         } else if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) { // fetchType === 'CREATE' &&
-
             modificationValues = this.createInterpolatedInstance(instant, modificationA, modificationB);
-
         } else {
-
             modificationValues = this.createCopy(instant, modificationA);
-
         }
 
         const modification = new ModificationContact(modificationValues);
         if (fetchType === 'CREATE') {
             modification.setInstants(instant, instant); // will trigger update of 'work' and other mobility based values
-            // console.log(fetchType, 'after delegation', modification.getModificationValues());
         }
 
         return modification;

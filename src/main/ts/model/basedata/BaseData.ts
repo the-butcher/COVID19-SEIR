@@ -229,23 +229,23 @@ export class BaseData {
         positivityIndices.forEach(positivityIndex => {
 
             const positivityMarker = positivityMarkers[positivityIndex];
-            const overall = StrainUtil.calculateDiscoveryRate(0.33, 0.10, positivityMarker.display);
+            const overall = StrainUtil.calculateDiscoveryRate(positivityMarker.display);
             const id = ObjectUtil.createId();
             const contactCategories = Demographics.getInstance().getCategories();
             const multipliers: { [k: string]: number} = {}
             contactCategories.forEach(contactCategory => {
                 multipliers[contactCategory.getName()] = overall;
             });
-            multipliers['school'] = 0.5;
-            multipliers['nursing'] = 0.5;
-            multipliers['family'] = 0.5;
+            multipliers['school'] = 0.4;
+            multipliers['nursing'] = 0.75;
+            multipliers['family'] = 0.6;
             multipliers['work'] = 0.2;
             multipliers['other'] = 0.2;
 
-            // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
-            if (positivityMarker.instant > new Date('2021-11-02').getTime()) {
+            if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+            // if (positivityMarker.instant > new Date('2021-11-02').getTime()) {
 
-                console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
+                // console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationDiscovery({
                 //     id,
