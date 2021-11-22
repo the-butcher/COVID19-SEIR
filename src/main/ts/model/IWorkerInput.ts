@@ -2,6 +2,7 @@ import { IBaseDataConfig } from './basedata/BaseData';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IDemographicsConfig } from '../common/demographics/IDemographicsConfig';
 import { IFitterParams } from './state/ModelStateIntegrator';
+import { WORKER_MODE } from '../client/ModelTask';
 
 /**
  * definition for data transfer to the model calculation worker
@@ -17,4 +18,6 @@ export interface IWorkerInput {
     modificationValues: IModificationValues[];
     baseDataConfig: IBaseDataConfig;
     fitterParams?: IFitterParams;
+    workerMode: WORKER_MODE;
+
 }

@@ -20,7 +20,7 @@ import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIn
  */
 export class ModificationAdaptor5 {
 
-    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, providerOfDataCompare: (dataItem: IDataItem, ageGroup: AgeGroup) => IDataCompare , progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number}> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number}> {
 
         let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())}`;
 
@@ -32,11 +32,11 @@ export class ModificationAdaptor5 {
             });
         });
 
-        const errorRatio = 0.05;
+        const errorRatio = 0.03;
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-            const cases = providerOfDataCompare(stepData[stepData.length - 1], ageGroup); //  StrainUtil.findCases(stepData[stepData.length - 1], ageGroup);
+            const cases = StrainUtil.findCases(stepData[stepData.length - 1], ageGroup);
             const error = cases.base != 0 ? (cases.data / cases.base) - 1 : 0;
             errorsG[ageGroup.getName()] = error;
         });

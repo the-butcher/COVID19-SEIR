@@ -7,11 +7,16 @@ import { Modifications } from './common/modification/Modifications';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
+import { StrainUtil } from './util/StrainUtil';
 
 // console.log('pos     disc')
 // for (let positivityRate = 0.00; positivityRate <= 0.9; positivityRate += 0.01) {
 //     console.log(positivityRate.toFixed(4).padStart(7, ' '), '   ', StrainUtil.calculateDiscoveryRate(positivityRate).toFixed(4).padStart(7, ' '))
 // }
+[0.000, 0.010, 0.020, 0.040, 0.10].forEach(positivityRate => {
+    console.log(positivityRate.toFixed(4).padStart(7, ' '), '   ', StrainUtil.calculateDiscoveryRate(positivityRate).toFixed(4).padStart(7, ' '));
+})
+
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {

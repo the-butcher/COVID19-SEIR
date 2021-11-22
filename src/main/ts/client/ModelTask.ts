@@ -16,6 +16,9 @@ import { SliderModification } from './gui/SliderModification';
 import { StorageUtil } from './storage/StorageUtil';
 import { ModificationResolverRegression } from '../common/modification/ModificationResolverRegression';
 import { ModificationRegression } from '../common/modification/ModificationRegression';
+import { QueryUtil } from '../util/QueryUtil';
+
+export type WORKER_MODE = 'REGRESSION' | 'PROJECTION' | 'REBUILDING';
 
 /**
  * utility type that will pass rebuilding of the model to a web-worker
@@ -31,9 +34,8 @@ export class ModelTask {
     private static worker: ModelWorker;
 
     private static fitterParams: IFitterParams = {
-        derivRatio: 0.1,
-        errorTLast: -1,
-        fitter7Idx: 0
+        maxErrorTolerance: 0.20,
+        curErrorCalculate: Number.MAX_VALUE
     }
 
     static async commit(key: MODIFICATION____KEY, workerInput: IWorkerInput): Promise<void> {
@@ -47,6 +49,7 @@ export class ModelTask {
         }
 
         workerInput.fitterParams = ModelTask.fitterParams;
+
 
         /**
          * pass input for a full model rebuild to a web-worker where a few seconds of calculation will not interfere with responsiveness of gui
@@ -73,6 +76,9 @@ export class ModelTask {
                 });
 
                 ModelTask.fitterParams = modelProgress.fitterParams;
+                if (QueryUtil.getInstance().getWorkerMode() === 'REBUILDING') {
+                    document.title = `COVID19-SEIR (${ModelTask.fitterParams.maxErrorTolerance.toFixed(4)}) - ${ModelTask.fitterParams.currDateCalculate}`;
+                }                   
 
                 /**
                  * restore any values that may have been altered in the worker
@@ -87,6 +93,7 @@ export class ModelTask {
                     });
                     StorageUtil.getInstance().setSaveRequired(true);
                 });
+             
 
                 // if (modelProgress.modificationValuesRegression) {
                 //     const modificationRegression = Modifications.getInstance().findModificationById(modelProgress.modificationValuesRegression.id) as ModificationRegression;
@@ -96,11 +103,13 @@ export class ModelTask {
                 //     });
                 // }
 
-                // setTimeout(() => {
-                //     // ChartAgeGroup.getInstance().exportToPng().then(() => {
-                //         ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
-                //     // });
-                // }, 3000);
+                if (QueryUtil.getInstance().getWorkerMode() === 'REBUILDING') {
+                    setTimeout(() => {
+                        // ChartAgeGroup.getInstance().exportToPng().then(() => {
+                            ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                        // });
+                    }, 100);
+                }
 
                 // show any contact updates
                 // const displayableModification = ControlsContact.getInstance().getModification();

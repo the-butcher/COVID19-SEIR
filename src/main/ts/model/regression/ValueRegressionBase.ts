@@ -344,11 +344,14 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
             let ci95Min = regression - ci95;
             let ci95Max = regression + ci95;
 
-            if (ci95Min <= 0) {
-                ci95Min = 0;
-                regression = (ci95Max - ci95Min) / 2;
-                ci95Max = regression + ci95;
+            if (regression < 0) {
+                regression = 0;
             }
+            // if (ci95Min <= 0) {
+            //     ci95Min = 0;
+            //     regression = (ci95Max - ci95Min) / 2;
+            //     ci95Max = regression + ci95;
+            // }
 
             return {
                 loess: loessValue,

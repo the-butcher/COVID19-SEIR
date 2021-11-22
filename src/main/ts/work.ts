@@ -10,8 +10,6 @@ import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
 import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
-import { ModelStateFitter7 } from './model/state/fitter7/ModelStateFitter7';
-import { ModelStateFitter8 } from './model/state/fitter8/ModelStateFitter8';
 import { ModelStateFitter9Reg1 } from './model/state/fitter9reg1/ModelStateFitter9Reg1';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
@@ -71,20 +69,27 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
          * iterate
          */
 
-        new ModelStateFitter9Reg1().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
-            ctx.postMessage(modelProgress);
-        }).then(data => {
-            data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
-            data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
-            ctx.postMessage(data);
-        });
-
-        /**
-         * complete model build (add more sophisticated logic here)
-         */
-        // modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-        //     ctx.postMessage(modelProgress);
-        // });
+        if (workerInput.workerMode === 'REBUILDING') {
+            new ModelStateFitter5().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+                ctx.postMessage(modelProgress);
+            }).then(data => {
+                data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+                data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
+                ctx.postMessage(data);
+            });
+        } else if (workerInput.workerMode == 'REGRESSION') {
+            new ModelStateFitter9Reg1().adapt(workerInput.fitterParams, modelStateIntegrator, maxInstant, modelProgress => {
+                ctx.postMessage(modelProgress);
+            }).then(data => {
+                data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
+                data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
+                ctx.postMessage(data);
+            });
+        } else {
+            modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+                ctx.postMessage(modelProgress);
+            });
+        }
 
     } catch (error: any) {
         Logger.getInstance().log('failed to work due to: ', error);

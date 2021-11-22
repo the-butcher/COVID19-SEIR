@@ -260,12 +260,24 @@ export class ChartAgeGroup {
          * marker line to indicate the currently selected modification on the modification slider
          */
         this.selectedModificationRange = this.xAxis.axisRanges.create();
-        this.selectedModificationRange.label.visible = false;
         this.selectedModificationRange.grid.fillOpacity = 0.00;
         this.selectedModificationRange.grid.strokeOpacity = 0.75;
-        this.selectedModificationRange.grid.strokeWidth = 0.75
-        this.selectedModificationRange.grid.strokeDasharray = '2, 2';
+        this.selectedModificationRange.grid.strokeWidth = 2
         this.selectedModificationRange.grid.stroke = color(ControlsConstants.COLOR____FONT).brighten(-0.4);
+        // this.selectedModificationRange.grid.strokeDasharray = '6, 1, 2, 1';
+
+        // this.selectedModificationRange.label.visible = false;
+        this.selectedModificationRange.label.text = 'here';
+        this.selectedModificationRange.label.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.selectedModificationRange.label.fontSize = ControlsConstants.FONT_SIZE - 2;
+        this.selectedModificationRange.label.strokeOpacity = 0;
+        this.selectedModificationRange.label.fillOpacity = 1;
+        // this.selectedModificationRange.label.inside = true;
+        // this.selectedModificationRange.label.padding(0, 0, 5, 0);
+        // this.selectedModificationRange.label.adapter.add('y', (value, target) => {
+        //     target.measure();
+        //     return target.measuredHeight - this.chart.plotContainer.contentHeight + 4;
+        // });
 
         this.yAxisPlotAbsolute = this.chart.yAxes.push(new ValueAxis());
         ChartUtil.getInstance().configureAxis(this.yAxisPlotAbsolute, 'population');
@@ -307,8 +319,8 @@ export class ChartAgeGroup {
             baseLabel: 'incidence (CI95)',
             valueField: 'ageGroupIncidence95L',
             colorKey: 'CASES',
-            strokeWidth: 1,
-            dashed: false,
+            strokeWidth: 2,
+            dashed: true,
             locationOnPath: 0.10,
             labels: {
                 tooltip: false,
@@ -319,7 +331,7 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupIncidence95L.getSeries().strokeOpacity = 0.5;
+        // this.seriesAgeGroupIncidence95L.getSeries().strokeOpacity = 0.5;
         this.seriesAgeGroupIncidence95U = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
@@ -327,8 +339,8 @@ export class ChartAgeGroup {
             baseLabel: 'CI 95%',
             valueField: 'ageGroupIncidence95U',
             colorKey: 'CASES',
-            strokeWidth: 1,
-            dashed: false,
+            strokeWidth: 2,
+            dashed: true,
             locationOnPath: 0.10,
             labels: {
                 tooltip: false,
@@ -339,7 +351,7 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupIncidence95U.getSeries().strokeOpacity = 0.5;
+        // this.seriesAgeGroupIncidence95U.getSeries().strokeOpacity = 0.5;
         this.seriesAgeGroupIncidence95U.getSeries().fillOpacity = 0.2;
         this.seriesAgeGroupIncidence95U.bindToLegend(this.seriesAgeGroupIncidence95L);
 
@@ -350,8 +362,8 @@ export class ChartAgeGroup {
             baseLabel: 'incidence (CI68)',
             valueField: 'ageGroupIncidence68L',
             colorKey: 'CASES',
-            strokeWidth: 1,
-            dashed: false,
+            strokeWidth: 2,
+            dashed: true,
             locationOnPath: 0.10,
             labels: {
                 tooltip: false,
@@ -362,7 +374,7 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupIncidence68L.getSeries().strokeOpacity = 0.5;
+        // this.seriesAgeGroupIncidence68L.getSeries().strokeOpacity = 0.5;
         this.seriesAgeGroupIncidence68U = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
@@ -370,8 +382,8 @@ export class ChartAgeGroup {
             baseLabel: 'CI 68%',
             valueField: 'ageGroupIncidence68U',
             colorKey: 'CASES',
-            strokeWidth: 1,
-            dashed: false,
+            strokeWidth: 2,
+            dashed: true,
             locationOnPath: 0.10,
             labels: {
                 tooltip: false,
@@ -382,7 +394,7 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupIncidence68U.getSeries().strokeOpacity = 0.5;
+        // this.seriesAgeGroupIncidence68U.getSeries().strokeOpacity = 0.5;
         this.seriesAgeGroupIncidence68U.getSeries().fillOpacity = 0.2;
         this.seriesAgeGroupIncidence68U.bindToLegend(this.seriesAgeGroupIncidence68L);
 
@@ -475,7 +487,7 @@ export class ChartAgeGroup {
             baseLabel: 'incidence (model)',
             valueField: 'ageGroupIncidence',
             colorKey: 'INCIDENCE',
-            strokeWidth: 2,
+            strokeWidth: 4,
             dashed: false,
             locationOnPath: 0.16,
             labels: {
@@ -487,7 +499,7 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-
+        this.seriesAgeGroupIncidence.getSeries().fillOpacity = 0.1;
 
         this.seriesAgeGroupIncidenceR = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -521,7 +533,7 @@ export class ChartAgeGroup {
             baseLabel: 'vaccinated, full',
             valueField: 'ageGroupRemovedV2',
             colorKey: 'VACCINATION',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.05,
             labels: {
@@ -540,7 +552,7 @@ export class ChartAgeGroup {
             baseLabel: 'vaccinated, after asymptomatic infection',
             valueField: 'ageGroupRemovedVU',
             colorKey: 'VACCINATION',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.20,
             labels: {
@@ -561,7 +573,7 @@ export class ChartAgeGroup {
             baseLabel: 'immunizing',
             valueField: 'ageGroupRemovedVI',
             colorKey: 'IMMUNIZING',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.05,
             labels: {
@@ -585,7 +597,7 @@ export class ChartAgeGroup {
             baseLabel: 'recovered after symptomatic infection',
             valueField: 'ageGroupRemovedID',
             colorKey: 'REMOVED',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.15,
             labels: {
@@ -608,7 +620,7 @@ export class ChartAgeGroup {
             baseLabel: 'recovered after asymptomatic infection',
             valueField: 'ageGroupRemovedIU',
             colorKey: 'REMOVED',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.41,
             labels: {
@@ -630,7 +642,7 @@ export class ChartAgeGroup {
             baseLabel: 'susceptible',
             valueField: 'ageGroupSusceptible',
             colorKey: 'SUSCEPTIBLE',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.05,
             labels: {
@@ -651,7 +663,7 @@ export class ChartAgeGroup {
             baseLabel: 'exposed',
             valueField: 'ageGroupExposed',
             colorKey: 'EXPOSED',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.25,
             labels: {
@@ -670,7 +682,7 @@ export class ChartAgeGroup {
             baseLabel: 'infectious',
             valueField: 'ageGroupInfectious',
             colorKey: 'INFECTIOUS',
-            strokeWidth: 1,
+            strokeWidth: 3,
             dashed: false,
             locationOnPath: 0.75,
             labels: {
@@ -1703,7 +1715,7 @@ export class ChartAgeGroup {
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = 2500; // maxIncidence * 1.25;
+            this.yAxisPlotIncidence.max = 1700; // maxIncidence * 1.25;
 
             this.yAxisPlotPercent.min = 0;
             this.yAxisPlotPercent.max = maxInfectious * 1.00;

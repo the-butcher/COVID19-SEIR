@@ -172,7 +172,7 @@ export class ChartAgeGroupSeries {
 
         this.series.stacked = stacked;
         this.series.fillOpacity = stacked ? 0.7 : 0.0;
-        this.series.strokeOpacity = stacked ? 0.7 : 1.0;
+        this.series.strokeOpacity = 1.0;
 
         // this.series.segments.template.interactionsEnabled = stacked;
 

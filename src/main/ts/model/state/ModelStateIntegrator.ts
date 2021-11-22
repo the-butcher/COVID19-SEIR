@@ -27,9 +27,9 @@ export interface IModelProgress {
 }
 
 export interface IFitterParams {
-    derivRatio: number;
-    errorTLast: number;
-    fitter7Idx: number;
+    maxErrorTolerance: number;
+    curErrorCalculate: number;
+    currDateCalculate?: string;
 }
 
 export interface IDataForecast {

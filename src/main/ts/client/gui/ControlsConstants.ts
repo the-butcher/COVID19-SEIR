@@ -372,6 +372,7 @@ export class ControlsConstants {
             showInEditor: modification => ControlsSettings.getInstance().acceptModification(modification as ModificationSettings),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         }
+        // 'HOSPITAL' M 5.034 -1.774 H -1.162 C -1.375 -1.774 -1.549 -1.6 -1.549 -1.387 V 2.098 H -6.195 V -3.71 C -6.195 -3.923 -6.369 -4.098 -6.582 -4.098 H -7.357 C -7.57 -4.098 -7.744 -3.923 -7.744 -3.71 V 4.808 C -7.744 5.021 -7.57 5.195 -7.357 5.195 H -6.582 C -6.369 5.195 -6.195 5.021 -6.195 4.808 V 3.646 H 6.195 V 4.808 C 6.195 5.021 6.369 5.195 6.582 5.195 H 7.357 C 7.57 5.195 7.744 5.021 7.744 4.808 V 0.936 C 7.744 -0.562 6.532 -1.774 5.034 -1.774 Z M -4.453 -4.872 H -1.401 L -0.733 -3.536 C -0.59 -3.251 -0.184 -3.251 -0.041 -3.536 L 1.162 -5.942 L 1.696 -4.872 H 4.646 C 4.859 -4.872 5.034 -5.046 5.034 -5.259 S 4.859 -5.646 4.646 -5.646 H 2.176 L 1.508 -6.982 C 1.365 -7.268 0.958 -7.268 0.816 -6.982 L -0.387 -4.577 L -0.869 -5.54 C -0.903 -5.605 -0.968 -5.646 -1.043 -5.646 H -4.453 C -4.559 -5.646 -4.646 -5.559 -4.646 -5.453 V -5.066 C -4.646 -4.959 -4.559 -4.872 -4.453 -4.872 Z M -3.872 1.323 C -3.018 1.323 -2.323 0.629 -2.323 -0.226 S -3.018 -1.774 -3.872 -1.774 S -5.421 -1.08 -5.421 -0.226 S -4.726 1.323 -3.872 1.323 Z
     };
 
     static readonly BULLET_CIRCLE = 'M 0 -12.4 C -6.85 -12.4 -12.4 -6.85 -12.4 0 S -6.85 12.4 0 12.4 S 12.4 6.85 12.4 0 S 6.85 -12.4 0 -12.4 Z';
@@ -391,10 +392,10 @@ export class ControlsConstants {
             demographicsConfig: Demographics.getInstance().getDemographicsConfig(),
             modificationValues: Modifications.getInstance().buildModificationValues(),
             baseDataConfig: BaseData.getInstance().getBaseDataConfig(),
+            workerMode: QueryUtil.getInstance().getWorkerMode(),
             fitterParams: {
-                derivRatio: 0.2,
-                errorTLast: 200,
-                fitter7Idx: 2
+                maxErrorTolerance: 0.20,
+                curErrorCalculate: Number.MAX_VALUE
             }
         }
     }

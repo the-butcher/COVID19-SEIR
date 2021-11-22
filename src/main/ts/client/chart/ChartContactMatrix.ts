@@ -1,5 +1,5 @@
 import { CategoryAxis, ColumnSeries, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
-import { color, create, Label, percent, useTheme } from '@amcharts/amcharts4/core';
+import { color, create, IDisposer, Label, percent, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
@@ -44,6 +44,8 @@ export class ChartContactMatrix {
 
     private readonly showToggleAndPercentage: boolean;
 
+    private hitDisposer: IDisposer;
+
     constructor(container: string, showToggleAndPercentage: boolean) {
 
         useTheme(am4themes_dark);
@@ -59,7 +61,9 @@ export class ChartContactMatrix {
         ChartUtil.getInstance().configureChartPadding(this.chart);
         ChartUtil.getInstance().configureSeparators(this.chart);
 
+        this.chart.exporting.timeoutDelay = 10000;
         this.chart.exporting.adapter.add('filePrefix', (value, target) => {
+            // console.log('filePrefix')
             return {
                 filePrefix: ObjectUtil.createDownloadName()
             };
@@ -123,8 +127,8 @@ export class ChartContactMatrix {
         this.yAxisPlot.renderer.labels.template.disabled = true;
         this.yAxisPlot.renderer.grid.template.disabled = false;
 
-        this.yAxisPlot.min = 0.00;
-        // this.yAxisPlot.max = 25.0; // 0.15;
+        this.yAxisPlot.min = 0.000;
+        // this.yAxisPlot.max = 0.002; // 0.15;
         // this.yAxisPlot.strictMinMax = true;
 
         this.yAxisPlot.renderer.minGridDistance = 10;
@@ -141,8 +145,9 @@ export class ChartContactMatrix {
         this.seriesPlot.dataFields.categoryX = 'plotX';
         this.seriesPlot.dataFields.valueY = 'plotY';
         this.seriesPlot.fillOpacity = 0.2;
-        this.seriesPlot.strokeWidth = 1;
+        this.seriesPlot.strokeWidth = 4;
         this.seriesPlot.strokeLinecap = 'round';
+        this.seriesPlot.strokeLinejoin = 'round';
         this.seriesPlot.strokeOpacity = 1.0;
 
         this.seriesPlot.tooltipText = '{categoryX}';
@@ -200,11 +205,11 @@ export class ChartContactMatrix {
 
         this.valueTotalLabel = this.chart.createChild(Label);
         this.valueTotalLabel.fontFamily = ControlsConstants.FONT_FAMILY;
-        this.valueTotalLabel.fontSize = ControlsConstants.FONT_SIZE - 1;
+        this.valueTotalLabel.fontSize = ControlsConstants.FONT_SIZE - 2;
         this.valueTotalLabel.fill = color(ControlsConstants.COLOR____FONT);
         this.valueTotalLabel.text = '';
         this.valueTotalLabel.isMeasured = false;
-        this.valueTotalLabel.x = 50;
+        this.valueTotalLabel.x = 72;
         this.valueTotalLabel.y = 287;
         this.valueTotalLabel.horizontalCenter = 'right';
 
@@ -222,10 +227,19 @@ export class ChartContactMatrix {
             (this.seriesPlot.element.node.firstChild as SVGGElement).setAttributeNS(null, 'clip-path', '');
         });
 
+        this.hitDisposer = this.chart.events.on('hit', e => {
+            this.handleHit();
+        });
+
     }
 
     exportToPng(): void {
         this.chart.exporting.export("png");
+    }
+
+    async handleHit(): Promise<void> {
+        await this.exportToPng();
+        this.setInstant(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
     }
 
     async acceptContactMatrix(contactMatrix: IContactMatrix): Promise<void> {
