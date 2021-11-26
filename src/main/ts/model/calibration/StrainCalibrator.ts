@@ -154,7 +154,7 @@ export class StrainCalibrator {
 
             modificationValuesStrain.transmissionRisk *= nrmDeltaAvg; // with different incidences there are slightly different transmission risks needed to maintain equilibrium
 
-            const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCUBATE_0 || c.getCompartmentType() === ECompartmentType.X__INCUBATE_N));
+            const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 || c.getCompartmentType() === ECompartmentType.X__INCIDENCE_N));
             const modelIncidence = modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * demographics.getAbsTotal() * 100000 / demographics.getAbsTotal();
 
             const incidenceCorrection = modificationValuesStrain.dstIncidence / modelIncidence;

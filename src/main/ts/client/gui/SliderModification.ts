@@ -71,7 +71,7 @@ export class SliderModification extends Slider {
                 if (index >= 0) {
                     const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());
                     ControlsConstants.MODIFICATION_PARAMS[modification.getKey()].showInEditor(modification);
-                    ChartAgeGroup.getInstance().updateModificationInstant(modification.getInstantA()); // update marker in age group chart
+                    ChartAgeGroup.getInstance().updateModificationInstant(modification.getInstantA(), modification.getName(), ControlsConstants.COLORS[modification.getKey()]); // update marker in age group chart
                 }
             }
         });

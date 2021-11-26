@@ -68,7 +68,7 @@ export class CompartmentChain {
             reproduction = (Weibull.getInstance().getNormalizedDistribution(instantB) - Weibull.getInstance().getNormalizedDistribution(instantA));
             shareOfPreSymptomaticInfection1 += reproduction;
             this.compartmentParams.push({
-                type: ECompartmentType.I__INFECTIOUS,
+                type: ECompartmentType.I_INFECTIOUS_A,
                 r0: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,
@@ -83,7 +83,7 @@ export class CompartmentChain {
             instantB = normalizedIncubation + normalizedDuration * compartmentIndex;
             reproduction = (Weibull.getInstance().getNormalizedDistribution(instantB) - Weibull.getInstance().getNormalizedDistribution(instantA));
             this.compartmentParams.push({
-                type: ECompartmentType.I__INFECTIOUS,
+                type: ECompartmentType.I_INFECTIOUS_A,
                 r0: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,
@@ -113,7 +113,7 @@ export class CompartmentChain {
         const toStrainedValue = (normalized: number) => normalized * strainValues.serialInterval * strainValues.intervalScale + mean;
 
         strainedCompartmentParams.push({
-            type: ECompartmentType.E_____EXPOSED,
+            type: ECompartmentType.E______EXPOSED,
             r0: CompartmentChain.NO_REPRODUCTION,
             instantA: 0,
             instantB: Math.round(toStrainedValue(this.compartmentParams[0].instantA) * TimeUtil.MILLISECONDS_PER____DAY),

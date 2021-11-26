@@ -153,7 +153,7 @@ export class BaseData {
                 }
 
             } else {
-                this.dailyOffsetInstantMin = instant - TimeUtil.MILLISECONDS_PER___WEEK * 5;
+                this.dailyOffsetInstantMin = instant - TimeUtil.MILLISECONDS_PER___WEEK * 3;
                 this.dailyOffsetInstantMax = instant + TimeUtil.MILLISECONDS_PER___WEEK;
             }
 

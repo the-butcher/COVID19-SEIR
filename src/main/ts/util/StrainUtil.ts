@@ -34,7 +34,7 @@ export class StrainUtil {
      */
     static calculateDiscoveryRate(positivityRate: number): number {
         const trimmedPositivityRate = Math.max(0, positivityRate); // will produce max discovery rate ~0.94
-        return 1 / (trimmedPositivityRate * 300 + 1.25) + 0.35 - trimmedPositivityRate / 10
+        return 1 / (trimmedPositivityRate * 300 + 1.25) + 0.17 - trimmedPositivityRate / 10
     }
 
     static calculateLatency(serialInterval: number, intervalScale: number) {

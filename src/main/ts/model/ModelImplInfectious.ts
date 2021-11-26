@@ -48,7 +48,6 @@ export class ModelImplInfectious implements IModelSeir {
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupTotal = ageGroup.getAbsValue();
 
-
         // make some assumptions about initial cases (duplicated code in ModelImplIncidence)
         let dailyTested = strainValues.preIncidence * ageGroup.getAbsValue() / 700000;
 
@@ -109,7 +108,7 @@ export class ModelImplInfectious implements IModelSeir {
                 const incidenceC = incidenceRatio * StrainUtil.calculateValueB(strainValues.preIncidences[this.ageGroupIndex], strainValues.preGrowthRate[this.ageGroupIndex], 0, instantB, strainValues.serialInterval * strainValues.intervalScale);
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
             }
-            const compartmentType = incidenceIndex == 0 ? ECompartmentType.X__INCUBATE_0 : ECompartmentType.X__INCUBATE_N;
+            const compartmentType = incidenceIndex == 0 ? ECompartmentType.X__INCIDENCE_0 : ECompartmentType.X__INCIDENCE_N;
             this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER____DAY), `_7DI_${ObjectUtil.padZero(incidenceIndex)}`));
         }
         // console.log('incidenceSum', incidenceSum / 7);
@@ -136,6 +135,8 @@ export class ModelImplInfectious implements IModelSeir {
                     increments.addNrmValue(-continuationValue, sourceCompartment);
                     if (targetCompartment) {
                         increments.addNrmValue(continuationValue, targetCompartment);
+                    } else {
+                        // just drop here
                     }
                     return increments;
 
@@ -179,9 +180,13 @@ export class ModelImplInfectious implements IModelSeir {
                      * only consider cases that have been discovered
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
+
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
                         const discoveredNrmCases = continuationValue * modificationTime.getDiscoveryRatios(this.ageGroupIndex).discovery;
                         increments.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
+
+
+
                     }
                     return increments;
 

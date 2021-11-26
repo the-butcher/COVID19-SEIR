@@ -51,7 +51,7 @@ export class ModelStateFitter9Reg1 {
             predictionStats[ageGroup.getName()] = {};
         });
 
-        const iterations = 30;
+        const iterations = 100;
         for (let i = 0; i < iterations; i++) {
 
             console.log('iteration', i);

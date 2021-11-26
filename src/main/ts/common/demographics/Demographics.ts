@@ -109,7 +109,7 @@ export class Demographics implements IContactCategories {
                     1, // 65-74
                     1, // 75-84
                     1  // >= 85
-                ].map(v => v * 1.2)
+                ].map(v => v)
             }
 
             if (matrixConfig.name === 'nursing') {
@@ -122,14 +122,14 @@ export class Demographics implements IContactCategories {
                     1, // 45-54
                     1, // 55-64
                     1, // 65-74
-                    1.20, // 75-84
+                    1, // 75-84
                     1  // >= 85
-                ].map(v => v * 1.5)
+                ].map(v => v * 0.7)
             }
 
             if (matrixConfig.name === 'family') {
                 corrections = [
-                    0.70, // <= 04
+                    1, // <= 04
                     1, // 05-14
                     1, // 15-24
                     1, // 25-34
@@ -139,7 +139,7 @@ export class Demographics implements IContactCategories {
                     1, // 65-74
                     1, // 75-84
                     1  // >= 85
-                ]
+                ].map(v => v * 0.4)
             }
 
             if (matrixConfig.name === 'work') {
@@ -154,7 +154,7 @@ export class Demographics implements IContactCategories {
                     1, // 65-74
                     1, // 75-84
                     1  // >= 85
-                ].map(v => v * 0.7)
+                ].map(v => v * 0.4)
             }
 
             if (matrixConfig.name === 'other') {
@@ -171,39 +171,6 @@ export class Demographics implements IContactCategories {
                     1.00  // >= 85
                 ].map(v => v)
             }
-
-            // if (matrixConfig.name === 'other') {
-            //     corrections = [
-            //         0.05, // <= 04
-            //         0.20, // 05-14
-            //         0.65, // 15-24
-            //         0.80, // 25-34
-            //         0.90, // 35-44
-            //         1.00, // 45-54
-            //         1.20, // 55-64
-            //         1.00, // 65-74
-            //         1.60, // 75-84
-            //         1.10  // >= 85
-            //     ].map(v => v * 2)
-            // }
-
-            // /**
-            //  * a derivate of 'other' with proprietary scaling
-            //  */
-            // if (matrixConfig.name === 'risk') {
-            //     corrections = [
-            //         0.00, // <= 04
-            //         0.05, // 05-14
-            //         1.93, // 15-24
-            //         1.89, // 25-34
-            //         0.62, // 35-44
-            //         0.04, // 45-54
-            //         0.02, // 55-64
-            //         0.00, // 65-74
-            //         0.00, // 75-84
-            //         0.00  // >= 85
-            //     ].map(v => v * Math.sqrt(2.0))
-            // }
 
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
                 contactCategoryParamsTarget.data[indexContact] = [];

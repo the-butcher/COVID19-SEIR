@@ -166,6 +166,10 @@ export class ChartAgeGroupSeries {
         this.series.visible = visible ? this.visible : false;
     }
 
+    isVisible(): boolean {
+        return this.series.visible;
+    }
+
     setStacked(stacked: boolean): void {
 
         this.series.stacked = stacked;

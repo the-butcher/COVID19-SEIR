@@ -1,9 +1,7 @@
-import { TimeUtil } from './../util/TimeUtil';
-import { BaseData } from './basedata/BaseData';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
-import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { ModificationTime } from '../common/modification/ModificationTime';
+import { BaseData } from './basedata/BaseData';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
@@ -133,7 +131,7 @@ export class ModelImplStrain implements IModelSeir {
             // calculate a normalized value of infectious individuals
             nrmI = 0
             infectiousModelContact.getCompartments().forEach(compartmentI => {
-                if (compartmentI.getCompartmentType() === ECompartmentType.I__INFECTIOUS) {
+                if (compartmentI.getCompartmentType() === ECompartmentType.I_INFECTIOUS_A) {
                     nrmI += state.getNrmValue(compartmentI) * compartmentI.getReproductionRatio().getRate(dT);
                 }
             });

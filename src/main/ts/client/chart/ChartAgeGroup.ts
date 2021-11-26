@@ -1,4 +1,4 @@
-import { CategoryAxis, CategoryAxisDataItem, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
+import { Bullet, CategoryAxis, CategoryAxisDataItem, Column, ColumnSeries, LineSeries, StepLineSeries, ValueAxis, XYChart, XYCursor } from "@amcharts/amcharts4/charts";
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
@@ -167,6 +167,7 @@ export class ChartAgeGroup {
     protected readonly seriesIcuR: ChartAgeGroupSeries; // real icu (all ages only)
 
     private readonly selectedModificationRange: CategoryAxisDataItem;
+    private readonly selectedModificationLabel: Label;
 
     /**
      * real average cases
@@ -264,18 +265,48 @@ export class ChartAgeGroup {
         this.selectedModificationRange.grid.strokeOpacity = 0.75;
         this.selectedModificationRange.grid.strokeWidth = 2
         this.selectedModificationRange.grid.stroke = color(ControlsConstants.COLOR____FONT).brighten(-0.4);
-        // this.selectedModificationRange.grid.strokeDasharray = '6, 1, 2, 1';
+        this.selectedModificationRange.grid.strokeDasharray = '4, 2';
+        this.selectedModificationRange.label.visible = false;
 
-        // this.selectedModificationRange.label.visible = false;
-        this.selectedModificationRange.label.text = 'here';
-        this.selectedModificationRange.label.fontFamily = ControlsConstants.FONT_FAMILY;
-        this.selectedModificationRange.label.fontSize = ControlsConstants.FONT_SIZE - 2;
-        this.selectedModificationRange.label.strokeOpacity = 0;
-        this.selectedModificationRange.label.fillOpacity = 1;
+        const multilayerBullet = new Bullet();
+        this.selectedModificationLabel = multilayerBullet.createChild(Label);
+        this.selectedModificationLabel.rotation = -90;
+        this.selectedModificationLabel.text = 'here';
+        this.selectedModificationLabel.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.selectedModificationLabel.fontSize = ControlsConstants.FONT_SIZE - 2;
+        this.selectedModificationLabel.fill = color(ControlsConstants.COLOR____FONT);
+        this.selectedModificationLabel.strokeOpacity = 0;
+        this.selectedModificationLabel.fillOpacity = 1;
+        this.selectedModificationLabel.valign = 'top';
+        this.selectedModificationLabel.adapter.add('dy', (value, target) => {
+            target.measure();
+            // console.log(target.measuredHeight, this.chart.plotContainer.contentHeight, value);
+            return target.measuredHeight - this.chart.plotContainer.contentHeight + 4;
+        });                
+
+        this.selectedModificationRange.bullet = multilayerBullet;
+
+
+        // this.selectedModificationRange.label.text = 'here';
+        // this.selectedModificationRange.label.fontFamily = ControlsConstants.FONT_FAMILY;
+        // this.selectedModificationRange.label.fontSize = ControlsConstants.FONT_SIZE - 2;
+        // this.selectedModificationRange.label.strokeOpacity = 0;
+        // this.selectedModificationRange.label.fillOpacity = 1;
+
+        // // this.selectedModificationRange.label.dx = -7;
+        // this.selectedModificationRange.label.y = -400;
+        // this.selectedModificationRange.label.valign = 'top';
+
+        // this.selectedModificationRange.label.adapter.add('dy', (value, target) => {
+        //     target.measure();
+        //     console.log(target.measuredHeight, this.chart.plotContainer.contentHeight, value);
+        //     return - this.chart.plotContainer.contentHeight;
+        // });        
+
         // this.selectedModificationRange.label.inside = true;
         // this.selectedModificationRange.label.padding(0, 0, 5, 0);
         // this.selectedModificationRange.label.adapter.add('y', (value, target) => {
-        //     target.measure();
+        //     // target.measure();
         //     return target.measuredHeight - this.chart.plotContainer.contentHeight + 4;
         // });
 
@@ -1196,6 +1227,9 @@ export class ChartAgeGroup {
         });
 
         this.chart.events.on('ready', e => {
+
+
+
             // (this.seriesHeat.bulletsContainer.element.node.parentNode as SVGGElement).setAttributeNS(null, 'clip-path', '');
         });
 
@@ -1579,8 +1613,10 @@ export class ChartAgeGroup {
 
     }
 
-    updateModificationInstant(instant: number): void {
+    updateModificationInstant(instant: number, modificationName: string, modificationColor: string): void {
         this.selectedModificationRange.category = TimeUtil.formatCategoryDateFull(instant);
+        this.selectedModificationRange.grid.stroke = color(modificationColor).brighten(0.4);
+        this.selectedModificationLabel.text = modificationName;
     }
 
     setSeriesContactVisible(visible: boolean): void {
@@ -1617,7 +1653,16 @@ export class ChartAgeGroup {
     }
 
     setSeriesTestingVisible(visible: boolean): void {
+
         this.seriesPositivityRateR.setVisible(visible);
+
+        if (visible) {
+            this.yAxisPlotPercent.visible = visible;
+            this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
+            this.yAxisPlotPercent.tooltip.disabled = !visible;
+            this.setAxisPercentBounds(0, 0.1);
+        }
+
     }
 
     setSeriesHospitalVisible(visible: boolean): void {
@@ -1704,21 +1749,45 @@ export class ChartAgeGroup {
             const maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
 
             let maxIncidence = 0;
-            let maxInfectious = 0;
+            // let maxInfectious = 0;
             for (const dataItem of this.modelData) {
                 if (dataItem.instant >= minInstant && dataItem.instant <= maxInstant) {
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupHeat => {
+
+                        // maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+                        // maxInfectious = Math.max(maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
                         maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
-                        maxInfectious = Math.max(maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
+
+                        const casesScaled1 = dataItem.valueset[ageGroupHeat.getName()].CASES * 700000 / ageGroupHeat.getAbsValue();
+                        if (this.seriesAgeGroupCasesP.isVisible()) {
+                            maxIncidence = Math.max(maxIncidence, casesScaled1);
+                        }
+
+                        if (this.seriesAgeGroupCasesN.isVisible()) {
+                            const casesOffset = BaseData.getInstance().getAverageOffset(ageGroupHeat.getIndex(), dataItem.instant);
+                            if (casesOffset) {
+                                maxIncidence = Math.max(maxIncidence, casesScaled1 * casesOffset); // daily prediction
+                            }
+                        }
+                                               
+                        if (this.seriesAgeGroupCasesR.isVisible()) {
+                            const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+                            if (dataItem00) {
+                                const casesScaled2 = dataItem00.getCasesM1(ageGroupHeat.getIndex()) * 700000 / ageGroupHeat.getAbsValue();
+                                maxIncidence = Math.max(maxIncidence, casesScaled2);
+                            }
+                        }
+
                     });
                 }
             }
 
             this.yAxisPlotIncidence.min = 0;
-            this.yAxisPlotIncidence.max = 1700; // maxIncidence * 1.25;
+            this.yAxisPlotIncidence.max = maxIncidence * 1.05;
+            console.log('maxIncidence', maxIncidence);
 
-            this.yAxisPlotPercent.min = 0;
-            this.yAxisPlotPercent.max = maxInfectious * 1.00;
+            // this.yAxisPlotPercent.min = 0;
+            // this.yAxisPlotPercent.max = maxInfectious * 1.00;
 
             this.applyMaxHeat(maxIncidence);
 
@@ -1837,7 +1906,7 @@ export class ChartAgeGroup {
                 ageGroupCasesN *= ageGroupCasesP;
             }
 
-            const seasonality = dataItem.seasonality * 1.3;
+            const seasonality = dataItem.seasonality;
             const reproductionP = dataItem.valueset[ageGroupPlot.getName()].REPRODUCTION; // this.calculateRt(dataItem.instant);
 
             let ageGroupIncidence95L: number;
@@ -2010,9 +2079,9 @@ export class ChartAgeGroup {
 
                 ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
                 positivityRateR = dataItem00.getAveragePositivity();
-                if (positivityRateR && !Number.isNaN(positivityRateR)) {
-                    positivityRateR *= 10; // TODO project this into a usable scale
-                }
+                // if (positivityRateR && !Number.isNaN(positivityRateR)) {
+                //     positivityRateR; // TODO project this into a usable scale
+                // }
 
                 hospitalizationR = dataItem00.getHospitalization() / ageGroupPlot.getAbsValue();
                 icuR = dataItem00.getIcu() / ageGroupPlot.getAbsValue();
