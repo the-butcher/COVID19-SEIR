@@ -153,7 +153,7 @@ export class ModelConstants {
     static readonly RANGE____INCIDENCE_1000 = [0, 250, 500, 750, 1000];
     static readonly RANGE_____INCIDENCE__10 = [0, 2, 4, 6, 8, 10];
     static readonly RANGE___SERIAL_INTERVAL = [2, 3, 4, 5, 6, 7, 8];
-    static readonly RANGE________________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    static readonly RANGE________________R0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
     static readonly RANGE________UNDETECTED = [0, 1, 2, 3];
     static readonly RANGE_________BACK_DAYS = [-35, -28, -21, -14, -7, 0];
 

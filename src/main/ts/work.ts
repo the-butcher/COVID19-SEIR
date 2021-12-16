@@ -10,6 +10,7 @@ import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
 import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
+import { ModelStateFitter8 } from './model/state/fitter8/ModelStateFitter8';
 import { ModelStateFitter9Reg1 } from './model/state/fitter9reg1/ModelStateFitter9Reg1';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';

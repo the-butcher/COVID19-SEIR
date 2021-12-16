@@ -1272,7 +1272,46 @@ export class ChartAgeGroup {
     }
 
     exportToJson(): void {
-        StorageUtil.getInstance().exportJson(this.modelData);
+        
+        const strippedData: any[] = [];
+        this.modelData.forEach(data => {
+            strippedData.push({
+                instant: data.instant,
+                date: '',
+                cases_00_04: data.valueset['<= 04'].CASES.toLocaleString(),
+                disco_00_04: data.valueset['<= 04'].DISCOVERY.toLocaleString(),
+                assum_00_04: (data.valueset['<= 04'].CASES / data.valueset['<= 04'].DISCOVERY).toLocaleString(),
+                cases_05_14: data.valueset['05-14'].CASES.toLocaleString(),
+                disco_05_14: data.valueset['05-14'].DISCOVERY.toLocaleString(),
+                assum_05_14: (data.valueset['05-14'].CASES / data.valueset['05-14'].DISCOVERY).toLocaleString(),
+                cases_15_24: data.valueset['15-24'].CASES.toLocaleString(),
+                disco_15_24: data.valueset['15-24'].DISCOVERY.toLocaleString(),
+                assum_15_24: (data.valueset['15-24'].CASES / data.valueset['15-24'].DISCOVERY).toLocaleString(),
+                cases_25_34: data.valueset['25-34'].CASES.toLocaleString(),
+                disco_25_34: data.valueset['25-34'].DISCOVERY.toLocaleString(),
+                assum_25_34: (data.valueset['25-34'].CASES / data.valueset['25-34'].DISCOVERY).toLocaleString(),
+                cases_35_44: data.valueset['35-44'].CASES.toLocaleString(),
+                disco_35_44: data.valueset['35-44'].DISCOVERY.toLocaleString(),
+                assum_35_44: (data.valueset['35-44'].CASES / data.valueset['35-44'].DISCOVERY).toLocaleString(),
+                cases_45_54: data.valueset['45-54'].CASES.toLocaleString(),
+                disco_45_54: data.valueset['45-54'].DISCOVERY.toLocaleString(),
+                assum_45_54: (data.valueset['45-54'].CASES / data.valueset['45-54'].DISCOVERY).toLocaleString(),
+                cases_55_64: data.valueset['55-64'].CASES.toLocaleString(),
+                disco_55_64: data.valueset['55-64'].DISCOVERY.toLocaleString(),
+                assum_55_64: (data.valueset['55-64'].CASES / data.valueset['55-64'].DISCOVERY).toLocaleString(),
+                cases_65_74: data.valueset['65-74'].CASES.toLocaleString(),
+                disco_65_74: data.valueset['65-74'].DISCOVERY.toLocaleString(),
+                assum_65_74: (data.valueset['65-74'].CASES / data.valueset['65-74'].DISCOVERY).toLocaleString(),
+                cases_75_84: data.valueset['75-84'].CASES.toLocaleString(),
+                disco_75_84: data.valueset['75-84'].DISCOVERY.toLocaleString(),
+                assum_75_84: (data.valueset['75-84'].CASES / data.valueset['75-84'].DISCOVERY).toLocaleString(),
+                cases_85_00: data.valueset['>= 85'].CASES.toLocaleString(),
+                disco_85_00: data.valueset['>= 85'].DISCOVERY.toLocaleString(),
+                assum_85_00: (data.valueset['>= 85'].CASES / data.valueset['>= 85'].DISCOVERY).toLocaleString(),
+            })
+        })
+        // StorageUtil.getInstance().exportJson(this.modelData);
+        StorageUtil.getInstance().exportJson(strippedData);
     }
 
     async handleAgeGroupChange(): Promise<void> {
@@ -1514,8 +1553,8 @@ export class ChartAgeGroup {
                 dashed: true,
                 locationOnPath: this.seriesAgeGroupLabelLocation,
                 labels: {
-                    tooltip: false,
-                    pathtip: false
+                    tooltip: true,
+                    pathtip: true
                 },
                 stacked: false,
                 legend: false,
@@ -1536,8 +1575,8 @@ export class ChartAgeGroup {
 
         const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
-        // seriesAgeGroup.setVisible(this.chartMode === 'INCIDENCE');
-        seriesAgeGroup.setVisible(false);
+        seriesAgeGroup.setVisible(this.chartMode === 'INCIDENCE');
+        // seriesAgeGroup.setVisible(false);
         return seriesAgeGroup;
 
     }
@@ -1599,7 +1638,7 @@ export class ChartAgeGroup {
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
-            seriesAgeGroupIncidence.setVisible(false);
+            seriesAgeGroupIncidence.setVisible(visible);
         });
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
 
@@ -1607,7 +1646,7 @@ export class ChartAgeGroup {
         if (visible && modificationValuesStrain.length > 1) {
             // turn all active strain back on
             modificationValuesStrain.forEach(strainValues => {
-                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setVisible(false);
+                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setVisible(visible);
             });
         }
 
@@ -2037,6 +2076,10 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN.getSeries().data = plotData;
         this.seriesSeasonality.getSeries().data = plotData;
         this.seriesReproductionP.getSeries().data = plotData;
+
+        this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
+            seriesAgeGroupIncidence.getSeries().data = plotData;
+        });        
 
     }
 

@@ -1,7 +1,3 @@
-import { ModificationResolverTime } from './../../common/modification/ModificationResolverTime';
-import { SliderModification } from './../gui/SliderModification';
-import { ModificationTime } from './../../common/modification/ModificationTime';
-import { ChartUtil } from './ChartUtil';
 import { SankeyDiagram } from "@amcharts/amcharts4/charts";
 import { color, Container, create, IDisposer, Label, percent, Tooltip, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';

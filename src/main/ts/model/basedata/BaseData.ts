@@ -153,7 +153,7 @@ export class BaseData {
                 }
 
             } else {
-                this.dailyOffsetInstantMin = instant - TimeUtil.MILLISECONDS_PER___WEEK * 3;
+                this.dailyOffsetInstantMin = instant - TimeUtil.MILLISECONDS_PER___WEEK * 5;
                 this.dailyOffsetInstantMax = instant + TimeUtil.MILLISECONDS_PER___WEEK;
             }
 
@@ -242,10 +242,10 @@ export class BaseData {
             multipliers['work'] = 0.2;
             multipliers['other'] = 0.2;
 
-            if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
-            // if (positivityMarker.instant > new Date('2021-11-02').getTime()) {
+            // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+            if (positivityMarker.instant > new Date('2021-11-02').getTime()) {
 
-                // console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
+                console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationDiscovery({
                 //     id,
@@ -294,16 +294,7 @@ export class BaseData {
             return this.baseDataItems[instant];
         } else if (allowExtrapolation) {
 
-            // // static readonly BASE_DATA_INDEX_EXPOSED = 0;
-            // // static readonly BASE_DATA_INDEX_REMOVED = 1;
-            // // static readonly BASE_DATA_INDEX_VACC1ST = 2;
-            // // static readonly BASE_DATA_INDEX_VACC2ND = 3;
-            // // static readonly BASE_DATA_INDEX___TESTS = 4;
-            // // static readonly BASE_DATA_INDEX__MOBI_O = 5;
-            // // static readonly BASE_DATA_INDEX__MOBI_W = 6;
-            // // static readonly BASE_DATA_INDEX__MOBI_H = 7;
-
-            // // build a hypothetical "P4" item
+            // build a hypothetical "P4" item
             const dataItemM4 = BaseData.getInstance().findBaseDataItem(instant - TimeUtil.MILLISECONDS_PER____DAY * 4, false);
             if (dataItemM4) {
 
