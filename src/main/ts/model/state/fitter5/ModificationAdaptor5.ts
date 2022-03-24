@@ -20,7 +20,7 @@ import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIn
  */
 export class ModificationAdaptor5 {
 
-    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number}> {
+    async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number }> {
 
         let loggableRange = `${TimeUtil.formatCategoryDateFull(modelStateIntegrator.getInstant())} >> ${TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant())}`;
 
@@ -78,7 +78,7 @@ export class ModificationAdaptor5 {
         } else {
 
             modificationSet.modA.acceptUpdate({
-                corrections: {...corrections}
+                corrections: { ...corrections }
             });
             // if (modificationSet.ratio === 1) {
             //     modificationSet.modB.acceptUpdate({

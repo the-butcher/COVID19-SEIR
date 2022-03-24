@@ -44,7 +44,7 @@ export class BaseData {
      * initial setup of BaseData instance (at runtime)
      * @param path
      */
-    static setInstanceFromConfig(path: string, baseDataset: {[K: string]: IBaseDataItemConfig}): void {
+    static setInstanceFromConfig(path: string, baseDataset: { [K: string]: IBaseDataItemConfig }): void {
         this.instance = new BaseData(path, baseDataset);
     }
 
@@ -55,8 +55,8 @@ export class BaseData {
     private static instance: BaseData;
 
     private readonly path: string;
-    private readonly baseDataset: {[K: string]: IBaseDataItemConfig};
-    private readonly baseDataItems: {[K: string]: IBaseDataItem};
+    private readonly baseDataset: { [K: string]: IBaseDataItemConfig };
+    private readonly baseDataItems: { [K: string]: IBaseDataItem };
     private dailyOffsetInstantMin: number;
     private dailyOffsetInstantMax: number;
 
@@ -65,7 +65,7 @@ export class BaseData {
      */
     private readonly dailyOffsets: Statistics[][];
 
-    constructor(path: string, baseDataset: {[K: string]: IBaseDataItemConfig}) {
+    constructor(path: string, baseDataset: { [K: string]: IBaseDataItemConfig }) {
         this.path = path;
         this.baseDataset = baseDataset;
         this.baseDataItems = {};
@@ -97,7 +97,7 @@ export class BaseData {
          */
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
             this.dailyOffsets[ageGroup.getIndex()] = [];
-            for (let i=0; i<7; i++) {
+            for (let i = 0; i < 7; i++) {
                 this.dailyOffsets[ageGroup.getIndex()][i] = new Statistics();
             }
         });
@@ -180,7 +180,7 @@ export class BaseData {
             const reproductionMarker = reproductionMarkers[reproductionIndex];
             const id = ObjectUtil.createId();
             const contactCategories = Demographics.getInstance().getCategories();
-            const multipliers: { [k: string]: number} = {}
+            const multipliers: { [k: string]: number } = {}
             contactCategories.forEach(contactCategory => {
                 multipliers[contactCategory.getName()] = 0.1;
             });
@@ -191,6 +191,8 @@ export class BaseData {
             multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityOther() * 0.60;
 
             if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+
+                console.log('adding at', TimeUtil.formatCategoryDateFull(reproductionMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationContact({
                 //     id,
@@ -232,7 +234,7 @@ export class BaseData {
             const overall = StrainUtil.calculateDiscoveryRate(positivityMarker.display);
             const id = ObjectUtil.createId();
             const contactCategories = Demographics.getInstance().getCategories();
-            const multipliers: { [k: string]: number} = {}
+            const multipliers: { [k: string]: number } = {}
             contactCategories.forEach(contactCategory => {
                 multipliers[contactCategory.getName()] = overall;
             });
@@ -243,9 +245,9 @@ export class BaseData {
             multipliers['other'] = 0.2;
 
             // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
-            if (positivityMarker.instant > new Date('2021-11-02').getTime()) {
+            if (positivityMarker.instant > new Date('2021-10-01').getTime()) {
 
-                console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
+                // console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationDiscovery({
                 //     id,

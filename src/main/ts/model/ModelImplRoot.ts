@@ -51,7 +51,7 @@ export class ModelImplRoot implements IModelSeir {
          */
         const model = new ModelImplRoot(demographics, Modifications.getInstance(), approximator.getReferenceDataRemoved(), baseData);
         const modelStateIntegrator = new ModelStateIntegrator(model, instantPre);
-        await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => {});
+        await modelStateIntegrator.buildModelData(instantDst - TimeUtil.MILLISECONDS_PER____DAY, () => false, () => { });
         modelStateIntegrator.resetExposure();
         return modelStateIntegrator;
 
@@ -88,9 +88,11 @@ export class ModelImplRoot implements IModelSeir {
 
         demographics.getAgeGroups().forEach(ageGroup => {
 
+            // start with full population of respective group
             let absValueSC = ageGroup.getAbsValue()
             this.strainModels.forEach(strainModel => {
-                absValueSC -=  strainModel.getNrmValueGroup(ageGroup.getIndex()) * this.getAbsTotal();
+                // subtract anything that may be in any infection model state
+                absValueSC -= strainModel.getNrmValueGroup(ageGroup.getIndex()) * this.getAbsTotal();
             });
 
             // removed at model init and reduced by initial share of vaccination
@@ -101,8 +103,8 @@ export class ModelImplRoot implements IModelSeir {
             absValueSC -= absValueIU;
 
             const vaccinationConfig = modificationTime.getVaccinationConfig2(ageGroup.getName());
-            const grpValueV1 = vaccinationConfig.v1; // - vaccinationConfig.v2; // subtract v2 to have a v1 status
-            const grpValueV2 = vaccinationConfig.v2;
+            const grpValueV1 = vaccinationConfig.v1 * 0.6;
+            const grpValueV2 = vaccinationConfig.v2 * 0.6;
             // const grpValueV3 = vaccinationConfig.v2;
 
             let absValueV1 = grpValueV1 * ageGroup.getAbsValue();

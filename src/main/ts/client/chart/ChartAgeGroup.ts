@@ -282,7 +282,7 @@ export class ChartAgeGroup {
             target.measure();
             // console.log(target.measuredHeight, this.chart.plotContainer.contentHeight, value);
             return target.measuredHeight - this.chart.plotContainer.contentHeight + 4;
-        });                
+        });
 
         this.selectedModificationRange.bullet = multilayerBullet;
 
@@ -493,7 +493,7 @@ export class ChartAgeGroup {
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
             title: 'cases (ages)',
-            baseLabel: 'cases (ages)' ,
+            baseLabel: 'cases (ages)',
             valueField: 'ageGroupCasesR',
             colorKey: 'CASES',
             strokeWidth: 1,
@@ -1272,7 +1272,7 @@ export class ChartAgeGroup {
     }
 
     exportToJson(): void {
-        
+
         const strippedData: any[] = [];
         this.modelData.forEach(data => {
             strippedData.push({
@@ -1329,7 +1329,7 @@ export class ChartAgeGroup {
         if (ObjectUtil.isNotEmpty(this.modelData)) {
 
             // if (requiresBaseDataRender) {
-                this.renderBaseData();
+            this.renderBaseData();
             // }
             if (requiresRegressionDataRender) {
                 this.renderRegressionData();
@@ -1465,9 +1465,9 @@ export class ChartAgeGroup {
             range.axisFill.strokeOpacity = 0.75;
             range.axisFill.strokeWidth = 0.50;
             if (new Date(instant).getDay() === 0) {
-                range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.20);
+                range.grid.stroke = color(ControlsConstants.COLOR____FONT).brighten(-0.20);
             } else {
-                range.grid.stroke  = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
+                range.grid.stroke = color(ControlsConstants.COLOR____FONT).brighten(-0.60);
             }
 
         }
@@ -1491,15 +1491,15 @@ export class ChartAgeGroup {
 
         const minCategoryX = TimeUtil.formatCategoryDateFull(minInstant);
         const maxCategoryX = TimeUtil.formatCategoryDateFull(maxInstant);
-        const minPointX =  this.xAxis.categoryToPoint(minCategoryX).x;
-        const maxPointX =  this.xAxis.categoryToPoint(maxCategoryX).x;
+        const minPointX = this.xAxis.categoryToPoint(minCategoryX).x;
+        const maxPointX = this.xAxis.categoryToPoint(maxCategoryX).x;
         const fctPointX = (offsetCoordinate.x - minPointX) / (maxPointX - minPointX);
         const vacPointX = minInstant + (maxInstant - minInstant) * fctPointX;
 
         // round to closest midnight
         const valueX = Math.round(vacPointX / TimeUtil.MILLISECONDS_PER____DAY) * TimeUtil.MILLISECONDS_PER____DAY;
 
-        const positionY =  this.yAxisPlotPercent.pointToPosition(offsetCoordinate);
+        const positionY = this.yAxisPlotPercent.pointToPosition(offsetCoordinate);
         const valueY = this.yAxisPlotPercent.positionToValue(positionY);
 
         return {
@@ -1518,8 +1518,8 @@ export class ChartAgeGroup {
 
         const minCategoryX = TimeUtil.formatCategoryDateFull(ModelInstants.getInstance().getMinInstant());
         const maxCategoryX = TimeUtil.formatCategoryDateFull(ModelInstants.getInstance().getMaxInstant());
-        const minPointX =  this.xAxis.categoryToPoint(minCategoryX).x;
-        const maxPointX =  this.xAxis.categoryToPoint(maxCategoryX).x;
+        const minPointX = this.xAxis.categoryToPoint(minCategoryX).x;
+        const maxPointX = this.xAxis.categoryToPoint(maxCategoryX).x;
         const fctPointX = (vaccinationCoordinate.x - ModelInstants.getInstance().getMinInstant()) / (ModelInstants.getInstance().getMaxInstant() - ModelInstants.getInstance().getMinInstant());
 
         const pointX = minPointX + (maxPointX - minPointX) * fctPointX;
@@ -1808,7 +1808,7 @@ export class ChartAgeGroup {
                                 maxIncidence = Math.max(maxIncidence, casesScaled1 * casesOffset); // daily prediction
                             }
                         }
-                                               
+
                         if (this.seriesAgeGroupCasesR.isVisible()) {
                             const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
                             if (dataItem00) {
@@ -1999,7 +1999,7 @@ export class ChartAgeGroup {
                 let color: string;
                 if (QueryUtil.getInstance().isDiffDisplay() && dataItem && dataItem00) { //
 
-                    const caseValue =  dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
+                    const caseValue = dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
 
                     // const caseValue = dataItem.derivs ? dataItem.derivs[ageGroupHeat.getName()] : 0;
 
@@ -2079,7 +2079,7 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
             seriesAgeGroupIncidence.getSeries().data = plotData;
-        });        
+        });
 
     }
 

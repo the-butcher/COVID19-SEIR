@@ -69,7 +69,6 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
             xValues.push(ValueRegressionBase.toRegressionX(modification.getInstantA()));
             yValues.push(this.toValueY(modification));
         });
-
         return {
             x: xValues,
             y: yValues
@@ -119,15 +118,15 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
 
         this.loessModel01000 = new Loess.default(loessModelInput, {
             span: 1.00,
-             band: 0.50
+            band: 0.50
         });
         this.loessModel00500 = new Loess.default(loessModelInput, {
             span: 0.50,
-             band: 0.50
+            band: 0.50
         });
         this.loessModel00250 = new Loess.default(loessModelInput, {
             span: 0.25,
-             band: 0.50
+            band: 0.50
         });
 
         /**
@@ -139,7 +138,7 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         const loessPrediction00250 = this.loessModel00250.predict(loessPredictionInput);
         const regressionInput: DataPoint[] = [];
 
-        for (let i=0; i<loessPredictionInput.i.length; i++) {
+        for (let i = 0; i < loessPredictionInput.i.length; i++) {
 
             const instant = loessPredictionInput.i[i];
             if (instant >= this.instantA && instant <= this.instantB && loessPredictionInput.m[i]) {
@@ -284,7 +283,7 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         let m: number;
         if (loessValue01000.m && loessValue00500.m && loessValue00250.m) {
             m = loessValue01000.m * share01000 + loessValue00500.m * share00500 + loessValue00250.m * share00250;
-        } 
+        }
         const x = loessValue01000.x * share01000 + loessValue00500.x * share00500 + loessValue00250.x * share00250;
         const y = loessValue01000.y * share01000 + loessValue00500.y * share00500 + loessValue00250.y * share00250;
         const i = loessValue01000.i * share01000 + loessValue00500.i * share00500 + loessValue00250.i * share00250;
@@ -302,7 +301,7 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
 
     findOrInterpolateLoessValue(instant: number, loessValues: ILoessResult[]): ILoessResult {
 
-        for (let i=1; i<loessValues.length; i++) {
+        for (let i = 1; i < loessValues.length; i++) {
 
             if (loessValues[i].i === instant) {
 
