@@ -17,7 +17,7 @@ import { ModificationAdaptor5 } from './ModificationAdaptor5';
  */
 export class ModelStateFitter5 {
 
-    static readonly ERROR_TOLERANCES: number[] = [0.20, 0.17, 0.14, 0.12, 0.10, 0.08, 0.07, 0.06, 0.05, 0.04, 0.035, 0.03, 0.025, 0.020, 0.017, 0.014, 0.012, 0.010];
+    static readonly ERROR_TOLERANCES: number[] = [0.20, 0.17, 0.14, 0.12, 0.10, 0.08, 0.07, 0.065, 0.06, 0.055, 0.05, 0.045, 0.04, 0.035, 0.03, 0.025, 0.020, 0.017, 0.014, 0.012, 0.010];
 
     static readonly FIT_INTERVAL = 1;
 
@@ -43,9 +43,9 @@ export class ModelStateFitter5 {
             console.log(`error-tolerance max: ${fitterParams.maxErrorTolerance.toFixed(4)}, last: ${fitterParams.curErrorCalculate.toFixed(4)}, adjusting from ${fitterParams.maxErrorTolerance.toFixed(4)} to ${nxtErrorTolerance.toFixed(4)}`);
             fitterParams.maxErrorTolerance = nxtErrorTolerance;
         } else if (nxtErrorTolerance) {
-            console.log(`error-tolerance max: ${fitterParams.maxErrorTolerance.toFixed(4)}, last: ${fitterParams.curErrorCalculate.toFixed(4)}, continuing with ${fitterParams.maxErrorTolerance.toFixed(4)} ...`);                
+            console.log(`error-tolerance max: ${fitterParams.maxErrorTolerance.toFixed(4)}, last: ${fitterParams.curErrorCalculate.toFixed(4)}, continuing with ${fitterParams.maxErrorTolerance.toFixed(4)} ...`);
         } else {
-            console.log(`error-tolerance max: ${fitterParams.maxErrorTolerance.toFixed(4)}, last: ${fitterParams.curErrorCalculate.toFixed(4)}, reached adjustment limit!`);                
+            console.log(`error-tolerance max: ${fitterParams.maxErrorTolerance.toFixed(4)}, last: ${fitterParams.curErrorCalculate.toFixed(4)}, reached adjustment limit!`);
         }
 
         const modificationAdapter = new ModificationAdaptor5();
@@ -64,7 +64,7 @@ export class ModelStateFitter5 {
         dataset.push(...stepDataI);
 
         fitterParams.curErrorCalculate = -1;
-        for (let modificationIndex = modificationIndexStart; modificationIndex < modificationsContact.length - ModelStateFitter5.FIT_INTERVAL; modificationIndex ++) {
+        for (let modificationIndex = modificationIndexStart; modificationIndex < modificationsContact.length - ModelStateFitter5.FIT_INTERVAL; modificationIndex++) {
 
             const ratio = (modificationIndex + 2) / modificationsContact.length;
             const modificationSet: IModificationSet = {
@@ -77,7 +77,7 @@ export class ModelStateFitter5 {
 
             const maxAbsErrorViolationsAllowed = 10;
             const maxAbsErrorTolerance = fitterParams.maxErrorTolerance; // 0.04; // 0.5%
-            const maxViolatableGroupCount = 2;
+            const maxViolatableGroupCount = 1;
 
             let maxAbsErrorLast = Number.MAX_VALUE;
             let maxAbsErrorGroup: string;
@@ -85,7 +85,7 @@ export class ModelStateFitter5 {
             let iterationIndex = 0;
             let violationIgnoreGroups: Set<string> = new Set();
 
-            
+
             while (!modificationSet.modA.isReadonly()) { //
 
                 const valueErrors = await modificationAdapter.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], iterationIndex++, progressCallback);
@@ -102,7 +102,7 @@ export class ModelStateFitter5 {
                     fitterParams.curErrorCalculate = maxAbsErrorCurr;
                     fitterParams.currDateCalculate = TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant());
                 }
-                
+
 
 
                 if (maxAbsErrorCurr < maxAbsErrorLast && iterationIndex < 100) {
@@ -110,9 +110,9 @@ export class ModelStateFitter5 {
                     // if there was improvement
                     maxAbsErrorViolations = 0;
                     maxAbsErrorLast = maxAbsErrorCurr;
-                   
 
-                    if (maxAbsErrorCurr <= maxAbsErrorTolerance) {
+                    const extraTolerance = iterationIndex > 1 ? 0.99 : 1.00;
+                    if (maxAbsErrorCurr <= maxAbsErrorTolerance * extraTolerance) {
                         console.log(iterationIndex.toString().padStart(4, '0'), '|', loggableRange, maxAbsErrorCurr.toFixed(4).padStart(7, ' '), maxAbsErrorGroup, 'success ...');
                         break;
                     } else {
@@ -145,7 +145,7 @@ export class ModelStateFitter5 {
                         }
 
                     } else {
-                        console.log(iterationIndex.toString().padStart(4, '0'), '|', loggableRange, maxAbsErrorCurr.toFixed(4).padStart(7, ' '), maxAbsErrorGroup,  maxAbsErrorViolationsAllowed - maxAbsErrorViolations, 'more attempts');
+                        console.log(iterationIndex.toString().padStart(4, '0'), '|', loggableRange, maxAbsErrorCurr.toFixed(4).padStart(7, ' '), maxAbsErrorGroup, maxAbsErrorViolationsAllowed - maxAbsErrorViolations, 'more attempts');
                         continue;
                     }
 
@@ -170,7 +170,7 @@ export class ModelStateFitter5 {
 
         }
 
-       
+
 
         console.log('------------------------------------------------------------------------------------------');
 

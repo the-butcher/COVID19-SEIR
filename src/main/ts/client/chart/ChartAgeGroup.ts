@@ -146,14 +146,14 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupInfectious: ChartAgeGroupSeries;
 
     protected readonly seriesAgeGroupRemovedID: ChartAgeGroupSeries;
-    protected readonly seriesAgeGroupRemovedIU: ChartAgeGroupSeries;
+    // protected readonly seriesAgeGroupRemovedIU: ChartAgeGroupSeries;
 
     /**
      * modelled vaccination data
      */
     protected readonly seriesAgeGroupRemovedVI: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupRemovedV2: ChartAgeGroupSeries;
-    protected readonly seriesAgeGroupRemovedVU: ChartAgeGroupSeries;
+    // protected readonly seriesAgeGroupRemovedVU: ChartAgeGroupSeries;
 
     /**
      * real data
@@ -576,25 +576,25 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        this.seriesAgeGroupRemovedVU = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'vaccinated, after asymptomatic infection',
-            baseLabel: 'vaccinated, after asymptomatic infection',
-            valueField: 'ageGroupRemovedVU',
-            colorKey: 'VACCINATION',
-            strokeWidth: 3,
-            dashed: false,
-            locationOnPath: 0.20,
-            labels: {
-                tooltip: true,
-                pathtip: true
-            },
-            stacked: true,
-            legend: false,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
+        // this.seriesAgeGroupRemovedVU = new ChartAgeGroupSeries({
+        //     chart: this.chart,
+        //     yAxis: this.yAxisPlotPercent,
+        //     title: 'vaccinated, after asymptomatic infection',
+        //     baseLabel: 'vaccinated, after asymptomatic infection',
+        //     valueField: 'ageGroupRemovedVU',
+        //     colorKey: 'VACCINATION',
+        //     strokeWidth: 3,
+        //     dashed: false,
+        //     locationOnPath: 0.20,
+        //     labels: {
+        //         tooltip: true,
+        //         pathtip: true
+        //     },
+        //     stacked: true,
+        //     legend: false,
+        //     labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+        //     seriesConstructor: () => new LineSeries()
+        // });
 
 
         this.seriesAgeGroupRemovedVI = new ChartAgeGroupSeries({
@@ -641,30 +641,30 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
-        /**
-         * recovered after asymptomatic infection
-         */
-        this.seriesAgeGroupRemovedIU = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'recovered',
-            baseLabel: 'recovered after asymptomatic infection',
-            valueField: 'ageGroupRemovedIU',
-            colorKey: 'REMOVED',
-            strokeWidth: 3,
-            dashed: false,
-            locationOnPath: 0.41,
-            labels: {
-                tooltip: true,
-                pathtip: true
-            },
-            stacked: true,
-            legend: false,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedIU);
-        this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedVU);
+        // /**
+        //  * recovered after asymptomatic infection
+        //  */
+        // this.seriesAgeGroupRemovedIU = new ChartAgeGroupSeries({
+        //     chart: this.chart,
+        //     yAxis: this.yAxisPlotPercent,
+        //     title: 'recovered',
+        //     baseLabel: 'recovered after asymptomatic infection',
+        //     valueField: 'ageGroupRemovedIU',
+        //     colorKey: 'REMOVED',
+        //     strokeWidth: 3,
+        //     dashed: false,
+        //     locationOnPath: 0.41,
+        //     labels: {
+        //         tooltip: true,
+        //         pathtip: true
+        //     },
+        //     stacked: true,
+        //     legend: false,
+        //     labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+        //     seriesConstructor: () => new LineSeries()
+        // });
+        // this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedIU);
+        // this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedVU);
 
         this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -1398,10 +1398,10 @@ export class ChartAgeGroup {
         this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupInfectious.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedID.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedIU.setSeriesNote(ageGroup.getName());
+        // this.seriesAgeGroupRemovedIU.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVI.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedV2.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupRemovedVU.setSeriesNote(ageGroup.getName());
+        // this.seriesAgeGroupRemovedVU.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR1.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR3.setSeriesNote(ageGroup.getName());
@@ -1591,11 +1591,11 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupSusceptible.setVisible(visible);
         this.seriesAgeGroupRemovedID.setVisible(visible);
-        this.seriesAgeGroupRemovedIU.setVisible(visible);
+        // this.seriesAgeGroupRemovedIU.setVisible(visible);
 
         this.seriesAgeGroupRemovedVI.setVisible(visible);
         this.seriesAgeGroupRemovedV2.setVisible(visible);
-        this.seriesAgeGroupRemovedVU.setVisible(visible);
+        // this.seriesAgeGroupRemovedVU.setVisible(visible);
         this.seriesAgeGroupRemovedVR1.setVisible(visible);
         this.seriesAgeGroupRemovedVR2.setVisible(visible);
         this.seriesAgeGroupRemovedVR3.setVisible(visible);
@@ -1699,7 +1699,7 @@ export class ChartAgeGroup {
             this.yAxisPlotPercent.visible = visible;
             this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
             this.yAxisPlotPercent.tooltip.disabled = !visible;
-            this.setAxisPercentBounds(0, 0.1);
+            this.setAxisPercentBounds(0, 0.15);
         }
 
     }
@@ -1933,9 +1933,9 @@ export class ChartAgeGroup {
             const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID___________ALL];;
             const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupRemovedID = dataItem.valueset[ageGroupPlot.getName()].REMOVED_ID;
-            const ageGroupRemovedIU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_IU;
+            // const ageGroupRemovedIU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_IU;
             const ageGroupRemovedVI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VI;
-            const ageGroupRemovedVU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VU;
+            // const ageGroupRemovedVU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VU;
             const ageGroupRemovedV2 = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V2;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
@@ -1965,9 +1965,9 @@ export class ChartAgeGroup {
                 ageGroupExposed,
                 ageGroupInfectious,
                 ageGroupRemovedID,
-                ageGroupRemovedIU,
+                // ageGroupRemovedIU,
                 ageGroupRemovedVI,
-                ageGroupRemovedVU,
+                // ageGroupRemovedVU,
                 ageGroupRemovedV2,
                 ageGroupIncidence,
                 ageGroupIncidence95L,
@@ -2063,9 +2063,9 @@ export class ChartAgeGroup {
         this.seriesAgeGroupExposed.getSeries().data = plotData;
         this.seriesAgeGroupInfectious.getSeries().data = plotData;
         this.seriesAgeGroupRemovedID.getSeries().data = plotData;
-        this.seriesAgeGroupRemovedIU.getSeries().data = plotData;
+        // this.seriesAgeGroupRemovedIU.getSeries().data = plotData;
         this.seriesAgeGroupRemovedVI.getSeries().data = plotData;
-        this.seriesAgeGroupRemovedVU.getSeries().data = plotData;
+        // this.seriesAgeGroupRemovedVU.getSeries().data = plotData;
         this.seriesAgeGroupRemovedV2.getSeries().data = plotData;
         this.seriesAgeGroupIncidence.getSeries().data = plotData;
         this.seriesAgeGroupIncidence95L.getSeries().data = plotData;

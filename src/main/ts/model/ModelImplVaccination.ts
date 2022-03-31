@@ -3,7 +3,7 @@ import { Demographics } from '../common/demographics/Demographics';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { TimeUtil } from './../util/TimeUtil';
 import { CompartmentBase } from './compartment/CompartmentBase';
-import { CompartmentChain } from './compartment/CompartmentChain';
+import { CompartmentChainReproduction } from './compartment/CompartmentChainReproduction';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';
 import { ModelConstants } from './ModelConstants';
@@ -29,7 +29,7 @@ export class ModelImplVaccination implements IModelSeir {
     /**
      * pure model based --> amount of re-immunizing at given time
      */
-     private readonly compartmentR: CompartmentBase;
+    private readonly compartmentR: CompartmentBase;
 
     /**
      * pure model based --> people fully vaccinated, should be configured to match the vacc_2 curve
@@ -40,7 +40,7 @@ export class ModelImplVaccination implements IModelSeir {
      * people immunized after previously having been infected unknowingly
      * an interim stage to simulate 2-vaccinations after unknown infection
      */
-    private readonly compartmentU: CompartmentBase;
+    // private readonly compartmentU: CompartmentBase;
 
     // /**
     //  * control compartment (not contributing to model sum, but useful to validate actual vacc1 progress)
@@ -67,10 +67,10 @@ export class ModelImplVaccination implements IModelSeir {
         const durationToReexposable = modificationTime.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
 
         // this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
-        this.compartmentI = new CompartmentBase(ECompartmentType.R___REMOVED_VI, this.absTotal, absValueVI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
+        this.compartmentI = new CompartmentBase(ECompartmentType.R___REMOVED_VI, this.absTotal, absValueVI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChainReproduction.NO_CONTINUATION, '');
         this.compartmentR = new CompartmentBase(ECompartmentType.R___REMOVED_VI, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(3 * TimeUtil.MILLISECONDS_PER___WEEK), '');
-        this.compartmentU = new CompartmentBase(ECompartmentType.R___REMOVED_VU, this.absTotal, absValueVU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
-        this.compartmentV = new CompartmentBase(ECompartmentType.R___REMOVED_V2, this.absTotal, absValueV2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
+        // this.compartmentU = new CompartmentBase(ECompartmentType.R___REMOVED_VU, this.absTotal, absValueVU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
+        this.compartmentV = new CompartmentBase(ECompartmentType.R___REMOVED_V2, this.absTotal, absValueVU + absValueV2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
 
     }
 
@@ -86,10 +86,18 @@ export class ModelImplVaccination implements IModelSeir {
         return this.compartmentR;
     }
 
-    getCompartmentU(): CompartmentBase {
-        return this.compartmentU;
-    }
+    // /**
+    //  * people immunized after previously having been infected unknowingly an interim stage to simulate 2-vaccinations after unknown infection
+    //  * @returns 
+    //  */
+    // getCompartmentU(): CompartmentBase {
+    //     return this.compartmentU;
+    // }
 
+    /**
+     * pure model based --> people fully vaccinated
+     * @returns 
+     */
     getCompartmentV(): CompartmentBase {
         return this.compartmentV;
     }
@@ -105,7 +113,7 @@ export class ModelImplVaccination implements IModelSeir {
     getNrmValue(): number {
         let nrmValue = 0;
         nrmValue += this.compartmentI.getNrmValue();
-        nrmValue += this.compartmentU.getNrmValue();
+        // nrmValue += this.compartmentU.getNrmValue();
         nrmValue += this.compartmentV.getNrmValue();
         return nrmValue;
     }
@@ -130,7 +138,7 @@ export class ModelImplVaccination implements IModelSeir {
         const initialState = ModelState.empty();
         initialState.addNrmValue(this.compartmentI.getNrmValue(), this.compartmentI);
         initialState.addNrmValue(this.compartmentR.getNrmValue(), this.compartmentR);
-        initialState.addNrmValue(this.compartmentU.getNrmValue(), this.compartmentU);
+        // initialState.addNrmValue(this.compartmentU.getNrmValue(), this.compartmentU);
         initialState.addNrmValue(this.compartmentV.getNrmValue(), this.compartmentV);
         return initialState;
     }

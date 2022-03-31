@@ -1,13 +1,12 @@
-import { ObjectUtil } from './../util/ObjectUtil';
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { StrainUtil } from '../util/StrainUtil';
+import { ObjectUtil } from './../util/ObjectUtil';
 import { TimeUtil } from './../util/TimeUtil';
-import { BaseData } from './basedata/BaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
-import { CompartmentChain } from './compartment/CompartmentChain';
+import { CompartmentChainReproduction } from './compartment/CompartmentChainReproduction';
 import { CompartmentInfectious } from './compartment/CompartmentInfectious';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
@@ -76,10 +75,10 @@ export class ModelImplInfectious implements IModelSeir {
         }
 
 
-        const compartmentParams = CompartmentChain.getInstance().getStrainedCompartmentParams(strainValues);
+        const compartmentParams = CompartmentChainReproduction.getInstance().getStrainedCompartmentParams(strainValues);
 
         let absCompartmentInfectiousSum = 0;
-        const incubationOffset = (compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantA + compartmentParams[CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION].instantB) / 2;
+        const incubationOffset = (compartmentParams[CompartmentChainReproduction.COMPARTMENT_COUNT_PRE__INCUBATION].instantA + compartmentParams[CompartmentChainReproduction.COMPARTMENT_COUNT_PRE__INCUBATION].instantB) / 2;
 
         for (let chainIndex = 0; chainIndex < compartmentParams.length; chainIndex++) {
 
@@ -153,7 +152,7 @@ export class ModelImplInfectious implements IModelSeir {
         /**
          * connect infection compartments among each other
          */
-         for (let compartmentIndex = 0; compartmentIndex < compartmentsInfectious.length; compartmentIndex++) {
+        for (let compartmentIndex = 0; compartmentIndex < compartmentsInfectious.length; compartmentIndex++) {
 
             const sourceCompartment = compartmentsInfectious[compartmentIndex];
             const targetCompartment = compartmentsInfectious[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model

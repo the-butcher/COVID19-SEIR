@@ -1,6 +1,8 @@
+import { thisExpression } from '@babel/types';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
-import { CompartmentChain } from '../../model/compartment/CompartmentChain';
+import { CompartmentChainRecovery } from '../../model/compartment/CompartmentChainRecovery';
+import { CompartmentChainReproduction } from '../../model/compartment/CompartmentChainReproduction';
 import { ModelConstants } from '../../model/ModelConstants';
 import { Color } from '../../util/Color';
 import { ObjectUtil } from '../../util/ObjectUtil';
@@ -33,13 +35,20 @@ export class ControlsStrain {
     private readonly sliderReproduction: Slider;
     private readonly sliderSerialInterval: Slider;
     private readonly sliderIncidence: Slider;
+    private readonly sliderImmuneEscape: Slider;
+    private readonly sliderTimeToWane: Slider;
 
-    private readonly weibullCanvasContainer = 'weibullCanvas';
+    private readonly weibullCanvasReproductionContainer = 'weibullCanvasReproduction';
+    private readonly weibullCanvasRecoveryContainer = 'weibullCanvasRecovery';
 
     private r0: number;
     private serialInterval: number;
     private intervalScale: number;
     private incidence: number;
+    private immuneEscape: number;
+
+    private r0Escaping: number;
+    private timeToWane: number;
 
     private modification: ModificationStrain;
 
@@ -50,7 +59,7 @@ export class ControlsStrain {
             min: Math.min(...ModelConstants.RANGE________________R0),
             max: Math.max(...ModelConstants.RANGE________________R0),
             step: 0.01,
-            values: [1.0],
+            values: [0.0, 1.0],
             ticks: [...ModelConstants.RANGE___SERIAL_INTERVAL],
             label: 'R<sub>B</sub>/R<sub>0</sub>',
             thumbCreateFunction: (index: number) => {
@@ -64,8 +73,15 @@ export class ControlsStrain {
                 }
             },
             handleValueChange: (index, value, type) => {
-                this.r0 = value;
-                this.redrawCanvas();
+                if (index == 0) {
+                    this.r0Escaping = value;
+                    this.redrawCanvasRecovery();
+                } else if (index == 1) {
+                    this.r0 = value;
+                    this.redrawCanvasReproduction();
+                } else {
+                    console.error("invalid index in reproduction slider", index);
+                }
                 if (type === 'stop' || type === 'input') {
                     this.handleChange();
                 }
@@ -106,13 +122,13 @@ export class ControlsStrain {
                 }
             },
             handleValueChange: (index, value, type) => {
-                 if (index === 0) {
+                if (index === 0) {
                     this.intervalScale = StrainUtil.calculateIntervalScale(value, this.serialInterval);
-                    this.redrawCanvas();
+                    this.redrawCanvasReproduction();
                 } else if (index === 1) {
                     this.sliderSerialInterval.setValueAndRedraw(0, StrainUtil.calculateLatency(value, this.intervalScale), false);
                     this.serialInterval = value;
-                    this.redrawCanvas();
+                    this.redrawCanvasReproduction();
                 }
                 if (type === 'stop' || type === 'input') {
                     this.handleChange();
@@ -165,8 +181,85 @@ export class ControlsStrain {
             }
         });
 
+        this.sliderImmuneEscape = new Slider({
+            container: 'sliderImmuneEscapeDiv',
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
+            step: 0.01,
+            values: [0.0],
+            ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
+            label: 'immune escape',
+            thumbCreateFunction: (index: number) => {
+                return new IconSlider();
+            },
+            labelFormatFunction: (index, value, type) => {
+                return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
+            },
+            handleValueChange: (index, value, type) => {
+                this.immuneEscape = value;
+                if (type === 'stop' || type === 'input') {
+                    this.handleChange();
+                }
+            },
+            handleThumbPicked: (index) => {
+                // nothing
+            },
+            inputFunctions: {
+                inputFormatFunction: (index, value) => {
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                },
+                inputHandleFunction: (index, value) => {
+                    return parseFloat(value.replace(',', '.')) / 100;
+                }
+            }
+        });
+
+        this.sliderTimeToWane = new Slider({
+            container: 'sliderTimeToWaneDiv',
+            min: Math.min(...ModelConstants.RANGE________REEXPOSURE),
+            max: Math.max(...ModelConstants.RANGE________REEXPOSURE),
+            step: 0.1,
+            values: [3.0],
+            ticks: [...ModelConstants.RANGE________REEXPOSURE],
+            label: 'reexposure (months)',
+            thumbCreateFunction: (index: number) => {
+                const iconSlider = new IconSlider();
+                if (index === 0) {
+                    iconSlider.getBulletGroupElement().style.transform = 'scale(0.6)'; // rotate(90deg)
+                }
+                return iconSlider;
+            },
+            labelFormatFunction: (index, value, type) => {
+                if (type === 'tick') {
+                    return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
+                } else {
+                    return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1);
+                }
+            },
+            handleValueChange: (index, value, type) => {
+                this.timeToWane = value;
+                this.redrawCanvasRecovery();
+                if (type === 'stop' || type === 'input') {
+                    this.handleChange();
+                }
+            },
+            handleThumbPicked: (index) => {
+                // nothing
+            },
+            inputFunctions: {
+                inputFormatFunction: (index, value) => {
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                },
+                inputHandleFunction: (index, value) => {
+                    return parseFloat(value.replace(',', '.'));
+                }
+            }
+        });
+        // this.sliderTimeToWane.setLabelPosition(13);
+
         // initial redraw of internal canvas
-        this.redrawCanvas();
+        this.redrawCanvasReproduction();
+        this.redrawCanvasRecovery();
 
     }
 
@@ -189,19 +282,28 @@ export class ControlsStrain {
         this.intervalScale = strain.intervalScale;
         this.incidence = strain.dstIncidence;
 
+        this.immuneEscape = strain.immuneEscape || 0.0;
+        this.timeToWane = strain.timeToWane || 3; // months
+        this.r0Escaping = strain.r0Escaping || 0.0;
+
         this.sliderSerialInterval.setValueAndRedraw(0, StrainUtil.calculateLatency(this.serialInterval, this.intervalScale), true); // = [Strain.calculateLatency(this.serialInterval, this.intervalScale), this.serialInterval];
         this.sliderSerialInterval.setValueAndRedraw(1, this.serialInterval, true);
-        this.sliderReproduction.setValueAndRedraw(0, this.r0, true);
+        this.sliderReproduction.setValueAndRedraw(0, this.r0Escaping, true);
+        this.sliderReproduction.setValueAndRedraw(1, this.r0, true);
         this.sliderIncidence.setValueAndRedraw(0, this.incidence, true);
+        this.sliderImmuneEscape.setValueAndRedraw(0, this.immuneEscape, true);
+        this.sliderTimeToWane.setValueAndRedraw(0, this.timeToWane, true);
 
         requestAnimationFrame(() => {
             this.sliderIncidence.handleResize();
             this.sliderReproduction.handleResize();
-            this.sliderReproduction.handleResize();
+            this.sliderImmuneEscape.handleResize();
+            this.sliderTimeToWane.handleResize();
             this.sliderIncidence.setDisabled(modification.isPrimary());
         });
 
-        this.redrawCanvas();
+        this.redrawCanvasReproduction();
+        this.redrawCanvasRecovery();
 
     }
 
@@ -211,7 +313,10 @@ export class ControlsStrain {
             r0: this.r0,
             serialInterval: this.serialInterval,
             intervalScale: this.intervalScale,
-            dstIncidence: this.incidence
+            dstIncidence: this.incidence,
+            immuneEscape: this.immuneEscape,
+            r0Escaping: this.r0Escaping,
+            timeToWane: this.timeToWane
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
@@ -236,21 +341,75 @@ export class ControlsStrain {
         return this.intervalScale;
     }
 
-    redrawCanvas(): void {
+    redrawCanvasRecovery(): void {
 
         // get the canvas
-        const weibullCanvas = document.getElementById(this.weibullCanvasContainer) as HTMLCanvasElement;
+        const weibullCanvas = document.getElementById(this.weibullCanvasRecoveryContainer) as HTMLCanvasElement;
         const weibullContext = weibullCanvas.getContext("2d");
 
         // clear the canvas
-        weibullCanvas.width = document.getElementById(this.weibullCanvasContainer).offsetWidth;
-        weibullCanvas.height = document.getElementById(this.weibullCanvasContainer).offsetHeight;
+        weibullCanvas.width = document.getElementById(this.weibullCanvasRecoveryContainer).offsetWidth;
+        weibullCanvas.height = document.getElementById(this.weibullCanvasRecoveryContainer).offsetHeight;
+
+        weibullContext.fillStyle = "#cccccc";
+        weibullContext.clearRect(0, 0, weibullCanvas.width, weibullCanvas.height);
+
+        const toCanvasY = (n: number) => weibullCanvas.height - 20 - n;
+        const pxPerMilli = weibullCanvas.width / (this.sliderTimeToWane.getMaxValue() * TimeUtil.MILLISECONDS_PER____DAY * 30); // one month in pixel
+
+        console.log('pxPerMonth', pxPerMilli);
+
+        const strain: IModificationValuesStrain = {
+            id: 'temp',
+            key: 'STRAIN',
+            instant: -1,
+            name: 'misc',
+            r0: this.r0,
+            serialInterval: this.serialInterval,
+            intervalScale: this.intervalScale,
+            immuneEscape: this.immuneEscape,
+            timeToWane: this.timeToWane,
+            r0Escaping: this.r0Escaping,
+            dstIncidence: -1,
+            deletable: false,
+            draggable: false,
+            primary: false
+        };
+        const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(strain);
+        compartmentParams.forEach(compartmentParam => {
+
+            console.log('a', compartmentParam.instantA * pxPerMilli);
+
+            const xMin = compartmentParam.instantA * pxPerMilli;
+            const xMax = compartmentParam.instantB * pxPerMilli;
+            const xDim = xMax - xMin;
+
+            const yMin = toCanvasY(0);
+            const yDim = compartmentParam.r0 * 300 / xDim; // TODO magic number
+            const yMax = toCanvasY(yDim);
+
+            weibullContext.fillStyle = 'rgba(131, 202, 13, 0.50)'; // ValueSet.COLORS.REMOVED;
+            weibullContext.fillRect(xMin + 0.5, yMin, (xMax - xMin) - 1, Math.min(yMax - yMin, -1));
+
+        });
+
+    }
+
+    redrawCanvasReproduction(): void {
+
+        // get the canvas
+        const weibullCanvas = document.getElementById(this.weibullCanvasReproductionContainer) as HTMLCanvasElement;
+        const weibullContext = weibullCanvas.getContext("2d");
+
+        // clear the canvas
+        weibullCanvas.width = document.getElementById(this.weibullCanvasReproductionContainer).offsetWidth;
+        weibullCanvas.height = document.getElementById(this.weibullCanvasReproductionContainer).offsetHeight;
 
         weibullContext.fillStyle = "#cccccc";
         weibullContext.clearRect(0, 0, weibullCanvas.width, weibullCanvas.height);
         weibullContext.fillStyle = 'rgba(187, 137, 12, 0.75)'; // ValueSet.COLORS.EXPOSED;
 
-        const toCanvasY = (n: number) =>  weibullCanvas.height - 20 - n;
+        const toCanvasY = (n: number) => weibullCanvas.height - 20 - n;
         const pxPerDay = weibullCanvas.width / (this.sliderSerialInterval.getMaxValue() * TimeUtil.MILLISECONDS_PER____DAY); // one day in pixel
 
         const strain: IModificationValuesStrain = {
@@ -261,12 +420,15 @@ export class ControlsStrain {
             r0: this.r0,
             serialInterval: this.serialInterval,
             intervalScale: this.intervalScale,
+            immuneEscape: this.immuneEscape,
+            timeToWane: this.timeToWane,
+            r0Escaping: this.r0Escaping,
             dstIncidence: -1,
             deletable: false,
             draggable: false,
             primary: false
         };
-        const compartmentParams = CompartmentChain.getInstance().getStrainedCompartmentParams(strain);
+        const compartmentParams = CompartmentChainReproduction.getInstance().getStrainedCompartmentParams(strain);
         compartmentParams.forEach(compartmentParam => {
 
             const xMin = compartmentParam.instantA * pxPerDay;
@@ -282,7 +444,7 @@ export class ControlsStrain {
             weibullContext.fillRect(xMin + 0.5, yMin, (xMax - xMin) - 1, Math.min(yMax - yMin, -1));
 
         });
-        const xMinN = compartmentParams[compartmentParams.length-1].instantB * pxPerDay;
+        const xMinN = compartmentParams[compartmentParams.length - 1].instantB * pxPerDay;
 
         weibullContext.fillStyle = 'rgba(131, 202, 13, 0.75)'; // ValueSet.COLORS.REMOVED;
         weibullContext.fillRect(xMinN + 1, toCanvasY(0), 500, -1);

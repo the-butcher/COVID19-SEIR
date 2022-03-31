@@ -41,12 +41,20 @@ export class ModelConstants {
 
     static readonly CONFIG_VERSION = 'AT_0_00_06';
 
-    static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]:IModificationDefinitions} = {
+    static readonly MODIFICATION_PARAMS: { [K in MODIFICATION____KEY]: IModificationDefinitions } = {
         'REGRESSION': {
             createValuesModification: (modificationValues) => new ModificationRegression(modificationValues as IModificationValuesRegression),
         },
         'TIME': {
             createValuesModification: (modificationValues) => new ModificationTime(modificationValues as IModificationValuesTime),
+            createDefaultModification: (instant: number) => new ModificationTime({
+                id: ObjectUtil.createId(),
+                key: 'TIME',
+                instant,
+                name: 'time',
+                deletable: true,
+                draggable: true
+            }),
         },
         'STRAIN': {
             createValuesModification: (modificationValues) => new ModificationStrain(modificationValues as IModificationValuesStrain),
@@ -58,6 +66,7 @@ export class ModelConstants {
                 r0: 4.4,
                 serialInterval: 4.8,
                 intervalScale: 1.0,
+                immuneEscape: 0.0,
                 dstIncidence: 1,
                 deletable: true,
                 draggable: true,
@@ -148,7 +157,7 @@ export class ModelConstants {
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
-    static readonly RANGE________REEXPOSURE = [3, 6, 9, 12];
+    static readonly RANGE________REEXPOSURE = [0, 1, 2, 3, 4, 5, 6];
     static readonly RANGE________INCUBATION = [1, 7, 14];
     static readonly RANGE____INCIDENCE_1000 = [0, 250, 500, 750, 1000];
     static readonly RANGE_____INCIDENCE__10 = [0, 2, 4, 6, 8, 10];

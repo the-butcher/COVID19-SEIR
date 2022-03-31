@@ -46,7 +46,7 @@ export class SliderDiscoveryCategory extends Slider {
                     return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
                 },
                 inputHandleFunction: (index, value) => {
-                    return parseFloat(value) / 100;
+                    return parseFloat(value.replace(',', '.')) / 100;
                 }
             }
         });

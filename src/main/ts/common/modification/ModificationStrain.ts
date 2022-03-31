@@ -34,4 +34,8 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         return this.modificationValues.intervalScale;
     }
 
+    getImmuneEscape(): number {
+        return this.modificationValues.immuneEscape;
+    }
+
 }

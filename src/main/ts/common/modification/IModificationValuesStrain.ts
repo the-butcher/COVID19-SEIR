@@ -30,6 +30,23 @@ export interface IModificationValuesStrain extends IModificationValues {
     intervalScale: number;
 
     /**
+     * get the ratio of immune escape for this strain
+     * 0 would mean, no recovered or vaccinated individual would be infected until immunity has vanished
+     * @deprecated
+     */
+    immuneEscape: number;
+
+    /**
+     * time in months for total waning of immunity
+     */
+    timeToWane: number;
+
+    /**
+     * r0 that this strain has in population regarded as immune
+     */
+    r0Escaping: number;
+
+    /**
      * the initial incidence of this strain
      */
     dstIncidence: number;

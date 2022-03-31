@@ -62,8 +62,8 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     }
 
     normalize(): void {
-        const multiplier_randoms: { [K in string]: number} = {};
-        const correction_randoms: { [K in string]: number} = {};
+        const multiplier_randoms: { [K in string]: number } = {};
+        const correction_randoms: { [K in string]: number } = {};
         Demographics.getInstance().getCategories().forEach(category => {
             multiplier_randoms[category.getName()] = 0;
         });
@@ -79,8 +79,8 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     randomize(): void {
 
-        const multiplier_randoms: { [K in string]: number} = {};
-        const correction_randoms: { [K in string]: number} = {};
+        const multiplier_randoms: { [K in string]: number } = {};
+        const correction_randoms: { [K in string]: number } = {};
 
         Demographics.getInstance().getCategories().forEach(category => {
             multiplier_randoms[category.getName()] = StrainUtil.randomGaussian(StrainUtil.RANDOM_SCALE_095);
@@ -104,7 +104,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
             minInstant = Math.min(minInstant, this.getInstantA() + this.modificationValues.correction_configs[ageGroup.getName()].back_days_a * TimeUtil.MILLISECONDS_PER____DAY);
             ModificationRegression.VACC_KEYS.forEach(vaccKey => {
                 minInstant = Math.min(minInstant, this.getInstantA() + this.modificationValues.vaccination_configs[ageGroup.getName()][vaccKey].back_days_a * TimeUtil.MILLISECONDS_PER____DAY);
-            }); 
+            });
         });
         return minInstant;
     }
@@ -123,6 +123,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     /**
      * get a multiplier randomized in a way that fits the confidence interval associated with this multiplier
+     * 
      * @param instant
      * @param contactCategory
      * @returns
@@ -147,11 +148,12 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     /**
      * get a correction randomized in a way that fits the confidence interval associated with this correction
+     * 
      * @param instant
      * @param ageGroupIndex
      * @returns
      */
-     getCorrectionRegression(instant: number, ageGroupName: string): IRegressionResult {
+    getCorrectionRegression(instant: number, ageGroupName: string): IRegressionResult {
 
         const result = this.correctionRegressions[ageGroupName].getRegressionResult(instant);
         if (result.regression && result.ci95Dim) {
@@ -171,7 +173,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     getVaccinationRegression(instant: number, ageGroupName: string, vaccKey: string): IRegressionResult {
         return this.vaccinationRegressions[ageGroupName][vaccKey].getRegressionResult(instant);
-    }    
+    }
 
     /**
      * internal regression needs to update when the instant changes
@@ -187,19 +189,19 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      * internal regression needs to update when some value changes
      */
     acceptUpdate(update: Partial<IModificationValuesRegression>): void {
-        this.updateRegressions({...update.multiplier_configs}, {...update.correction_configs}, {...update.vaccination_configs});
-        update.multiplier_configs = {...this.modificationValues.multiplier_configs, ...update.multiplier_configs};
-        update.correction_configs = {...this.modificationValues.correction_configs, ...update.correction_configs};
+        this.updateRegressions({ ...update.multiplier_configs }, { ...update.correction_configs }, { ...update.vaccination_configs });
+        update.multiplier_configs = { ...this.modificationValues.multiplier_configs, ...update.multiplier_configs };
+        update.correction_configs = { ...this.modificationValues.correction_configs, ...update.correction_configs };
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             if (update.vaccination_configs) {
-                update.vaccination_configs[ageGroup.getName()] = {...this.modificationValues.vaccination_configs[ageGroup.getName()], ...update.vaccination_configs[ageGroup.getName()]};
+                update.vaccination_configs[ageGroup.getName()] = { ...this.modificationValues.vaccination_configs[ageGroup.getName()], ...update.vaccination_configs[ageGroup.getName()] };
             }
         });
-        update.vaccination_configs = {...this.modificationValues.vaccination_configs, ...update.vaccination_configs};
+        update.vaccination_configs = { ...this.modificationValues.vaccination_configs, ...update.vaccination_configs };
         super.acceptUpdate(update);
     }
 
-    private updateRegressions(multiplierConfigs: { [K in string]: IRegressionConfig}, correctionConfigs: { [K in string]: IRegressionConfig}, vaccinationConfigs: { [K in string]: { [K in string]: IRegressionConfig } }): void {
+    private updateRegressions(multiplierConfigs: { [K in string]: IRegressionConfig }, correctionConfigs: { [K in string]: IRegressionConfig }, vaccinationConfigs: { [K in string]: { [K in string]: IRegressionConfig } }): void {
 
         for (const key of Object.keys(multiplierConfigs)) {
             // console.log('updating m-regression', key);
@@ -258,7 +260,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                     modifications: new ModificationResolverVaccination().getModifications() // .filter(m => m.getInstantA() <= instantB)
                 });
             };
-        }        
+        }
 
     }
 

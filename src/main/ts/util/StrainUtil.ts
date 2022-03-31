@@ -38,7 +38,7 @@ export class StrainUtil {
     }
 
     static calculateLatency(serialInterval: number, intervalScale: number) {
-        return serialInterval - serialInterval * intervalScale * Weibull.getInstance().getNormalizedMean();
+        return serialInterval - serialInterval * intervalScale * Weibull.getInstanceReproduction().getNormalizedMean();
     }
 
     static calculateInfecty(serialInterval: number, intervalScale: number) {
@@ -46,7 +46,7 @@ export class StrainUtil {
     }
 
     static calculateIntervalScale(latency: number, serialInterval: number): number {
-        return (latency - serialInterval) / (Weibull.getInstance().getNormalizedMean() * -serialInterval);
+        return (latency - serialInterval) / (Weibull.getInstanceReproduction().getNormalizedMean() * -serialInterval);
     }
 
     static calculateValueB(valueA: number, r0: number, instantA: number, instantB: number, serialInterval: number): number {
@@ -95,8 +95,8 @@ export class StrainUtil {
 
     }
 
-    static stdNormalDistribution (x: number) {
-        return Math.pow(Math.E,-Math.pow(x,2)/2)/Math.sqrt(2*Math.PI);
+    static stdNormalDistribution(x: number) {
+        return Math.pow(Math.E, -Math.pow(x, 2) / 2) / Math.sqrt(2 * Math.PI);
     }
 
     static readonly RANDOM_SCALE_095 = 5 / 1.96;
@@ -109,20 +109,20 @@ export class StrainUtil {
      */
     static randomGaussian(scale: number) {
         let u = 0, v = 0;
-        while(u === 0) u = Math.random() //Converting [0,1) to (0,1)
-        while(v === 0) v = Math.random()
-        let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v )
+        while (u === 0) u = Math.random() //Converting [0,1) to (0,1)
+        while (v === 0) v = Math.random()
+        let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
 
         num = num / 10.0 + 0.5 // Translate to 0 -> 1
         if (num > 1 || num < 0)
-          num = StrainUtil.randomGaussian(scale) // resample between 0 and 1 if out of range
+            num = StrainUtil.randomGaussian(scale) // resample between 0 and 1 if out of range
         else {
-          num = Math.pow(num, 1) // Skew
-          num *= (scale + scale) // Stretch to fill range
-          num -= scale // offset to min
+            num = Math.pow(num, 1) // Skew
+            num *= (scale + scale) // Stretch to fill range
+            num -= scale // offset to min
         }
         return num;
-      }
+    }
 
 
 }

@@ -27,6 +27,7 @@ export class ModelImplStrain implements IModelSeir {
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly transmissionRisk: number;
+    private readonly immuneEscape: number;
 
     private readonly nrmDeltas: number[];
     private nrmExposure: number[][];
@@ -36,6 +37,7 @@ export class ModelImplStrain implements IModelSeir {
         this.parentModel = parentModel;
         this.infectiousModels = [];
         this.transmissionRisk = strainValues.transmissionRisk;
+        this.immuneEscape = strainValues.immuneEscape;
 
         this.nrmDeltas = [];
 
@@ -123,6 +125,8 @@ export class ModelImplStrain implements IModelSeir {
         });
         let nrm_ISums: number[] = [];
 
+        let susceptibility: number;
+
         this.nrmExposure = [];
         this.infectiousModels.forEach(infectiousModelContact => {
 
@@ -147,8 +151,10 @@ export class ModelImplStrain implements IModelSeir {
                 nrmESum = 0;
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
 
+                    susceptibility = (compartmentS.getCompartmentType() == ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() == ECompartmentType.R___REMOVED_VI) ? 1 : this.immuneEscape;
+
                     nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
-                    nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk;
+                    nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk * susceptibility;
 
                     // remove from susceptible compartment (adding to exposed happens after loop in a single call)
                     result.addNrmValue(-nrmE, compartmentS);
@@ -189,8 +195,8 @@ export class ModelImplStrain implements IModelSeir {
          */
         for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
 
-            const compartmentRemovedD = this.parentModel.getCompartmentRemovedD(ageGroupIndex);
-            const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(ageGroupIndex);
+            const compartmentRemovedD = this.parentModel.getCompartmentRemoved(ageGroupIndex);
+            // const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(ageGroupIndex);
             // ~~~CALIBRATION
             // const compartmentSusceptible = this.parentModel.getCompartmentsSusceptible(ageGroupIndex)[0];
 
@@ -200,12 +206,13 @@ export class ModelImplStrain implements IModelSeir {
             const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
 
             // based upon age-group testing ratios move from infectious to known recovery / unknown recovery
-            const ratioD = modificationTime.getDiscoveryRatios(ageGroupIndex).discovery;
-            const ratioU = 1 - ratioD;
+            // const ratioD = modificationTime.getDiscoveryRatios(ageGroupIndex).discovery;
+            // const ratioU = 1 - ratioD;
 
             // removal from last infectious happens in infectious model (TODO find a more readable version)
-            result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
-            result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
+            result.addNrmValue(continuationValue, compartmentRemovedD);
+            // result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
+            // result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
             // ~~~CALIBRATION
             // result.addNrmValue(continuationValue, compartmentSusceptible);
 

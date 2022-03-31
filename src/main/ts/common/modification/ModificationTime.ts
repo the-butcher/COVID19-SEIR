@@ -2,7 +2,7 @@ import { IVaccinationConfig2 } from './../demographics/IVaccinationConfig2';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelImplRoot } from './../../model/ModelImplRoot';
 import { deprecate } from 'util';
-import { CompartmentChain } from '../../model/compartment/CompartmentChain';
+import { CompartmentChainReproduction } from '../../model/compartment/CompartmentChainReproduction';
 import { ModelImplStrain } from '../../model/ModelImplStrain';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
@@ -93,7 +93,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     }
 
     acceptUpdate(update: Partial<IModificationValuesTime>): void {
-        // nothing to be updated
+        super.acceptUpdate(update); // title is updateable
     }
 
     /**
@@ -220,7 +220,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     }
 
     getQuarantineMultiplier(ageGroupIndex: number): number {
-        const shareOfInfectionBeforeIncubation = CompartmentChain.getInstance().getShareOfPresymptomaticInfection();
+        const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
         return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getDiscoveryRatios(ageGroupIndex).discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
     }
@@ -248,7 +248,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
              */
             const contactValue = this.modificationContact.getCellValue(indexContact, indexParticipant);
 
-            this.cellValues[indexContact][indexParticipant] = contactValue * multiplierQuarantine *  multiplierSeasonality;
+            this.cellValues[indexContact][indexParticipant] = contactValue * multiplierQuarantine * multiplierSeasonality;
 
         }
 

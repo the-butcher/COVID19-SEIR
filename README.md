@@ -34,7 +34,7 @@ Please feel free to contact me on Twitter <a href="https://twitter.com/Fleischer
 
 # <a name="anchor_timeline">TIMELINE</a>
 
-An area where you can place "modifications" of different types. These modifications are used to alter the model by i.e. changing contact levels, adding new strains, definition seasonality.
+An area where you can place "modifications" of different types. These modifications are used to alter the model by i.e. changing contact levels, adding new strains, definition of seasonality.
 
 * To change configuration of a modification click the modification. A configuration area of the modification will appear in the upper right area of your browser.
 * To change the date of a modification drag it along the slider. Some modification are fixes to the beginning of the timeline an can not be dragged.
@@ -90,6 +90,9 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 
 #### Issues
+* if the model increases a specific indicator constantly (and there is no apparent reason for this parameter to rise)
+  * it could mean the the model needs to ramp up contact in order to compensate for some other parameter that may i.e. not reduce protection on the other end
+  * so if the elderly keep going up, it may mean that immunity in that group should vanish quicker, therefore providing a larger susceptlible group requiring less contact
 * detect duplicate modifications
   * errors are hard to find
   * would help with creation of i.e. auto testing modifications

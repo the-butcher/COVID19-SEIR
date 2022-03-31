@@ -15,12 +15,12 @@ export interface ICompartmentParams {
 }
 
 /**
- * helper type that can provide a number of compartment definition, distributed underneath a weibull distribution
+ * helper type that can provide a number of compartment definitions, distributed underneath a weibull distribution
  *
  * @author h.fleischer
  * @since 16.05.2021
  */
-export class CompartmentChain {
+export class CompartmentChainReproduction {
 
     static readonly INCUBATION_TO_MEAN__________RATIO = 0.9;
     static readonly COMPARTMENT_COUNT_PRE__INCUBATION = 3; // 5;
@@ -29,13 +29,13 @@ export class CompartmentChain {
     static readonly NO_REPRODUCTION = 0;
     static readonly NO_CONTINUATION = new RationalDurationFixed(0);
 
-    static getInstance(): CompartmentChain {
+    static getInstance(): CompartmentChainReproduction {
         if (ObjectUtil.isEmpty(this.instance)) {
-            this.instance = new CompartmentChain();
+            this.instance = new CompartmentChainReproduction();
         }
         return this.instance;
     }
-    private static instance: CompartmentChain;
+    private static instance: CompartmentChainReproduction;
 
     private readonly compartmentParams: ICompartmentParams[];
     private readonly shareOfPreSymptomaticInfection: number;
@@ -44,12 +44,8 @@ export class CompartmentChain {
 
         this.compartmentParams = [];
 
-        const normalizedMean = Weibull.getInstance().getNormalizedMean();
-        const normalizedIncubation = normalizedMean * CompartmentChain.INCUBATION_TO_MEAN__________RATIO;
-
-        // console.log('mean(0)', normalizedMean);
-        // console.log('incubation(0)', normalizedIncubation);
-        // console.log('off(0)', normalizedMean - normalizedIncubation);
+        const normalizedMean = Weibull.getInstanceReproduction().getNormalizedMean();
+        const normalizedIncubation = normalizedMean * CompartmentChainReproduction.INCUBATION_TO_MEAN__________RATIO;
 
         let compartmentCount: number;
         let normalizedDuration: number;
@@ -60,12 +56,12 @@ export class CompartmentChain {
 
         let shareOfPreSymptomaticInfection1 = 0;
 
-        compartmentCount = CompartmentChain.COMPARTMENT_COUNT_PRE__INCUBATION;
+        compartmentCount = CompartmentChainReproduction.COMPARTMENT_COUNT_PRE__INCUBATION;
         normalizedDuration = normalizedIncubation / compartmentCount; // the duration of each compartment before incubation
         instantA = 0;
         for (let compartmentIndex = 1; compartmentIndex <= compartmentCount; compartmentIndex++) {
             instantB = normalizedDuration * compartmentIndex;
-            reproduction = (Weibull.getInstance().getNormalizedDistribution(instantB) - Weibull.getInstance().getNormalizedDistribution(instantA));
+            reproduction = (Weibull.getInstanceReproduction().getNormalizedDistribution(instantB) - Weibull.getInstanceReproduction().getNormalizedDistribution(instantA));
             shareOfPreSymptomaticInfection1 += reproduction;
             this.compartmentParams.push({
                 type: ECompartmentType.I_INFECTIOUS_A,
@@ -77,11 +73,11 @@ export class CompartmentChain {
             });
             instantA = instantB;
         }
-        compartmentCount = CompartmentChain.COMPARTMENT_COUNT_POST_INCUBATION;
+        compartmentCount = CompartmentChainReproduction.COMPARTMENT_COUNT_POST_INCUBATION;
         normalizedDuration = (1 - normalizedIncubation) / compartmentCount; // the duration of each compartment after incubation
         for (let compartmentIndex = 1; compartmentIndex <= compartmentCount; compartmentIndex++) {
             instantB = normalizedIncubation + normalizedDuration * compartmentIndex;
-            reproduction = (Weibull.getInstance().getNormalizedDistribution(instantB) - Weibull.getInstance().getNormalizedDistribution(instantA));
+            reproduction = (Weibull.getInstanceReproduction().getNormalizedDistribution(instantB) - Weibull.getInstanceReproduction().getNormalizedDistribution(instantA));
             this.compartmentParams.push({
                 type: ECompartmentType.I_INFECTIOUS_A,
                 r0: reproduction,
@@ -101,20 +97,12 @@ export class CompartmentChain {
 
         const mean = strainValues.serialInterval; // Weibull.getInstance().getNormalizedMean() * strain.getSerialInterval();
 
-        // const normalizedOffset = Weibull.getInstance().getNormalizedMean() * (1 - CompartmentChain.INCUBATION_TO_MEAN__________RATIO); // TODO static constant to describe dependency
-        // // control values
-        // const incubation = mean - normalizedOffset * strain.getSerialInterval() * strain.getIntervalScale();
-        // // const incubation = mean - (mean * 0.1 * strain.getIntervalScale());
-        // console.log('mean', mean);
-        // console.log('incubation', incubation);
-        // console.log('off', normalizedOffset, mean - incubation);
-
         const strainedCompartmentParams: ICompartmentParams[] = [];
         const toStrainedValue = (normalized: number) => normalized * strainValues.serialInterval * strainValues.intervalScale + mean;
 
         strainedCompartmentParams.push({
             type: ECompartmentType.E______EXPOSED,
-            r0: CompartmentChain.NO_REPRODUCTION,
+            r0: CompartmentChainReproduction.NO_REPRODUCTION,
             instantA: 0,
             instantB: Math.round(toStrainedValue(this.compartmentParams[0].instantA) * TimeUtil.MILLISECONDS_PER____DAY),
             i0Normal: 0,

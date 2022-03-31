@@ -35,7 +35,7 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
             corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instant, ageGroup.getName()).regression;
         });
         const id = ObjectUtil.createId();
-        return{
+        return {
             id,
             key: 'CONTACT',
             name: `regression (${id})`,
@@ -53,8 +53,8 @@ export class ModificationResolverContact extends AModificationResolver<IModifica
         const modificationValuesA = modificationA.getModificationValues();
         const modificationValuesB = modificationB.getModificationValues();
 
-        const multipliers: { [K: string]: number} = {};
-        const corrections: { [K: string]: number} = {};
+        const multipliers: { [K: string]: number } = {};
+        const corrections: { [K: string]: number } = {};
 
         const categoryNames = Demographics.getInstance().getCategories().map(c => c.getName());
         const ageGroups = Demographics.getInstance().getAgeGroups();

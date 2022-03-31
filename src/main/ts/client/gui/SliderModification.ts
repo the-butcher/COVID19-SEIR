@@ -98,7 +98,6 @@ export class SliderModification extends Slider {
      */
     indicateUpdate(id: string): void {
 
-
         const modificationIcon = this.modificationIcons.find(m => m.getId() === id);
 
         // const previousTransform = modificationIcon.getBulletGroupElement().style.transform;

@@ -1,10 +1,10 @@
 import { expect, describe, it, test } from '@jest/globals';
 import { ObjectUtil } from './../../../util/ObjectUtil';
 import { IModificationValuesStrain } from './../../../common/modification/IModificationValuesStrain';
-import { CompartmentChain } from '../CompartmentChain';
+import { CompartmentChainReproduction } from '../CompartmentChainReproduction';
 describe("test value", () => {
     it("should return 1 as reproduction value", () => {
-        const compartmentParams = new CompartmentChain().getCompartmentParams();
+        const compartmentParams = new CompartmentChainReproduction().getCompartmentParams();
         let totalReproduction = 0;
         compartmentParams.forEach(compartmentParam => {
             totalReproduction += compartmentParam.r0;
@@ -12,7 +12,7 @@ describe("test value", () => {
         expect(totalReproduction).toBe(1);
     });
     it("should return 1 as total duration value", () => {
-        const compartmentParams = new CompartmentChain().getCompartmentParams();
+        const compartmentParams = new CompartmentChainReproduction().getCompartmentParams();
         let totalDuration = 0;
         compartmentParams.forEach(compartmentParam => {
             totalDuration += (compartmentParam.instantB - compartmentParam.instantA);
@@ -27,13 +27,16 @@ describe("test value", () => {
             r0: 1.0,
             intervalScale: 1.13402,
             serialInterval: 5.0,
+            immuneEscape: 0,
+            timeToWane: 3,
+            r0Escaping: 0,
             name: 'test',
             dstIncidence: 1,
             deletable: true,
             draggable: true,
             primary: false
         };
-        const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
+        const compartmentParams = new CompartmentChainReproduction().getStrainedCompartmentParams(strain);
         expect(compartmentParams[0].instantB).toBeCloseTo(259200000, -4);
         expect(compartmentParams[5].instantB).toBeCloseTo(526179274, -3);
     });
@@ -45,13 +48,16 @@ describe("test value", () => {
             r0: 3.0,
             intervalScale: 1.0,
             serialInterval: 5.0,
+            immuneEscape: 0,
+            timeToWane: 3,
+            r0Escaping: 0,
             name: 'test',
             dstIncidence: 1,
             deletable: true,
             draggable: true,
             primary: false
         };
-        const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
+        const compartmentParams = new CompartmentChainReproduction().getStrainedCompartmentParams(strain);
         let totalReproduction = 0;
         compartmentParams.forEach(compartmentParam => {
             totalReproduction += compartmentParam.r0;
@@ -66,13 +72,16 @@ describe("test value", () => {
             r0: 3.4,
             intervalScale: 1.25,
             serialInterval: 5.0,
+            immuneEscape: 0,
+            timeToWane: 3,
+            r0Escaping: 0,
             name: 'test',
             dstIncidence: 1,
             deletable: true,
             draggable: true,
             primary: false
         };
-        const compartmentParams = new CompartmentChain().getStrainedCompartmentParams(strain);
+        const compartmentParams = new CompartmentChainReproduction().getStrainedCompartmentParams(strain);
         let totalReproduction = 0;
         compartmentParams.forEach(compartmentParam => {
             totalReproduction += compartmentParam.r0;
@@ -80,7 +89,7 @@ describe("test value", () => {
         expect(totalReproduction).toBeCloseTo(3.4, 8);
     });
     it("should return 0.4631 as shareOfPresymptomaticInfection", () => {
-        expect(CompartmentChain.getInstance().getShareOfPresymptomaticInfection()).toBeCloseTo(0.4631, 3);
+        expect(CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection()).toBeCloseTo(0.4631, 3);
     });
 
 });

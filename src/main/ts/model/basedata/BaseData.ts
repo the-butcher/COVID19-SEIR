@@ -192,7 +192,7 @@ export class BaseData {
 
             if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
-                console.log('adding at', TimeUtil.formatCategoryDateFull(reproductionMarker.instant));
+                // console.log('adding at', TimeUtil.formatCategoryDateFull(reproductionMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationContact({
                 //     id,
@@ -245,9 +245,9 @@ export class BaseData {
             multipliers['other'] = 0.2;
 
             // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
-            if (positivityMarker.instant > new Date('2021-10-01').getTime()) {
+            if (positivityMarker.instant > new Date('2022-03-22').getTime()) {
 
-                // console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
+                console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationDiscovery({
                 //     id,
