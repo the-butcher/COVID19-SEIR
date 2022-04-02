@@ -3,6 +3,7 @@ import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { ObjectUtil } from './../util/ObjectUtil';
+import { IBaseDataItem } from './basedata/BaseDataItem';
 import { CompartmentChainRecovery } from './compartment/CompartmentChainRecovery';
 import { CompartmentRecovery } from './compartment/CompartmentRecovery';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
@@ -30,17 +31,19 @@ export class ModelImplRecovery implements IModelSeir {
 
     private integrationSteps: IModelIntegrationStep[];
 
-    constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime) {
+    constructor(parentModel: ModelImplStrain, absTotal: number, absValue: number, ageGroup: AgeGroup, strainValues: IModificationValuesStrain) {
 
         this.parentModel = parentModel;
         this.compartmentsRecovery = [];
         this.integrationSteps = [];
 
-        this.absTotal = demographics.getAbsTotal();
+        this.absTotal = absTotal;
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupTotal = ageGroup.getAbsValue();
 
         const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(strainValues);
+
+        // this.nrmValue = absValue * 1.0 / this.absTotal;
 
         let absCompartmentRecoverySum = 0;
         for (let chainIndex = 0; chainIndex < compartmentParams.length; chainIndex++) {
@@ -50,7 +53,7 @@ export class ModelImplRecovery implements IModelSeir {
 
             const instantC = (compartmentParam.instantA + compartmentParam.instantB) / 2;
             const absCompartment = 0; // TODO need to find logic for a meaningful prefill of the recovered comparments (but maybe it can work with empty compartments when the model starts in a low incidence situation) 
-            this.compartmentsRecovery.push(new CompartmentRecovery(this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.immunity, duration, `_RCV_${ObjectUtil.padZero(chainIndex)}`));
+            this.compartmentsRecovery.push(new CompartmentRecovery(this.absTotal, 0 /* absValue / compartmentParams.length */, this.ageGroupIndex, strainValues.id, compartmentParam.immunity, duration, `_RCV_${ObjectUtil.padZero(chainIndex)}`));
 
             absCompartmentRecoverySum += absCompartment;
 

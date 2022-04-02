@@ -47,7 +47,7 @@ export class ModelImplVaccination implements IModelSeir {
     //  */
     // private readonly compartmentC: CompartmentBase;
 
-    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, modificationTime: ModificationTime, absValueVI: number, absValueVU: number, absValueV2: number, ageGroup: AgeGroup) {
+    constructor(parentModel: ModelImplRoot, modelSettings: Demographics, modificationTime: ModificationTime, absValueImmunizing: number, absValueVaccinated: number, ageGroup: AgeGroup) {
 
         this.parentModel = parentModel;
         this.absTotal = modelSettings.getAbsTotal();
@@ -67,10 +67,10 @@ export class ModelImplVaccination implements IModelSeir {
         const durationToReexposable = modificationTime.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
 
         // this.compartmentC = new CompartmentBase(ECompartmentType.X__REMOVED_VC, this.absTotal, absVacc1, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChain.NO_CONTINUATION, '');
-        this.compartmentI = new CompartmentBase(ECompartmentType.R___REMOVED_VI, this.absTotal, absValueVI, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChainReproduction.NO_CONTINUATION, '');
+        this.compartmentI = new CompartmentBase(ECompartmentType.R___REMOVED_VI, this.absTotal, absValueImmunizing, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, CompartmentChainReproduction.NO_CONTINUATION, '');
         this.compartmentR = new CompartmentBase(ECompartmentType.R___REMOVED_VI, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(3 * TimeUtil.MILLISECONDS_PER___WEEK), '');
         // this.compartmentU = new CompartmentBase(ECompartmentType.R___REMOVED_VU, this.absTotal, absValueVU, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
-        this.compartmentV = new CompartmentBase(ECompartmentType.R___REMOVED_V2, this.absTotal, absValueVU + absValueV2, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
+        this.compartmentV = new CompartmentBase(ECompartmentType.R___REMOVED_V2, this.absTotal, absValueVaccinated, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
 
     }
 

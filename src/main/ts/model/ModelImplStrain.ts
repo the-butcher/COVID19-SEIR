@@ -2,6 +2,7 @@ import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { BaseData } from './basedata/BaseData';
+import { IBaseDataItem } from './basedata/BaseDataItem';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
@@ -37,7 +38,7 @@ export class ModelImplStrain implements IModelSeir {
     private readonly nrmDeltas: number[];
     private nrmExposure: number[][];
 
-    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, baseData: BaseData) {
+    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, referenceDataRemoved: IBaseDataItem, initialUndetected: number) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
@@ -53,12 +54,13 @@ export class ModelImplStrain implements IModelSeir {
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
+            let absValueRecoveredD = strainValues.primary ? referenceDataRemoved.getRemoved(ageGroup.getName()) * (1 + initialUndetected) : 0;
+
             const infectiousModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime);
             this.infectiousModels.push(infectiousModel);
             nrmValue1 += infectiousModel.getNrmValue();
 
-
-            const recoveryModel = new ModelImplRecovery(this, demographics, ageGroup, strainValues, modificationTime);
+            const recoveryModel = new ModelImplRecovery(this, demographics.getAbsTotal(), absValueRecoveredD, ageGroup, strainValues);
             this.recoveryModels.push(recoveryModel);
             nrmValue1 += recoveryModel.getNrmValue();
 

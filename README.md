@@ -93,6 +93,8 @@ A higher discovery rate means:
 * if the model increases a specific indicator constantly (and there is no apparent reason for this parameter to rise)
   * it could mean the the model needs to ramp up contact in order to compensate for some other parameter that may i.e. not reduce protection on the other end
   * so if the elderly keep going up, it may mean that immunity in that group should vanish quicker, therefore providing a larger susceptlible group requiring less contact
+* vaccination also needs to implement a recovery chain (which then probably needs to get a different name)
+* take care of last recovery model feeding back to susceptible
 * detect duplicate modifications
   * errors are hard to find
   * would help with creation of i.e. auto testing modifications

@@ -32,6 +32,7 @@ export class ModelImplRoot implements IModelSeir {
      * this method performs multiple integrations of the model from a date earlier than the actual model date
      * from the model values at specific times in the model integration corrective multipliers are approximated
      * that way the desired starting values can be achieved with satisfactory precision
+     * 
      * @param demographics
      * @param modifications
      * @param progressCallback
@@ -83,69 +84,37 @@ export class ModelImplRoot implements IModelSeir {
 
         this.demographics = demographics;
         modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {
-            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTime, baseData));
+            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTime, referenceDataRemoved, modificationSettings.getInitialUndetected()));
         });
 
         demographics.getAgeGroups().forEach(ageGroup => {
 
             // start with full population of respective group
-            let absValueSC = ageGroup.getAbsValue()
+            let absValueSusceptible = ageGroup.getAbsValue()
             this.strainModels.forEach(strainModel => {
                 // subtract anything that may be in any infection model state
-                absValueSC -= strainModel.getNrmValueGroup(ageGroup.getIndex()) * this.getAbsTotal();
+                absValueSusceptible -= strainModel.getNrmValueGroup(ageGroup.getIndex()) * this.getAbsTotal();
             });
 
             // removed at model init and reduced by initial share of vaccination
-            let absValueID = referenceDataRemoved.getRemoved(ageGroup.getName());
-            absValueSC -= absValueID;
-
-            let absValueIU = absValueID * modificationSettings.getInitialUndetected();
-            absValueSC -= absValueIU;
+            let absValueRecoveredD = referenceDataRemoved.getRemoved(ageGroup.getName()) * (1 + modificationSettings.getInitialUndetected());
+            absValueSusceptible -= absValueRecoveredD;
 
             const vaccinationConfig = modificationTime.getVaccinationConfig2(ageGroup.getName());
-
             const grpRatio = 1 - ageGroup.getIndex() * 0.05; // 0.55 for oldest (longer ago), 1 for youngest (were vaccinated more recently)
-
-            const grpValueV1 = vaccinationConfig.v1 * grpRatio;
             const grpValueV2 = vaccinationConfig.v2 * grpRatio;
 
-            // console.log(ageGroup.getName(), ageGroup.getIndex(), 1 - ageGroup.getIndex() * 0.05);
-            // const grpValueV3 = vaccinationConfig.v2;
-
-            let absValueV1 = grpValueV1 * ageGroup.getAbsValue();
             let absValueV2 = grpValueV2 * ageGroup.getAbsValue();
-            // let absValueV3 = grpValueV2 * ageGroup.getAbsValue();
+            absValueSusceptible -= absValueV2;
 
-            // console.log(ageGroup.getName(), absValueV1.toFixed(2).padStart(10, ' '), absValueSC.toFixed(2).padStart(10, ' '), absValueID.toFixed(2).padStart(10, ' '), absValueIU.toFixed(2).padStart(10, ' '));
-
-            const absWeight1 = absValueSC + absValueID + absValueIU;
-            let absValueVI = absWeight1 !== 0 ? absValueV1 * absValueSC / absWeight1 : 0;
-            const absValueVD = absWeight1 !== 0 ? absValueV1 * absValueID / absWeight1 : 0;
-            let absValueVU = absWeight1 !== 0 ? absValueV1 * absValueIU / absWeight1 : 0;
-
-            absValueSC -= absValueVI;
-            absValueIU -= absValueVU;
-            absValueID -= absValueVD;
-
-            const absWeight2 = absValueVI + absValueVU;
-            const absValueVI2 = absWeight2 !== 0 ? absValueV2 * absValueVI / absWeight2 : 0;
-            const absValueVU2 = absWeight2 !== 0 ? absValueV2 * absValueVU / absWeight2 : 0;
-
-            absValueVI -= absValueVI2;
-            absValueVU -= absValueVU2;
-
-            const vaccinationModel = new ModelImplVaccination(this, demographics, modificationTime, absValueVI, absValueVU, absValueV2 + absValueVD, ageGroup);
+            const vaccinationModel = new ModelImplVaccination(this, demographics, modificationTime, 0, absValueV2, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
             const durationToReexposable = modificationTime.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
-
-            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_ID, this.demographics.getAbsTotal(), absValueID + absValueIU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
+            const compartmentRemovedD = new CompartmentBase(ECompartmentType.R___REMOVED_ID, this.demographics.getAbsTotal(), absValueRecoveredD, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
             this.compartmentsRemoved.push(compartmentRemovedD);
 
-            // const compartmentRemovedU = new CompartmentBase(ECompartmentType.R___REMOVED_IU, this.demographics.getAbsTotal(), absValueIU, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(durationToReexposable), '');
-            // this.compartmentsRemovedU.push(compartmentRemovedU);
-
-            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S__SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSC, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChainReproduction.NO_CONTINUATION, '');
+            const compartmentSusceptible = new CompartmentBase(ECompartmentType.S__SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, CompartmentChainReproduction.NO_CONTINUATION, '');
             this.compartmentsSusceptible.push(compartmentSusceptible);
 
         });
