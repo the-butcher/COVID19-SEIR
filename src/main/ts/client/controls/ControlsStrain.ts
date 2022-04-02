@@ -220,8 +220,8 @@ export class ControlsStrain {
             max: Math.max(...ModelConstants.RANGE________REEXPOSURE),
             step: 0.1,
             values: [3.0],
-            ticks: [...ModelConstants.RANGE________REEXPOSURE],
-            label: 'reexposure (months)',
+            ticks: [1, 2, 3],
+            label: 'immunity (months)',
             thumbCreateFunction: (index: number) => {
                 const iconSlider = new IconSlider();
                 if (index === 0) {
@@ -255,7 +255,7 @@ export class ControlsStrain {
                 }
             }
         });
-        // this.sliderTimeToWane.setLabelPosition(13);
+        this.sliderTimeToWane.setLabelPosition(13);
 
         // initial redraw of internal canvas
         this.redrawCanvasReproduction();
@@ -378,14 +378,14 @@ export class ControlsStrain {
         const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(strain);
         compartmentParams.forEach(compartmentParam => {
 
-            console.log('a', compartmentParam.instantA * pxPerMilli);
+            console.log('a', compartmentParam.instantA * pxPerMilli, compartmentParam.immunity);
 
             const xMin = compartmentParam.instantA * pxPerMilli;
             const xMax = compartmentParam.instantB * pxPerMilli;
             const xDim = xMax - xMin;
 
             const yMin = toCanvasY(0);
-            const yDim = compartmentParam.r0 * 300 / xDim; // TODO magic number
+            const yDim = compartmentParam.immunity * 40; // TODO magic number
             const yMax = toCanvasY(yDim);
 
             weibullContext.fillStyle = 'rgba(131, 202, 13, 0.50)'; // ValueSet.COLORS.REMOVED;

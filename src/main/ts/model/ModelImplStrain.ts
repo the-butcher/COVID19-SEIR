@@ -6,6 +6,7 @@ import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
 import { ModelImplInfectious } from './ModelImplInfectious';
+import { ModelImplRecovery } from './ModelImplRecovery';
 import { ModelImplRoot } from './ModelImplRoot';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
@@ -21,7 +22,11 @@ export class ModelImplStrain implements IModelSeir {
 
     private readonly parentModel: ModelImplRoot;
 
+    /**
+     * one infectious model / age
+     */
     private readonly infectiousModels: ModelImplInfectious[];
+    private readonly recoveryModels: ModelImplRecovery[];
 
     private readonly strainId: string;
     private readonly absTotal: number;
@@ -36,6 +41,7 @@ export class ModelImplStrain implements IModelSeir {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
+        this.recoveryModels = [];
         this.transmissionRisk = strainValues.transmissionRisk;
         this.immuneEscape = strainValues.immuneEscape;
 
@@ -46,9 +52,16 @@ export class ModelImplStrain implements IModelSeir {
 
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
-            const groupModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime);
-            this.infectiousModels.push(groupModel);
-            nrmValue1 += groupModel.getNrmValue();
+
+            const infectiousModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime);
+            this.infectiousModels.push(infectiousModel);
+            nrmValue1 += infectiousModel.getNrmValue();
+
+
+            const recoveryModel = new ModelImplRecovery(this, demographics, ageGroup, strainValues, modificationTime);
+            this.recoveryModels.push(recoveryModel);
+            nrmValue1 += recoveryModel.getNrmValue();
+
         });
 
         // pre-fill norm exposure
@@ -76,6 +89,10 @@ export class ModelImplStrain implements IModelSeir {
         return this.infectiousModels[ageGroupIndex];
     }
 
+    getRecoveryModel(ageGroupIndex: number): ModelImplRecovery {
+        return this.recoveryModels[ageGroupIndex];
+    }
+
     getNrmValueGroup(ageGroupIndex: number): number {
         return this.infectiousModels[ageGroupIndex].getNrmValue();
     }
@@ -92,8 +109,11 @@ export class ModelImplStrain implements IModelSeir {
 
     getInitialState(): IModelState {
         const initialState = ModelState.empty();
-        this.infectiousModels.forEach(groupModel => {
-            initialState.add(groupModel.getInitialState());
+        this.infectiousModels.forEach(infectiousModel => {
+            initialState.add(infectiousModel.getInitialState());
+        });
+        this.recoveryModels.forEach(recoveryModel => {
+            initialState.add(recoveryModel.getInitialState());
         });
         return initialState;
     }
@@ -196,27 +216,29 @@ export class ModelImplStrain implements IModelSeir {
         for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
 
             const compartmentRemovedD = this.parentModel.getCompartmentRemoved(ageGroupIndex);
-            // const compartmentRemovedU = this.parentModel.getCompartmentRemovedU(ageGroupIndex);
-            // ~~~CALIBRATION
-            // const compartmentSusceptible = this.parentModel.getCompartmentsSusceptible(ageGroupIndex)[0];
 
-            const outgoingCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
+            const lastInfectiousCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
+            const firstRecoveryCompartment = this.recoveryModels[ageGroupIndex].getFirstCompartment();
 
-            const continuationRate = outgoingCompartment.getContinuationRatio().getRate(dT, tT);
-            const continuationValue = continuationRate * state.getNrmValue(outgoingCompartment);
-
-            // based upon age-group testing ratios move from infectious to known recovery / unknown recovery
-            // const ratioD = modificationTime.getDiscoveryRatios(ageGroupIndex).discovery;
-            // const ratioU = 1 - ratioD;
+            const continuationRate = lastInfectiousCompartment.getContinuationRatio().getRate(dT, tT);
+            const continuationValue = continuationRate * state.getNrmValue(lastInfectiousCompartment);
 
             // removal from last infectious happens in infectious model (TODO find a more readable version)
             result.addNrmValue(continuationValue, compartmentRemovedD);
-            // result.addNrmValue(continuationValue * ratioD, compartmentRemovedD);
-            // result.addNrmValue(continuationValue * ratioU, compartmentRemovedU);
-            // ~~~CALIBRATION
-            // result.addNrmValue(continuationValue, compartmentSusceptible);
+
+            /**
+             * put into recovery chain (where it should self-continue down the chain)
+             */
+            // result.addNrmValue(continuationValue, firstRecoveryCompartment);
 
         }
+
+        /**
+         * recovery internal transfer through compartment chain
+         */
+        this.recoveryModels.forEach(recoveryModel => {
+            result.add(recoveryModel.apply(state, dT, tT, modificationTime));
+        });
 
         return result;
 

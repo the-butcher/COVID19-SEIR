@@ -7,7 +7,7 @@ import { RationalDurationFixed } from '../rational/RationalDurationFixed';
 
 export interface ICompartmentParamsRecovery {
     type: ECompartmentType;
-    r0: number; // reproduction outbound from this specific compartment
+    immunity: number; // reproduction outbound from this specific compartment
     instantA: number; // start of this compartment (with respect to mean)
     instantB: number; // end of this compartment (with respect to mean)
     i0Normal: number;
@@ -42,20 +42,23 @@ export class CompartmentChainRecovery {
 
         let instantA: number;
         let instantB: number;
-        let reproduction: number;
+        let immunity: number;
 
         let shareOfPreSymptomaticInfection1 = 0;
 
-        compartmentCount = 5;
+        let density0 = Weibull.getInstanceRecovery().getNormalizedDensity(0);
+
+        compartmentCount = 9;
         normalizedDuration = 1 / compartmentCount; // the duration of each compartment before incubation
         instantA = 0;
         for (let compartmentIndex = 0; compartmentIndex < compartmentCount; compartmentIndex++) {
             instantB = normalizedDuration * (compartmentIndex + 1);
-            reproduction = (Weibull.getInstanceRecovery().getNormalizedDistribution(instantB) - Weibull.getInstanceRecovery().getNormalizedDistribution(instantA));
-            shareOfPreSymptomaticInfection1 += reproduction;
+            immunity = 1 - Weibull.getInstanceRecovery().getNormalizedDensity((1 - (instantA + instantB) / 2)) / density0;
+            console.log('wb0', (instantA + instantB) / 2, immunity);
+            shareOfPreSymptomaticInfection1 += immunity;
             this.compartmentParams.push({
                 type: ECompartmentType.I_INFECTIOUS_A,
-                r0: reproduction,
+                immunity: immunity,
                 instantA: instantA,
                 instantB: instantB,
                 i0Normal: normalizedDuration
@@ -73,7 +76,7 @@ export class CompartmentChainRecovery {
         this.compartmentParams.forEach(compartmentParam => {
             strainedCompartmentParams.push({
                 type: compartmentParam.type,
-                r0: compartmentParam.r0 * 2 * strainValues.timeToWane,
+                immunity: compartmentParam.immunity,
                 instantA: Math.round(toStrainedValue(compartmentParam.instantA)),
                 instantB: Math.round(toStrainedValue(compartmentParam.instantB)),
                 i0Normal: compartmentParam.i0Normal

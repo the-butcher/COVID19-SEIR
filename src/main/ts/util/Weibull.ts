@@ -14,7 +14,7 @@ export class Weibull {
 
     static getInstanceRecovery(): Weibull {
         if (ObjectUtil.isEmpty(this.instanceRecovery)) {
-            this.instanceRecovery = new Weibull(1, 4);
+            this.instanceRecovery = new Weibull(1, 5);
         }
         return this.instanceRecovery;
     }
