@@ -5,11 +5,13 @@ import { ModificationTime } from '../common/modification/ModificationTime';
 import { ObjectUtil } from './../util/ObjectUtil';
 import { IBaseDataItem } from './basedata/BaseDataItem';
 import { CompartmentChainRecovery } from './compartment/CompartmentChainRecovery';
-import { CompartmentRecovery } from './compartment/CompartmentRecovery';
+import { CompartmentImmunity } from './compartment/CompartmentImmunity';
+import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
 import { ModelImplRoot } from './ModelImplRoot';
 import { ModelImplStrain } from './ModelImplStrain';
+import { RationalDurationFixed } from './rational/RationalDurationFixed';
 import { IModelState } from './state/IModelState';
 import { ModelState } from './state/ModelState';
 
@@ -27,7 +29,7 @@ export class ModelImplRecovery implements IModelSeir {
     private readonly ageGroupIndex: number;
     private readonly ageGroupTotal: number;
 
-    private readonly compartmentsRecovery: CompartmentRecovery[];
+    private readonly compartmentsRecovery: CompartmentImmunity[];
 
     private integrationSteps: IModelIntegrationStep[];
 
@@ -41,7 +43,7 @@ export class ModelImplRecovery implements IModelSeir {
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupTotal = ageGroup.getAbsValue();
 
-        const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(strainValues);
+        const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(strainValues.timeToWane);
 
         // this.nrmValue = absValue * 1.0 / this.absTotal;
 
@@ -51,15 +53,15 @@ export class ModelImplRecovery implements IModelSeir {
             const compartmentParam = compartmentParams[chainIndex];
             const duration = compartmentParam.instantB - compartmentParam.instantA;
 
-            const instantC = (compartmentParam.instantA + compartmentParam.instantB) / 2;
+            // const instantC = (compartmentParam.instantA + compartmentParam.instantB) / 2;
             const absCompartment = 0; // TODO need to find logic for a meaningful prefill of the recovered comparments (but maybe it can work with empty compartments when the model starts in a low incidence situation) 
-            this.compartmentsRecovery.push(new CompartmentRecovery(this.absTotal, 0 /* absValue / compartmentParams.length */, this.ageGroupIndex, strainValues.id, compartmentParam.immunity, duration, `_RCV_${ObjectUtil.padZero(chainIndex)}`));
+            this.compartmentsRecovery.push(new CompartmentImmunity(ECompartmentType.R___REMOVED_ID, this.absTotal, absValue / compartmentParams.length, this.ageGroupIndex, strainValues.id, compartmentParam.immunity, new RationalDurationFixed(duration), `_RCV_${ObjectUtil.padZero(chainIndex)}`));
 
             absCompartmentRecoverySum += absCompartment;
 
-        };
+        }
 
-        this.nrmValue = absCompartmentRecoverySum / this.absTotal;
+        this.nrmValue = absValue / this.absTotal;
         // console.log('incidenceSum', incidenceSum / 7);
 
         /**
@@ -67,11 +69,9 @@ export class ModelImplRecovery implements IModelSeir {
          */
         this.linkCompartmentsRecovery(this.compartmentsRecovery);
 
-
-
     }
 
-    linkCompartmentsRecovery(compartmentsRecovery: CompartmentRecovery[]): void {
+    linkCompartmentsRecovery(compartmentsRecovery: CompartmentImmunity[]): void {
 
         /**
          * connect infection compartments among each other
@@ -95,8 +95,9 @@ export class ModelImplRecovery implements IModelSeir {
                     increments.addNrmValue(-continuationValue, sourceCompartment);
                     if (targetCompartment) {
                         increments.addNrmValue(continuationValue, targetCompartment);
+                    } else {
+                        increments.addNrmValue(continuationValue, this.getRootModel().getCompartmentSusceptible(this.ageGroupIndex));
                     }
-
                     return increments;
 
                 }
@@ -111,15 +112,15 @@ export class ModelImplRecovery implements IModelSeir {
         return this.parentModel.getRootModel();
     }
 
-    getFirstCompartment(): CompartmentRecovery {
+    getFirstCompartment(): CompartmentImmunity {
         return this.compartmentsRecovery[0];
     }
 
-    getLastCompartment(): CompartmentRecovery {
+    getLastCompartment(): CompartmentImmunity {
         return this.compartmentsRecovery[this.compartmentsRecovery.length - 1];
     }
 
-    getCompartments(): CompartmentRecovery[] {
+    getCompartments(): CompartmentImmunity[] {
         return this.compartmentsRecovery;
     }
 

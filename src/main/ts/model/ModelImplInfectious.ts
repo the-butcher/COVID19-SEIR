@@ -128,14 +128,13 @@ export class ModelImplInfectious implements IModelSeir {
 
                 apply: (modelState: IModelState, dT: number, tT: number) => {
 
-                    // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
                     const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
                     const increments = ModelState.empty();
                     increments.addNrmValue(-continuationValue, sourceCompartment);
                     if (targetCompartment) {
                         increments.addNrmValue(continuationValue, targetCompartment);
                     } else {
-                        // just drop here
+                        // just drop
                     }
                     return increments;
 
@@ -172,6 +171,8 @@ export class ModelImplInfectious implements IModelSeir {
                     increments.addNrmValue(-continuationValue, sourceCompartment);
                     if (targetCompartment) {
                         increments.addNrmValue(continuationValue, targetCompartment);
+                    } else {
+                        increments.addNrmValue(continuationValue, this.parentModel.getRecoveryModel(this.ageGroupIndex).getFirstCompartment());
                     }
 
                     /**

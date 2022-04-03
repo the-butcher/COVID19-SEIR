@@ -220,7 +220,7 @@ export class ControlsStrain {
             max: Math.max(...ModelConstants.RANGE________REEXPOSURE),
             step: 0.1,
             values: [3.0],
-            ticks: [1, 2, 3],
+            ticks: [1, 2, 3, 4],
             label: 'immunity (months)',
             thumbCreateFunction: (index: number) => {
                 const iconSlider = new IconSlider();
@@ -359,23 +359,7 @@ export class ControlsStrain {
 
         console.log('pxPerMonth', pxPerMilli);
 
-        const strain: IModificationValuesStrain = {
-            id: 'temp',
-            key: 'STRAIN',
-            instant: -1,
-            name: 'misc',
-            r0: this.r0,
-            serialInterval: this.serialInterval,
-            intervalScale: this.intervalScale,
-            immuneEscape: this.immuneEscape,
-            timeToWane: this.timeToWane,
-            r0Escaping: this.r0Escaping,
-            dstIncidence: -1,
-            deletable: false,
-            draggable: false,
-            primary: false
-        };
-        const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(strain);
+        const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(this.timeToWane);
         compartmentParams.forEach(compartmentParam => {
 
             console.log('a', compartmentParam.instantA * pxPerMilli, compartmentParam.immunity);

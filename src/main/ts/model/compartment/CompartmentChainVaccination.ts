@@ -19,22 +19,24 @@ export interface ICompartmentParamsRecovery {
  * @author h.fleischer
  * @since 16.05.2021
  */
-export class CompartmentChainRecovery {
+export class CompartmentChainVaccination {
 
     static readonly NO_CONTINUATION = new RationalDurationFixed(0);
 
-    static getInstance(): CompartmentChainRecovery {
-        if (ObjectUtil.isEmpty(this.instanceRecovery)) {
-            this.instanceRecovery = new CompartmentChainRecovery(Weibull.getInstanceRecovery());
+    static getInstance(): CompartmentChainVaccination {
+        if (ObjectUtil.isEmpty(this.instanceVaccination)) {
+            this.instanceVaccination = new CompartmentChainVaccination(Weibull.getInstanceVaccination());
         }
-        return this.instanceRecovery;
+        return this.instanceVaccination;
 
     }
-    private static instanceRecovery: CompartmentChainRecovery;
+    private static instanceVaccination: CompartmentChainVaccination;
 
     private readonly compartmentParams: ICompartmentParamsRecovery[];
 
     constructor(weibull: Weibull) {
+
+        console.log('weibull', weibull);
 
         this.compartmentParams = [];
 
@@ -47,15 +49,13 @@ export class CompartmentChainRecovery {
 
         let shareOfPreSymptomaticInfection1 = 0;
 
-        let density0 = weibull.getNormalizedDensity(0);
-
         compartmentCount = 5;
         normalizedDuration = 1 / compartmentCount; // the duration of each compartment before incubation
         instantA = 0;
         for (let compartmentIndex = 0; compartmentIndex < compartmentCount; compartmentIndex++) {
             instantB = normalizedDuration * (compartmentIndex + 1);
-            immunity = 1 - weibull.getNormalizedDensity((1 - (instantA + instantB) / 2)) / density0;
-            // console.log('wb0', (instantA + instantB) / 2, immunity);
+            immunity = (weibull.getNormalizedDensity((instantA + instantB) / 2) - 0.147) / 1.5687; // 1 - weibull.getNormalizedDensity((1 - (instantA + instantB) / 2)) / density0;
+            //console.log('wb0', (instantA + instantB) / 2, immunity);
             shareOfPreSymptomaticInfection1 += immunity;
             this.compartmentParams.push({
                 type: ECompartmentType.I_INFECTIOUS_A,

@@ -54,7 +54,9 @@ export class ModelImplStrain implements IModelSeir {
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
+            const grpRatio = 1 - ageGroup.getIndex() * 0.075; // 0.55 for oldest (longer ago), 1 for youngest (were vaccinated more recently)
             let absValueRecoveredD = strainValues.primary ? referenceDataRemoved.getRemoved(ageGroup.getName()) * (1 + initialUndetected) : 0;
+            absValueRecoveredD = absValueRecoveredD * grpRatio;
 
             const infectiousModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime);
             this.infectiousModels.push(infectiousModel);
@@ -96,7 +98,7 @@ export class ModelImplStrain implements IModelSeir {
     }
 
     getNrmValueGroup(ageGroupIndex: number): number {
-        return this.infectiousModels[ageGroupIndex].getNrmValue();
+        return this.infectiousModels[ageGroupIndex].getNrmValue() + this.recoveryModels[ageGroupIndex].getNrmValue();
     }
 
     getAbsTotal(): number {
@@ -173,7 +175,9 @@ export class ModelImplStrain implements IModelSeir {
                 nrmESum = 0;
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
 
-                    susceptibility = (compartmentS.getCompartmentType() == ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() == ECompartmentType.R___REMOVED_VI) ? 1 : this.immuneEscape;
+                    // TODO remove once vacc is an 
+                    // susceptibility = (compartmentS.getCompartmentType() == ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() == ECompartmentType.R___REMOVED_VI) ? 1 : this.immuneEscape;
+                    susceptibility = (1 - compartmentS.getImmunity() * (1 - this.immuneEscape)); // (compartmentS.getCompartmentType() == ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() == ECompartmentType.R___REMOVED_VI) ? 1 : this.immuneEscape;
 
                     nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
                     nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk * susceptibility;
@@ -212,28 +216,28 @@ export class ModelImplStrain implements IModelSeir {
             result.add(infectiousModel.apply(state, dT, tT, modificationTime));
         });
 
-        /**
-         * transfer from last infectious compartment to removed (split to discovered and undiscovered)
-         */
-        for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
+        // /**
+        //  * transfer from last infectious compartment to removed (split to discovered and undiscovered)
+        //  */
+        // for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
 
-            const compartmentRemovedD = this.parentModel.getCompartmentRemoved(ageGroupIndex);
+        //     // const compartmentRemovedD = this.parentModel.getCompartmentRemoved(ageGroupIndex);
 
-            const lastInfectiousCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
-            const firstRecoveryCompartment = this.recoveryModels[ageGroupIndex].getFirstCompartment();
+        //     const lastInfectiousCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
+        //     const firstRecoveryCompartment = this.recoveryModels[ageGroupIndex].getFirstCompartment();
 
-            const continuationRate = lastInfectiousCompartment.getContinuationRatio().getRate(dT, tT);
-            const continuationValue = continuationRate * state.getNrmValue(lastInfectiousCompartment);
+        //     const continuationRateInfectious = lastInfectiousCompartment.getContinuationRatio().getRate(dT, tT);
+        //     const continuationValueInfectious = continuationRateInfectious * state.getNrmValue(lastInfectiousCompartment);
 
-            // removal from last infectious happens in infectious model (TODO find a more readable version)
-            result.addNrmValue(continuationValue, compartmentRemovedD);
+        //     // removal from last infectious happens in infectious model (TODO find a more readable version)
+        //     // result.addNrmValue(continuationValue, compartmentRemovedD);
 
-            /**
-             * put into recovery chain (where it should self-continue down the chain)
-             */
-            // result.addNrmValue(continuationValue, firstRecoveryCompartment);
+        //     /**
+        //      * put into recovery chain (where it should self-continue down the chain)
+        //      */
+        //     result.addNrmValue(continuationValueInfectious, firstRecoveryCompartment);
 
-        }
+        // }
 
         /**
          * recovery internal transfer through compartment chain
