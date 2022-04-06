@@ -39,20 +39,27 @@ export class ModificationAdaptor5 {
             const cases = StrainUtil.findCases(stepData[stepData.length - 1], ageGroup);
             const error = cases.base != 0 ? (cases.data / cases.base) - 1 : 0;
             errorsG[ageGroup.getName()] = error;
+            if (!error) {
+                Math.random();
+            }
         });
 
         const prevMultO = modificationSet.modA.getCategoryValue('other');
         const prevMultN = modificationSet.modA.getCategoryValue('nursing');
         const prevMultS = modificationSet.modA.getCategoryValue('school');
 
-        const currMultO = Math.max(0.00, Math.min(1, prevMultO - errorsG['TOTAL'] * errorRatio * 0.75));
-        const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 1.0));
-        const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 1.0));
+        if (!errorsG['TOTAL']) {
+            Math.random();
+        }
+
+        const currMultO = Math.max(0.00, Math.min(1, prevMultO - errorsG['TOTAL'] * errorRatio * 0.50));
+        const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.75));
+        const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 0.75));
 
         const corrections: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             const prevCorrG = modificationSet.modA.getCorrectionValue(ageGroup.getIndex());
-            const currCorrG = Math.max(0.01, Math.min(4, prevCorrG - errorsG[ageGroup.getName()] * errorRatio * 0.10));
+            const currCorrG = Math.max(0.01, Math.min(4, prevCorrG - errorsG[ageGroup.getName()] * errorRatio * 0.90));
             corrections[ageGroup.getName()] = currCorrG;
         });
 

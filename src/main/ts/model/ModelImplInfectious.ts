@@ -7,6 +7,7 @@ import { ObjectUtil } from './../util/ObjectUtil';
 import { TimeUtil } from './../util/TimeUtil';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChainReproduction } from './compartment/CompartmentChainReproduction';
+import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { CompartmentInfectious } from './compartment/CompartmentInfectious';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
@@ -29,6 +30,7 @@ export class ModelImplInfectious implements IModelSeir {
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly ageGroupIndex: number;
+    private readonly ageGroupName: string;
     private readonly ageGroupTotal: number;
 
     private readonly compartmentsInfectiousPrimary: CompartmentInfectious[];
@@ -45,6 +47,7 @@ export class ModelImplInfectious implements IModelSeir {
 
         this.absTotal = demographics.getAbsTotal();
         this.ageGroupIndex = ageGroup.getIndex();
+        this.ageGroupName = ageGroup.getName();
         this.ageGroupTotal = ageGroup.getAbsValue();
 
         // make some assumptions about initial cases (duplicated code in ModelImplIncidence)
@@ -94,7 +97,7 @@ export class ModelImplInfectious implements IModelSeir {
             }
             const dailyActual = dailyTested / modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
-            this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic, `_INF_${ObjectUtil.padZero(chainIndex)}`));
+            this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic, `_INF_${ObjectUtil.padZero(chainIndex)}`));
 
             absCompartmentInfectiousSum += absCompartment;
 
@@ -108,7 +111,7 @@ export class ModelImplInfectious implements IModelSeir {
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
             }
             const compartmentType = incidenceIndex == 0 ? ECompartmentType.X__INCIDENCE_0 : ECompartmentType.X__INCIDENCE_N;
-            this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, strainValues.id, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER____DAY), `_7DI_${ObjectUtil.padZero(incidenceIndex)}`));
+            this.compartmentsIncidence.push(new CompartmentBase(compartmentType, this.absTotal, dailyTested, this.ageGroupIndex, this.ageGroupName, strainValues.id, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER____DAY), `_7DI_${ObjectUtil.padZero(incidenceIndex)}`));
         }
         // console.log('incidenceSum', incidenceSum / 7);
 
@@ -148,18 +151,34 @@ export class ModelImplInfectious implements IModelSeir {
 
     linkCompartmentsInfectious(compartmentsInfectious: CompartmentInfectious[]): void {
 
-        /**
-         * connect infection compartments among each other
-         */
-        for (let compartmentIndex = 0; compartmentIndex < compartmentsInfectious.length; compartmentIndex++) {
+        this.integrationSteps.push({
 
-            const sourceCompartment = compartmentsInfectious[compartmentIndex];
-            const targetCompartment = compartmentsInfectious[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
-            this.integrationSteps.push({
+            apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
 
-                apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
+                const result = ModelState.empty();
 
-                    const increments = ModelState.empty();
+                let nrmRecov = 0;
+                let nrmIncrs: number[] = [];
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsInfectious.length; compartmentIndex++) {
+                    nrmIncrs[compartmentIndex] = 0;
+                }
+
+                const recovCompartment = this.parentModel.getRecoveryModel(this.ageGroupIndex).getFirstCompartment();
+                let sourceIndex: number;
+                let targetIndex: number;
+
+                // console.log(this.ageGroupName + ' s > ' + recovCompartment.getAgeGroupName());
+
+                /**
+                 * connect infection compartments among each other
+                 */
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsInfectious.length; compartmentIndex++) {
+
+                    sourceIndex = compartmentIndex;
+                    targetIndex = compartmentIndex + 1;
+
+                    const sourceCompartment = compartmentsInfectious[compartmentIndex];
+                    const targetCompartment = compartmentsInfectious[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
 
                     // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
                     const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
@@ -168,11 +187,15 @@ export class ModelImplInfectious implements IModelSeir {
                      * move from infectious compartment to next infectious compartment, if any
                      * moving to recovered currently happens in ModelImplRoot (?)
                      */
-                    increments.addNrmValue(-continuationValue, sourceCompartment);
+                    // increments.addNrmValue(-continuationValue, sourceCompartment);
+                    nrmIncrs[sourceIndex] = nrmIncrs[sourceIndex] - continuationValue;
+
                     if (targetCompartment) {
-                        increments.addNrmValue(continuationValue, targetCompartment);
+                        // increments.addNrmValue(continuationValue, targetCompartment);
+                        nrmIncrs[targetIndex] = nrmIncrs[targetIndex] + continuationValue
                     } else {
-                        increments.addNrmValue(continuationValue, this.parentModel.getRecoveryModel(this.ageGroupIndex).getFirstCompartment());
+                        nrmRecov += continuationValue;
+                        // increments.addNrmValue(continuationValue, this.parentModel.getRecoveryModel(this.ageGroupIndex).getFirstCompartment());
                     }
 
                     /**
@@ -180,21 +203,27 @@ export class ModelImplInfectious implements IModelSeir {
                      * only consider cases that have been discovered
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
-
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
                         const discoveredNrmCases = continuationValue * modificationTime.getDiscoveryRatios(this.ageGroupIndex).discovery;
-                        increments.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
-
-
-
+                        result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
                     }
-                    return increments;
 
                 }
 
-            });
+                // let nrmIncrSum = 0;
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsInfectious.length; compartmentIndex++) {
+                    result.addNrmValue(nrmIncrs[compartmentIndex], compartmentsInfectious[compartmentIndex]);
+                    // nrmIncrSum += nrmIncrs[compartmentIndex];
+                }
+                result.addNrmValue(nrmRecov, recovCompartment);
+                // nrmIncrSum += nrmRecov;
 
-        }
+                // console.log('res', result.getNrmValueSum(new CompartmentFilter(c => c.getCompartmentType() != ECompartmentType.X__INCIDENCE_0 && c.getCompartmentType() != ECompartmentType.X__INCIDENCE_N)) * this.getAbsTotal());
+                return result;
+
+            }
+
+        });
 
     }
 

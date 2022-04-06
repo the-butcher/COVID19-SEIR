@@ -1,16 +1,15 @@
-import { TimeUtil } from './../../util/TimeUtil';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
+import { CompartmentChainRecovery } from '../../model/compartment/CompartmentChainRecovery';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { ControlsConstants } from '../gui/ControlsConstants';
+import { IconSlider } from '../gui/IconSlider';
+import { Slider } from '../gui/Slider';
 import { SliderModification } from '../gui/SliderModification';
 import { SliderSetting } from '../gui/SliderSetting';
-import { Controls } from './Controls';
-import { ControlsConstants } from '../gui/ControlsConstants';
 import { StorageUtil } from '../storage/StorageUtil';
-import { Slider } from '../gui/Slider';
-import { IconSlider } from '../gui/IconSlider';
-import { CompartmentChainRecovery } from '../../model/compartment/CompartmentChainRecovery';
-import { CompartmentChainVaccination } from '../../model/compartment/CompartmentChainVaccination';
+import { TimeUtil } from './../../util/TimeUtil';
+import { Controls } from './Controls';
 
 /**
  * controller for editing settings modifications
@@ -109,7 +108,7 @@ export class ControlsSettings {
 
         console.log('pxPerMonth', pxPerMilli);
 
-        const compartmentParams = CompartmentChainVaccination.getInstance().getStrainedCompartmentParams(this.timeToWane);
+        const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(this.timeToWane);
         compartmentParams.forEach(compartmentParam => {
 
             // console.log('a', compartmentParam.instantA * pxPerMilli, compartmentParam.immunity);

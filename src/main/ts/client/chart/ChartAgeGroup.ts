@@ -2,7 +2,9 @@ import { Bullet, CategoryAxis, CategoryAxisDataItem, Column, ColumnSeries, LineS
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
+import { IModificationValuesDiscovery } from "../../common/modification/IModificationValueDiscovery";
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { ModificationResolverDiscovery } from "../../common/modification/ModificationResolverDiscovery";
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
@@ -146,14 +148,12 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupInfectious: ChartAgeGroupSeries;
 
     protected readonly seriesAgeGroupRemovedID: ChartAgeGroupSeries;
-    // protected readonly seriesAgeGroupRemovedIU: ChartAgeGroupSeries;
 
     /**
      * modelled vaccination data
      */
     protected readonly seriesAgeGroupRemovedVI: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupRemovedV2: ChartAgeGroupSeries;
-    // protected readonly seriesAgeGroupRemovedVU: ChartAgeGroupSeries;
 
     /**
      * real data
@@ -165,6 +165,8 @@ export class ChartAgeGroup {
     protected readonly seriesPositivityRateR: ChartAgeGroupSeries; // real test numbers
     protected readonly seriesHospitalizationR: ChartAgeGroupSeries; // real hospitalization (all ages only)
     protected readonly seriesIcuR: ChartAgeGroupSeries; // real icu (all ages only)
+
+    protected readonly seriesMobilityOther: ChartAgeGroupSeries;
 
     private readonly selectedModificationRange: CategoryAxisDataItem;
     private readonly selectedModificationLabel: Label;
@@ -561,10 +563,10 @@ export class ChartAgeGroup {
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
             title: 'vaccinated',
-            baseLabel: 'vaccinated, full',
+            baseLabel: 'vaccinated',
             valueField: 'ageGroupRemovedV2',
             colorKey: 'VACCINATION',
-            strokeWidth: 3,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.05,
             labels: {
@@ -576,25 +578,6 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-        // this.seriesAgeGroupRemovedVU = new ChartAgeGroupSeries({
-        //     chart: this.chart,
-        //     yAxis: this.yAxisPlotPercent,
-        //     title: 'vaccinated, after asymptomatic infection',
-        //     baseLabel: 'vaccinated, after asymptomatic infection',
-        //     valueField: 'ageGroupRemovedVU',
-        //     colorKey: 'VACCINATION',
-        //     strokeWidth: 3,
-        //     dashed: false,
-        //     locationOnPath: 0.20,
-        //     labels: {
-        //         tooltip: true,
-        //         pathtip: true
-        //     },
-        //     stacked: true,
-        //     legend: false,
-        //     labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-        //     seriesConstructor: () => new LineSeries()
-        // });
 
 
         this.seriesAgeGroupRemovedVI = new ChartAgeGroupSeries({
@@ -604,9 +587,9 @@ export class ChartAgeGroup {
             baseLabel: 'immunizing',
             valueField: 'ageGroupRemovedVI',
             colorKey: 'IMMUNIZING',
-            strokeWidth: 3,
+            strokeWidth: 2,
             dashed: false,
-            locationOnPath: 0.05,
+            locationOnPath: 0.25,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -617,54 +600,6 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
-
-        /**
-         * recovered after known infection
-         */
-        this.seriesAgeGroupRemovedID = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'recovered',
-            baseLabel: 'recovered after symptomatic infection',
-            valueField: 'ageGroupRemovedID',
-            colorKey: 'REMOVED',
-            strokeWidth: 3,
-            dashed: false,
-            locationOnPath: 0.15,
-            labels: {
-                tooltip: true,
-                pathtip: true
-            },
-            stacked: true,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-
-        // /**
-        //  * recovered after asymptomatic infection
-        //  */
-        // this.seriesAgeGroupRemovedIU = new ChartAgeGroupSeries({
-        //     chart: this.chart,
-        //     yAxis: this.yAxisPlotPercent,
-        //     title: 'recovered',
-        //     baseLabel: 'recovered after asymptomatic infection',
-        //     valueField: 'ageGroupRemovedIU',
-        //     colorKey: 'REMOVED',
-        //     strokeWidth: 3,
-        //     dashed: false,
-        //     locationOnPath: 0.41,
-        //     labels: {
-        //         tooltip: true,
-        //         pathtip: true
-        //     },
-        //     stacked: true,
-        //     legend: false,
-        //     labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-        //     seriesConstructor: () => new LineSeries()
-        // });
-        // this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedIU);
-        // this.seriesAgeGroupRemovedID.bindToLegend(this.seriesAgeGroupRemovedVU);
 
         this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -673,7 +608,7 @@ export class ChartAgeGroup {
             baseLabel: 'susceptible',
             valueField: 'ageGroupSusceptible',
             colorKey: 'SUSCEPTIBLE',
-            strokeWidth: 3,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.05,
             labels: {
@@ -694,7 +629,7 @@ export class ChartAgeGroup {
             baseLabel: 'exposed',
             valueField: 'ageGroupExposed',
             colorKey: 'EXPOSED',
-            strokeWidth: 3,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.25,
             labels: {
@@ -703,7 +638,7 @@ export class ChartAgeGroup {
             },
             stacked: true,
             legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
         this.seriesAgeGroupInfectious = new ChartAgeGroupSeries({
@@ -713,7 +648,7 @@ export class ChartAgeGroup {
             baseLabel: 'infectious',
             valueField: 'ageGroupInfectious',
             colorKey: 'INFECTIOUS',
-            strokeWidth: 3,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.75,
             labels: {
@@ -722,9 +657,35 @@ export class ChartAgeGroup {
             },
             stacked: true,
             legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2_ABS,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+
+        /**
+         * recovered after known infection
+         */
+        this.seriesAgeGroupRemovedID = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'recovered',
+            baseLabel: 'recovered',
+            valueField: 'ageGroupRemovedID',
+            colorKey: 'REMOVED',
+            strokeWidth: 0,
+            dashed: false,
+            locationOnPath: 0.15,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+
+
 
         /**
          * vaccinated (first)
@@ -800,6 +761,26 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.35,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesMobilityOther = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'mobility, other',
+            baseLabel: 'mobility, other',
+            valueField: 'mobilityOther',
+            colorKey: 'TESTING',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.55,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -1131,7 +1112,7 @@ export class ChartAgeGroup {
         this.columnTemplate = this.seriesHeat.columns.template;
         this.columnTemplate.strokeWidth = 0;
         this.columnTemplate.tooltipText = `{${ChartAgeGroup.FIELD_CATEGORY_X}}, {${ChartAgeGroup.FIELD_CATEGORY_Y}}: {label}`;
-        this.columnTemplate.width = percent(100);
+        this.columnTemplate.width = percent(110);
         this.columnTemplate.height = percent(100);
         this.columnTemplate.events.on('hit', e => {
             const index = e.target.dataItem.dataContext[ChartAgeGroup.FIELD______INDEX];
@@ -1390,6 +1371,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
         this.seriesPositivityRateR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
+        this.seriesMobilityOther.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesHospitalizationR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesIcuR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
 
@@ -1398,10 +1380,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupInfectious.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedID.setSeriesNote(ageGroup.getName());
-        // this.seriesAgeGroupRemovedIU.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVI.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedV2.setSeriesNote(ageGroup.getName());
-        // this.seriesAgeGroupRemovedVU.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR1.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR2.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupRemovedVR3.setSeriesNote(ageGroup.getName());
@@ -1588,14 +1568,12 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.tooltip.disabled = !visible;
         this.setAxisPercentBounds(0, 1);
 
-
         this.seriesAgeGroupSusceptible.setVisible(visible);
         this.seriesAgeGroupRemovedID.setVisible(visible);
-        // this.seriesAgeGroupRemovedIU.setVisible(visible);
 
         this.seriesAgeGroupRemovedVI.setVisible(visible);
         this.seriesAgeGroupRemovedV2.setVisible(visible);
-        // this.seriesAgeGroupRemovedVU.setVisible(visible);
+
         this.seriesAgeGroupRemovedVR1.setVisible(visible);
         this.seriesAgeGroupRemovedVR2.setVisible(visible);
         this.seriesAgeGroupRemovedVR3.setVisible(visible);
@@ -1688,6 +1666,9 @@ export class ChartAgeGroup {
         this.seriesReproductionP.setVisible(visible);
         this.seriesReproductionR.setVisible(visible);
         this.seriesSeasonality.setVisible(visible);
+
+        this.seriesMobilityOther.setVisible(visible);
+
 
     }
 
@@ -1919,6 +1900,7 @@ export class ChartAgeGroup {
         const heatData: any[] = [];
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        const modificationValuesDiscov = Modifications.getInstance().findModificationsByType('TESTING').map(m => m.getModificationValues() as IModificationValuesDiscovery);
 
         let maxGamma = 0;
         const randomVd = Math.random() * 0.00001;
@@ -1933,9 +1915,7 @@ export class ChartAgeGroup {
             const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID___________ALL];;
             const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupRemovedID = dataItem.valueset[ageGroupPlot.getName()].REMOVED_ID;
-            // const ageGroupRemovedIU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_IU;
             const ageGroupRemovedVI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VI;
-            // const ageGroupRemovedVU = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VU;
             const ageGroupRemovedV2 = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V2;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
@@ -1965,9 +1945,7 @@ export class ChartAgeGroup {
                 ageGroupExposed,
                 ageGroupInfectious,
                 ageGroupRemovedID,
-                // ageGroupRemovedIU,
                 ageGroupRemovedVI,
-                // ageGroupRemovedVU,
                 ageGroupRemovedV2,
                 ageGroupIncidence,
                 ageGroupIncidence95L,
@@ -1978,7 +1956,15 @@ export class ChartAgeGroup {
                 ageGroupCasesN,
                 seasonality,
                 reproductionP
-            }
+            };
+
+            // const check = ageGroupRemovedV2 + ageGroupRemovedVI + ageGroupRemovedID + ageGroupSusceptible + ageGroupExposed + ageGroupInfectious;
+            // if (TimeUtil.formatCategoryDateFull(dataItem.instant) === '25.12.2021') {
+            //     console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), check, [
+            //         ageGroupRemovedV2, ageGroupRemovedVI, ageGroupRemovedID, ageGroupSusceptible, ageGroupExposed, ageGroupInfectious
+            //     ]);
+            // }
+
 
             // add one strain value per modification
             modificationValuesStrain.forEach(modificationValueStrain => {
@@ -2063,9 +2049,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupExposed.getSeries().data = plotData;
         this.seriesAgeGroupInfectious.getSeries().data = plotData;
         this.seriesAgeGroupRemovedID.getSeries().data = plotData;
-        // this.seriesAgeGroupRemovedIU.getSeries().data = plotData;
         this.seriesAgeGroupRemovedVI.getSeries().data = plotData;
-        // this.seriesAgeGroupRemovedVU.getSeries().data = plotData;
         this.seriesAgeGroupRemovedV2.getSeries().data = plotData;
         this.seriesAgeGroupIncidence.getSeries().data = plotData;
         this.seriesAgeGroupIncidence95L.getSeries().data = plotData;
@@ -2107,6 +2091,7 @@ export class ChartAgeGroup {
             let icuR = null;
             let ageGroupCasesR = null;
             let reproductionR = null;
+            let mobilityOther = null;
             const dataItem00 = BaseData.getInstance().findBaseDataItem(instant);
             if (dataItem00) {
 
@@ -2122,6 +2107,9 @@ export class ChartAgeGroup {
 
                 ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
                 positivityRateR = dataItem00.getAveragePositivity();
+                mobilityOther = dataItem00.getAverageMobilityOther();
+
+                // positivityRateR = new ModificationResolverDiscovery().getModification(dataItem00.getInstant(), 'INTERPOLATE').getOverall();
                 // if (positivityRateR && !Number.isNaN(positivityRateR)) {
                 //     positivityRateR; // TODO project this into a usable scale
                 // }
@@ -2146,7 +2134,8 @@ export class ChartAgeGroup {
                 hospitalizationR,
                 icuR,
                 ageGroupCasesR,
-                reproductionR
+                reproductionR,
+                mobilityOther
             }
             baseData.push(item);
 
@@ -2179,6 +2168,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidenceR.getSeries().data = baseData;
         this.seriesAgeGroupAverageCasesR.getSeries().data = baseData;
         this.seriesPositivityRateR.getSeries().data = baseData;
+        this.seriesMobilityOther.getSeries().data = baseData;
         this.seriesHospitalizationR.getSeries().data = baseData;
         this.seriesIcuR.getSeries().data = baseData;
         this.seriesAgeGroupCasesR.getSeries().data = baseData;

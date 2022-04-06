@@ -117,15 +117,15 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         const loessModelInput = this.collectLoessModelInput();
 
         this.loessModel01000 = new Loess.default(loessModelInput, {
-            span: 1.00,
-            band: 0.50
-        });
-        this.loessModel00500 = new Loess.default(loessModelInput, {
             span: 0.50,
             band: 0.50
         });
-        this.loessModel00250 = new Loess.default(loessModelInput, {
+        this.loessModel00500 = new Loess.default(loessModelInput, {
             span: 0.25,
+            band: 0.50
+        });
+        this.loessModel00250 = new Loess.default(loessModelInput, {
+            span: 0.125,
             band: 0.50
         });
 

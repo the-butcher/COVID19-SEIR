@@ -83,7 +83,11 @@ export class BaseData {
 
     findBaseDataItem(instant: number, allowExtrapolation?: boolean): IBaseDataItem {
         const normalizedInstant = instant - instant % TimeUtil.MILLISECONDS_PER____DAY;
-        return this.baseDataItems[normalizedInstant] || this.buildBaseDataItem(normalizedInstant, allowExtrapolation);
+        const dataItem = this.baseDataItems[normalizedInstant] || this.buildBaseDataItem(normalizedInstant, allowExtrapolation);
+        if (!dataItem) {
+            Math.random();
+        }
+        return dataItem;
     }
 
 
@@ -245,7 +249,7 @@ export class BaseData {
             multipliers['other'] = 0.2;
 
             // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
-            if (positivityMarker.instant > new Date('2022-03-22').getTime()) {
+            if (positivityMarker.instant > new Date('2022-03-28').getTime()) {
 
                 console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
 

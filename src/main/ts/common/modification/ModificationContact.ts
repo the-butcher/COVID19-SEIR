@@ -8,6 +8,8 @@ import { AModification } from './AModification';
 import { IContactCategories } from './IContactCategories';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesContact } from './IModificationValuesContact';
+import { ModificationRegression } from './ModificationRegression';
+import { Modifications } from './Modifications';
 
 /**
  * implementation of IModification for age-group contact matrix
@@ -44,8 +46,26 @@ export class ModificationContact extends AModification<IModificationValuesContac
     }
 
     setInstants(instantA: number, instantB: number): void {
+
         super.setInstants(instantA, instantB);
         const baseDataItem = BaseData.getInstance().findBaseDataItem(instantA);
+
+        // const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
+        // if (modificationRegression) {
+        //     const multipliers: { [K in string]: number } = {};
+        //     const corrections: { [K in string]: number } = {};
+        //     Demographics.getInstance().getCategories().forEach(category => {
+        //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).regression;
+        //     });
+        //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+        //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).regression;
+        //     });
+        //     this.acceptUpdate({
+        //         multipliers,
+        //         corrections
+        //     });
+        // }
+
         if (baseDataItem) {
             const multipliers: { [K in string]: number } = {};
             const multiplierWork = baseDataItem.getAverageMobilityWork();
@@ -60,6 +80,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
                 multipliers
             });
         }
+
     }
 
     getCategories(): ContactCategory[] {
@@ -81,8 +102,8 @@ export class ModificationContact extends AModification<IModificationValuesContac
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
-        update.multipliers = {...this.modificationValues.multipliers, ...update.multipliers};
-        update.corrections = {...this.modificationValues.corrections, ...update.corrections};
+        update.multipliers = { ...this.modificationValues.multipliers, ...update.multipliers };
+        update.corrections = { ...this.modificationValues.corrections, ...update.corrections };
         super.acceptUpdate(update);
         this.resetValues();
     }
@@ -98,7 +119,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
     logSummary(ageGroupName: string): void {
         const ageGroupContact = this.ageGroups.find(g => g.getName() === ageGroupName);
         console.log('ageGroupContact', ageGroupContact);
-        const summary: { [K: string]: number} = {};
+        const summary: { [K: string]: number } = {};
         let total = 0;
         this.contactCategories.forEach(contactCategory => {
             let sum = 0;

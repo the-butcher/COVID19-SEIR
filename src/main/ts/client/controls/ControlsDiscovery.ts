@@ -74,7 +74,7 @@ export class ControlsDiscovery {
         const bindToOverall = this.iconBoundToTotal.getState();
         this.sliderOverall.setDisabled(!bindToOverall);
 
-        const multipliers: { [K in string] : number } = {};
+        const multipliers: { [K in string]: number } = {};
         let updatedCategories: string[] = [];
         this.slidersDiscovery.forEach(sliderDiscovery => {
             if (sliderDiscovery.getValue() !== this.modification.getCategoryValue(sliderDiscovery.getName())) {
@@ -108,6 +108,8 @@ export class ControlsDiscovery {
 
         this.sliderOverall.setDisabled(!modification.isBoundToTotal());
         this.sliderOverall.setValue(modification.getOverall());
+
+        // console.log('overall', modification);
 
         this.slidersDiscovery.forEach(sliderTesting => {
             sliderTesting.setValue(modification.getCategoryValue(sliderTesting.getName()));

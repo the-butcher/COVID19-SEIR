@@ -58,7 +58,7 @@ export class CompartmentChainRecovery {
             // console.log('wb0', (instantA + instantB) / 2, immunity);
             shareOfPreSymptomaticInfection1 += immunity;
             this.compartmentParams.push({
-                type: ECompartmentType.I_INFECTIOUS_A,
+                type: ECompartmentType.I___INFECTIOUS,
                 immunity: immunity,
                 instantA: instantA,
                 instantB: instantB,

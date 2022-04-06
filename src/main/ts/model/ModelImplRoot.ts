@@ -9,6 +9,7 @@ import { IBaseDataItem } from './basedata/BaseDataItem';
 import { StrainApproximatorBaseData } from './calibration/StrainApproximatorBaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChainReproduction } from './compartment/CompartmentChainReproduction';
+import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { CompartmentImmunity } from './compartment/CompartmentImmunity';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';
@@ -106,7 +107,7 @@ export class ModelImplRoot implements IModelSeir {
             const vaccinationModel = new ModelImplVaccination(this, demographics, modificationTime, 0, absValueV2, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
-            const compartmentSusceptible = new CompartmentImmunity(ECompartmentType.S__SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ModelConstants.STRAIN_ID___________ALL, 0, CompartmentChainReproduction.NO_CONTINUATION, '');
+            const compartmentSusceptible = new CompartmentImmunity(ECompartmentType.S__SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ageGroup.getName(), ModelConstants.STRAIN_ID___________ALL, 0, CompartmentChainReproduction.NO_CONTINUATION, '');
             this.compartmentsSusceptible.push(compartmentSusceptible);
 
         });
@@ -133,30 +134,10 @@ export class ModelImplRoot implements IModelSeir {
             this.strainModels.forEach(strainModel => {
                 this.compartmentsImmunity[ageGroupIndex].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
             });
+            this.compartmentsImmunity[ageGroupIndex].push(...this.vaccinationModels[ageGroupIndex].getCompartments());
             this.compartmentsImmunity[ageGroupIndex].push(this.vaccinationModels[ageGroupIndex].getCompartmentI());
-            this.compartmentsImmunity[ageGroupIndex].push(this.vaccinationModels[ageGroupIndex].getCompartmentV());
         }
         return this.compartmentsImmunity[ageGroupIndex];
-    }
-
-    /**
-     * get all compartments holding immune population, thus loosing immunity over time
-     * @param ageGroupIndex
-     * @returns
-     */
-    getCompartmentsLoosingImmunity(ageGroupIndex: number): CompartmentBase[] {
-        return [
-            this.vaccinationModels[ageGroupIndex].getCompartmentV(),
-        ];
-    }
-
-    /**
-     * get the compartment that contains fully vaccinated people
-     * @param ageGroupIndex the specific age group to get the compartment for
-     * @returns
-     */
-    getCompartmentRemovedV(ageGroupIndex: number): CompartmentBase {
-        return this.vaccinationModels[ageGroupIndex].getCompartmentV();
     }
 
     getNrmValueGroup(ageGroupIndex: number): number {
@@ -205,44 +186,6 @@ export class ModelImplRoot implements IModelSeir {
         return initialState;
     }
 
-    /**
-     * from people previously having gained immunity, return a specific share to susceptible, as immunity vanishes over time
-     * @param state
-     * @param dT
-     * @param tT
-     * @param modificationTime
-     * @returns
-     */
-    applyLossOfImmunity(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
-
-        const result = ModelState.empty();
-
-        /**
-         * have vaccinated population wane back to susceptible, age-group wise
-         */
-        for (let ageGroupIndex = 0; ageGroupIndex < this.compartmentsSusceptible.length; ageGroupIndex++) {
-
-            const compartmentSusceptible = this.compartmentsSusceptible[ageGroupIndex];
-
-            let nrmImmunityLossSum = 0;
-            this.getCompartmentsLoosingImmunity(ageGroupIndex).forEach(compartmentLoosingImmunity => {
-
-                const nrmImmunityLoss = compartmentLoosingImmunity.getContinuationRatio().getRate(dT, tT) * state.getNrmValue(compartmentLoosingImmunity);
-                nrmImmunityLossSum += nrmImmunityLoss;
-
-                // subtract from compartment
-                result.addNrmValue(-nrmImmunityLoss, compartmentLoosingImmunity);
-
-            });
-
-            result.addNrmValue(nrmImmunityLossSum, compartmentSusceptible);
-
-        }
-
-        return result;
-
-    }
-
     applyVaccination(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();
@@ -251,7 +194,7 @@ export class ModelImplRoot implements IModelSeir {
             /**
              * threshold value that keeps compartments from intersecting and doing strange things
              */
-            const minRemain = 500 / this.vaccinationModels[i].getAgeGroupTotal();
+            // const minRemain = 500 / this.vaccinationModels[i].getAgeGroupTotal();
             const vaccinationsPerDay = modificationTime.getVaccinationConfig2(this.vaccinationModels[i].getAgeGroupName());
 
             /**
@@ -262,34 +205,30 @@ export class ModelImplRoot implements IModelSeir {
             const grpJab3T = vaccinationsPerDay.d3 * dT / TimeUtil.MILLISECONDS_PER____DAY;
             const nrmJab1T = grpJab1T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
             const nrmJab2T = grpJab2T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
-            const nrmJab3T = grpJab3T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
+            const nrmJab3Tval = grpJab3T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
 
             /**
              * assumptions about 1st dose
              */
-            const nrmValueSC = Math.max(minRemain, state.getNrmValue(this.compartmentsSusceptible[i])) - minRemain; // susceptible to immunizing
-            const nrmWeight1 = nrmValueSC;
-
-            const nrmJabSI = nrmWeight1 !== 0 ? nrmJab1T * nrmValueSC / nrmWeight1 : 0;
+            const nrmJab1Tmax = state.getNrmValue(this.compartmentsSusceptible[i]); // Math.max(minRemain, state.getNrmValue(this.compartmentsSusceptible[i])) - minRemain; // susceptible to immunizing
+            const nrmJab1Tval = Math.min(nrmJab1Tmax, nrmJab1T);
 
             /**
              * assumptions about 2nd dose
              */
-            const nrmValueVI = Math.max(minRemain, state.getNrmValue(this.vaccinationModels[i].getCompartmentI())) - minRemain; // immunizing to vaccinated (regular second shot)
-            // const nrmValueVU = Math.max(minRemain, state.getNrmValue(this.vaccinationModels[i].getCompartmentU())) - minRemain; // vaccinated to vaccinated
-            const nrmWeight2 = nrmValueVI; // + nrmValueVU;
+            const nrmJab2Tmax = state.getNrmValue(this.vaccinationModels[i].getCompartmentI()); // Math.max(minRemain, state.getNrmValue(this.vaccinationModels[i].getFirstCompartment())) - minRemain; // immunizing to vaccinated (regular second shot)
+            const nrmJab2Tval = Math.min(nrmJab2Tmax, nrmJab2T); // nrmValueVI !== 0 ? nrmJab2T : 0;
 
-            const nrmJabIV = nrmWeight2 !== 0 ? nrmJab2T * nrmValueVI / nrmWeight2 : 0;
+            result.addNrmValue(-nrmJab1Tval, this.compartmentsSusceptible[i]);
+            result.addNrmValue(+nrmJab1Tval, this.vaccinationModels[i].getCompartmentI());
 
-            result.addNrmValue(-nrmJabSI, this.compartmentsSusceptible[i]);
-            result.addNrmValue(+nrmJabSI, this.vaccinationModels[i].getCompartmentI());
-
-            result.addNrmValue(-nrmJabIV, this.vaccinationModels[i].getCompartmentI());
-            result.addNrmValue(+nrmJabIV, this.vaccinationModels[i].getCompartmentV());
+            result.addNrmValue(-nrmJab2Tval, this.vaccinationModels[i].getCompartmentI());
+            result.addNrmValue(+nrmJab2Tval, this.vaccinationModels[i].getFirstCompartment());
 
             // v3 (TODO: find out if the time to re-gain immunity is significant and needs to be modelled)
-            result.addNrmValue(-nrmJab3T, this.compartmentsSusceptible[i]);
-            result.addNrmValue(+nrmJab3T, this.vaccinationModels[i].getCompartmentV());
+            result.addNrmValue(-nrmJab3Tval, this.compartmentsSusceptible[i]);
+            result.addNrmValue(+nrmJab3Tval, this.vaccinationModels[i].getFirstCompartment());
+
 
         }
 
@@ -299,10 +238,14 @@ export class ModelImplRoot implements IModelSeir {
 
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
         const result = this.applyVaccination(state, dT, tT, modificationTime);
-        result.add(this.applyLossOfImmunity(state, dT, tT, modificationTime)); // TODO :: add a series of recovery chains to each strain (so some strains can hold immunity shorter or longer than others)
+        // result.add(this.applyLossOfImmunity(state, dT, tT, modificationTime)); // TODO :: add a series of recovery chains to each strain (so some strains can hold immunity shorter or longer than others)
+        this.vaccinationModels.forEach(vaccinationModel => {
+            result.add(vaccinationModel.apply(state, dT, tT, modificationTime));
+        });
         this.strainModels.forEach(strainModel => {
             result.add(strainModel.apply(state, dT, tT, modificationTime));
         });
+        // console.log('res', result.getNrmValueSum(new CompartmentFilter(c => c.getCompartmentType() != ECompartmentType.X__INCIDENCE_0 && c.getCompartmentType() != ECompartmentType.X__INCIDENCE_N)) * this.getAbsTotal());
         return result;
     }
 

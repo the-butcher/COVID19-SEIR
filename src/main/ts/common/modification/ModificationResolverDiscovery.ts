@@ -37,7 +37,7 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
             });
 
             const fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
-            const multipliers: { [K: string]: number} = {};
+            const multipliers: { [K: string]: number } = {};
             mergedKeys.forEach(key => {
                 const multiplierA = modificationValuesA.multipliers[key];
                 const multiplierB = modificationValuesB.multipliers[key];
@@ -54,12 +54,14 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                 name: 'interpolation',
                 instant,
                 overall,
-                bindToOverall: false,
+                bindToOverall: true,
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),
                 multipliers
             });
+            // console.log('interpolatedModification', interpolatedModification);
+
             return interpolatedModification;
 
         } else {

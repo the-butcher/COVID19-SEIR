@@ -125,7 +125,7 @@ export class ChartAgeGroupSeries {
         //   });
 
         this.series.tooltip.disabled = !params.labels.tooltip;
-        this.seriesLabel.disabled =  !params.labels.pathtip;
+        this.seriesLabel.disabled = !params.labels.pathtip;
 
         this.getSeries().events.on('hidden', () => {
             // console.log('hiding', this.seriesLabel);
@@ -180,7 +180,7 @@ export class ChartAgeGroupSeries {
 
         // this.series.segments.template.interactionsEnabled = stacked;
 
-        this.series.tooltip.disabled = stacked;
+        // this.series.tooltip.disabled = stacked;
 
     }
 

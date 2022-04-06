@@ -1,4 +1,7 @@
+import { BaseData } from '../../model/basedata/BaseData';
 import { ModelConstants, MODIFICATION____KEY } from '../../model/ModelConstants';
+import { StrainUtil } from '../../util/StrainUtil';
+import { TimeUtil } from '../../util/TimeUtil';
 import { ModelInstants } from './../../model/ModelInstants';
 import { IModification } from './IModification';
 import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
@@ -9,6 +12,7 @@ import { IModificationValuesSettings } from './IModificationValuesSettings';
 import { IModificationValuesStrain } from './IModificationValuesStrain';
 import { IModificationValuesTime } from './IModificationValuesTime';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
+import { ModificationDiscovery } from './ModificationDiscovery';
 
 export type IAnyModificationValue = IModificationValuesTime | IModificationValuesContact | IModificationValuesStrain | IModificationValuesDiscovery | IModificationValuesSettings | IModificationValuesDiscovery | IModificationValuesSeasonality | IModificationValuesVaccination;
 
@@ -25,7 +29,7 @@ export class Modifications {
         this.instance = new Modifications();
         modificationValues.forEach(modificationValue => {
             // if (modificationValue.key !== 'TESTING') {
-                this.instance.addModification(ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue));
+            this.instance.addModification(ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue));
             // }
         });
         this.instance.updateModificationInstants();
@@ -94,12 +98,14 @@ export class Modifications {
     }
 
     updateModificationInstants(): void {
+
         this.sortModifications();
+
         Object.keys(ModelConstants.MODIFICATION_PARAMS).forEach((key: MODIFICATION____KEY) => {
             const typedModifications = this.findModificationsByType(key);
             if (typedModifications.length > 0) {
-                for (let i=0; i<typedModifications.length-1; i++) {
-                    typedModifications[i].setInstants(typedModifications[i].getInstantA(), typedModifications[i+1].getInstantA());
+                for (let i = 0; i < typedModifications.length - 1; i++) {
+                    typedModifications[i].setInstants(typedModifications[i].getInstantA(), typedModifications[i + 1].getInstantA());
                 }
                 const lastModification = typedModifications[typedModifications.length - 1];
                 lastModification.setInstants(lastModification.getInstantA(), ModelInstants.getInstance().getMaxInstant());

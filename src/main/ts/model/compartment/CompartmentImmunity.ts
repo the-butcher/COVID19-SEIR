@@ -14,8 +14,8 @@ export class CompartmentImmunity extends CompartmentBase {
 
     private readonly immunity: number;
 
-    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, strainId: string, immunity: number, duration: IRational, chainId: string) {
-        super(compartmentType, absTotal, absValue, ageGroupIndex, strainId, duration, chainId);
+    constructor(compartmentType: ECompartmentType, absTotal: number, absValue: number, ageGroupIndex: number, ageGroupName: string, strainId: string, immunity: number, duration: IRational, chainId: string) {
+        super(compartmentType, absTotal, absValue, ageGroupIndex, ageGroupName, strainId, duration, chainId);
         this.immunity = immunity;
     }
 

@@ -33,8 +33,16 @@ export class StrainUtil {
      * @returns
      */
     static calculateDiscoveryRate(positivityRate: number): number {
-        const trimmedPositivityRate = Math.max(0, positivityRate); // will produce max discovery rate ~0.94
-        return 1 / (trimmedPositivityRate * 300 + 1.25) + 0.17 - trimmedPositivityRate / 10
+        const trimmedPositivityRate = Math.max(0, positivityRate);
+        // return 1 / (trimmedPositivityRate * 300 + 1.25) + 0.17 - trimmedPositivityRate / 10
+
+        // return 1 / (trimmedPositivityRate * 200 + 1.25) + 0.17 - trimmedPositivityRate / 10;
+        // const posA = (0.01 / trimmedPositivityRate) * 1.58437 + 0.15;
+        // const posB = 0.74 - trimmedPositivityRate / 0.175;
+        // return Math.min(posB);
+
+        return 1 / Math.pow(positivityRate * 1.5 + 1, 10);
+
     }
 
     static calculateLatency(serialInterval: number, intervalScale: number) {

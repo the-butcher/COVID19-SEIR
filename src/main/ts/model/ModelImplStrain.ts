@@ -3,6 +3,7 @@ import { IModificationValuesStrain } from '../common/modification/IModificationV
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { BaseData } from './basedata/BaseData';
 import { IBaseDataItem } from './basedata/BaseDataItem';
+import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
@@ -149,6 +150,7 @@ export class ModelImplStrain implements IModelSeir {
         });
         let nrm_ISums: number[] = [];
 
+        let immunity: number;
         let susceptibility: number;
 
         this.nrmExposure = [];
@@ -159,7 +161,7 @@ export class ModelImplStrain implements IModelSeir {
             // calculate a normalized value of infectious individuals
             nrmI = 0
             infectiousModelContact.getCompartments().forEach(compartmentI => {
-                if (compartmentI.getCompartmentType() === ECompartmentType.I_INFECTIOUS_A) {
+                if (compartmentI.getCompartmentType() === ECompartmentType.I___INFECTIOUS) {
                     nrmI += state.getNrmValue(compartmentI) * compartmentI.getReproductionRatio().getRate(dT);
                 }
             });
@@ -175,9 +177,8 @@ export class ModelImplStrain implements IModelSeir {
                 nrmESum = 0;
                 this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
 
-                    // TODO remove once vacc is an 
-                    // susceptibility = (compartmentS.getCompartmentType() == ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() == ECompartmentType.R___REMOVED_VI) ? 1 : this.immuneEscape;
-                    susceptibility = (1 - compartmentS.getImmunity() * (1 - this.immuneEscape)); // (compartmentS.getCompartmentType() == ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() == ECompartmentType.R___REMOVED_VI) ? 1 : this.immuneEscape;
+                    // if there is some immunity, can be treated as immune (escape only), if there is no immunity (immunizing, susceptible), treat as fully susceptible
+                    susceptibility = compartmentS.getImmunity() > 0 ? this.immuneEscape : 1;
 
                     nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
                     nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk * susceptibility;
@@ -196,6 +197,7 @@ export class ModelImplStrain implements IModelSeir {
             });
 
         });
+
 
         // calculate a ratio between infections and exposure to be used by calibration
         this.infectiousModels.forEach(infectiousModelContact => {
@@ -216,35 +218,14 @@ export class ModelImplStrain implements IModelSeir {
             result.add(infectiousModel.apply(state, dT, tT, modificationTime));
         });
 
-        // /**
-        //  * transfer from last infectious compartment to removed (split to discovered and undiscovered)
-        //  */
-        // for (let ageGroupIndex = 0; ageGroupIndex < this.infectiousModels.length; ageGroupIndex++) {
-
-        //     // const compartmentRemovedD = this.parentModel.getCompartmentRemoved(ageGroupIndex);
-
-        //     const lastInfectiousCompartment = this.infectiousModels[ageGroupIndex].getLastCompartment();
-        //     const firstRecoveryCompartment = this.recoveryModels[ageGroupIndex].getFirstCompartment();
-
-        //     const continuationRateInfectious = lastInfectiousCompartment.getContinuationRatio().getRate(dT, tT);
-        //     const continuationValueInfectious = continuationRateInfectious * state.getNrmValue(lastInfectiousCompartment);
-
-        //     // removal from last infectious happens in infectious model (TODO find a more readable version)
-        //     // result.addNrmValue(continuationValue, compartmentRemovedD);
-
-        //     /**
-        //      * put into recovery chain (where it should self-continue down the chain)
-        //      */
-        //     result.addNrmValue(continuationValueInfectious, firstRecoveryCompartment);
-
-        // }
-
         /**
          * recovery internal transfer through compartment chain
          */
         this.recoveryModels.forEach(recoveryModel => {
             result.add(recoveryModel.apply(state, dT, tT, modificationTime));
         });
+
+
 
         return result;
 

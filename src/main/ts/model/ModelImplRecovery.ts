@@ -2,9 +2,11 @@ import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
+import { TimeUtil } from '../util/TimeUtil';
 import { ObjectUtil } from './../util/ObjectUtil';
 import { IBaseDataItem } from './basedata/BaseDataItem';
 import { CompartmentChainRecovery } from './compartment/CompartmentChainRecovery';
+import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { CompartmentImmunity } from './compartment/CompartmentImmunity';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelIntegrationStep } from './IModelIntegrationStep';
@@ -27,6 +29,7 @@ export class ModelImplRecovery implements IModelSeir {
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly ageGroupIndex: number;
+    private readonly ageGroupName: string;
     private readonly ageGroupTotal: number;
 
     private readonly compartmentsRecovery: CompartmentImmunity[];
@@ -41,6 +44,7 @@ export class ModelImplRecovery implements IModelSeir {
 
         this.absTotal = absTotal;
         this.ageGroupIndex = ageGroup.getIndex();
+        this.ageGroupName = ageGroup.getName();
         this.ageGroupTotal = ageGroup.getAbsValue();
 
         const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(strainValues.timeToWane);
@@ -54,14 +58,14 @@ export class ModelImplRecovery implements IModelSeir {
             const duration = compartmentParam.instantB - compartmentParam.instantA;
 
             // const instantC = (compartmentParam.instantA + compartmentParam.instantB) / 2;
-            const absCompartment = 0; // TODO need to find logic for a meaningful prefill of the recovered comparments (but maybe it can work with empty compartments when the model starts in a low incidence situation) 
-            this.compartmentsRecovery.push(new CompartmentImmunity(ECompartmentType.R___REMOVED_ID, this.absTotal, absValue / compartmentParams.length, this.ageGroupIndex, strainValues.id, compartmentParam.immunity, new RationalDurationFixed(duration), `_RCV_${ObjectUtil.padZero(chainIndex)}`));
+            const absCompartment = absValue / compartmentParams.length; // TODO need to find logic for a meaningful prefill of the recovered comparments (but maybe it can work with empty compartments when the model starts in a low incidence situation) 
+            this.compartmentsRecovery.push(new CompartmentImmunity(ECompartmentType.R____RECOVERED, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, strainValues.id, compartmentParam.immunity, new RationalDurationFixed(duration), `_RCV_${ObjectUtil.padZero(chainIndex)}`));
 
             absCompartmentRecoverySum += absCompartment;
 
         }
 
-        this.nrmValue = absValue / this.absTotal;
+        this.nrmValue = absCompartmentRecoverySum / this.absTotal;
         // console.log('incidenceSum', incidenceSum / 7);
 
         /**
@@ -73,38 +77,70 @@ export class ModelImplRecovery implements IModelSeir {
 
     linkCompartmentsRecovery(compartmentsRecovery: CompartmentImmunity[]): void {
 
-        /**
-         * connect infection compartments among each other
-         */
-        for (let compartmentIndex = 0; compartmentIndex < compartmentsRecovery.length; compartmentIndex++) {
 
-            const sourceCompartment = compartmentsRecovery[compartmentIndex];
-            const targetCompartment = compartmentsRecovery[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
-            this.integrationSteps.push({
+        this.integrationSteps.push({
 
-                apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
+            apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
 
-                    const increments = ModelState.empty();
+                const result = ModelState.empty();
 
-                    // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
+                let nrmSuscp = 0;
+                let nrmIncrs: number[] = [];
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsRecovery.length; compartmentIndex++) {
+                    nrmIncrs[compartmentIndex] = 0;
+                }
+
+                const suscptCompartment = this.getRootModel().getCompartmentSusceptible(this.ageGroupIndex);
+                let sourceIndex: number;
+                let targetIndex: number;
+
+                // console.log(this.ageGroupName + ' s > ' + suscptCompartment.getAgeGroupName());
+
+                /**
+                 * connect infection compartments among each other
+                 */
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsRecovery.length; compartmentIndex++) {
+
+                    sourceIndex = compartmentIndex;
+                    targetIndex = compartmentIndex + 1;
+
+                    const sourceCompartment = compartmentsRecovery[compartmentIndex];
+                    const targetCompartment = compartmentsRecovery[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
+
                     const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
 
                     /**
                      * move from recovered compartment to next recovered compartment, if any
                      */
-                    increments.addNrmValue(-continuationValue, sourceCompartment);
+                    // increments.addNrmValue(-continuationValue, sourceCompartment);
+                    nrmIncrs[compartmentIndex] = nrmIncrs[compartmentIndex] - continuationValue;
+
+                    let targetRatio = 0;
+                    let suscptRatio = 1;
                     if (targetCompartment) {
-                        increments.addNrmValue(continuationValue, targetCompartment);
-                    } else {
-                        increments.addNrmValue(continuationValue, this.getRootModel().getCompartmentSusceptible(this.ageGroupIndex));
+
+                        targetRatio = targetCompartment.getImmunity() / sourceCompartment.getImmunity();
+                        suscptRatio = 1 - targetRatio;
+
+                        // increments.addNrmValue(continuationValue * targetRatio, targetCompartment);
+                        nrmIncrs[targetIndex] = nrmIncrs[targetIndex] + continuationValue * targetRatio;
+
                     }
-                    return increments;
+                    nrmSuscp += continuationValue * suscptRatio;
 
                 }
 
-            });
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsRecovery.length; compartmentIndex++) {
+                    result.addNrmValue(nrmIncrs[compartmentIndex], compartmentsRecovery[compartmentIndex]);
+                }
+                result.addNrmValue(nrmSuscp, suscptCompartment);
 
-        }
+                // console.log('res', result.getNrmValueSum(new CompartmentFilter(() => true)) * this.getAbsTotal());
+                return result;
+
+            }
+
+        });
 
     }
 

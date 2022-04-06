@@ -64,7 +64,7 @@ export class CompartmentChainReproduction {
             reproduction = (Weibull.getInstanceReproduction().getNormalizedDistribution(instantB) - Weibull.getInstanceReproduction().getNormalizedDistribution(instantA));
             shareOfPreSymptomaticInfection1 += reproduction;
             this.compartmentParams.push({
-                type: ECompartmentType.I_INFECTIOUS_A,
+                type: ECompartmentType.I___INFECTIOUS,
                 r0: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,
@@ -79,7 +79,7 @@ export class CompartmentChainReproduction {
             instantB = normalizedIncubation + normalizedDuration * compartmentIndex;
             reproduction = (Weibull.getInstanceReproduction().getNormalizedDistribution(instantB) - Weibull.getInstanceReproduction().getNormalizedDistribution(instantA));
             this.compartmentParams.push({
-                type: ECompartmentType.I_INFECTIOUS_A,
+                type: ECompartmentType.I___INFECTIOUS,
                 r0: reproduction,
                 instantA: instantA - normalizedMean,
                 instantB: instantB - normalizedMean,

@@ -1,11 +1,13 @@
 import { AgeGroup } from '../common/demographics/AgeGroup';
 import { Demographics } from '../common/demographics/Demographics';
 import { ModificationTime } from '../common/modification/ModificationTime';
+import { ObjectUtil } from '../util/ObjectUtil';
 import { TimeUtil } from './../util/TimeUtil';
-import { CompartmentBase } from './compartment/CompartmentBase';
+import { CompartmentChainRecovery } from './compartment/CompartmentChainRecovery';
 import { CompartmentChainReproduction } from './compartment/CompartmentChainReproduction';
 import { CompartmentImmunity } from './compartment/CompartmentImmunity';
 import { ECompartmentType } from './compartment/ECompartmentType';
+import { IModelIntegrationStep } from './IModelIntegrationStep';
 import { IModelSeir } from './IModelSeir';
 import { ModelConstants } from './ModelConstants';
 import { ModelImplRoot } from './ModelImplRoot';
@@ -17,6 +19,7 @@ export class ModelImplVaccination implements IModelSeir {
 
     private readonly parentModel: ModelImplRoot;
     private readonly absTotal: number;
+    private readonly nrmValue: number;
 
     private readonly ageGroupIndex: number;
     private readonly ageGroupTotal: number;
@@ -27,15 +30,13 @@ export class ModelImplVaccination implements IModelSeir {
      */
     private readonly compartmentI: CompartmentImmunity;
 
-    /**
-     * pure model based --> amount of re-immunizing at given time
-     */
-    // private readonly compartmentR: CompartmentBase;
+    // /**
+    //  * pure model based --> people fully vaccinated, should be configured to match the vacc_2 curve
+    //  */
+    // private readonly compartmentV: CompartmentImmunity;
 
-    /**
-     * pure model based --> people fully vaccinated, should be configured to match the vacc_2 curve
-     */
-    private readonly compartmentV: CompartmentImmunity;
+    private readonly compartmentsVaccination: CompartmentImmunity[];
+    private integrationSteps: IModelIntegrationStep[];
 
     constructor(parentModel: ModelImplRoot, modelSettings: Demographics, modificationTime: ModificationTime, absValueImmunizing: number, absValueVaccinated: number, ageGroup: AgeGroup) {
 
@@ -45,13 +46,101 @@ export class ModelImplVaccination implements IModelSeir {
         this.ageGroupTotal = ageGroup.getAbsValue();
         this.ageGroupName = ageGroup.getName();
 
-        const durationToReexposable = modificationTime.getReexposure() * TimeUtil.MILLISECONDS_PER____DAY * 30;
+        this.compartmentsVaccination = [];
+        this.integrationSteps = [];
 
-        this.compartmentI = new CompartmentImmunity(ECompartmentType.R___REMOVED_VI, this.absTotal, absValueImmunizing, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, 0, CompartmentChainReproduction.NO_CONTINUATION, '');
-        // this.compartmentR = new CompartmentBase(ECompartmentType.R___REMOVED_VI, this.absTotal, 0, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, new RationalDurationFixed(3 * TimeUtil.MILLISECONDS_PER___WEEK), '');
-        this.compartmentV = new CompartmentImmunity(ECompartmentType.R___REMOVED_V2, this.absTotal, absValueVaccinated, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, 1, new RationalDurationFixed(durationToReexposable), '');
+        const timeToWane = modificationTime.getReexposure();
+        const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(timeToWane);
+        let absCompartmentRecoverySum = 0;
+        for (let chainIndex = 0; chainIndex < compartmentParams.length; chainIndex++) {
+
+            const compartmentParam = compartmentParams[chainIndex];
+            const duration = compartmentParam.instantB - compartmentParam.instantA;
+
+            const absCompartment = absValueVaccinated / compartmentParams.length;
+            this.compartmentsVaccination.push(new CompartmentImmunity(ECompartmentType.R___VACCINATED, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, ObjectUtil.createId(), compartmentParam.immunity, new RationalDurationFixed(duration), `_VAC_${ObjectUtil.padZero(chainIndex)}`));
+
+            absCompartmentRecoverySum += absCompartment;
+
+        }
+        this.linkCompartmentsVaccination(this.compartmentsVaccination);
+
+        this.compartmentI = new CompartmentImmunity(ECompartmentType.R___IMMUNIZING, this.absTotal, absValueImmunizing, this.ageGroupIndex, this.ageGroupName, ModelConstants.STRAIN_ID___________ALL, 0, CompartmentChainReproduction.NO_CONTINUATION, '');
+
+        this.nrmValue = (absCompartmentRecoverySum + absValueImmunizing) / this.absTotal;
 
 
+        // this.compartmentV = new CompartmentImmunity(ECompartmentType.R___REMOVED_V2, this.absTotal, absValueVaccinated, this.ageGroupIndex, ModelConstants.STRAIN_ID___________ALL, 1, new RationalDurationFixed(durationToReexposable), '');
+
+    }
+
+    linkCompartmentsVaccination(compartmentsVaccination: CompartmentImmunity[]): void {
+
+        this.integrationSteps.push({
+
+            apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
+
+                const increments = ModelState.empty();
+
+                let nrmSuscp = 0;
+                let nrmIncrs: number[] = [];
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsVaccination.length; compartmentIndex++) {
+                    nrmIncrs[compartmentIndex] = 0;
+                }
+
+                const suscptCompartment = this.getRootModel().getCompartmentSusceptible(this.ageGroupIndex);
+                let sourceIndex: number;
+                let targetIndex: number;
+
+                // console.log(this.ageGroupName + ' s > ' + suscptCompartment.getAgeGroupName());
+
+                /**
+                 * connect infection compartments among each other
+                 */
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsVaccination.length; compartmentIndex++) {
+
+                    sourceIndex = compartmentIndex;
+                    targetIndex = compartmentIndex + 1;
+
+                    const sourceCompartment = compartmentsVaccination[compartmentIndex];
+                    const targetCompartment = compartmentsVaccination[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
+
+                    // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
+                    const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
+
+                    /**
+                     * move from recovered compartment to next recovered compartment, if any
+                     */
+                    // increments.addNrmValue(-continuationValue, sourceCompartment);
+                    nrmIncrs[compartmentIndex] = nrmIncrs[compartmentIndex] - continuationValue;
+
+                    let targetRatio = 0;
+                    let suscptRatio = 1;
+                    if (targetCompartment) {
+
+                        targetRatio = targetCompartment.getImmunity() / sourceCompartment.getImmunity();
+                        suscptRatio = 1 - targetRatio;
+
+                        // increments.addNrmValue(continuationValue * targetRatio, targetCompartment);
+                        nrmIncrs[targetIndex] = nrmIncrs[targetIndex] + continuationValue * targetRatio;
+
+                    }
+                    nrmSuscp += continuationValue * suscptRatio;
+
+                }
+
+                for (let compartmentIndex = 0; compartmentIndex < compartmentsVaccination.length; compartmentIndex++) {
+                    increments.addNrmValue(nrmIncrs[compartmentIndex], compartmentsVaccination[compartmentIndex]);
+
+                }
+                increments.addNrmValue(nrmSuscp, suscptCompartment);
+
+
+                return increments;
+
+            }
+
+        });
 
     }
 
@@ -63,14 +152,6 @@ export class ModelImplVaccination implements IModelSeir {
         return this.compartmentI;
     }
 
-    /**
-     * pure model based --> people fully vaccinated
-     * @returns 
-     */
-    getCompartmentV(): CompartmentImmunity {
-        return this.compartmentV;
-    }
-
     getNrmValueGroup(ageGroupIndex: number): number {
         return ageGroupIndex === this.ageGroupIndex ? this.getNrmValue() : 0;
     }
@@ -79,47 +160,47 @@ export class ModelImplVaccination implements IModelSeir {
         return this.absTotal;
     }
 
-    getNrmValue(): number {
-        let nrmValue = 0;
-        nrmValue += this.compartmentI.getNrmValue();
-        // nrmValue += this.compartmentU.getNrmValue();
-        nrmValue += this.compartmentV.getNrmValue();
-        return nrmValue;
+    getFirstCompartment(): CompartmentImmunity {
+        return this.compartmentsVaccination[0];
+    }
+    getLastCompartment(): CompartmentImmunity {
+        return this.compartmentsVaccination[this.compartmentsVaccination.length - 1];
+    }
+    getCompartments(): CompartmentImmunity[] {
+        return this.compartmentsVaccination;
     }
 
     getAbsValue(): number {
         return this.getNrmValue() * this.absTotal;
     }
-
+    getNrmValue(): number {
+        return this.nrmValue;
+    }
     getAgeGroupIndex(): number {
         return this.ageGroupIndex;
     }
-
     getAgeGroupTotal(): number {
         return this.ageGroupTotal;
     }
-
     getAgeGroupName(): string {
         return this.ageGroupName;
     }
 
     getInitialState(): IModelState {
         const initialState = ModelState.empty();
+        this.compartmentsVaccination.forEach(compartment => {
+            initialState.addNrmValue(compartment.getNrmValue(), compartment);
+        });
         initialState.addNrmValue(this.compartmentI.getNrmValue(), this.compartmentI);
-        // initialState.addNrmValue(this.compartmentR.getNrmValue(), this.compartmentR);
-        // initialState.addNrmValue(this.compartmentU.getNrmValue(), this.compartmentU);
-        initialState.addNrmValue(this.compartmentV.getNrmValue(), this.compartmentV);
         return initialState;
     }
 
-    /**
-     * @param state handle internal transfer (vaccination1 to vaccination2)
-     * @param dT
-     * @param tT
-     * @returns
-     */
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
-        return ModelState.empty();
+        const result = ModelState.empty();
+        this.integrationSteps.forEach(integrationStep => {
+            result.add(integrationStep.apply(state, dT, tT, modificationTime));
+        });
+        return result;
     }
 
 }

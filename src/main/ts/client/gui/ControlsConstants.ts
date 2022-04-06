@@ -44,7 +44,7 @@ export interface IControlsDefinitions {
     handleModificationUpdate: () => Promise<void>;
     handleModificationDrag: (instant: number) => void;
     showInEditor?: (modification: IModification<IModificationValues>) => void;
-    getModificationResolver(): IModificationResolver<IModificationValues,IModification<IModificationValues>>;
+    getModificationResolver(): IModificationResolver<IModificationValues, IModification<IModificationValues>>;
     labellingDefinition: ILabellingDefinition;
 }
 
@@ -113,7 +113,7 @@ export class ControlsConstants {
         format: value => value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)
     }
 
-    static readonly COLORS: {[K in COMPARTMENT__COLORS]:string} = {
+    static readonly COLORS: { [K in COMPARTMENT__COLORS]: string } = {
         'SUSCEPTIBLE': '#515f6c',
         'IMMUNIZING': '#516c63',
         'EXPOSED': '#bb890c',
@@ -141,7 +141,7 @@ export class ControlsConstants {
         getHeatColor: (value) => new Color(0.0, 0.0, Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex()
     }
 
-    static readonly HEATMAP_DATA_PARAMS: {[K in CHART_MODE______KEY]: IHeatmapChartDefinition} = {
+    static readonly HEATMAP_DATA_PARAMS: { [K in CHART_MODE______KEY]: IHeatmapChartDefinition } = {
         'INCIDENCE': {
             id: ObjectUtil.createId(),
             title: 'Incidence',
@@ -162,9 +162,9 @@ export class ControlsConstants {
         'VACCINATED': {
             id: ObjectUtil.createId(),
             title: 'Compartments',
-            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].SUSCEPTIBLE,
+            getHeatValue: (dataItem, ageGroupName) => 1 - dataItem.valueset[ageGroupName].SUSCEPTIBLE,
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.54, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.54, Math.min(0.75, value * 0.25), value * 0.75).getHex(), //  Math.min(1.0, (10 + Math.round(value * 90)) / 100)
             getHeatMax: () => 1,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
@@ -248,7 +248,7 @@ export class ControlsConstants {
         }
     }
 
-    static readonly MODIFICATION_PARAMS: {[K in MODIFICATION____KEY]: IControlsDefinitions} = {
+    static readonly MODIFICATION_PARAMS: { [K in MODIFICATION____KEY]: IControlsDefinitions } = {
         'TIME': {
             icon: 'M 4.62 3.25 H 4.62 L 3.62 4.5 A 0.8 0.8 90 0 1 2.5 4.63 H 2.5 L -0.85 2.14 A 2 2 90 0 1 -1.6 0.58 V -7.2 A 0.8 0.8 90 0 1 -0.8 -8 H 0.8 A 0.8 0.8 90 0 1 1.6 -7.2 V 0 L 4.5 2.13 A 0.8 0.8 90 0 1 4.62 3.25 Z',
             container: 'modificationTimeDiv',
@@ -278,7 +278,7 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverStrain();
             },
-            handleModificationDrag: () => {},
+            handleModificationDrag: () => { },
             showInEditor: modification => ControlsStrain.getInstance().acceptModification(modification as ModificationStrain),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2
         },
@@ -291,7 +291,7 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverContact();
             },
-            handleModificationDrag: () => {},
+            handleModificationDrag: () => { },
             showInEditor: modification => ControlsContact.getInstance().acceptModification(modification as ModificationContact),
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -304,7 +304,7 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverDiscovery();
             },
-            handleModificationDrag: () => {},
+            handleModificationDrag: () => { },
             showInEditor: modification => {
                 ControlsDiscovery.getInstance().acceptModification(modification as ModificationDiscovery);
                 ChartAgeGroup.getInstance().setChartMode('TESTING');
@@ -320,7 +320,7 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverVaccination();
             },
-            handleModificationDrag: () => {},
+            handleModificationDrag: () => { },
             showInEditor: modification => {
                 ControlsVaccination.getInstance().acceptModification(modification as ModificationVaccination);
                 ChartAgeGroup.getInstance().setChartMode('VACCINATED');
@@ -333,7 +333,7 @@ export class ControlsConstants {
             handleModificationUpdate: () => {
                 return ModelTask.commit('SEASONALITY', ControlsConstants.createWorkerInput());
             },
-            handleModificationDrag: () => {},
+            handleModificationDrag: () => { },
             getModificationResolver: () => {
                 return new ModificationResolverSeasonality();
             },
@@ -352,7 +352,7 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverRegression();
             },
-            handleModificationDrag: () => {},
+            handleModificationDrag: () => { },
             showInEditor: modification => {
                 ChartAgeGroup.getInstance().setChartMode('CONTACT');
                 ControlsRegression.getInstance().acceptModification(modification as ModificationRegression);
@@ -368,7 +368,7 @@ export class ControlsConstants {
             getModificationResolver: () => {
                 return new ModificationResolverSettings();
             },
-            handleModificationDrag: () => {},
+            handleModificationDrag: () => { },
             showInEditor: modification => ControlsSettings.getInstance().acceptModification(modification as ModificationSettings),
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED
         }

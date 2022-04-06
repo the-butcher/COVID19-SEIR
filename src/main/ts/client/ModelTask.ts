@@ -34,7 +34,7 @@ export class ModelTask {
     private static worker: ModelWorker;
 
     private static fitterParams: IFitterParams = {
-        maxErrorTolerance: 0.20,
+        maxErrorTolerance: 0.40,
         curErrorCalculate: Number.MAX_VALUE
     }
 
@@ -78,7 +78,7 @@ export class ModelTask {
                 ModelTask.fitterParams = modelProgress.fitterParams;
                 if (QueryUtil.getInstance().getWorkerMode() === 'REBUILDING') {
                     document.title = `COVID19-SEIR (${ModelTask.fitterParams.maxErrorTolerance.toFixed(4)}) - ${ModelTask.fitterParams.currDateCalculate}`;
-                }                   
+                }
 
                 /**
                  * restore any values that may have been altered in the worker
@@ -93,7 +93,7 @@ export class ModelTask {
                     });
                     StorageUtil.getInstance().setSaveRequired(true);
                 });
-             
+
 
                 // if (modelProgress.modificationValuesRegression) {
                 //     const modificationRegression = Modifications.getInstance().findModificationById(modelProgress.modificationValuesRegression.id) as ModificationRegression;
@@ -106,7 +106,7 @@ export class ModelTask {
                 if (QueryUtil.getInstance().getWorkerMode() === 'REBUILDING') {
                     setTimeout(() => {
                         // ChartAgeGroup.getInstance().exportToPng().then(() => {
-                            ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
+                        ModelTask.commit('CONTACT', ControlsConstants.createWorkerInput());
                         // });
                     }, 100);
                 }
