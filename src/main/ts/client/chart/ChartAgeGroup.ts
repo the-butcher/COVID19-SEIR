@@ -4,7 +4,6 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesDiscovery } from "../../common/modification/IModificationValueDiscovery";
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { ModificationResolverDiscovery } from "../../common/modification/ModificationResolverDiscovery";
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
@@ -288,30 +287,6 @@ export class ChartAgeGroup {
 
         this.selectedModificationRange.bullet = multilayerBullet;
 
-
-        // this.selectedModificationRange.label.text = 'here';
-        // this.selectedModificationRange.label.fontFamily = ControlsConstants.FONT_FAMILY;
-        // this.selectedModificationRange.label.fontSize = ControlsConstants.FONT_SIZE - 2;
-        // this.selectedModificationRange.label.strokeOpacity = 0;
-        // this.selectedModificationRange.label.fillOpacity = 1;
-
-        // // this.selectedModificationRange.label.dx = -7;
-        // this.selectedModificationRange.label.y = -400;
-        // this.selectedModificationRange.label.valign = 'top';
-
-        // this.selectedModificationRange.label.adapter.add('dy', (value, target) => {
-        //     target.measure();
-        //     console.log(target.measuredHeight, this.chart.plotContainer.contentHeight, value);
-        //     return - this.chart.plotContainer.contentHeight;
-        // });        
-
-        // this.selectedModificationRange.label.inside = true;
-        // this.selectedModificationRange.label.padding(0, 0, 5, 0);
-        // this.selectedModificationRange.label.adapter.add('y', (value, target) => {
-        //     // target.measure();
-        //     return target.measuredHeight - this.chart.plotContainer.contentHeight + 4;
-        // });
-
         this.yAxisPlotAbsolute = this.chart.yAxes.push(new ValueAxis());
         ChartUtil.getInstance().configureAxis(this.yAxisPlotAbsolute, 'population');
         this.yAxisPlotAbsolute.tooltip.exportable = false;
@@ -559,6 +534,7 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupIncidenceByStrain = new Map();
 
+        const vaccSeriesColor = '#000000';
         this.seriesAgeGroupRemovedV2 = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
@@ -566,18 +542,19 @@ export class ChartAgeGroup {
             baseLabel: 'vaccinated',
             valueField: 'ageGroupRemovedV2',
             colorKey: 'VACCINATION',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.05,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesAgeGroupRemovedV2.getSeries().stroke = color(vaccSeriesColor);
 
 
         this.seriesAgeGroupRemovedVI = new ChartAgeGroupSeries({
@@ -587,18 +564,19 @@ export class ChartAgeGroup {
             baseLabel: 'immunizing',
             valueField: 'ageGroupRemovedVI',
             colorKey: 'IMMUNIZING',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.25,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesAgeGroupRemovedVI.getSeries().stroke = color(vaccSeriesColor);
 
 
         this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
@@ -608,18 +586,19 @@ export class ChartAgeGroup {
             baseLabel: 'susceptible',
             valueField: 'ageGroupSusceptible',
             colorKey: 'SUSCEPTIBLE',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.05,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesAgeGroupSusceptible.getSeries().stroke = color(vaccSeriesColor);
         this.seriesAgeGroupSusceptible.bindToLegend(this.seriesAgeGroupRemovedVI);
 
         this.seriesAgeGroupExposed = new ChartAgeGroupSeries({
@@ -629,18 +608,20 @@ export class ChartAgeGroup {
             baseLabel: 'exposed',
             valueField: 'ageGroupExposed',
             colorKey: 'EXPOSED',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.25,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesAgeGroupExposed.getSeries().stroke = color(vaccSeriesColor);
+
         this.seriesAgeGroupInfectious = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
@@ -648,18 +629,19 @@ export class ChartAgeGroup {
             baseLabel: 'infectious',
             valueField: 'ageGroupInfectious',
             colorKey: 'INFECTIOUS',
-            strokeWidth: 2,
+            strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.75,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesAgeGroupInfectious.getSeries().stroke = color(vaccSeriesColor);
 
         /**
          * recovered after known infection
@@ -676,14 +658,14 @@ export class ChartAgeGroup {
             locationOnPath: 0.15,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: true,
             legend: true,
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
-
+        // no need to switch to black, should not have stroke at all
 
 
 
@@ -1577,6 +1559,9 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedVR1.setVisible(visible);
         this.seriesAgeGroupRemovedVR2.setVisible(visible);
         this.seriesAgeGroupRemovedVR3.setVisible(visible);
+        this.seriesAgeGroupRemovedVR1.getSeries().visible = false;
+        this.seriesAgeGroupRemovedVR2.getSeries().visible = false;
+        this.seriesAgeGroupRemovedVR3.getSeries().visible = false;
 
     }
 

@@ -20,6 +20,7 @@ module.exports = {
     main__ts: "./src/main/ts/main.ts",
     work__ts: "./src/main/ts/work.ts",
     main_css: "./src/main/webapp/css/main.css",
+    mort__ts: "./src/main/ts/mort.ts",
   },
   output: {
     path: $path.join(__dirname, "dist"),
@@ -128,6 +129,18 @@ module.exports = {
 
     new HtmlWebPackPlugin({
       title: "COVID19-SEIR",
+      template: "./src/main/webapp/mortality.html",
+      filename: "./mortality.html",
+      chunksSortMode: "none",
+      //hash: true,
+      chunks: [
+        "mort__ts",
+        "main_css"
+      ],
+      inlineSource: ".(css)$"
+    }),
+    new HtmlWebPackPlugin({
+      title: "COVID19-SEIR",
       template: "./src/main/webapp/index.html",
       filename: "./index.html",
       chunksSortMode: "none",
@@ -154,11 +167,15 @@ module.exports = {
         { from: './src/main/webapp/data/default-config.json', to: 'data/default-config.json' },
         { from: './src/main/webapp/data/heatmap-data-at.json', to: 'data/heatmap-data-at.json' },
         { from: './src/main/webapp/data/demographics-at.json', to: 'data/demographics-at.json' },
-        { from: './src/main/webapp/data/default-config-salzburg.json', to: 'data/default-config-salzburg.json' },
-        // { from: './src/main/webapp/data/heatmap-data-at-salzburg.json', to: 'data/heatmap-data-at-salzburg.json' },
-        // { from: './src/main/webapp/data/demographics-at-salzburg.json', to: 'data/demographics-at-salzburg.json' },
+        // { from: './src/main/webapp/data/mortality-data-at.json', to: 'data/mortality-data-at.json' },
         { from: './src/main/webapp/assets/icon_192.png', to: 'assets/icon_192.png' },
         { from: './src/main/webapp/assets/favicon.png', to: 'assets/favicon.png' },
+        {
+          from: "./src/main/webapp/data/mortality-*.json",
+          to({ context, absoluteFilename }) {
+            return "data/[name][ext]";
+          },
+        },
       ]
     }),
 

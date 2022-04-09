@@ -70,7 +70,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
             const multipliers: { [K in string]: number } = {};
             const multiplierWork = baseDataItem.getAverageMobilityWork();
             if (multiplierWork) {
-                multipliers['work'] = multiplierWork * 0.60;
+                multipliers['work'] = multiplierWork * 0.90;
             }
             const multiplierHome = baseDataItem.getAverageMobilityHome();
             if (multiplierHome) {

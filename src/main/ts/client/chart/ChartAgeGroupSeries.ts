@@ -1,5 +1,5 @@
 import { LineSeries, StepLineSeries, ValueAxis, XYChart } from "@amcharts/amcharts4/charts";
-import { Label, useTheme } from "@amcharts/amcharts4/core";
+import { color, Label, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { COMPARTMENT__COLORS, ControlsConstants } from '../gui/ControlsConstants';
@@ -92,15 +92,14 @@ export class ChartAgeGroupSeries {
         this.series.sequencedInterpolation = false;
 
         this.series.hiddenInLegend = true; // !params.legend;
-        this.setStacked(params.stacked);
         this.series.strokeWidth = params.strokeWidth;
         if (params.dashed) {
             this.series.strokeDasharray = params.strokeWidth * 2 + ',' + params.strokeWidth * 2;
         }
-        // this.series.strokeOpacity = 1.0;
         this.series.fontFamily = ControlsConstants.FONT_FAMILY;
         this.series.fontSize = ControlsConstants.FONT_SIZE;
         ChartUtil.getInstance().configureAgeGroupSeries(this, ControlsConstants.COLORS[params.colorKey], true);
+        this.setStacked(params.stacked); // needs to come after basic series config
 
         if (this.series instanceof LineSeries) {
             (this.series as LineSeries).adapter.add('tooltipText', (value, target) => {
@@ -174,9 +173,12 @@ export class ChartAgeGroupSeries {
 
         this.series.stacked = stacked;
 
-        this.series.stacked = stacked;
         this.series.fillOpacity = stacked ? 0.7 : 0.0;
-        this.series.strokeOpacity = 1.0;
+        // if (stacked) {
+        //     this.series.strokeWidth = 1.0;
+        //     this.series.strokeOpacity = 1.0;
+        //     // this.series.stroke = color('#000000');
+        // }
 
         // this.series.segments.template.interactionsEnabled = stacked;
 

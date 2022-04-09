@@ -125,7 +125,7 @@ export class ControlsConstants {
         'DEAD': '#0e1d22',
         'INCIDENCE': '#bbbbbb', // '#df5f5f',
         'CASES': '#666666', // '#acb00b',
-        'TIME': '#aaaaaa',
+        'TIME': '#aaaaaa', // '#aaaaaa',
         'STRAIN': '#b012bb',
         'CONTACT': '#f43f3f',
         'TESTING': '#29c437',
