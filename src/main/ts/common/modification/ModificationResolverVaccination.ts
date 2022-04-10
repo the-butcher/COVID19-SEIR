@@ -32,21 +32,25 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
             const v1A = modificationRegression.getVaccinationRegression(instantA, ageGroup.getName(), 'v1').regression;
             const v2A = modificationRegression.getVaccinationRegression(instantA, ageGroup.getName(), 'v2').regression;
             const v3A = modificationRegression.getVaccinationRegression(instantA, ageGroup.getName(), 'v3').regression;
+            const v4A = modificationRegression.getVaccinationRegression(instantA, ageGroup.getName(), 'v4').regression;
 
             const v1B = modificationRegression.getVaccinationRegression(instantB, ageGroup.getName(), 'v1').regression;
             const v2B = modificationRegression.getVaccinationRegression(instantB, ageGroup.getName(), 'v2').regression;
             const v3B = modificationRegression.getVaccinationRegression(instantB, ageGroup.getName(), 'v3').regression;
+            const v4B = modificationRegression.getVaccinationRegression(instantB, ageGroup.getName(), 'v4').regression;
 
             vaccinations[ageGroup.getName()] = {
                 v1: v1A,
                 v2: v2A,
                 v3: v3A,
+                v4: v4A,
                 d1: v1B - v1A,
                 d2: v2B - v2A,
-                d3: v3B - v3A
-            }                
+                d3: v3B - v3A,
+                d4: v4B - v4A
+            }
 
-        });        
+        });
 
         const id = ObjectUtil.createId();
         const modificationValues: IModificationValuesVaccination = {
@@ -65,7 +69,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
 
         return modificationValues;
 
-    }    
+    }
 
     createInterpolatedInstance(instant: number, modificationA: ModificationVaccination, modificationB: ModificationVaccination): IModificationValuesVaccination {
 
@@ -83,9 +87,11 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
                 v1: vaccinationsA.v1,
                 v2: vaccinationsA.v2,
                 v3: vaccinationsA.v3,
+                v4: vaccinationsA.v4,
                 d1: (vaccinationsB.v1 - vaccinationsA.v1) / daysAB,
                 d2: (vaccinationsB.v2 - vaccinationsA.v2) / daysAB,
-                d3: (vaccinationsB.v3 - vaccinationsA.v3) / daysAB
+                d3: (vaccinationsB.v3 - vaccinationsA.v3) / daysAB,
+                d4: (vaccinationsB.v4 - vaccinationsA.v4) / daysAB
             }
         });
 
@@ -114,9 +120,11 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
                 v1: vaccinationsA.v1,
                 v2: vaccinationsA.v2,
                 v3: vaccinationsA.v3,
+                v4: vaccinationsA.v4,
                 d1: 0,
                 d2: 0,
-                d3: 0
+                d3: 0,
+                d4: 0
             }
         });
 
@@ -142,7 +150,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
 
         const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
         if (modificationRegression && instant > modificationRegression.getInstantA()) { // in the prediction range?
-            modificationValues = this.createRegressionModification(instant, modificationRegression);        
+            modificationValues = this.createRegressionModification(instant, modificationRegression);
         } else if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) { // fetchType === 'CREATE' &&
             modificationValues = this.createInterpolatedInstance(instant, modificationA, modificationB);
         } else {

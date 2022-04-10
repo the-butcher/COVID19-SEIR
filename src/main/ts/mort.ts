@@ -43,7 +43,7 @@ dateAxis.baseInterval = { timeUnit: "day", count: 1 };
 
 let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 valueAxis.min = 0;
-valueAxis.max = 45;
+valueAxis.max = 50;
 valueAxis.tooltip.disabled = true;
 valueAxis.title.text = "Sterblichkeit / Woche / 100.000";
 
@@ -144,7 +144,7 @@ chartTitle.dx = -200;
 chartTitle.exportable = true;
 
 let dateTitle = titleContainer.createChild(am4core.Label);
-dateTitle.text = `@FleischerHannes, ${TimeUtil.formatCategoryDateFull(Date.now())} - https://www.statistik.at`;
+dateTitle.text = `@FleischerHannes, ${TimeUtil.formatCategoryDateFull(Date.now())} - https://ec.europa.eu/eurostat`; // https://www.statistik.at;
 dateTitle.align = "right";
 dateTitle.dy = 2;
 dateTitle.dx = -40;
@@ -200,7 +200,7 @@ const createRange = (date1: Date, date2: Date, text: string, opacity: number) =>
 
 // https://www.kleinezeitung.at/politik/innenpolitik/6056751/Lockdowns-und-Lockerungen_Chronologie-der-Pandemie
 
-let postFix = '-5';
+let postFix = '-ES';
 
 /**
  * 1 - Burgenland - ältestes Bundesland - breites Intervall Q1 - trotzdem bei Wildtyp am Rand CI97 - Übersterblichkeit waährend Lockdown Ost
@@ -214,16 +214,16 @@ let postFix = '-5';
  * 9 - Wien - jüngestes Bundesland - Übersterblichkeit währen Lockdown Ost (nur wien und burgenland)
  */
 
-createRange(new Date('2020-03-16'), new Date('2020-05-01'), 'Lockdown I', 0.15);
-createRange(new Date('2020-11-17'), new Date('2020-12-07'), 'Lockdown II', 0.15);
-createRange(new Date('2020-12-26'), new Date('2021-02-21'), 'Lockdown III', 0.15);
+// createRange(new Date('2020-03-16'), new Date('2020-05-01'), 'Lockdown I', 0.15);
+// createRange(new Date('2020-11-17'), new Date('2020-12-07'), 'Lockdown II', 0.15);
+// createRange(new Date('2020-12-26'), new Date('2021-02-21'), 'Lockdown III', 0.15);
 if (postFix === '-1' || postFix === '-3' || postFix === '-9') {
     createRange(new Date('2021-04-01'), new Date('2021-05-03'), 'Lockdown Ost', 0.15);
 } else if (postFix === '') {
     createRange(new Date('2021-04-01'), new Date('2021-05-03'), 'Lockdown Ost', 0.08);
 }
-createRange(new Date('2021-11-22'), new Date('2021-12-12'), 'Lockdown IV', 0.10);
-createRange(new Date('2021-11-15'), new Date('2022-02-31'), 'Lockdown ungeimpft', 0.10);
+// createRange(new Date('2021-11-22'), new Date('2021-12-12'), 'Lockdown IV', 0.10);
+// createRange(new Date('2021-11-15'), new Date('2022-02-31'), 'Lockdown ungeimpft', 0.10);
 
 // burgenland
 if (postFix === '-1') {
@@ -257,7 +257,7 @@ document.addEventListener('keyup', e => {
     }
 });
 
-new JsonLoader().load('/data/mortality-data-at' + postFix + '.json').then(rawData => {
+new JsonLoader().load('/data/mortality-data-eu' + postFix + '.json').then(rawData => {
 
     chartTitle.text = rawData.name;
     seriesAvg.name = `Sterblichkeit ${rawData.minYear}-${rawData.maxYear} / CI68 / CI95`;

@@ -109,7 +109,8 @@ export class ModelConstants {
                     vaccinations[ageGroup.getName()] = {
                         v1: 0,
                         v2: 0,
-                        v3: 0
+                        v3: 0,
+                        v4: 0
                     }
                 });
                 return new ModificationVaccination({

@@ -41,7 +41,7 @@ export class StrainUtil {
         // const posB = 0.74 - trimmedPositivityRate / 0.175;
         // return Math.min(posB);
 
-        return 1 / Math.pow(positivityRate * 1.5 + 1, 10);
+        return Math.pow(positivityRate * 1.5 + 1, -10);
 
     }
 

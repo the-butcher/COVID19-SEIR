@@ -1,6 +1,7 @@
 import { BaseData } from '../../model/basedata/BaseData';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { TimeUtil } from '../../util/TimeUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
 import { Demographics } from './../demographics/Demographics';
@@ -55,11 +56,12 @@ export class ModificationContact extends AModification<IModificationValuesContac
         //     const multipliers: { [K in string]: number } = {};
         //     const corrections: { [K in string]: number } = {};
         //     Demographics.getInstance().getCategories().forEach(category => {
-        //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).regression;
+        //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).loess.y;
         //     });
         //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-        //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).regression;
+        //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).loess.y;
         //     });
+        //     console.log(TimeUtil.formatCategoryDateFull(this.modificationValues.instant), modificationRegression, multipliers, corrections);
         //     this.acceptUpdate({
         //         multipliers,
         //         corrections

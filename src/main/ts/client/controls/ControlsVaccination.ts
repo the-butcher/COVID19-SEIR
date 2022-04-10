@@ -39,13 +39,14 @@ export class ControlsVaccination {
 
         // TODO it must be ensured that a modification can not have lower values than a previous modification
 
-        const vaccinations: { [K in string] : IVaccinationConfig2 } = {};
+        const vaccinations: { [K in string]: IVaccinationConfig2 } = {};
 
         this.slidersVaccination.forEach(sliderVaccination => {
             vaccinations[sliderVaccination.getName()] = {
-                v1: sliderVaccination.getValue(2),
-                v2: sliderVaccination.getValue(1),
-                v3: sliderVaccination.getValue(0)
+                v1: sliderVaccination.getValue(3),
+                v2: sliderVaccination.getValue(2),
+                v3: sliderVaccination.getValue(1),
+                v4: sliderVaccination.getValue(0)
             };
         });
 
@@ -66,9 +67,10 @@ export class ControlsVaccination {
 
         this.slidersVaccination.forEach(sliderVaccination => {
             const vaccinations = this.modification.getVaccinationConfig2(sliderVaccination.getName());
-            sliderVaccination.setValue(2, vaccinations.v1);
-            sliderVaccination.setValue(1, vaccinations.v2);
-            sliderVaccination.setValue(0, vaccinations.v3);
+            sliderVaccination.setValue(3, vaccinations.v1);
+            sliderVaccination.setValue(2, vaccinations.v2);
+            sliderVaccination.setValue(1, vaccinations.v3);
+            sliderVaccination.setValue(0, vaccinations.v4);
         });
 
         requestAnimationFrame(() => {

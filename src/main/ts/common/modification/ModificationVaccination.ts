@@ -32,6 +32,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
                     v1: baseDataItem.getVacc1(ageGroup.getName()) / ageGroup.getAbsValue(),
                     v2: baseDataItem.getVacc2(ageGroup.getName()) / ageGroup.getAbsValue(),
                     v3: baseDataItem.getVacc3(ageGroup.getName()) / ageGroup.getAbsValue(),
+                    v4: 0
                 }
             });
             this.acceptUpdate({
@@ -41,7 +42,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
     }
 
     acceptUpdate(update: Partial<IModificationValuesVaccination>): void {
-        this.modificationValues = {...this.modificationValues, ...update};
+        this.modificationValues = { ...this.modificationValues, ...update };
     }
 
     getVaccinationConfig2(ageGroup: string): IVaccinationConfig2 {

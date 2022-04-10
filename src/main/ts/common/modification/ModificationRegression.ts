@@ -24,7 +24,7 @@ import { ModificationVaccination } from './ModificationVaccination';
  */
 export class ModificationRegression extends AModification<IModificationValuesRegression> {
 
-    static readonly VACC_KEYS = ['v1', 'v2', 'v3'];
+    static readonly VACC_KEYS = ['v1', 'v2', 'v3', 'v4'];
 
     private multiplierRegressions: { [K in string]: ValueRegressionMultiplier };
     private correctionRegressions: { [K in string]: ValueRegressionCorrection };
@@ -252,7 +252,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 this.vaccinationRegressions[ageKey][vaccKey] = new ValueRegressionVaccination({
                     ageGroupName: ageKey,
                     vaccinationPropertyGetter: (m: ModificationVaccination) => {
-                        return m.getModificationValues().vaccinations[ageKey][vaccKey];
+                        return m.getModificationValues().vaccinations[ageKey][vaccKey] || 0;
                     },
                     instantA,
                     instantB,

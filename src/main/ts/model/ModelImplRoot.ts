@@ -203,9 +203,11 @@ export class ModelImplRoot implements IModelSeir {
             const grpJab1T = vaccinationsPerDay.d1 * dT / TimeUtil.MILLISECONDS_PER____DAY;
             const grpJab2T = vaccinationsPerDay.d2 * dT / TimeUtil.MILLISECONDS_PER____DAY;
             const grpJab3T = vaccinationsPerDay.d3 * dT / TimeUtil.MILLISECONDS_PER____DAY;
+            const grpJab4T = vaccinationsPerDay.d4 * dT / TimeUtil.MILLISECONDS_PER____DAY;
+
             const nrmJab1T = grpJab1T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
             const nrmJab2T = grpJab2T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
-            const nrmJab3Tval = grpJab3T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
+            const nrmJabBTval = grpJab3T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal() + grpJab4T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
 
             /**
              * assumptions about 1st dose
@@ -226,8 +228,8 @@ export class ModelImplRoot implements IModelSeir {
             result.addNrmValue(+nrmJab2Tval, this.vaccinationModels[i].getFirstCompartment());
 
             // v3 (TODO: find out if the time to re-gain immunity is significant and needs to be modelled)
-            result.addNrmValue(-nrmJab3Tval, this.compartmentsSusceptible[i]);
-            result.addNrmValue(+nrmJab3Tval, this.vaccinationModels[i].getFirstCompartment());
+            result.addNrmValue(-nrmJabBTval, this.compartmentsSusceptible[i]);
+            result.addNrmValue(+nrmJabBTval, this.vaccinationModels[i].getFirstCompartment());
 
 
         }
