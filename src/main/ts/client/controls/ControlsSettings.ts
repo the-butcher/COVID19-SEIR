@@ -54,11 +54,7 @@ export class ControlsSettings {
             ticks: [1, 2, 3, 4],
             label: 'immunity (months)',
             thumbCreateFunction: (index: number) => {
-                const iconSlider = new IconSlider();
-                if (index === 0) {
-                    iconSlider.getBulletGroupElement().style.transform = 'scale(0.6)'; // rotate(90deg)
-                }
-                return iconSlider;
+                return new IconSlider();;
             },
             labelFormatFunction: (index, value, type) => {
                 if (type === 'tick') {
@@ -86,7 +82,7 @@ export class ControlsSettings {
                 }
             }
         });
-        this.sliderReexposure.setLabelPosition(13);
+        // this.sliderReexposure.setLabelPosition(13);
 
     }
 

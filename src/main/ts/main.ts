@@ -9,11 +9,12 @@ import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 import { StrainUtil } from './util/StrainUtil';
 
-[0.001, 0.004, 0.006, 0.01].forEach(v => {
+[0.00001, 0.004, 0.006, 0.01].forEach(v => {
     const log = Math.log10(v);
-    const min = Math.pow(10, log - 1);
-    const max = Math.pow(10, log + 1);
-    console.log(v, Math.round(Math.log10(v)), min, max)
+    const min = Math.pow(10, Math.floor(log - 1));
+    const max = Math.pow(10, Math.ceil(log + 1));
+    const tick = Math.pow(10, Math.round(log - 2));
+    console.log(v, Math.round(Math.log10(v)), min, max, tick)
 });
 
 

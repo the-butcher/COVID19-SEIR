@@ -140,6 +140,7 @@ export class ControlsStrain {
         });
         this.sliderSerialInterval.setLabelPosition(13);
 
+
         this.sliderIncidence = new Slider({
             container: 'sliderIncidenceDiv',
             min: Math.min(...ModelConstants.RANGE____INCIDENCE_1000),
@@ -152,7 +153,7 @@ export class ControlsStrain {
                 return new IconSlider();
             },
             labelFormatFunction: (index, value, type) => {
-                return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
+                return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
             },
             handleValueChange: (index, value, type) => {
                 this.incidence = value;
@@ -273,6 +274,22 @@ export class ControlsStrain {
         this.immuneEscape = strain.immuneEscape || 0.0;
         this.timeToWane = strain.timeToWane || 3; // months
 
+        const log = Math.log10(this.incidence);
+        const minR0 = Math.pow(10, Math.floor(log - 1));
+        const maxR0 = Math.pow(10, Math.floor(log + 1));
+        const stepR0 = minR0; // Math.pow(10, Math.round(log));
+        console.log(this.incidence, Math.round(Math.log10(this.incidence)), minR0, maxR0, stepR0);
+
+        if (log < 0) {
+            this.sliderIncidence.setFractionDigits(1 - log);
+        } else {
+            this.sliderIncidence.setFractionDigits(0);
+        }
+        this.sliderIncidence.setStep(minR0);
+        this.sliderIncidence.setRange([minR0, maxR0]);
+
+
+
         this.sliderSerialInterval.setValueAndRedraw(0, StrainUtil.calculateLatency(this.serialInterval, this.intervalScale), true); // = [Strain.calculateLatency(this.serialInterval, this.intervalScale), this.serialInterval];
         this.sliderSerialInterval.setValueAndRedraw(1, this.serialInterval, true);
         this.sliderReproduction.setValueAndRedraw(0, this.r0, true);
@@ -342,12 +359,12 @@ export class ControlsStrain {
         const toCanvasY = (n: number) => weibullCanvas.height - 20 - n;
         const pxPerMilli = weibullCanvas.width / (this.sliderTimeToWane.getMaxValue() * TimeUtil.MILLISECONDS_PER____DAY * 30); // one month in pixel
 
-        console.log('pxPerMonth', pxPerMilli);
+        // console.log('pxPerMonth', pxPerMilli);
 
         const compartmentParams = CompartmentChainRecovery.getInstance().getStrainedCompartmentParams(this.timeToWane);
         compartmentParams.forEach(compartmentParam => {
 
-            console.log('a', compartmentParam.instantA * pxPerMilli, compartmentParam.immunity);
+            // console.log('a', compartmentParam.instantA * pxPerMilli, compartmentParam.immunity);
 
             const xMin = compartmentParam.instantA * pxPerMilli;
             const xMax = compartmentParam.instantB * pxPerMilli;

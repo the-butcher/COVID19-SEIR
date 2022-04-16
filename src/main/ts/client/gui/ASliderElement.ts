@@ -13,7 +13,7 @@ export abstract class ASliderElement {
     private index: number;
     private readonly container: HTMLDivElement;
     private readonly labelContainer: HTMLDivElement;
-    private readonly labelFormatFunction: (index: number, value: number, type: LABEL__TYPE) => string;
+    private labelFormatFunction: (index: number, value: number, type: LABEL__TYPE) => string;
 
     constructor(params: ISliderElementParams) {
 
@@ -52,6 +52,16 @@ export abstract class ASliderElement {
         if (this.labelFormatFunction) {
             this.labelContainer.innerHTML = this.labelFormatFunction(this.index, this.value, this.type);
         }
+    }
+
+    setFractionDigits(fractionDigits: number): void {
+        const numberFormat = {
+            minimumFractionDigits: fractionDigits,
+            maximumFractionDigits: fractionDigits
+        };
+        this.labelFormatFunction = (index, value, type) => {
+            return value.toLocaleString(undefined, numberFormat);
+        };
     }
 
     /**

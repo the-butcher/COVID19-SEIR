@@ -118,7 +118,7 @@ export class Slider {
     private minValue: number;
     private maxValue: number;
     private readonly tickParams: ISliderFunctions;
-    private readonly step: number;
+    private step: number;
 
     private disabled: boolean;
 
@@ -130,7 +130,7 @@ export class Slider {
         this.draggableThumbIndex = -1;
         this.clickableThumbIndex = -1;
         this.focusableThumbIndex = -1;
-        this.dragOffset  = 0;
+        this.dragOffset = 0;
         this.minValue = params.min;
         this.maxValue = params.max;
         this.tickParams = params;
@@ -178,7 +178,7 @@ export class Slider {
         /**
          * wrap any input function so it auto clamps values to min / max
          */
-        const thumbParams = {...params};
+        const thumbParams = { ...params };
         if (params.inputFunctions) {
             this.inputEnabled = true;
             thumbParams.inputFunctions = {
@@ -280,6 +280,26 @@ export class Slider {
     // getTickValues(): number[] {
     //     return this.sliderTicks.map(t => t.getValue());
     // }
+
+    setFractionDigits(fractionDigits: number): void {
+        const numberFormat = {
+            minimumFractionDigits: fractionDigits,
+            maximumFractionDigits: fractionDigits
+        };
+        this.tickParams.labelFormatFunction = (index, value, type) => {
+            return value.toLocaleString(undefined, numberFormat);
+        };
+        this.tickParams.inputFunctions.inputFormatFunction = (index, value) => {
+            return `${value.toLocaleString(undefined, numberFormat)}`;
+        };
+        this.sliderThumbs.forEach(sliderThumb => {
+            sliderThumb.setFractionDigits(fractionDigits);
+        });
+    }
+
+    setStep(step: number): void {
+        this.step = step;
+    }
 
     setRange(range: number[]): void {
 
@@ -384,8 +404,8 @@ export class Slider {
             value,
             index,
             thumbCreateFunction: params.thumbCreateFunction,
-            labelFormatFunction: params.labelFormatFunction,
-            inputFunctions: params.inputFunctions,
+            labelFormatFunction: this.tickParams.labelFormatFunction,
+            inputFunctions: this.tickParams.inputFunctions,
             containerClass: Slider.CLASS_THUMB__CONTAINER,
             labelContainerClass: Slider.CLASS_THUMB______LABEL,
             draggable
@@ -493,7 +513,7 @@ export class Slider {
             this.clickableThumbIndex = index;
             if (this.sliderThumbs[index].isDraggable()) {
                 this.draggableThumbIndex = index;
-                this.dragOffset =  e.clientX - this.sliderThumbs[index].getContainer().getBoundingClientRect().left - this.sliderThumbs[index].getContainer().getBoundingClientRect().width / 2;
+                this.dragOffset = e.clientX - this.sliderThumbs[index].getContainer().getBoundingClientRect().left - this.sliderThumbs[index].getContainer().getBoundingClientRect().width / 2;
             }
         }
         // this.handleThumbPicked(index);

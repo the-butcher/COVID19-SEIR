@@ -90,16 +90,11 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 
 #### Issues
-* go back from init-discover 1.6 to 1.4, reduce vacc immunity to 5mo
-* change ba.2 to have mor immune escape
-* reduce omicron-immunity to 5
-* increase omicron-immunity to 6
-
 * possibilities
-  * initial level of vaccination
+  * initial levels of vaccination by age group, waning of vaccination
   * discovery settings (by category over time)
   * maybe introduce some further modifications to discovery rate calc based upon number of cases
-  * steepness of discovery function
+  * steepness of discovery function (TODO :: adjustability within model, would make models much more saveable)
 
 * not being able to test for 60 days after infection
   * less cases found due to any reinfection in that time likely not to be found
