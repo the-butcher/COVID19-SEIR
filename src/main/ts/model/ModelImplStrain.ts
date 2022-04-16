@@ -1,6 +1,7 @@
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
+import { TimeUtil } from '../util/TimeUtil';
 import { BaseData } from './basedata/BaseData';
 import { IBaseDataItem } from './basedata/BaseDataItem';
 import { CompartmentFilter } from './compartment/CompartmentFilter';
@@ -144,13 +145,15 @@ export class ModelImplStrain implements IModelSeir {
         let compartmentE: ICompartment;
         let nrmESum: number;
 
+        let nrmESumTotal = 0;
+        let nrmESumRecov = 0;
+
         let nrmSESums: number[] = [];
         this.infectiousModels.forEach(() => {
             nrmSESums.push(0.0);
         });
         let nrm_ISums: number[] = [];
 
-        let immunity: number;
         let susceptibility: number;
 
         this.nrmExposure = [];
@@ -187,6 +190,13 @@ export class ModelImplStrain implements IModelSeir {
                     result.addNrmValue(-nrmE, compartmentS);
 
                     nrmESum += nrmE;
+
+                    // if (compartmentS.getCompartmentType() === ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() === ECompartmentType.R___VACCINATED) {
+                    nrmESumTotal += nrmE;
+                    // }
+                    if (compartmentS.getCompartmentType() === ECompartmentType.R____RECOVERED) {
+                        nrmESumRecov += nrmE;
+                    }
                     nrmSESums[infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
                     this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
 
@@ -197,6 +207,10 @@ export class ModelImplStrain implements IModelSeir {
             });
 
         });
+
+        // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        //     console.log(TimeUtil.formatCategoryDateFull(tT), nrmESumRecov / nrmESumTotal);
+        // }
 
 
         // calculate a ratio between infections and exposure to be used by calibration

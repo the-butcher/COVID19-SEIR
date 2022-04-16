@@ -16,7 +16,7 @@ export class SliderContactCategory extends Slider {
     private readonly ageGroupLabelDivs: HTMLDivElement[];
 
 
-    private corrections: { [K in string] : number };
+    private corrections: { [K in string]: number };
 
     constructor(contactCategory: ContactCategory) {
 
@@ -194,7 +194,7 @@ export class SliderContactCategory extends Slider {
 
     }
 
-    getCorrections(): { [K in string] : number } {
+    getCorrections(): { [K in string]: number } {
         const corrections = {};
         let isCorrected = false;
         for (const k in this.corrections) {
@@ -266,7 +266,7 @@ export class SliderContactCategory extends Slider {
     redrawCanvas(): void {
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
-        const scale = 0.75 * this.getValue();
+        const scale = 10.75 * this.getValue();
 
         ageGroups.forEach(ageGroup => {
 
@@ -274,6 +274,7 @@ export class SliderContactCategory extends Slider {
             const value = this.contactCategory.getColumnValue(ageGroup.getIndex()) * scale + 1;
 
             // ageGroupProfileDiv.style.top = `${27 - value}px`;
+            ageGroupProfileDiv.style.top = `${28 - value}px`;
             ageGroupProfileDiv.style.height = `${value}px`;
             ageGroupProfileDiv.style.backgroundColor = '#444444';
 
@@ -284,6 +285,7 @@ export class SliderContactCategory extends Slider {
 
                 if (correction < 1) {
                     ageGroupProfileDiv.style.backgroundColor = '#884444';
+                    ageGroupProfileDiv.style.top = `32px`;
                 } else if (correction > 1) {
                     ageGroupProfileDiv.style.backgroundColor = '#448844';
                 } else {

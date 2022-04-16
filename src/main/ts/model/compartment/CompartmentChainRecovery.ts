@@ -32,9 +32,16 @@ export class CompartmentChainRecovery {
     }
     private static instanceRecovery: CompartmentChainRecovery;
 
-    private readonly compartmentParams: ICompartmentParamsRecovery[];
+    private compartmentParams: ICompartmentParamsRecovery[];
+    private readonly weibull: Weibull;
 
     constructor(weibull: Weibull) {
+        this.weibull = weibull;
+
+
+    }
+
+    getStrainedCompartmentParams(timeToWane: number): ICompartmentParamsRecovery[] {
 
         this.compartmentParams = [];
 
@@ -47,14 +54,14 @@ export class CompartmentChainRecovery {
 
         let shareOfPreSymptomaticInfection1 = 0;
 
-        let density0 = weibull.getNormalizedDensity(0);
+        let density0 = this.weibull.getNormalizedDensity(0);
 
-        compartmentCount = 5;
+        compartmentCount = Math.min(10, Math.ceil(timeToWane));
         normalizedDuration = 1 / compartmentCount; // the duration of each compartment before incubation
         instantA = 0;
         for (let compartmentIndex = 0; compartmentIndex < compartmentCount; compartmentIndex++) {
             instantB = normalizedDuration * (compartmentIndex + 1);
-            immunity = 1 - weibull.getNormalizedDensity((1 - (instantA + instantB) / 2)) / density0;
+            immunity = 1 - this.weibull.getNormalizedDensity((1 - (instantA + instantB) / 2)) / density0;
             // console.log('wb0', (instantA + instantB) / 2, immunity);
             shareOfPreSymptomaticInfection1 += immunity;
             this.compartmentParams.push({
@@ -66,10 +73,6 @@ export class CompartmentChainRecovery {
             });
             instantA = instantB;
         }
-
-    }
-
-    getStrainedCompartmentParams(timeToWane: number): ICompartmentParamsRecovery[] {
 
         const strainedCompartmentParams: ICompartmentParamsRecovery[] = [];
         const toStrainedValue = (normalized: number) => normalized * timeToWane * TimeUtil.MILLISECONDS_PER____DAY * 30;

@@ -170,7 +170,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
             this.contactCategories.forEach(contactCategory => {
 
-                // current contact ratio for contact category as set in modification (0 to 1 or 0% to 100%)
+                // current contact ratio for that contact category as set in modification (0 to 1 or 0% to 100%)
                 const contactRatioCategory = this.modificationContact.getCategoryValue(contactCategory.getName());
                 // total contact in the requested age group in contact category (TODO - question this value)
                 const contactGroupCategory = contactCategory.getColumnValue(ageGroupIndex);
@@ -202,7 +202,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const correction = this.modificationDiscovery.getOverall() / this.discoveryRatioOverall;
         this.ageGroups.forEach(ageGroup => {
             let contact = this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].contact * correction;
-            let discovery = Math.min(0.95, this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery * correction);
+            let discovery = Math.min(1.0, this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery * correction);
             this.discoveryRatiosByAgeGroup[ageGroup.getIndex()] = {
                 contact,
                 discovery

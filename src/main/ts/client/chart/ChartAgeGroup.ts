@@ -155,6 +155,11 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedV2: ChartAgeGroupSeries;
 
     /**
+     * modelled discovery rate
+     */
+    protected readonly seriesAgeGroupDiscovery: ChartAgeGroupSeries;
+
+    /**
      * real data
      */
     protected readonly seriesAgeGroupRemovedVR1: ChartAgeGroupSeries;
@@ -743,6 +748,26 @@ export class ChartAgeGroup {
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.35,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesAgeGroupDiscovery = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'discovery rate',
+            baseLabel: 'discovery rate',
+            valueField: 'ageGroupDiscoveryRate',
+            colorKey: 'TESTING',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.15,
             labels: {
                 tooltip: true,
                 pathtip: true
@@ -1353,6 +1378,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
         this.seriesPositivityRateR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
+        this.seriesAgeGroupDiscovery.setSeriesNote(ageGroup.getName());
         this.seriesMobilityOther.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesHospitalizationR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesIcuR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
@@ -1660,12 +1686,13 @@ export class ChartAgeGroup {
     setSeriesTestingVisible(visible: boolean): void {
 
         this.seriesPositivityRateR.setVisible(visible);
+        this.seriesAgeGroupDiscovery.setVisible(visible);
 
         if (visible) {
             this.yAxisPlotPercent.visible = visible;
             this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
             this.yAxisPlotPercent.tooltip.disabled = !visible;
-            this.setAxisPercentBounds(0, 0.15);
+            this.setAxisPercentBounds(0, 1.0);
         }
 
     }
@@ -1904,6 +1931,7 @@ export class ChartAgeGroup {
             const ageGroupRemovedV2 = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V2;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupCasesP = dataItem.valueset[ageGroupPlot.getName()].CASES;
+            const ageGroupDiscoveryRate = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
 
             let ageGroupCasesN = ageGroupCasesP && BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), dataItem.instant);
             if (ageGroupCasesN) {
@@ -1940,7 +1968,8 @@ export class ChartAgeGroup {
                 ageGroupCasesP,
                 ageGroupCasesN,
                 seasonality,
-                reproductionP
+                reproductionP,
+                ageGroupDiscoveryRate
             };
 
             // const check = ageGroupRemovedV2 + ageGroupRemovedVI + ageGroupRemovedID + ageGroupSusceptible + ageGroupExposed + ageGroupInfectious;
@@ -2045,6 +2074,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN.getSeries().data = plotData;
         this.seriesSeasonality.getSeries().data = plotData;
         this.seriesReproductionP.getSeries().data = plotData;
+        this.seriesAgeGroupDiscovery.getSeries().data = plotData;
 
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
             seriesAgeGroupIncidence.getSeries().data = plotData;

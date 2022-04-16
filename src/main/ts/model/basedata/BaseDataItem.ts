@@ -31,6 +31,7 @@ export interface IBaseDataItem {
     getIncidence(ageGroupIndex: number): number;
 
     getTestsM7(): number;
+    getAverageTests(): number;
     getAveragePositivity(): number;
     getDerivedPositivity(): number;
 
@@ -58,6 +59,7 @@ export class BaseDataItem implements IBaseDataItem {
     private readonly incidences: number[];
 
     private testsM7: number;
+    private averageTests: number;
     private averagePositivity: number;
     private derivedPositivity: number;
 
@@ -129,17 +131,17 @@ export class BaseDataItem implements IBaseDataItem {
 
     getMobilityOther(): number {
         const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_O];
-        return configValue >=0 ? configValue / 120 : undefined;
+        return configValue >= 0 ? configValue / 120 : undefined;
     }
 
     getMobilityWork(): number {
         const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_W];
-        return configValue >=0 ? configValue / 120 : undefined;
+        return configValue >= 0 ? configValue / 120 : undefined;
     }
 
     getMobilityHome(): number {
         const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_H];
-        return configValue >=0 ? configValue / 120 : undefined;
+        return configValue >= 0 ? configValue / 120 : undefined;
     }
 
     /**
@@ -230,7 +232,7 @@ export class BaseDataItem implements IBaseDataItem {
 
                 if (dataItemP4) {
                     const casesP4 = dataItemP4.getCasesM7(ageGroup.getIndex());
-                    this.averageCases[ageGroup.getIndex()] = (casesP2 * 0.25 + casesP3 * 0.50 + casesP4 * 0.25)  / 7;
+                    this.averageCases[ageGroup.getIndex()] = (casesP2 * 0.25 + casesP3 * 0.50 + casesP4 * 0.25) / 7;
                     this.averageHelp2[ageGroup.getIndex()] = dataItemP4.getCasesM1(ageGroup.getIndex()) * 0.25;
                 }
 
@@ -242,10 +244,10 @@ export class BaseDataItem implements IBaseDataItem {
                 const testsP4 = dataItemP4.getTestsM7();
                 if (testsP2 && testsP3 && testsP4) {
                     const averageCases = this.averageCases[ageGroupIndexTotal];
-                    let _averagePositivity =  (testsP2 * 0.25 + testsP3 * 0.50 + testsP4 * 0.25) / 7;
-                    _averagePositivity = averageCases / _averagePositivity;
-                    if (!Number.isNaN(_averagePositivity)) {
-                        this.averagePositivity = _averagePositivity;
+                    let _averageTests = (testsP2 * 0.25 + testsP3 * 0.50 + testsP4 * 0.25) / 7;
+                    if (!Number.isNaN(_averageTests)) {
+                        this.averageTests = _averageTests;
+                        this.averagePositivity = averageCases / _averageTests;
                     }
                 }
             }
@@ -277,7 +279,7 @@ export class BaseDataItem implements IBaseDataItem {
             mobilityWorkValues.sort((a, b) => a - b);
             mobilityHomeValues.sort((a, b) => a - b);
 
-            this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) /  mobilityOtherValues.length;
+            this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) / mobilityOtherValues.length;
             this.averageMobilityWork = mobilityWorkValues.reduce((a, b) => a + b, 0) / mobilityWorkValues.length;
             this.averageMobilityHome = mobilityHomeValues.reduce((a, b) => a + b, 0) / mobilityHomeValues.length;
 
@@ -335,6 +337,10 @@ export class BaseDataItem implements IBaseDataItem {
 
     getAveragePositivity(): number {
         return this.averagePositivity;
+    }
+
+    getAverageTests(): number {
+        return this.averageTests;
     }
 
     getDerivedPositivity(): number {

@@ -88,6 +88,19 @@ export class ModelImplRoot implements IModelSeir {
             this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTime, referenceDataRemoved, modificationSettings.getInitialUndetected()));
         });
 
+        let groupRatios: number[] = [
+            1.000,
+            0.695, // 05-14
+            0.625, // 15-24
+            0.325, // 25-34
+            0.300, // 35-44
+            0.275, // 45-55
+            0.250, // 55-65
+            0.225, // 65-74
+            0.205, // 75-84
+            0.135  // >= 85
+        ];
+
         demographics.getAgeGroups().forEach(ageGroup => {
 
             // start with full population of respective group
@@ -98,7 +111,18 @@ export class ModelImplRoot implements IModelSeir {
             });
 
             const vaccinationConfig = modificationTime.getVaccinationConfig2(ageGroup.getName());
-            const grpRatio = 1 - ageGroup.getIndex() * 0.06; // 0.55 for oldest (longer ago), 1 for youngest (were vaccinated more recently)
+            // const grpRatio = 1 - ageGroup.getIndex() * 0.06; // 0.55 for oldest (longer ago), 1 for youngest (were vaccinated more recently)
+
+            // const grpOffset = 4.5 - ageGroup.getIndex();
+            let grpRatio = groupRatios[ageGroup.getIndex()]; // 0.45 + grpOffset * 0.07;
+
+
+
+            // if (ageGroup.getIndex() <= 1) {
+            //     grpRatio = 0.9;
+            // }
+            // console.log(ageGroup.getName(), ageGroup.getIndex(), 'group ratio', grpRatio);
+
             const grpValueV2 = vaccinationConfig.v2 * grpRatio;
 
             let absValueV2 = grpValueV2 * ageGroup.getAbsValue();
@@ -131,9 +155,9 @@ export class ModelImplRoot implements IModelSeir {
         if (!this.compartmentsImmunity[ageGroupIndex]) {
             this.compartmentsImmunity[ageGroupIndex] = [];
             this.compartmentsImmunity[ageGroupIndex].push(this.compartmentsSusceptible[ageGroupIndex]);
-            this.strainModels.forEach(strainModel => {
-                this.compartmentsImmunity[ageGroupIndex].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
-            });
+            // this.strainModels.forEach(strainModel => {
+            //     this.compartmentsImmunity[ageGroupIndex].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
+            // });
             this.compartmentsImmunity[ageGroupIndex].push(...this.vaccinationModels[ageGroupIndex].getCompartments());
             this.compartmentsImmunity[ageGroupIndex].push(this.vaccinationModels[ageGroupIndex].getCompartmentI());
         }
@@ -207,30 +231,38 @@ export class ModelImplRoot implements IModelSeir {
 
             const nrmJab1T = grpJab1T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
             const nrmJab2T = grpJab2T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
-            const nrmJabBTval = grpJab3T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal() + grpJab4T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
+            const nrmJab3T = grpJab3T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
+            const nrmJab4T = grpJab4T * this.vaccinationModels[i].getAgeGroupTotal() / this.getAbsTotal();
+
+            // const nrmJabBTval = nrmJab3T + nrmJab4T;
+            const nrmJabIT = nrmJab1T + nrmJab2T + nrmJab3T + nrmJab4T;
 
             /**
              * assumptions about 1st dose
              */
             const nrmJab1Tmax = state.getNrmValue(this.compartmentsSusceptible[i]); // Math.max(minRemain, state.getNrmValue(this.compartmentsSusceptible[i])) - minRemain; // susceptible to immunizing
-            const nrmJab1Tval = Math.min(nrmJab1Tmax, nrmJab1T);
+            const nrmJab1Tval = Math.min(nrmJab1Tmax, nrmJabIT);
 
             /**
              * assumptions about 2nd dose
              */
-            const nrmJab2Tmax = state.getNrmValue(this.vaccinationModels[i].getCompartmentI()); // Math.max(minRemain, state.getNrmValue(this.vaccinationModels[i].getFirstCompartment())) - minRemain; // immunizing to vaccinated (regular second shot)
-            const nrmJab2Tval = Math.min(nrmJab2Tmax, nrmJab2T); // nrmValueVI !== 0 ? nrmJab2T : 0;
+            // const nrmJab2Tmax = state.getNrmValue(this.vaccinationModels[i].getCompartmentI()); // Math.max(minRemain, state.getNrmValue(this.vaccinationModels[i].getFirstCompartment())) - minRemain; // immunizing to vaccinated (regular second shot)
+            // const nrmJab2Tval = Math.min(nrmJab2Tmax, nrmJab2T); // nrmValueVI !== 0 ? nrmJab2T : 0;
 
             result.addNrmValue(-nrmJab1Tval, this.compartmentsSusceptible[i]);
             result.addNrmValue(+nrmJab1Tval, this.vaccinationModels[i].getCompartmentI());
 
-            result.addNrmValue(-nrmJab2Tval, this.vaccinationModels[i].getCompartmentI());
-            result.addNrmValue(+nrmJab2Tval, this.vaccinationModels[i].getFirstCompartment());
+            const continuationValue = this.vaccinationModels[i].getCompartmentI().getContinuationRatio().getRate(dT, tT) * state.getNrmValue(this.vaccinationModels[i].getCompartmentI());
+            result.addNrmValue(-continuationValue, this.vaccinationModels[i].getCompartmentI());
+            result.addNrmValue(+continuationValue, this.vaccinationModels[i].getFirstCompartment());
 
-            // v3 (TODO: find out if the time to re-gain immunity is significant and needs to be modelled)
-            result.addNrmValue(-nrmJabBTval, this.compartmentsSusceptible[i]);
-            result.addNrmValue(+nrmJabBTval, this.vaccinationModels[i].getFirstCompartment());
 
+            // result.addNrmValue(-nrmJab2Tval, this.vaccinationModels[i].getCompartmentI());
+            // result.addNrmValue(+nrmJab2Tval, this.vaccinationModels[i].getFirstCompartment());
+
+            // // v3 (TODO: find out if the time to re-gain immunity is significant and needs to be modelled)
+            // result.addNrmValue(-nrmJabBTval, this.compartmentsSusceptible[i]);
+            // result.addNrmValue(+nrmJabBTval, this.vaccinationModels[i].getFirstCompartment());
 
         }
 

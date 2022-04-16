@@ -9,9 +9,13 @@ import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
 import { StrainUtil } from './util/StrainUtil';
 
-// [0.000, 0.010, 0.020, 0.040, 0.10].forEach(positivityRate => {
-//     console.log(positivityRate.toFixed(4).padStart(7, ' '), '   ', StrainUtil.calculateDiscoveryRate(positivityRate).toFixed(4).padStart(7, ' '));
-// })
+[0.001, 0.004, 0.006, 0.01].forEach(v => {
+    const log = Math.log10(v);
+    const min = Math.pow(10, log - 1);
+    const max = Math.pow(10, log + 1);
+    console.log(v, Math.round(Math.log10(v)), min, max)
+});
+
 
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {

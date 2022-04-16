@@ -47,7 +47,6 @@ export class ControlsStrain {
     private incidence: number;
     private immuneEscape: number;
 
-    private r0Escaping: number;
     private timeToWane: number;
 
     private modification: ModificationStrain;
@@ -59,7 +58,7 @@ export class ControlsStrain {
             min: Math.min(...ModelConstants.RANGE________________R0),
             max: Math.max(...ModelConstants.RANGE________________R0),
             step: 0.01,
-            values: [0.0, 1.0],
+            values: [0.0],
             ticks: [...ModelConstants.RANGE___SERIAL_INTERVAL],
             label: 'R<sub>B</sub>/R<sub>0</sub>',
             thumbCreateFunction: (index: number) => {
@@ -73,15 +72,8 @@ export class ControlsStrain {
                 }
             },
             handleValueChange: (index, value, type) => {
-                if (index == 0) {
-                    this.r0Escaping = value;
-                    this.redrawCanvasRecovery();
-                } else if (index == 1) {
-                    this.r0 = value;
-                    this.redrawCanvasReproduction();
-                } else {
-                    console.error("invalid index in reproduction slider", index);
-                }
+                this.r0 = value;
+                this.redrawCanvasReproduction();
                 if (type === 'stop' || type === 'input') {
                     this.handleChange();
                 }
@@ -223,11 +215,7 @@ export class ControlsStrain {
             ticks: [1, 2, 3, 4],
             label: 'immunity (months)',
             thumbCreateFunction: (index: number) => {
-                const iconSlider = new IconSlider();
-                if (index === 0) {
-                    iconSlider.getBulletGroupElement().style.transform = 'scale(0.6)'; // rotate(90deg)
-                }
-                return iconSlider;
+                return new IconSlider();
             },
             labelFormatFunction: (index, value, type) => {
                 if (type === 'tick') {
@@ -284,12 +272,10 @@ export class ControlsStrain {
 
         this.immuneEscape = strain.immuneEscape || 0.0;
         this.timeToWane = strain.timeToWane || 3; // months
-        this.r0Escaping = strain.r0Escaping || 0.0;
 
         this.sliderSerialInterval.setValueAndRedraw(0, StrainUtil.calculateLatency(this.serialInterval, this.intervalScale), true); // = [Strain.calculateLatency(this.serialInterval, this.intervalScale), this.serialInterval];
         this.sliderSerialInterval.setValueAndRedraw(1, this.serialInterval, true);
-        this.sliderReproduction.setValueAndRedraw(0, this.r0Escaping, true);
-        this.sliderReproduction.setValueAndRedraw(1, this.r0, true);
+        this.sliderReproduction.setValueAndRedraw(0, this.r0, true);
         this.sliderIncidence.setValueAndRedraw(0, this.incidence, true);
         this.sliderImmuneEscape.setValueAndRedraw(0, this.immuneEscape, true);
         this.sliderTimeToWane.setValueAndRedraw(0, this.timeToWane, true);
@@ -315,7 +301,6 @@ export class ControlsStrain {
             intervalScale: this.intervalScale,
             dstIncidence: this.incidence,
             immuneEscape: this.immuneEscape,
-            r0Escaping: this.r0Escaping,
             timeToWane: this.timeToWane
         });
 
@@ -406,7 +391,6 @@ export class ControlsStrain {
             intervalScale: this.intervalScale,
             immuneEscape: this.immuneEscape,
             timeToWane: this.timeToWane,
-            r0Escaping: this.r0Escaping,
             dstIncidence: -1,
             deletable: false,
             draggable: false,

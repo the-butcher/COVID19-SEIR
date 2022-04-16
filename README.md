@@ -90,17 +90,27 @@ A higher discovery rate means:
 * Demographics corrections on the matrices
 
 #### Issues
+* go back from init-discover 1.6 to 1.4, reduce vacc immunity to 5mo
+* change ba.2 to have mor immune escape
+* reduce omicron-immunity to 5
+* increase omicron-immunity to 6
+
+* possibilities
+  * initial level of vaccination
+  * discovery settings (by category over time)
+  * maybe introduce some further modifications to discovery rate calc based upon number of cases
+  * steepness of discovery function
+
+* not being able to test for 60 days after infection
+  * less cases found due to any reinfection in that time likely not to be found
+  * any calculated positivity rate would only be valid for "testable" population
+  * 
 * if the model increases a specific indicator constantly (and there is no apparent reason for this parameter to rise)
   * it could mean the the model needs to ramp up contact in order to compensate for some other parameter that may i.e. not reduce protection on the other end
   * so if the elderly keep going up, it may mean that immunity in that group should vanish quicker, therefore providing a larger susceptlible group requiring less contact
-* vaccination also needs to implement a recovery chain (which then probably needs to get a different name)
-* more vaccinations need to remove from recovered
-* take care of last recovery model feeding back to susceptible
 * detect duplicate modifications
   * errors are hard to find
   * would help with creation of i.e. auto testing modifications
-* rename "VACCINATED" chart to a more general term (i.e. STATE)
-* add an age group discovery curve to the testing chart-view
 * acceptModification is called multiple times -> check for performance and streamline
 * consider corrections when calculating category ratio in ModificationContact (check if that is not the case already)
 * wiki on github
@@ -130,6 +140,11 @@ A higher discovery rate means:
   * introduce simple undo/redo
 
 #### Done
+* ~~more vaccinations need to remove from recovered~~
+* ~~take care of last recovery model feeding back to susceptible~~
+* ~~rename "VACCINATED" chart to a more general term (i.e. STATE)~~
+* ~~add an age group discovery curve to the testing chart-view~~
+* ~~vaccination also needs to implement a recovery chain (which then probably needs to get a different name)~~
 * ~~add by age group R rate to the model output >> exportable and can be added to chart (define which chart view that would be)~~
 * ~~when TIME is saved later than regression, things happen in the wrong order and ModificationTime will try to create a regression instance that is not ready >> ModelConstants.MODIFICATION_PARAMS, REGRESSION moved to before TIME~~
 * ~~regression slider collapsed at 1,1 can not be moved afterwards (would likely not happen at 0,0 since z-order would be ok on that end)~~

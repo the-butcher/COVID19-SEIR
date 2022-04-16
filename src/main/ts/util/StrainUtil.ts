@@ -32,16 +32,21 @@ export class StrainUtil {
      * @param positivityRate
      * @returns
      */
-    static calculateDiscoveryRate(positivityRate: number): number {
-        const trimmedPositivityRate = Math.max(0, positivityRate);
-        // return 1 / (trimmedPositivityRate * 300 + 1.25) + 0.17 - trimmedPositivityRate / 10
+    static calculateDiscoveryRate(instant: number, positivityRate: number, testsPer100000: number): number {
 
-        // return 1 / (trimmedPositivityRate * 200 + 1.25) + 0.17 - trimmedPositivityRate / 10;
-        // const posA = (0.01 / trimmedPositivityRate) * 1.58437 + 0.15;
-        // const posB = 0.74 - trimmedPositivityRate / 0.175;
-        // return Math.min(posB);
+        // const trimmedPositivityRate = Math.max(0, positivityRate);
 
-        return Math.pow(positivityRate * 1.5 + 1, -10);
+        // 6000 when there were very many tests
+        // 2700 now (14.04.2022)
+        // const slope = 1.5 - testsPer100000 / 10000; // 0.6 - 0.27
+        // if (instant % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        //     console.log(TimeUtil.formatCategoryDateFull(instant), slope);
+        // }
+        // const slope = 1.35 - testsPer100000 / 20000;
+
+
+        // return Math.pow(positivityRate * 1.1 + 1, -10);
+        return Math.pow(positivityRate * 2.3 + 1.10, -4);
 
     }
 

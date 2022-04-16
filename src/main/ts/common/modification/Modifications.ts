@@ -109,6 +109,11 @@ export class Modifications {
                 }
                 const lastModification = typedModifications[typedModifications.length - 1];
                 lastModification.setInstants(lastModification.getInstantA(), ModelInstants.getInstance().getMaxInstant());
+                for (let i = 1; i < typedModifications.length; i++) {
+                    if (typedModifications[i - 1].getInstantA() === typedModifications[i].getInstantA()) {
+                        console.error("coincident modifications", key, TimeUtil.formatCategoryDateFull(typedModifications[i].getInstantA()), typedModifications[i - 1].getId(), typedModifications[i].getId());
+                    }
+                }
             }
         });
         this.lastUpdate = Date.now();

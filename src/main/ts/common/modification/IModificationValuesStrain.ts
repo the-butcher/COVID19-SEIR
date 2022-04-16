@@ -42,11 +42,6 @@ export interface IModificationValuesStrain extends IModificationValues {
     timeToWane: number;
 
     /**
-     * r0 that this strain has in population regarded as immune
-     */
-    r0Escaping: number;
-
-    /**
      * the initial incidence of this strain
      */
     dstIncidence: number;

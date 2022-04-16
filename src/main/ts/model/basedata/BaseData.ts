@@ -14,7 +14,8 @@ import { ModificationDiscovery } from '../../common/modification/ModificationDis
 export interface IBaseDataMarker {
     instant: number,
     derived: number,
-    display: number
+    display: number,
+    avgTest?: number
 }
 export interface IBaseDataConfig {
     [K: string]: IBaseDataItemConfig;
@@ -226,7 +227,8 @@ export class BaseData {
                     positivityMarkers.push({
                         instant,
                         derived: value,
-                        display: dataItem.getAveragePositivity()
+                        display: dataItem.getAveragePositivity(),
+                        avgTest: dataItem.getAverageTests() * 100000 / Demographics.getInstance().getAbsTotal()
                     });
                 }
             }
@@ -235,7 +237,7 @@ export class BaseData {
         positivityIndices.forEach(positivityIndex => {
 
             const positivityMarker = positivityMarkers[positivityIndex];
-            const overall = StrainUtil.calculateDiscoveryRate(positivityMarker.display);
+            const overall = StrainUtil.calculateDiscoveryRate(positivityMarker.instant, positivityMarker.display, positivityMarker.avgTest);
             const id = ObjectUtil.createId();
             const contactCategories = Demographics.getInstance().getCategories();
             const multipliers: { [k: string]: number } = {}
