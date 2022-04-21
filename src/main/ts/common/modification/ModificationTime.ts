@@ -1,4 +1,4 @@
-import { IVaccinationConfig2 } from './../demographics/IVaccinationConfig2';
+import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelImplRoot } from './../../model/ModelImplRoot';
 import { deprecate } from 'util';
@@ -69,7 +69,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private discoveryRatiosByAgeGroup: IRatios[];
     private discoveryRatioOverall: number;
 
-    private vaccinationsPerDay: { [K in string]: IVaccinationConfig2 };
+    private vaccinationsPerDay: { [K in string]: IVaccinationConfig };
 
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
@@ -126,8 +126,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     }
 
-    getVaccinationConfig2(ageGroup: string): IVaccinationConfig2 {
-        return this.modificationVaccination.getVaccinationConfig2(ageGroup);
+    getVaccinationConfig2(ageGroup: string): IVaccinationConfig {
+        return this.modificationVaccination.getVaccinationConfig(ageGroup);
     }
 
     getReexposure(): number {

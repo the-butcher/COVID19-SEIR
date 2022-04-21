@@ -4,6 +4,8 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesDiscovery } from "../../common/modification/IModificationValueDiscovery";
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { ModificationResolverContact } from "../../common/modification/ModificationResolverContact";
+import { ModificationResolverTime } from "../../common/modification/ModificationResolverTime";
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
@@ -911,10 +913,10 @@ export class ChartAgeGroup {
             colorKey: 'CASES',
             strokeWidth: 1,
             dashed: false,
-            locationOnPath: 0.40,
+            locationOnPath: 0.20,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: false,
             legend: false,
@@ -1625,6 +1627,9 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN.setVisible(visible); // visible
         this.seriesAgeGroupCasesR.setVisible(visible); // visible
 
+        // this.seriesSeasonality.setVisible(visible);
+        // this.setAxisPercentBounds(0, 2);
+
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
             seriesAgeGroupIncidence.setVisible(visible);
@@ -1853,8 +1858,15 @@ export class ChartAgeGroup {
 
     async renderRegressionData(): Promise<void> {
 
+        // const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
+        // const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
+        // const lastRegressionType = ModelActions.getInstance().getLastRegressionType();
+        // const contactSummary = new ModificationResolverContact().getModification(dataItem.instant, 'INTERPOLATE').getColumnValueSummary(ageGroupPlot);
+        // const shareOfFamily = contactSummary['family'] / contactSummary['total'];
+
         const plotData: any[] = [];
         for (const dataItem of this.modelData) {
+
 
             const renderableRegressionResult = ControlsRegression.getInstance().getRenderableRegressionResult(dataItem.instant);
 
@@ -1912,7 +1924,7 @@ export class ChartAgeGroup {
         const heatData: any[] = [];
 
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
-        const modificationValuesDiscov = Modifications.getInstance().findModificationsByType('TESTING').map(m => m.getModificationValues() as IModificationValuesDiscovery);
+        // const modificationValuesDiscov = Modifications.getInstance().findModificationsByType('TESTING').map(m => m.getModificationValues() as IModificationValuesDiscovery);
 
         let maxGamma = 0;
         const randomVd = Math.random() * 0.00001;

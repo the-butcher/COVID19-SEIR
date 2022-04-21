@@ -82,7 +82,7 @@ export class ControlsSettings {
                 }
             }
         });
-        // this.sliderReexposure.setLabelPosition(13);
+        this.sliderReexposure.setLabelPosition(13);
 
     }
 

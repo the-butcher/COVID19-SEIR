@@ -120,19 +120,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
     logSummary(ageGroupName: string): void {
         const ageGroupContact = this.ageGroups.find(g => g.getName() === ageGroupName);
-        console.log('ageGroupContact', ageGroupContact);
-        const summary: { [K: string]: number } = {};
-        let total = 0;
-        this.contactCategories.forEach(contactCategory => {
-            let sum = 0;
-            this.ageGroups.forEach(ageGroupParticipant => {
-                sum += contactCategory.getCellValue(ageGroupContact.getIndex(), ageGroupParticipant.getIndex()) * this.getCategoryValue(contactCategory.getName());
-            });
-            summary[contactCategory.getName()] = sum;
-            total += sum;
-        });
-        summary['total'] = total;
-        console.log(summary);
+        console.log(this.getColumnValueSummary(ageGroupContact));
     }
 
     getInstant(): number {
@@ -162,6 +150,32 @@ export class ModificationContact extends AModification<IModificationValuesContac
             this.columnValues[indexAgeGroup] = ContactCellsUtil.findColumnValue(indexAgeGroup, this);
         }
         return this.columnValues[indexAgeGroup];
+    }
+
+    getColumnValueSummary(ageGroupContact: AgeGroup): { [K in string]: number } {
+
+        const correctionContact = this.getCorrectionValue(ageGroupContact.getIndex());
+        let correctionParticipant: number;
+
+        const summary: { [K: string]: number } = {};
+        let total = 0;
+        let val: number;
+
+        this.contactCategories.forEach(contactCategory => {
+            let sum = 0;
+            this.ageGroups.forEach(ageGroupParticipant => {
+                correctionParticipant = this.getCorrectionValue(ageGroupParticipant.getIndex());
+                val = contactCategory.getCellValue(ageGroupContact.getIndex(), ageGroupParticipant.getIndex()) * this.getCategoryValue(contactCategory.getName()) * correctionContact * correctionParticipant;
+                // console.log(contactCategory.getName(), ageGroupParticipant.getName(), val);
+                sum += val;
+            });
+            // console.log(contactCategory.getName(), 'TOTAL', sum);
+            summary[contactCategory.getName()] = sum;
+            total += sum;
+        });
+        summary['total'] = total;
+        console.log('TOTAL', total);
+        return summary;
     }
 
     getColumnSum(): number {

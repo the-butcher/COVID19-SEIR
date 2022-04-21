@@ -32,7 +32,7 @@ export class ModificationAdaptor5 {
             });
         });
 
-        const errorRatio = 0.03;
+        const errorRatio = 0.02;
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {

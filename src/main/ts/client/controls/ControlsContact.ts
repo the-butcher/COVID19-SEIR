@@ -73,10 +73,10 @@ export class ControlsContact {
 
     }
 
-    handleCorrections(corrections: { [K in string] : number }): void {
+    handleCorrections(corrections: { [K in string]: number }): void {
 
         this.modification.acceptUpdate({
-            corrections: {...corrections}
+            corrections: { ...corrections }
         });
         // console.log('handleChange', corrections, this.modification);
 
@@ -91,7 +91,7 @@ export class ControlsContact {
     handleChange(): void {
 
         // apply current slider settings to the slider-category filter on the modification
-        const multipliers: { [K in string] : number } = {};
+        const multipliers: { [K in string]: number } = {};
 
         multipliers[this.sliderCategory.getName()] = this.sliderCategory.getValue();
 

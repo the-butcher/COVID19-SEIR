@@ -95,7 +95,7 @@ export class SliderContactCategory extends Slider {
             ageGroupProfileDiv.style.bottom = '13px';
             ageGroupProfileDiv.style.width = 'calc(100% - 2px)';
             ageGroupProfileDiv.style.height = '27px';
-            ageGroupProfileDiv.style.backgroundColor = '#444444';
+            ageGroupProfileDiv.style.backgroundColor = 'red';
             ageGroupProfileDiv.style.transition = 'top 250ms ease-in-out, height 250ms ease-in-out';
             this.ageGroupProfileDivs.push(ageGroupProfileDiv);
             ageGroupProfileContainer.appendChild(ageGroupProfileDiv);
@@ -212,6 +212,9 @@ export class SliderContactCategory extends Slider {
 
     resetCorrections(): void {
         this.corrections = {};
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            this.corrections[ageGroup.getName()] = 1;
+        })
         ControlsContact.getInstance().handleCorrections(this.corrections);
         this.redrawCanvas();
     }

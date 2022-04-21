@@ -1,5 +1,5 @@
 import { Demographics } from '../../common/demographics/Demographics';
-import { IVaccinationConfig2 } from '../../common/demographics/IVaccinationConfig2';
+import { IVaccinationConfig } from '../../common/demographics/IVaccinationConfig';
 import { ModificationVaccination } from '../../common/modification/ModificationVaccination';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ControlsConstants } from '../gui/ControlsConstants';
@@ -39,7 +39,7 @@ export class ControlsVaccination {
 
         // TODO it must be ensured that a modification can not have lower values than a previous modification
 
-        const vaccinations: { [K in string]: IVaccinationConfig2 } = {};
+        const vaccinations: { [K in string]: IVaccinationConfig } = {};
 
         this.slidersVaccination.forEach(sliderVaccination => {
             vaccinations[sliderVaccination.getName()] = {
@@ -66,7 +66,7 @@ export class ControlsVaccination {
         this.modification = modification;
 
         this.slidersVaccination.forEach(sliderVaccination => {
-            const vaccinations = this.modification.getVaccinationConfig2(sliderVaccination.getName());
+            const vaccinations = this.modification.getVaccinationConfig(sliderVaccination.getName());
             sliderVaccination.setValue(3, vaccinations.v1);
             sliderVaccination.setValue(2, vaccinations.v2);
             sliderVaccination.setValue(1, vaccinations.v3);

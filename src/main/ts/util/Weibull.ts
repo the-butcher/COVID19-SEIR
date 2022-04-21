@@ -14,7 +14,7 @@ export class Weibull {
 
     static getInstanceRecovery(): Weibull {
         if (ObjectUtil.isEmpty(this.instanceImmunity)) {
-            this.instanceImmunity = new Weibull(1, 5);
+            this.instanceImmunity = new Weibull(1.5, 1);
         }
         return this.instanceImmunity;
     }

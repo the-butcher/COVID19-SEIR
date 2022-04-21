@@ -405,7 +405,7 @@ export class Slider {
             index,
             thumbCreateFunction: params.thumbCreateFunction,
             labelFormatFunction: this.tickParams.labelFormatFunction,
-            inputFunctions: this.tickParams.inputFunctions,
+            inputFunctions: params.inputFunctions,
             containerClass: Slider.CLASS_THUMB__CONTAINER,
             labelContainerClass: Slider.CLASS_THUMB______LABEL,
             draggable

@@ -46,8 +46,8 @@ export class ControlsRegression {
      * @returns
      */
     getRenderableRegressionResult(instant: number): IRegressionResult {
-        const lastRegressionType = ModelActions.getInstance().getLastRegressionType();
         const modelActions = ModelActions.getInstance();
+        const lastRegressionType = modelActions.getLastRegressionType();
         if (lastRegressionType === 'MULTIPLIER') {
             return this.modification.getMultiplierRegression(instant, modelActions.getCategory());
         } else if (lastRegressionType === 'CORRECTION') {

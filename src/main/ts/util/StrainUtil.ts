@@ -34,19 +34,20 @@ export class StrainUtil {
      */
     static calculateDiscoveryRate(instant: number, positivityRate: number, testsPer100000: number): number {
 
-        // const trimmedPositivityRate = Math.max(0, positivityRate);
+        // \left(x\ \cdot2\ +\ 0.70^{\frac{1}{-4}}\ \ \right)^{-4}
 
-        // 6000 when there were very many tests
-        // 2700 now (14.04.2022)
-        // const slope = 1.5 - testsPer100000 / 10000; // 0.6 - 0.27
+        const pow = -4;
+        const max = 0.7;
+        const slp = 2.2 - testsPer100000 / 10000; // higher number means steeper (less tests per person means steeper slope = less cases found for )
+
         // if (instant % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-        //     console.log(TimeUtil.formatCategoryDateFull(instant), slope);
+        //     console.log(TimeUtil.formatCategoryDateFull(instant), slp);
         // }
-        // const slope = 1.35 - testsPer100000 / 20000;
-
 
         // return Math.pow(positivityRate * 1.1 + 1, -10);
-        return Math.pow(positivityRate * 2.3 + 1.10, -4);
+        // return Math.pow(positivityRate * 2.0 + 1.10, -4);
+
+        return Math.pow(positivityRate * slp + Math.pow(max, 1 / pow), pow);
 
     }
 

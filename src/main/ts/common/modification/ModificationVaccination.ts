@@ -1,6 +1,6 @@
 // @ts-ignore
 import { BaseData } from '../../model/basedata/BaseData';
-import { IVaccinationConfig2 } from '../demographics/IVaccinationConfig2';
+import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
 import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
@@ -26,7 +26,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
         super.setInstants(instantA, instantB);
         const baseDataItem = BaseData.getInstance().findBaseDataItem(instantA);
         if (baseDataItem) {
-            const vaccinations: { [K in string]: IVaccinationConfig2 } = {};
+            const vaccinations: { [K in string]: IVaccinationConfig } = {};
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                 vaccinations[ageGroup.getName()] = {
                     v1: baseDataItem.getVacc1(ageGroup.getName()) / ageGroup.getAbsValue(),
@@ -45,7 +45,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
         this.modificationValues = { ...this.modificationValues, ...update };
     }
 
-    getVaccinationConfig2(ageGroup: string): IVaccinationConfig2 {
+    getVaccinationConfig(ageGroup: string): IVaccinationConfig {
         return this.modificationValues.vaccinations[ageGroup];
     }
 

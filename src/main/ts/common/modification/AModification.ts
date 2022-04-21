@@ -67,7 +67,7 @@ export abstract class AModification<P extends IModificationValues> implements IM
     }
 
     acceptUpdate(update: Partial<P>): void {
-        this.modificationValues = {...this.modificationValues, ...update};
+        this.modificationValues = { ...this.modificationValues, ...update };
     }
 
     getModificationValues(): P {

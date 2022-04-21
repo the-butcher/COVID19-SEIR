@@ -2,7 +2,7 @@ import { ObjectUtil } from '../../util/ObjectUtil';
 import { Demographics } from '../demographics/Demographics';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { TimeUtil } from './../../util/TimeUtil';
-import { IVaccinationConfig2 } from './../demographics/IVaccinationConfig2';
+import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
 import { AModificationResolver } from './AModificationResolver';
 import { IModificationValuesVaccination } from './IModificationValuesVaccination';
 import { ModificationRegression } from './ModificationRegression';
@@ -25,7 +25,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
 
         const instantA = instantB - TimeUtil.MILLISECONDS_PER____DAY;
 
-        const vaccinations: { [K: string]: IVaccinationConfig2 } = {};
+        const vaccinations: { [K: string]: IVaccinationConfig } = {};
         const ageGroups = Demographics.getInstance().getAgeGroups();
         ageGroups.forEach(ageGroup => {
 
@@ -78,7 +78,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
 
         const daysAB = (modificationValuesB.instant - modificationValuesA.instant) / TimeUtil.MILLISECONDS_PER____DAY; // fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
 
-        const vaccinations: { [K: string]: IVaccinationConfig2 } = {};
+        const vaccinations: { [K: string]: IVaccinationConfig } = {};
         const ageGroups = Demographics.getInstance().getAgeGroups();
         ageGroups.forEach(ageGroup => {
             const vaccinationsA = modificationValuesA.vaccinations[ageGroup.getName()];
@@ -112,7 +112,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
 
         const modificationValuesA = modificationA.getModificationValues();
 
-        const vaccinations: { [K: string]: IVaccinationConfig2 } = {};
+        const vaccinations: { [K: string]: IVaccinationConfig } = {};
         const ageGroups = Demographics.getInstance().getAgeGroups();
         ageGroups.forEach(ageGroup => {
             const vaccinationsA = modificationValuesA.vaccinations[ageGroup.getName()];

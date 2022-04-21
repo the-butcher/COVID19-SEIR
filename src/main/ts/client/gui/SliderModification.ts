@@ -47,8 +47,12 @@ export class SliderModification extends Slider {
             thumbCreateFunction: (index: number) => {
                 return new IconModification('x', 'CONTACT', 'create'); // TODO could this be optional
             },
-            labelFormatFunction: (index, value) => {
-                return `${TimeUtil.formatCategoryDateFull(value)}`;
+            labelFormatFunction: (index, value, type) => {
+                if (type === 'tick') {
+                    return `${TimeUtil.formatCategoryDateFull(value)}`;
+                } else {
+                    return `${TimeUtil.formatCategoryDateDay(value)}`;
+                }
             },
             handleValueChange: (index, value, type) => {
                 const modification = Modifications.getInstance().findModificationById(this.modificationIcons[index].getId());

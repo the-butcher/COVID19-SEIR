@@ -1,5 +1,5 @@
 import { Demographics } from './../common/demographics/Demographics';
-import { IVaccinationConfig2 } from './../common/demographics/IVaccinationConfig2';
+import { IVaccinationConfig } from '../common/demographics/IVaccinationConfig';
 import { IModification } from '../common/modification/IModification';
 import { IModificationValuesDiscovery } from '../common/modification/IModificationValueDiscovery';
 import { IModificationValues } from '../common/modification/IModificationValues';
@@ -66,6 +66,7 @@ export class ModelConstants {
                 r0: 4.4,
                 serialInterval: 4.8,
                 intervalScale: 1.0,
+                timeToWane: 5.0,
                 immuneEscape: 0.0,
                 dstIncidence: 1,
                 deletable: true,
@@ -104,7 +105,7 @@ export class ModelConstants {
         'VACCINATION': {
             createValuesModification: (modificationValues) => new ModificationVaccination(modificationValues as IModificationValuesVaccination),
             createDefaultModification: (instant: number) => {
-                const vaccinations: { [K in string]: IVaccinationConfig2 } = {};
+                const vaccinations: { [K in string]: IVaccinationConfig } = {};
                 Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
                     vaccinations[ageGroup.getName()] = {
                         v1: 0,
@@ -158,7 +159,7 @@ export class ModelConstants {
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
-    static readonly RANGE________REEXPOSURE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    static readonly RANGE________REEXPOSURE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     static readonly RANGE________INCUBATION = [1, 7, 14];
     static readonly RANGE____INCIDENCE_1000 = [0, 250, 500, 750, 1000];
     static readonly RANGE_____INCIDENCE__10 = [0, 2, 4, 6, 8, 10];

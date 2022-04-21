@@ -158,7 +158,7 @@ export class ChartContactMatrix {
                 const chartData = target.dataItems.values[indexCurr]?.dataContext as IChartData;
                 const rate = chartData.ratio.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
                 // if (this.axisDirection === 'CONTACT_PARTICIPANT') {
-                    return `${ChartUtil.getInstance().formatContactLine('contact', chartData.plotX)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
+                return `${ChartUtil.getInstance().formatContactLine('contact', chartData.plotX)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
                 // } else {
                 //     return `${ChartUtil.getInstance().formatContactLine('participant', chartData.plotX)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
                 // }
@@ -187,7 +187,7 @@ export class ChartContactMatrix {
                 const rate = chartData.ratio.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
                 const total = (chartData.ratio * ageGroups[chartData.indexX].getAbsValue()).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
                 // if (this.axisDirection === 'CONTACT_PARTICIPANT') {
-                    return `${ChartUtil.getInstance().formatContactLine('contact', chartData.categoryX)}\n${ChartUtil.getInstance().formatContactLine('participant', chartData.categoryY)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}\n${ChartUtil.getInstance().formatContactLine('total', total)}`;
+                return `${ChartUtil.getInstance().formatContactLine('contact', chartData.categoryX)}\n${ChartUtil.getInstance().formatContactLine('participant', chartData.categoryY)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}\n${ChartUtil.getInstance().formatContactLine('total', total)}`;
                 // } else {
                 //     return `${ChartUtil.getInstance().formatContactLine('participant', chartData.categoryX)}\n${ChartUtil.getInstance().formatContactLine('contact', chartData.categoryY)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}\n${ChartUtil.getInstance().formatContactLine('total', total)}`;
                 // }
@@ -227,9 +227,9 @@ export class ChartContactMatrix {
             (this.seriesPlot.element.node.firstChild as SVGGElement).setAttributeNS(null, 'clip-path', '');
         });
 
-        this.hitDisposer = this.chart.events.on('hit', e => {
-            this.handleHit();
-        });
+        // this.hitDisposer = this.chart.events.on('hit', e => {
+        //     this.handleHit();
+        // });
 
     }
 
@@ -237,10 +237,10 @@ export class ChartContactMatrix {
         this.chart.exporting.export("png");
     }
 
-    async handleHit(): Promise<void> {
-        await this.exportToPng();
-        this.setInstant(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
-    }
+    // async handleHit(): Promise<void> {
+    //     await this.exportToPng();
+    //     // this.setInstant(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
+    // }
 
     async acceptContactMatrix(contactMatrix: IContactMatrix): Promise<void> {
 

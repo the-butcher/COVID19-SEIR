@@ -1,5 +1,5 @@
 
-export interface IVaccinationConfig2 {
+export interface IVaccinationConfig {
     v1: number;
     v2: number;
     v3: number;

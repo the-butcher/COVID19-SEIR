@@ -54,14 +54,12 @@ export class CompartmentChainRecovery {
 
         let shareOfPreSymptomaticInfection1 = 0;
 
-        let density0 = this.weibull.getNormalizedDensity(0);
-
         compartmentCount = Math.min(10, Math.ceil(timeToWane));
         normalizedDuration = 1 / compartmentCount; // the duration of each compartment before incubation
         instantA = 0;
         for (let compartmentIndex = 0; compartmentIndex < compartmentCount; compartmentIndex++) {
             instantB = normalizedDuration * (compartmentIndex + 1);
-            immunity = 1 - this.weibull.getNormalizedDensity((1 - (instantA + instantB) / 2)) / density0;
+            immunity = 0.9 * this.weibull.getDistribution((1 - (instantA + instantB) / 2));
             // console.log('wb0', (instantA + instantB) / 2, immunity);
             shareOfPreSymptomaticInfection1 += immunity;
             this.compartmentParams.push({
