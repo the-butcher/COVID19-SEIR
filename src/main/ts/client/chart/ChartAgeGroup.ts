@@ -2,10 +2,7 @@ import { Bullet, CategoryAxis, CategoryAxisDataItem, Column, ColumnSeries, LineS
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
-import { IModificationValuesDiscovery } from "../../common/modification/IModificationValueDiscovery";
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { ModificationResolverContact } from "../../common/modification/ModificationResolverContact";
-import { ModificationResolverTime } from "../../common/modification/ModificationResolverTime";
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
@@ -169,10 +166,12 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedVR3: ChartAgeGroupSeries;
     protected readonly seriesAgeGroupIncidenceR: ChartAgeGroupSeries; // real incidence
     protected readonly seriesPositivityRateR: ChartAgeGroupSeries; // real test numbers
-    protected readonly seriesHospitalizationR: ChartAgeGroupSeries; // real hospitalization (all ages only)
-    protected readonly seriesIcuR: ChartAgeGroupSeries; // real icu (all ages only)
+    protected readonly seriesTestRateR: ChartAgeGroupSeries; // real tests per 100000 per week
 
-    protected readonly seriesMobilityOther: ChartAgeGroupSeries;
+    // protected readonly seriesHospitalizationR: ChartAgeGroupSeries; // real hospitalization (all ages only)
+    // protected readonly seriesIcuR: ChartAgeGroupSeries; // real icu (all ages only)
+
+    protected readonly seriesMobility: ChartAgeGroupSeries;
 
     private readonly selectedModificationRange: CategoryAxisDataItem;
     private readonly selectedModificationLabel: Label;
@@ -502,7 +501,7 @@ export class ChartAgeGroup {
             baseLabel: 'incidence (model)',
             valueField: 'ageGroupIncidence',
             colorKey: 'INCIDENCE',
-            strokeWidth: 4,
+            strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.16,
             labels: {
@@ -760,6 +759,26 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
+        this.seriesTestRateR = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'test rate',
+            baseLabel: 'test rate',
+            valueField: 'testRateR',
+            colorKey: 'STRAIN',
+            strokeWidth: 2,
+            dashed: false,
+            locationOnPath: 0.05,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
         this.seriesAgeGroupDiscovery = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
@@ -780,19 +799,19 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
-        this.seriesMobilityOther = new ChartAgeGroupSeries({
+        this.seriesMobility = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
-            title: 'mobility, other',
-            baseLabel: 'mobility, other',
-            valueField: 'mobilityOther',
+            title: 'mobility (google)',
+            baseLabel: 'mobility (google)',
+            valueField: 'mobility',
             colorKey: 'TESTING',
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.55,
             labels: {
-                tooltip: true,
-                pathtip: true
+                tooltip: false,
+                pathtip: false
             },
             stacked: false,
             legend: true,
@@ -800,44 +819,44 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
-        this.seriesHospitalizationR = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'hospitalization',
-            baseLabel: 'hospitalization',
-            valueField: 'hospitalizationR',
-            colorKey: 'VACCINATION',
-            strokeWidth: 2,
-            dashed: false,
-            locationOnPath: 0.35,
-            labels: {
-                tooltip: true,
-                pathtip: true
-            },
-            stacked: false,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesIcuR = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'icu',
-            baseLabel: 'icu',
-            valueField: 'icuR',
-            colorKey: 'CASES',
-            strokeWidth: 2,
-            dashed: false,
-            locationOnPath: 0.35,
-            labels: {
-                tooltip: true,
-                pathtip: true
-            },
-            stacked: false,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
+        // this.seriesHospitalizationR = new ChartAgeGroupSeries({
+        //     chart: this.chart,
+        //     yAxis: this.yAxisPlotPercent,
+        //     title: 'hospitalization',
+        //     baseLabel: 'hospitalization',
+        //     valueField: 'hospitalizationR',
+        //     colorKey: 'VACCINATION',
+        //     strokeWidth: 2,
+        //     dashed: false,
+        //     locationOnPath: 0.35,
+        //     labels: {
+        //         tooltip: true,
+        //         pathtip: true
+        //     },
+        //     stacked: false,
+        //     legend: true,
+        //     labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+        //     seriesConstructor: () => new LineSeries()
+        // });
+        // this.seriesIcuR = new ChartAgeGroupSeries({
+        //     chart: this.chart,
+        //     yAxis: this.yAxisPlotPercent,
+        //     title: 'icu',
+        //     baseLabel: 'icu',
+        //     valueField: 'icuR',
+        //     colorKey: 'CASES',
+        //     strokeWidth: 2,
+        //     dashed: false,
+        //     locationOnPath: 0.35,
+        //     labels: {
+        //         tooltip: true,
+        //         pathtip: true
+        //     },
+        //     stacked: false,
+        //     legend: true,
+        //     labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+        //     seriesConstructor: () => new LineSeries()
+        // });
 
 
         this.seriesSeasonality = new ChartAgeGroupSeries({
@@ -1263,45 +1282,48 @@ export class ChartAgeGroup {
 
     exportToJson(): void {
 
-        const strippedData: any[] = [];
-        this.modelData.forEach(data => {
-            strippedData.push({
-                instant: data.instant,
-                date: '',
-                cases_00_04: data.valueset['<= 04'].CASES.toLocaleString(),
-                disco_00_04: data.valueset['<= 04'].DISCOVERY.toLocaleString(),
-                assum_00_04: (data.valueset['<= 04'].CASES / data.valueset['<= 04'].DISCOVERY).toLocaleString(),
-                cases_05_14: data.valueset['05-14'].CASES.toLocaleString(),
-                disco_05_14: data.valueset['05-14'].DISCOVERY.toLocaleString(),
-                assum_05_14: (data.valueset['05-14'].CASES / data.valueset['05-14'].DISCOVERY).toLocaleString(),
-                cases_15_24: data.valueset['15-24'].CASES.toLocaleString(),
-                disco_15_24: data.valueset['15-24'].DISCOVERY.toLocaleString(),
-                assum_15_24: (data.valueset['15-24'].CASES / data.valueset['15-24'].DISCOVERY).toLocaleString(),
-                cases_25_34: data.valueset['25-34'].CASES.toLocaleString(),
-                disco_25_34: data.valueset['25-34'].DISCOVERY.toLocaleString(),
-                assum_25_34: (data.valueset['25-34'].CASES / data.valueset['25-34'].DISCOVERY).toLocaleString(),
-                cases_35_44: data.valueset['35-44'].CASES.toLocaleString(),
-                disco_35_44: data.valueset['35-44'].DISCOVERY.toLocaleString(),
-                assum_35_44: (data.valueset['35-44'].CASES / data.valueset['35-44'].DISCOVERY).toLocaleString(),
-                cases_45_54: data.valueset['45-54'].CASES.toLocaleString(),
-                disco_45_54: data.valueset['45-54'].DISCOVERY.toLocaleString(),
-                assum_45_54: (data.valueset['45-54'].CASES / data.valueset['45-54'].DISCOVERY).toLocaleString(),
-                cases_55_64: data.valueset['55-64'].CASES.toLocaleString(),
-                disco_55_64: data.valueset['55-64'].DISCOVERY.toLocaleString(),
-                assum_55_64: (data.valueset['55-64'].CASES / data.valueset['55-64'].DISCOVERY).toLocaleString(),
-                cases_65_74: data.valueset['65-74'].CASES.toLocaleString(),
-                disco_65_74: data.valueset['65-74'].DISCOVERY.toLocaleString(),
-                assum_65_74: (data.valueset['65-74'].CASES / data.valueset['65-74'].DISCOVERY).toLocaleString(),
-                cases_75_84: data.valueset['75-84'].CASES.toLocaleString(),
-                disco_75_84: data.valueset['75-84'].DISCOVERY.toLocaleString(),
-                assum_75_84: (data.valueset['75-84'].CASES / data.valueset['75-84'].DISCOVERY).toLocaleString(),
-                cases_85_00: data.valueset['>= 85'].CASES.toLocaleString(),
-                disco_85_00: data.valueset['>= 85'].DISCOVERY.toLocaleString(),
-                assum_85_00: (data.valueset['>= 85'].CASES / data.valueset['>= 85'].DISCOVERY).toLocaleString(),
-            })
-        })
-        // StorageUtil.getInstance().exportJson(this.modelData);
-        StorageUtil.getInstance().exportJson(strippedData);
+        StorageUtil.getInstance().exportJson(this.modelData);
+
+
+        // const strippedData: any[] = [];
+        // this.modelData.forEach(data => {
+        //     strippedData.push({
+        //         instant: data.instant,
+        //         date: '',
+        //         cases_00_04: data.valueset['<= 04'].CASES.toLocaleString(),
+        //         disco_00_04: data.valueset['<= 04'].DISCOVERY.toLocaleString(),
+        //         assum_00_04: (data.valueset['<= 04'].CASES / data.valueset['<= 04'].DISCOVERY).toLocaleString(),
+        //         cases_05_14: data.valueset['05-14'].CASES.toLocaleString(),
+        //         disco_05_14: data.valueset['05-14'].DISCOVERY.toLocaleString(),
+        //         assum_05_14: (data.valueset['05-14'].CASES / data.valueset['05-14'].DISCOVERY).toLocaleString(),
+        //         cases_15_24: data.valueset['15-24'].CASES.toLocaleString(),
+        //         disco_15_24: data.valueset['15-24'].DISCOVERY.toLocaleString(),
+        //         assum_15_24: (data.valueset['15-24'].CASES / data.valueset['15-24'].DISCOVERY).toLocaleString(),
+        //         cases_25_34: data.valueset['25-34'].CASES.toLocaleString(),
+        //         disco_25_34: data.valueset['25-34'].DISCOVERY.toLocaleString(),
+        //         assum_25_34: (data.valueset['25-34'].CASES / data.valueset['25-34'].DISCOVERY).toLocaleString(),
+        //         cases_35_44: data.valueset['35-44'].CASES.toLocaleString(),
+        //         disco_35_44: data.valueset['35-44'].DISCOVERY.toLocaleString(),
+        //         assum_35_44: (data.valueset['35-44'].CASES / data.valueset['35-44'].DISCOVERY).toLocaleString(),
+        //         cases_45_54: data.valueset['45-54'].CASES.toLocaleString(),
+        //         disco_45_54: data.valueset['45-54'].DISCOVERY.toLocaleString(),
+        //         assum_45_54: (data.valueset['45-54'].CASES / data.valueset['45-54'].DISCOVERY).toLocaleString(),
+        //         cases_55_64: data.valueset['55-64'].CASES.toLocaleString(),
+        //         disco_55_64: data.valueset['55-64'].DISCOVERY.toLocaleString(),
+        //         assum_55_64: (data.valueset['55-64'].CASES / data.valueset['55-64'].DISCOVERY).toLocaleString(),
+        //         cases_65_74: data.valueset['65-74'].CASES.toLocaleString(),
+        //         disco_65_74: data.valueset['65-74'].DISCOVERY.toLocaleString(),
+        //         assum_65_74: (data.valueset['65-74'].CASES / data.valueset['65-74'].DISCOVERY).toLocaleString(),
+        //         cases_75_84: data.valueset['75-84'].CASES.toLocaleString(),
+        //         disco_75_84: data.valueset['75-84'].DISCOVERY.toLocaleString(),
+        //         assum_75_84: (data.valueset['75-84'].CASES / data.valueset['75-84'].DISCOVERY).toLocaleString(),
+        //         cases_85_00: data.valueset['>= 85'].CASES.toLocaleString(),
+        //         disco_85_00: data.valueset['>= 85'].DISCOVERY.toLocaleString(),
+        //         assum_85_00: (data.valueset['>= 85'].CASES / data.valueset['>= 85'].DISCOVERY).toLocaleString(),
+        //     })
+        // })
+        // StorageUtil.getInstance().exportJson(strippedData);
+
     }
 
     async handleAgeGroupChange(): Promise<void> {
@@ -1380,10 +1402,12 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesN.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
         this.seriesPositivityRateR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
+        this.seriesTestRateR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesAgeGroupDiscovery.setSeriesNote(ageGroup.getName());
-        this.seriesMobilityOther.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
-        this.seriesHospitalizationR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
-        this.seriesIcuR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
+
+        // this.seriesMobility.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
+        // this.seriesHospitalizationR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
+        // this.seriesIcuR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
 
 
         this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
@@ -1576,7 +1600,9 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.visible = visible;
         this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
         this.yAxisPlotPercent.tooltip.disabled = !visible;
-        this.setAxisPercentBounds(0, 1);
+        if (visible) {
+            this.setAxisPercentBounds(0, 1);
+        }
 
         this.seriesAgeGroupSusceptible.setVisible(visible);
         this.seriesAgeGroupRemovedID.setVisible(visible);
@@ -1654,6 +1680,13 @@ export class ChartAgeGroup {
 
     setSeriesContactVisible(visible: boolean): void {
 
+        const validMobilityCategories = ['other', 'work', 'family'];
+
+        const modelActions = ModelActions.getInstance();
+        const lastRegressionType = modelActions.getLastRegressionType();
+        this.seriesMobility.setVisible(visible && lastRegressionType === 'MULTIPLIER' && validMobilityCategories.indexOf(modelActions.getCategory()) >= 0);
+        // this.seriesMobility.setVisible(visible); // needs to be kept for when visibility turn false (no call to renderRegressionData at that point)
+
         if (visible) {
             this.yAxisPlotPercent.visible = visible;
             this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
@@ -1683,7 +1716,6 @@ export class ChartAgeGroup {
         this.seriesReproductionR.setVisible(visible);
         this.seriesSeasonality.setVisible(visible);
 
-        this.seriesMobilityOther.setVisible(visible);
 
 
     }
@@ -1692,6 +1724,7 @@ export class ChartAgeGroup {
 
         this.seriesPositivityRateR.setVisible(visible);
         this.seriesAgeGroupDiscovery.setVisible(visible);
+        this.seriesTestRateR.setVisible(visible);
 
         if (visible) {
             this.yAxisPlotPercent.visible = visible;
@@ -1702,19 +1735,19 @@ export class ChartAgeGroup {
 
     }
 
-    setSeriesHospitalVisible(visible: boolean): void {
+    // setSeriesHospitalVisible(visible: boolean): void {
 
-        if (visible) {
-            this.yAxisPlotPercent.visible = visible;
-            this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
-            this.yAxisPlotPercent.tooltip.disabled = !visible;
-            this.setAxisPercentBounds(0, 0.001);
-        }
+    //     if (visible) {
+    //         this.yAxisPlotPercent.visible = visible;
+    //         this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
+    //         this.yAxisPlotPercent.tooltip.disabled = !visible;
+    //         this.setAxisPercentBounds(0, 0.001);
+    //     }
 
-        this.seriesHospitalizationR.setVisible(visible);
-        this.seriesIcuR.setVisible(visible);
+    //     this.seriesHospitalizationR.setVisible(visible);
+    //     this.seriesIcuR.setVisible(visible);
 
-    }
+    // }
 
     setChartMode(chartMode: CHART_MODE______KEY): void {
 
@@ -1740,7 +1773,8 @@ export class ChartAgeGroup {
     }
 
     setAxisPercentBounds(min: number, max: number): void {
-        this.yAxisPlotPercent.min = min; // min;
+        // console.warn(min, max);
+        this.yAxisPlotPercent.min = min;
         this.yAxisPlotPercent.max = max;
     }
 
@@ -1786,13 +1820,11 @@ export class ChartAgeGroup {
             const maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
 
             let maxIncidence = 0;
-            // let maxInfectious = 0;
             for (const dataItem of this.modelData) {
+
                 if (dataItem.instant >= minInstant && dataItem.instant <= maxInstant) {
                     Demographics.getInstance().getAgeGroups().forEach(ageGroupHeat => {
 
-                        // maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
-                        // maxInfectious = Math.max(maxInfectious, dataItem.valueset[ageGroupHeat.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL]);
                         maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
 
                         const casesScaled1 = dataItem.valueset[ageGroupHeat.getName()].CASES * 700000 / ageGroupHeat.getAbsValue();
@@ -1817,6 +1849,7 @@ export class ChartAgeGroup {
 
                     });
                 }
+
             }
 
             this.yAxisPlotIncidence.min = 0;
@@ -1858,11 +1891,16 @@ export class ChartAgeGroup {
 
     async renderRegressionData(): Promise<void> {
 
+        this.setAxisPercentBounds(0, 2);
+
         // const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
         // const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
         // const lastRegressionType = ModelActions.getInstance().getLastRegressionType();
         // const contactSummary = new ModificationResolverContact().getModification(dataItem.instant, 'INTERPOLATE').getColumnValueSummary(ageGroupPlot);
         // const shareOfFamily = contactSummary['family'] / contactSummary['total'];
+
+        const modelActions = ModelActions.getInstance();
+        let mobility: number;
 
         const plotData: any[] = [];
         for (const dataItem of this.modelData) {
@@ -1885,6 +1923,19 @@ export class ChartAgeGroup {
                 estimationValueLU = renderableRegressionResult.loess.y + renderableRegressionResult.loess.o - estimationValueLL;
             }
 
+
+            const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+            if (dataItem00) {
+                if (modelActions.getCategory() === 'other') {
+                    mobility = dataItem00.getAverageMobilityOther();
+                } else if (modelActions.getCategory() === 'work') {
+                    mobility = dataItem00.getAverageMobilityWork();
+                } else if (modelActions.getCategory() === 'family') {
+                    mobility = dataItem00.getAverageMobilityHome();
+                }
+            }
+
+
             const item = {
                 categoryX: dataItem.categoryX,
                 estimationValue,
@@ -1893,7 +1944,8 @@ export class ChartAgeGroup {
                 estimationValueM,
                 estimationValueL,
                 estimationValueLL,
-                estimationValueLU
+                estimationValueLU,
+                mobility
             }
 
             // console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), item);
@@ -1911,12 +1963,15 @@ export class ChartAgeGroup {
         this.seriesEstimationValueL.getSeries().data = chartData;
         this.seriesEstimationValueLL.getSeries().data = chartData;
         this.seriesEstimationValueLU.getSeries().data = chartData;
+        this.seriesMobility.getSeries().data = chartData;
 
     }
 
     async renderModelData(): Promise<void> {
 
         clearTimeout(this.renderTimeout);
+
+        // console.warn('rendering model data');
 
         const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
 
@@ -2114,11 +2169,12 @@ export class ChartAgeGroup {
             let ageGroupIncidenceR = null;
             let ageGroupAverageCasesR: number;
             let positivityRateR = null;
-            let hospitalizationR = null;
-            let icuR = null;
+            let testRateR = null;
+            // let hospitalizationR = null;
+            // let icuR = null;
             let ageGroupCasesR = null;
             let reproductionR = null;
-            let mobilityOther = null;
+            let mobility = null;
             const dataItem00 = BaseData.getInstance().findBaseDataItem(instant);
             if (dataItem00) {
 
@@ -2134,15 +2190,13 @@ export class ChartAgeGroup {
 
                 ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
                 positivityRateR = dataItem00.getAveragePositivity();
-                mobilityOther = dataItem00.getAverageMobilityOther();
 
-                // positivityRateR = new ModificationResolverDiscovery().getModification(dataItem00.getInstant(), 'INTERPOLATE').getOverall();
-                // if (positivityRateR && !Number.isNaN(positivityRateR)) {
-                //     positivityRateR; // TODO project this into a usable scale
-                // }
+                testRateR = dataItem00.getAverageTests() && dataItem00.getAverageTests() / Demographics.getInstance().getAbsTotal();
 
-                hospitalizationR = dataItem00.getHospitalization() / ageGroupPlot.getAbsValue();
-                icuR = dataItem00.getIcu() / ageGroupPlot.getAbsValue();
+                // mobility = dataItem00.getAverageMobilityOther();
+
+                // hospitalizationR = dataItem00.getHospitalization() / ageGroupPlot.getAbsValue();
+                // icuR = dataItem00.getIcu() / ageGroupPlot.getAbsValue();
 
                 reproductionR = dataItem00.getReproduction(ageGroupPlot.getIndex()); // dataItem00.getAverageMobilityOther();//
 
@@ -2158,11 +2212,9 @@ export class ChartAgeGroup {
                 ageGroupIncidenceR,
                 ageGroupAverageCasesR,
                 positivityRateR,
-                hospitalizationR,
-                icuR,
+                testRateR,
                 ageGroupCasesR,
                 reproductionR,
-                mobilityOther
             }
             baseData.push(item);
 
@@ -2195,9 +2247,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidenceR.getSeries().data = baseData;
         this.seriesAgeGroupAverageCasesR.getSeries().data = baseData;
         this.seriesPositivityRateR.getSeries().data = baseData;
-        this.seriesMobilityOther.getSeries().data = baseData;
-        this.seriesHospitalizationR.getSeries().data = baseData;
-        this.seriesIcuR.getSeries().data = baseData;
+        this.seriesTestRateR.getSeries().data = baseData;
         this.seriesAgeGroupCasesR.getSeries().data = baseData;
         this.seriesReproductionR.getSeries().data = baseData;
 

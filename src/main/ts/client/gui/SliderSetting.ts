@@ -15,12 +15,15 @@ export class SliderSetting extends Slider {
 
         document.getElementById('slidersSettingsDiv').appendChild(container);
 
-        // let labelFormat = ControlsConstants.LOCALE_FORMAT_FIXED;
-        // let inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
-        // if (steps < 0.01) {
-        //     labelFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
-        //     inputFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
-        // }
+        let tickFormat = ControlsConstants.LOCALE_FORMAT_FIXED;
+        let valueFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
+        if (steps < 0.1) {
+            tickFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
+            valueFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
+        } else if (steps < 1) {
+            tickFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
+            valueFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
+        }
 
         super({
             container,
@@ -42,9 +45,9 @@ export class SliderSetting extends Slider {
                     }
                 } else {
                     if (type === 'tick') {
-                        return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED);
+                        return value.toLocaleString(undefined, tickFormat);
                     } else {
-                        return value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1);
+                        return value.toLocaleString(undefined, valueFormat);
                     }
                 }
             },

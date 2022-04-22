@@ -281,7 +281,7 @@ export class ControlsStrain {
         console.log(this.incidence, Math.round(Math.log10(this.incidence)), minR0, maxR0, stepR0);
 
         if (log < 0) {
-            this.sliderIncidence.setFractionDigits(1 - log);
+            this.sliderIncidence.setFractionDigits(2 - log);
         } else {
             this.sliderIncidence.setFractionDigits(0);
         }

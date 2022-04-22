@@ -139,7 +139,7 @@ export class Demographics implements IContactCategories {
                     1, // 65-74
                     1, // 75-84
                     1  // >= 85
-                ].map(v => v * 0.4)
+                ].map(v => v * 0.36)
             }
 
             if (matrixConfig.name === 'work') {
@@ -154,7 +154,7 @@ export class Demographics implements IContactCategories {
                     1, // 65-74
                     1, // 75-84
                     1  // >= 85
-                ].map(v => v * 0.4)
+                ].map(v => v * 0.36)
             }
 
             if (matrixConfig.name === 'other') {
@@ -169,7 +169,7 @@ export class Demographics implements IContactCategories {
                     1.00, // 65-74
                     1.00, // 75-84
                     1.00  // >= 85
-                ].map(v => v)
+                ].map(v => v);
             }
 
             for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {

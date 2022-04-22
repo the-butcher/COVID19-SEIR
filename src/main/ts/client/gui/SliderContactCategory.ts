@@ -33,12 +33,12 @@ export class SliderContactCategory extends Slider {
 
         container.appendChild(canvasContainer);
 
-        const ticks = ModelConstants.RANGE____PERCENTAGE_100.slice(0, -1);
+        const ticks = ModelConstants.RANGE____PERCENTAGE_125.slice(0, -1);
 
         super({
             container,
-            min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
-            max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE_125),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE_125),
             step: 0.01, // 100
             values: [1.0],
             ticks,

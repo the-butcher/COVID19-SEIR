@@ -1,15 +1,13 @@
-import { ModificationContact } from './../../common/modification/ModificationContact';
 import { Modifications } from '../../common/modification/Modifications';
+import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { JsonLoader } from '../../util/JsonLoader';
 import { Demographics } from './../../common/demographics/Demographics';
 import { DouglasPeucker } from './../../util/DouglasPeucker';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { Statistics } from './../../util/Statistics';
-import { StrainUtil } from './../../util/StrainUtil';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelInstants } from './../ModelInstants';
 import { BaseDataItem, IBaseDataItem } from './BaseDataItem';
-import { ModificationDiscovery } from '../../common/modification/ModificationDiscovery';
 
 export interface IBaseDataMarker {
     instant: number,
@@ -228,7 +226,7 @@ export class BaseData {
                         instant,
                         derived: value,
                         display: dataItem.getAveragePositivity(),
-                        avgTest: dataItem.getAverageTests() * 100000 / Demographics.getInstance().getAbsTotal()
+                        avgTest: dataItem.getAverageTests() / Demographics.getInstance().getAbsTotal()
                     });
                 }
             }
@@ -237,8 +235,8 @@ export class BaseData {
         positivityIndices.forEach(positivityIndex => {
 
             const positivityMarker = positivityMarkers[positivityIndex];
-            const overall = StrainUtil.calculateDiscoveryRate(positivityMarker.instant, positivityMarker.display, positivityMarker.avgTest);
-            const id = ObjectUtil.createId();
+            const modifications = Modifications.getInstance();
+            const overall = ModificationSettings.getInstance().calculateDiscoveryRate(positivityMarker.display, positivityMarker.avgTest);
             const contactCategories = Demographics.getInstance().getCategories();
             const multipliers: { [k: string]: number } = {}
             contactCategories.forEach(contactCategory => {
@@ -251,9 +249,10 @@ export class BaseData {
             multipliers['other'] = 0.2;
 
             // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+            const id = ObjectUtil.createId();
             if (positivityMarker.instant > new Date('2022-03-28').getTime()) {
 
-                console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
+                // console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
 
                 // Modifications.getInstance().addModification(new ModificationDiscovery({
                 //     id,

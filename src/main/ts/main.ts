@@ -3,23 +3,18 @@ import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
+import { IModificationValuesSettings } from './common/modification/IModificationValuesSettings';
 import { Modifications } from './common/modification/Modifications';
+import { ModificationSettings } from './common/modification/ModificationSettings';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { Logger } from './util/Logger';
-import { StrainUtil } from './util/StrainUtil';
-
-[0.00001, 0.004, 0.006, 0.01].forEach(v => {
-    const log = Math.log10(v);
-    const min = Math.pow(10, Math.floor(log - 1));
-    const max = Math.pow(10, Math.ceil(log + 1));
-    const tick = Math.pow(10, Math.round(log - 2));
-    console.log(v, Math.round(Math.log10(v)), min, max, tick)
-});
-
-
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
+
+    const modificationValuesSettings = modelConfig.model_modifications.find(m => m.key === 'SETTINGS') as IModificationValuesSettings;
+    ModificationSettings.setupInstance(modificationValuesSettings);
+
     BaseData.setInstanceFromPath(modelConfig.model______basedata).then(() => {
         Demographics.setInstanceFromPath(modelConfig.model__demographics).then(() => {
 
@@ -33,8 +28,8 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             // initialize model mode
             ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length, false);
-            ModelActions.getInstance().toggleCategory('other', false);
-            ModelActions.getInstance().toggleVaccKey('v1', false);
+            // ModelActions.getInstance().toggleVaccKey('v1', false);
+            // ModelActions.getInstance().toggleCategory('other', false);
             ModelActions.getInstance().toggleModelMode('CONTACT');
 
             setTimeout(() => {
@@ -42,6 +37,8 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 requestAnimationFrame(() => {
                     ChartAgeGroup.getInstance().renderBaseData().then(() => {
                         ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length, true);
+                        ModelActions.getInstance().toggleVaccKey('v1', false);
+                        ModelActions.getInstance().toggleCategory('other', false);
                         ControlsConstants.MODIFICATION_PARAMS['CONTACT'].handleModificationUpdate();
                     });
                 });

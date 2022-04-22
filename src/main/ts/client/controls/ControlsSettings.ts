@@ -2,6 +2,7 @@ import { ModificationSettings } from '../../common/modification/ModificationSett
 import { CompartmentChainRecovery } from '../../model/compartment/CompartmentChainRecovery';
 import { ModelConstants } from '../../model/ModelConstants';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { ChartDiscoveryRate } from '../chart/ChartDiscoveryRate';
 import { ControlsConstants } from '../gui/ControlsConstants';
 import { IconSlider } from '../gui/IconSlider';
 import { Slider } from '../gui/Slider';
@@ -27,6 +28,13 @@ export class ControlsSettings {
     }
     private static instance: ControlsSettings;
 
+    private readonly chartTesting: ChartDiscoveryRate;
+
+    private sliderPow: SliderSetting;
+    private sliderMax: SliderSetting;
+    private sliderXmb: SliderSetting;
+    private sliderXmr: SliderSetting;
+
     private sliderUndetected: SliderSetting;
     private sliderQuarantine: SliderSetting;
     private sliderReexposure: Slider;
@@ -39,6 +47,13 @@ export class ControlsSettings {
     private readonly weibullCanvasVaccinationContainer = 'weibullCanvasVaccination';
 
     constructor() {
+
+        this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
+
+        this.sliderPow = new SliderSetting("exponent", [2, 4, 6, 8, 10], 1, false);
+        this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false);
+        this.sliderXmb = new SliderSetting("discovery slope base", [1.5, 2.00, 2.5, 3.0], 0.05, false);
+        this.sliderXmr = new SliderSetting("discovery slope rate", [0, 10, 20, 30, 40], 1, false);
 
         this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false);
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true);
@@ -126,6 +141,10 @@ export class ControlsSettings {
 
     handleChange(): void {
 
+        const pow = this.sliderPow.getValue();
+        const max = this.sliderMax.getValue();
+        const xmb = this.sliderXmb.getValue();
+        const xmr = this.sliderXmr.getValue();
         const undetected = this.sliderUndetected.getValue();
         const quarantine = this.sliderQuarantine.getValue();
         // const reexposure = this.sliderReexposure.getValue();
@@ -133,6 +152,10 @@ export class ControlsSettings {
 
         const dead = 0; // const dead = this.sliderDead.getValue();
         this.modification.acceptUpdate({
+            pow,
+            max,
+            xmb,
+            xmr,
             undetected,
             quarantine,
             reexposure: this.timeToWane,
@@ -149,6 +172,11 @@ export class ControlsSettings {
 
         Controls.acceptModification(modification);
         this.modification = modification;
+
+        this.sliderPow.setValue(this.modification.getPow() || 4);
+        this.sliderMax.setValue(this.modification.getMax() || 0.7);
+        this.sliderXmb.setValue(this.modification.getXmb() || 2.2);
+        this.sliderXmr.setValue(this.modification.getXmr() === undefined ? 10 : this.modification.getXmr());
 
         this.sliderUndetected.setValue(this.modification.getInitialUndetected());
         this.sliderQuarantine.setValue(this.modification.getQuarantine(-1)); // TODO - deprecate the slider, then introduce a contact category specific setting and calculate a value from there
@@ -170,7 +198,15 @@ export class ControlsSettings {
         this.modification = modification;
 
         this.redrawCanvasVaccination();
+        this.updateChart();
 
+    }
+
+    updateChart(): void {
+
+        requestAnimationFrame(() => {
+            this.chartTesting.acceptModificationSettings(this.modification);
+        });
 
     }
 

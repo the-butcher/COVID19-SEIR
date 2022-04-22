@@ -155,8 +155,8 @@ export class ModificationRegression extends AModification<IModificationValuesReg
      */
     getCorrectionRegression(instant: number, ageGroupName: string): IRegressionResult {
 
-        const result = this.correctionRegressions[ageGroupName].getRegressionResult(instant);
-        if (result.regression && result.ci95Dim) {
+        const result = this.correctionRegressions[ageGroupName]?.getRegressionResult(instant);
+        if (result && result.regression && result.ci95Dim) {
             let regression = result.regression + result.ci95Dim * this.modificationValues.correction_randoms[ageGroupName];
             if (regression < 0) {
                 regression = 0;

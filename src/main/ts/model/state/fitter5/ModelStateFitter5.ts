@@ -30,9 +30,12 @@ export class ModelStateFitter5 {
         0.12,
         0.11,
         0.10,
-        0.09,
-        0.08,
-        0.07,
+        0.095,
+        0.090,
+        0.085,
+        0.080,
+        0.075,
+        0.070,
         0.065,
         0.060,
         0.055,
@@ -45,7 +48,9 @@ export class ModelStateFitter5 {
         0.0300,
         0.0275,
         0.0250,
-        0.0225,
+        0.0230,
+        0.0220,
+        0.0210,
         0.0200
     ] // 0.17, 0.14, 0.12, 0.10, 0.08, 0.07, 0.065, 0.06, 0.055, 0.05, 0.045, 0.04, 0.035, 0.03, 0.025, 0.020, 0.017, 0.014, 0.012, 0.010];
 
@@ -94,7 +99,8 @@ export class ModelStateFitter5 {
         dataset.push(...stepDataI);
 
         fitterParams.curErrorCalculate = -1;
-        for (let modificationIndex = modificationIndexStart; modificationIndex < modificationsContact.length - ModelStateFitter5.FIT_INTERVAL; modificationIndex++) {
+        let modificationIndex = modificationIndexStart;
+        for (; modificationIndex < modificationsContact.length - ModelStateFitter5.FIT_INTERVAL; modificationIndex++) {
 
             const ratio = (modificationIndex + 2) / modificationsContact.length;
             const modificationSet: IModificationSet = {
@@ -183,6 +189,7 @@ export class ModelStateFitter5 {
 
             }
 
+
             // console.log(modificationIndex.toString().padStart(2, '0'), '|', loggableRange);
 
             const stepDataI = await modelStateIntegrator.buildModelData(modificationSet.modB.getInstant(), curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
@@ -200,6 +207,21 @@ export class ModelStateFitter5 {
 
         }
 
+        const modificationSet: IModificationSet = {
+            modA: modificationsContact[modificationsContact.length - 2],
+            modB: modificationsContact[modificationsContact.length - 1],
+            ratio: 1
+        }
+        modificationSet.modB.acceptUpdate({
+            multipliers: {
+                // 'other': currMultO,
+                'nursing': modificationSet.modA.getModificationValues().multipliers['nursing'],
+                'school': modificationSet.modA.getModificationValues().multipliers['school'],
+            },
+            corrections: {
+                ...modificationSet.modA.getModificationValues().corrections
+            }
+        });
 
 
         console.log('------------------------------------------------------------------------------------------');

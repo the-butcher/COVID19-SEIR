@@ -1,9 +1,11 @@
 import { Demographics } from './common/demographics/Demographics';
 import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
+import { IModificationValuesSettings } from './common/modification/IModificationValuesSettings';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { ModificationResolverRegression } from './common/modification/ModificationResolverRegression';
 import { Modifications } from './common/modification/Modifications';
+import { ModificationSettings } from './common/modification/ModificationSettings';
 import { BaseData } from './model/basedata/BaseData';
 import { StrainCalibrator } from './model/calibration/StrainCalibrator';
 import { IWorkerInput } from './model/IWorkerInput';
@@ -39,6 +41,9 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
          * create a demographics singleton (in worker scope, this does not interfere with main scope)
          */
         Demographics.setInstanceFromConfig('worker', demographicsConfig);
+
+        const modificationValuesSettings = modificationValues.find(m => m.key === 'SETTINGS') as IModificationValuesSettings;
+        ModificationSettings.setupInstance(modificationValuesSettings);
 
         /**
          * create a base-data singleton (in worker scope, this does not interfere with main scope)

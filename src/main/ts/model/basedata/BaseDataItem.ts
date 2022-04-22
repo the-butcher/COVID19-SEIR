@@ -6,6 +6,7 @@ import { BaseData, IBaseDataItemConfig } from './BaseData';
 import regression, { DataPoint } from 'regression';
 import { DataParser } from '@amcharts/amcharts4/core';
 import { ValueRegressionBase } from '../regression/ValueRegressionBase';
+import { Console } from 'console';
 
 export interface IBaseDataItem {
 
@@ -131,17 +132,17 @@ export class BaseDataItem implements IBaseDataItem {
 
     getMobilityOther(): number {
         const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_O];
-        return configValue >= 0 ? configValue / 120 : undefined;
+        return configValue >= 0 ? configValue / 100 : undefined;
     }
 
     getMobilityWork(): number {
         const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_W];
-        return configValue >= 0 ? configValue / 120 : undefined;
+        return configValue >= 0 ? configValue / 100 : undefined;
     }
 
     getMobilityHome(): number {
         const configValue = this.itemConfig[ModelConstants.AGEGROUP_NAME_______ALL][ModelConstants.BASE_DATA_INDEX__MOBI_H];
-        return configValue >= 0 ? configValue / 120 : undefined;
+        return configValue >= 0 ? configValue / 100 : undefined;
     }
 
     /**
@@ -239,6 +240,7 @@ export class BaseDataItem implements IBaseDataItem {
             });
 
             if (dataItemP4) {
+
                 const testsP2 = dataItemP2.getTestsM7();
                 const testsP3 = dataItemP3.getTestsM7();
                 const testsP4 = dataItemP4.getTestsM7();
@@ -252,36 +254,55 @@ export class BaseDataItem implements IBaseDataItem {
                 }
             }
 
-            let mobilityOtherValues: number[] = [];
-            let mobilityWorkValues: number[] = [];
-            let mobilityHomeValues: number[] = [];
+            this.averageMobilityOther = this.getMobilityOther();
+            this.averageMobilityWork = this.getMobilityWork();
+            this.averageMobilityHome = this.getMobilityHome();
 
-            mobilityOtherValues.push(this.getMobilityOther());
-            mobilityWorkValues.push(this.getMobilityWork());
-            mobilityHomeValues.push(this.getMobilityHome());
+            // let mobilityOtherValues: number[] = [];
+            // let mobilityWorkValues: number[] = [];
+            // let mobilityHomeValues: number[] = [];
 
-            const dataItemMI = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY);
-            const dataItemPI = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
-            if (dataItemMI.getMobilityOther() && dataItemPI.getMobilityOther()) {
-                mobilityOtherValues.push(dataItemMI.getMobilityOther());
-                mobilityOtherValues.push(dataItemPI.getMobilityOther());
-            }
-            if (dataItemMI.getMobilityWork() && dataItemPI.getMobilityWork()) {
-                mobilityWorkValues.push(dataItemMI.getMobilityWork());
-                mobilityWorkValues.push(dataItemPI.getMobilityWork());
-            }
-            if (dataItemMI.getMobilityHome() && dataItemPI.getMobilityHome()) {
-                mobilityHomeValues.push(dataItemMI.getMobilityHome());
-                mobilityHomeValues.push(dataItemPI.getMobilityHome());
-            }
+            // if (this.getMobilityOther()) {
+            //     mobilityOtherValues.push(this.getMobilityOther());
+            // }
+            // if (this.getMobilityWork()) {
+            //     mobilityWorkValues.push(this.getMobilityWork());
+            // }
+            // if (this.getMobilityHome()) {
+            //     mobilityHomeValues.push(this.getMobilityHome());
+            // }
 
-            mobilityOtherValues.sort((a, b) => a - b);
-            mobilityWorkValues.sort((a, b) => a - b);
-            mobilityHomeValues.sort((a, b) => a - b);
+            // const dataItemMI = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY);
+            // const dataItemPI = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
+            // if (dataItemMI.getMobilityOther() && dataItemPI.getMobilityOther()) {
+            //     mobilityOtherValues.push(dataItemMI.getMobilityOther());
+            //     mobilityOtherValues.push(dataItemPI.getMobilityOther());
+            // }
+            // if (dataItemMI.getMobilityWork() && dataItemPI.getMobilityWork()) {
+            //     mobilityWorkValues.push(dataItemMI.getMobilityWork());
+            //     mobilityWorkValues.push(dataItemPI.getMobilityWork());
+            // }
+            // if (dataItemMI.getMobilityHome() && dataItemPI.getMobilityHome()) {
+            //     mobilityHomeValues.push(dataItemMI.getMobilityHome());
+            //     mobilityHomeValues.push(dataItemPI.getMobilityHome());
+            // }
 
-            this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) / mobilityOtherValues.length;
-            this.averageMobilityWork = mobilityWorkValues.reduce((a, b) => a + b, 0) / mobilityWorkValues.length;
-            this.averageMobilityHome = mobilityHomeValues.reduce((a, b) => a + b, 0) / mobilityHomeValues.length;
+            // mobilityOtherValues.sort((a, b) => a - b);
+            // mobilityWorkValues.sort((a, b) => a - b);
+            // mobilityHomeValues.sort((a, b) => a - b);
+
+            // if (mobilityOtherValues.length > 2) {
+            //     this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) / mobilityOtherValues.length;
+            // }
+            // if (mobilityWorkValues.length > 2) {
+            //     this.averageMobilityWork = mobilityWorkValues.reduce((a, b) => a + b, 0) / mobilityWorkValues.length;
+            // }
+            // if (mobilityHomeValues.length > 2) {
+            //     this.averageMobilityHome = mobilityHomeValues.reduce((a, b) => a + b, 0) / mobilityHomeValues.length;
+            // }
+
+
+            // console.log(TimeUtil.formatCategoryDateFull(this.instant), this.averageMobilityOther, mobilityOtherValues);
 
         }
 

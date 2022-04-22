@@ -65,11 +65,11 @@ export class ControlsContact {
 
     setSliderState(): void {
 
-        if (this.modification?.isReadonly() || this.sliderCategory.getName() === 'work' || this.sliderCategory.getName() === 'family') {
-            this.sliderCategory.setDisabled(true);
-        } else {
-            this.sliderCategory.setDisabled(false);
-        }
+        // if (this.modification?.isReadonly() || this.sliderCategory.getName() === 'work' || this.sliderCategory.getName() === 'family') {
+        //     this.sliderCategory.setDisabled(true);
+        // } else {
+        //     this.sliderCategory.setDisabled(false);
+        // }
 
     }
 

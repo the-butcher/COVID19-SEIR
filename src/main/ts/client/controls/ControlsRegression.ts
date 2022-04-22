@@ -132,11 +132,7 @@ export class ControlsRegression {
             }
 
             if (ChartAgeGroup.getInstance().getChartMode() === 'CONTACT') {
-                if (lastRegressionType === 'MULTIPLIER') {
-                    ChartAgeGroup.getInstance().setAxisPercentBounds(0, 1);
-                } else if (lastRegressionType === 'CORRECTION') {
-                    ChartAgeGroup.getInstance().setAxisPercentBounds(0, 2);
-                }
+                ChartAgeGroup.getInstance().setAxisPercentBounds(0, 2);
             }
 
         }

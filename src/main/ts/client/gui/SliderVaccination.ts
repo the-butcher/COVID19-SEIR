@@ -1,9 +1,8 @@
-import { ControlsVaccination } from './../controls/ControlsVaccination';
-import { ControlsSettings } from '../controls/ControlsSettings';
 import { ModelConstants } from '../../model/ModelConstants';
+import { ControlsVaccination } from './../controls/ControlsVaccination';
+import { ControlsConstants } from './ControlsConstants';
 import { IconSlider } from './IconSlider';
 import { Slider } from './Slider';
-import { ControlsConstants } from './ControlsConstants';
 
 export class SliderVaccination extends Slider {
 

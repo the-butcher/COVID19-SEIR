@@ -51,33 +51,54 @@ export class ModificationContact extends AModification<IModificationValuesContac
         super.setInstants(instantA, instantB);
         const baseDataItem = BaseData.getInstance().findBaseDataItem(instantA);
 
-        // const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
-        // if (modificationRegression) {
-        //     const multipliers: { [K in string]: number } = {};
-        //     const corrections: { [K in string]: number } = {};
-        //     Demographics.getInstance().getCategories().forEach(category => {
-        //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).loess.y;
-        //     });
-        //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-        //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).loess.y;
-        //     });
-        //     console.log(TimeUtil.formatCategoryDateFull(this.modificationValues.instant), modificationRegression, multipliers, corrections);
-        //     this.acceptUpdate({
-        //         multipliers,
-        //         corrections
-        //     });
-        // }
+        const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
+        if (modificationRegression) {
+
+            const multipliers: { [K in string]: number } = {};
+            const corrections: { [K in string]: number } = {};
+
+            // multipliers['other'] = modificationRegression.getMultiplierRegression(instantA, 'other').loess.y;
+            // multipliers['work'] = modificationRegression.getMultiplierRegression(instantA, 'work').loess.y;
+            // multipliers['family'] = modificationRegression.getMultiplierRegression(instantA, 'family').loess.y;
+
+            //     Demographics.getInstance().getCategories().forEach(category => {
+            //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).loess.y;
+            //     });
+            //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).loess.y;
+            //     });
+            //     console.log(TimeUtil.formatCategoryDateFull(this.modificationValues.instant), modificationRegression, multipliers, corrections);
+
+            this.acceptUpdate({
+                multipliers,
+                corrections
+            });
+
+        }
 
         if (baseDataItem) {
+
             const multipliers: { [K in string]: number } = {};
-            const multiplierWork = baseDataItem.getAverageMobilityWork();
-            if (multiplierWork) {
-                multipliers['work'] = multiplierWork * 0.90;
-            }
-            const multiplierHome = baseDataItem.getAverageMobilityHome();
-            if (multiplierHome) {
-                multipliers['family'] = multiplierHome * 0.90;
-            }
+
+            /**
+             * 1) snap to google data
+             */
+
+            // const multiplierWork = baseDataItem.getAverageMobilityWork();
+            // if (multiplierWork) {
+            //     multipliers['work'] = multiplierWork;
+            // }
+            // const multiplierHome = baseDataItem.getAverageMobilityHome();
+            // if (multiplierHome) {
+            //     multipliers['family'] = multiplierHome;
+            // }
+            // const multiplierOther = baseDataItem.getAverageMobilityOther();
+            // if (multiplierOther) {
+            //     multipliers['other'] = multiplierOther;
+            // }
+
+            // multipliers['school'] = 0.75;
+
             this.acceptUpdate({
                 multipliers
             });

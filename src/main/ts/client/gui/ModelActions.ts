@@ -71,6 +71,10 @@ export class ModelActions {
 
         this.actionIcons = [];
 
+        // this.lastRegressionType = 'MULTIPLIER';
+        // this.category = 'other';
+        // this.ageGroup = Demographics.getInstance().getAgeGroupSchool();
+
         Object.keys(ModelConstants.MODIFICATION_PARAMS).forEach((key: MODIFICATION____KEY) => {
             this.modelModeIcons.push(new IconModelMode(key));
         });
@@ -146,14 +150,14 @@ export class ModelActions {
                 ModelActions.getInstance().toggleChartMode('REPRODUCTION');
             }
         }));
-        this.chartModeIcons.push(new IconChartMode({
-            container: 'charttoggleDiv',
-            label: 'HOSPITAL',
-            iconKey: 'HOSPITAL',
-            handleClick: () => {
-                ModelActions.getInstance().toggleChartMode('HOSPITAL');
-            }
-        }));
+        // this.chartModeIcons.push(new IconChartMode({
+        //     container: 'charttoggleDiv',
+        //     label: 'HOSPITAL',
+        //     iconKey: 'HOSPITAL',
+        //     handleClick: () => {
+        //         ModelActions.getInstance().toggleChartMode('HOSPITAL');
+        //     }
+        // }));
 
         const ageGroups = [...Demographics.getInstance().getAgeGroups()].reverse();
         this.ageGroupIcons.push(new IconChartMode({
@@ -206,7 +210,7 @@ export class ModelActions {
     getVaccKey(): string {
         return this.vaccKey;
     }
-    
+
     toggleVaccKey(vaccKey: string, updateChart: boolean): void {
         this.lastRegressionType = 'VACCKEY';
         this.vaccKey = vaccKey;

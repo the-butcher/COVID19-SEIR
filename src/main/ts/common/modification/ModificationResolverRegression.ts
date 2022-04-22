@@ -3,7 +3,7 @@ import { IModificationValuesRegression } from './IModificationValuesRegression';
 import { ModificationRegression } from './ModificationRegression';
 
 /**
- * modification resolver for settings modifications
+ * modification resolver for regression modifications
  * no-op
  *
  * @author h.fleischer

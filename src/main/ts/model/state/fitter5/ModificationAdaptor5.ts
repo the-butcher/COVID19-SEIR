@@ -48,9 +48,9 @@ export class ModificationAdaptor5 {
         const prevMultN = modificationSet.modA.getCategoryValue('nursing');
         const prevMultS = modificationSet.modA.getCategoryValue('school');
 
-        if (!errorsG['TOTAL']) {
-            Math.random();
-        }
+        // if (!errorsG['TOTAL']) {
+        //     Math.random();
+        // }
 
         const corrections: { [K in string]: number } = {};
         let currCorrT = 0;
@@ -65,16 +65,16 @@ export class ModificationAdaptor5 {
         // console.log(TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant()), currCorrT / ageGropups.length, currCorrT1);
 
         // currMultO *= currCorrT1;
-        const currMultO = Math.max(0.00, Math.min(1, (prevMultO - errorsG['TOTAL'] * errorRatio * 0.90) / currCorrT1));
-        const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.84 - errorsG['75-84'] * errorRatio * 0.36));
-        const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 1.20));
+        const currMultO = Math.max(0.00, Math.min(1, (prevMultO - errorsG['TOTAL'] * errorRatio * 0.30) / currCorrT1));
+        const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.28 - errorsG['75-84'] * errorRatio * 0.12));
+        const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 0.40));
 
 
         if (iterationIndex % 10 < 3) {
 
             modificationSet.modA.acceptUpdate({
                 multipliers: {
-                    'other': currMultO,
+                    // 'other': currMultO,
                     'nursing': currMultN,
                     'school': currMultS
                 }

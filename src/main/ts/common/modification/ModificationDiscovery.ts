@@ -1,11 +1,11 @@
 import { BaseData } from '../../model/basedata/BaseData';
 import { ObjectUtil } from '../../util/ObjectUtil';
-import { StrainUtil } from '../../util/StrainUtil';
-import { TimeUtil } from '../../util/TimeUtil';
 import { Demographics } from '../demographics/Demographics';
 import { AModification } from './AModification';
 import { IContactColumns } from './IContactColumns';
 import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
+import { Modifications } from './Modifications';
+import { ModificationSettings } from './ModificationSettings';
 
 /**
  * implementation of IModification for testing / discovery
@@ -45,8 +45,8 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
 
         const dataItem = BaseData.getInstance().findBaseDataItem(this.getInstantA());
         const averagePosititivity = dataItem.getAveragePositivity();
-        const testsPer100000 = dataItem.getAverageTests() * 100000 / Demographics.getInstance().getAbsTotal();
-        const discoveryRate = StrainUtil.calculateDiscoveryRate(this.getInstantA(), averagePosititivity, testsPer100000);
+        const testRate = dataItem.getAverageTests() / Demographics.getInstance().getAbsTotal();
+        const discoveryRate = ModificationSettings.getInstance().calculateDiscoveryRate(averagePosititivity, testRate);
 
         // console.log(TimeUtil.formatCategoryDateFull(this.getInstantA()), testsPer100000);
 
