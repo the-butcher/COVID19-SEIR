@@ -1,5 +1,7 @@
 import { Modifications } from '../../common/modification/Modifications';
+import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { TimeUtil } from '../../util/TimeUtil';
+import { BaseData } from '../basedata/BaseData';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
 import { ECompartmentType } from '../compartment/ECompartmentType';
 import { ModelConstants } from '../ModelConstants';
@@ -44,15 +46,15 @@ export interface IDataItem {
     valueset: { [K: string]: IDataValues };
     exposure: number[][];
     seasonality: number;
+    testRate: number;
+    positivityRate: number;
     errors?: { [K: string]: number };
     derivs?: { [K: string]: number };
 }
 export interface IDataValues {
     SUSCEPTIBLE: number;
     REMOVED_ID: number;
-    // REMOVED_IU: number;
     REMOVED_VI: number;
-    // REMOVED_VU: number;
     REMOVED_V2: number;
     CASES: number;
     INCIDENCES: { [K in string]: number };
@@ -81,6 +83,7 @@ export class ModelStateIntegrator {
 
     private modelState: IModelState;
     private exposure: number[][];
+    private nrmCasesLast: number;
 
     private rollbackInstant: number;
     private rollbackState: IModelState;
@@ -95,9 +98,40 @@ export class ModelStateIntegrator {
     }
 
     private integrate(dT: number, tT: number): ModificationTime {
+
         const modificationTime = ModificationTime.createInstance(tT);
+        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+
+            const baseData = BaseData.getInstance().findBaseDataItem(tT);
+            if (!baseData) {
+
+                // console.log(this.nrmCasesLast * this.model.getAbsTotal());
+                const realCases = this.nrmCasesLast * this.model.getAbsTotal();
+                for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 10) {
+                    const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(realCases, modificationTime.getTestRate()); // result.predict(discoveredCases * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
+                    const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, modificationTime.getTestRate());
+                    const realCasesCandidate = discoveredCases / discoveryRateCandidate;
+                    if (realCasesCandidate > realCases) {
+                        modificationTime.injectPositivityRate(positivityRateCandidate * 0.55);
+                        console.log(discoveredCases, ' >> ', realCases, positivityRateCandidate, realCasesCandidate);
+                        break;
+                    }
+                }
+
+                // const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0);
+                // const cases = this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * this.model.getAbsTotal();
+                // const discoveryRate = ModificationSettings.getInstance().calculateDiscoveryRateFromCases(cases);
+                // modificationTime.injectDiscoveryRateOverall(discoveryRate * 0.8);
+                // console.log('discoveryRate', discoveryRate);
+            }
+
+        }
+
+
+
         this.modelState.add(this.model.apply(this.modelState, dT, tT, modificationTime));
         return modificationTime;
+
     }
 
     getInstant(): number {
@@ -156,14 +190,14 @@ export class ModelStateIntegrator {
                     categoryX: TimeUtil.formatCategoryDateFull(this.curInstant),
                     valueset: {},
                     exposure: this.exposure,
-                    seasonality: modificationTime.getSeasonality()
+                    seasonality: modificationTime.getSeasonality(),
+                    testRate: modificationTime.getTestRate(),
+                    positivityRate: modificationTime.getPositivityRate(),
                 };
                 dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
                     SUSCEPTIBLE: undefined,
                     REMOVED_ID: undefined,
-                    // REMOVED_IU: undefined,
                     REMOVED_VI: undefined,
-                    // REMOVED_VU: undefined,
                     REMOVED_V2: undefined,
                     CASES: undefined,
                     INCIDENCES: incidences,
@@ -178,9 +212,7 @@ export class ModelStateIntegrator {
                     dataItem.valueset[ageGroup.getName()] = {
                         SUSCEPTIBLE: undefined,
                         REMOVED_ID: undefined,
-                        // REMOVED_IU: undefined,
                         REMOVED_VI: undefined,
-                        // REMOVED_VU: undefined,
                         REMOVED_V2: undefined,
                         CASES: undefined,
                         INCIDENCES: incidences,
@@ -220,6 +252,7 @@ export class ModelStateIntegrator {
         const dataSet: IDataItem[] = [];
         const absTotal = this.model.getDemographics().getAbsTotal();
 
+
         const minChartInstant = ModelInstants.getInstance().getMinInstant();
         const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
 
@@ -244,6 +277,7 @@ export class ModelStateIntegrator {
             const modificationTime = this.integrate(ModelStateIntegrator.DT, this.curInstant);
 
             // sum up strain exposures to a single exposure matrix
+            this.nrmCasesLast = 0;
             modificationValuesStrain.forEach(modificationValueStrain => {
                 const strainModel = this.model.findStrainModel(modificationValueStrain.id);
                 const strainExposure = strainModel.getNrmExposure();
@@ -252,6 +286,7 @@ export class ModelStateIntegrator {
                         this.exposure[indexContact][indexParticipant] += strainExposure[indexContact][indexParticipant];
                     }
                 }
+                this.nrmCasesLast += strainModel.getNrmCasesLast();
             });
 
             if (dataFilter(this.curInstant)) {
@@ -259,7 +294,7 @@ export class ModelStateIntegrator {
                 const removedIDTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedIDTotal);
                 const removedVITotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVITotal);
                 const removedV2Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV2Total);
-                const discoveryTotal = modificationTime.getDiscoveryRatioTotal();
+                const discoveryTotal = modificationTime.getDiscoveryRateTotal();
 
                 // values that come by strain
                 const incidences: { [K: string]: number } = {};
@@ -287,14 +322,14 @@ export class ModelStateIntegrator {
                     categoryX: TimeUtil.formatCategoryDateFull(this.curInstant),
                     valueset: {},
                     exposure: this.exposure,
-                    seasonality: modificationTime.getSeasonality()
+                    seasonality: modificationTime.getSeasonality(),
+                    testRate: modificationTime.getTestRate(),
+                    positivityRate: modificationTime.getPositivityRate(),
                 };
                 dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
                     SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptibleTotal),
                     REMOVED_ID: removedIDTotal,
-                    // REMOVED_IU: removedIUTotal,
                     REMOVED_VI: removedVITotal,
-                    // REMOVED_VU: removedVUTotal,
                     REMOVED_V2: removedV2Total,
                     CASES: this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal,
                     INCIDENCES: incidences,
@@ -322,6 +357,7 @@ export class ModelStateIntegrator {
                     const removedVI = this.modelState.getNrmValueSum(compartmentFilterRemovedVI) * groupNormalizer;
                     const removedV2 = this.modelState.getNrmValueSum(compartmentFilterRemovedV2) * groupNormalizer;
                     const discovery = modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
+                    // const positivity = modificationTime.getPos
 
                     const incidencesAgeGroup: { [K: string]: number } = {};
                     const exposedAgeGroup: { [K: string]: number } = {};

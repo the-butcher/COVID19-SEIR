@@ -36,7 +36,10 @@ export class ModelImplInfectious implements IModelSeir {
     private readonly compartmentsInfectiousPrimary: CompartmentInfectious[];
     private readonly compartmentsIncidence: CompartmentBase[];
 
-    private integrationSteps: IModelIntegrationStep[];
+    private readonly integrationSteps: IModelIntegrationStep[];
+
+    private nrmCasesLast: number;
+
 
     constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime) {
 
@@ -155,6 +158,10 @@ export class ModelImplInfectious implements IModelSeir {
 
             apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
 
+                if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+                    this.nrmCasesLast = 0;
+                }
+
                 const result = ModelState.empty();
 
                 let nrmRecov = 0;
@@ -206,6 +213,8 @@ export class ModelImplInfectious implements IModelSeir {
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
                         const discoveredNrmCases = continuationValue * modificationTime.getDiscoveryRatios(this.ageGroupIndex).discovery;
                         result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
+                        this.nrmCasesLast += continuationValue;
+                        // console.log(this.parentModel.getStrainId(), this.nrmCasesLast);
                     }
 
                 }
@@ -225,6 +234,10 @@ export class ModelImplInfectious implements IModelSeir {
 
         });
 
+    }
+
+    getNrmCasesLast(): number {
+        return this.nrmCasesLast;
     }
 
     getRootModel(): ModelImplRoot {

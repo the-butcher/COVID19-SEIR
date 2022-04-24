@@ -76,7 +76,7 @@ export class ModificationAdaptor5 {
                 multipliers: {
                     // 'other': currMultO,
                     'nursing': currMultN,
-                    'school': currMultS
+                    // 'school': currMultS
                 }
             });
             // if (modificationSet.ratio === 1) {

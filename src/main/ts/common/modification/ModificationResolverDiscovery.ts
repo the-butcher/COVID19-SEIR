@@ -44,17 +44,19 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                 const multiplier = multiplierA + (multiplierB - multiplierA) * fraction;
                 multipliers[key] = multiplier;
             });
-            const overallA = modificationValuesA.overall;
-            const overallB = modificationValuesB.overall;
-            const overall = overallA + (overallB - overallA) * fraction;
+
+            const testRateA = modificationValuesA.testRate;
+            const testRateB = modificationValuesB.testRate;
+            const testRate = testRateA + (testRateB - testRateA) * fraction;
 
             const interpolatedModification = new ModificationDiscovery({
                 id: ObjectUtil.createId(),
                 key: 'TESTING',
                 name: 'interpolation',
                 instant,
-                overall,
-                bindToOverall: true,
+                // overall,
+                testRate,
+                // bindToOverall: true,
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),
@@ -71,18 +73,8 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
     }
 
     getValue(instant: number): number {
-
         const modificationTime = ModificationTime.createInstance(instant);
-        return modificationTime.getDiscoveryRatioTotal();
-
-        // const demographics = Demographics.getInstance();
-        // let totalTestingValue = 0;
-        // for (let indexContact = 0; indexContact < demographics.getAgeGroups().length; indexContact++) {
-        //     const testingVal = this.getModification(instant).getColumnValue(indexContact);
-        //     totalTestingValue += testingVal * demographics.getAgeGroups()[indexContact].getAbsValue();
-        // }
-        // return totalTestingValue / Demographics.getInstance().getAbsTotal();
-
+        return modificationTime.getDiscoveryRateTotal();
     }
 
 }

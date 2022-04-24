@@ -41,61 +41,38 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
         super.acceptUpdate(update);
     }
 
-    getOverall(): number {
-
+    getPositivityRate(): number {
         const dataItem = BaseData.getInstance().findBaseDataItem(this.getInstantA());
-        const averagePosititivity = dataItem.getAveragePositivity();
-        const testRate = dataItem.getAverageTests() / Demographics.getInstance().getAbsTotal();
-        const discoveryRate = ModificationSettings.getInstance().calculateDiscoveryRate(averagePosititivity, testRate);
-
-        // console.log(TimeUtil.formatCategoryDateFull(this.getInstantA()), testsPer100000);
-
-
-        return discoveryRate;
-
-        // console.log(this.modificationValues.id, discoveryRate, this.modificationValues.overall);
-        // this.modificationValues.overall = discoveryRate;
-        // return discoveryRate;
-
-        // return this.modificationValues.overall;
-
+        if (dataItem) {
+            return dataItem.getAveragePositivity();
+        }
     }
 
-    isBoundToTotal(): boolean {
-        return this.modificationValues.bindToOverall;
+    getTestRate(): number {
+        const dataItem = BaseData.getInstance().findBaseDataItem(this.getInstantA());
+        if (dataItem) {
+            const averagePosititivity = dataItem.getAveragePositivity();
+            const averageTests = dataItem.getAverageTests();
+            if (averagePosititivity && averageTests) {
+                return averageTests / Demographics.getInstance().getAbsTotal();
+            }
+        }
+        return this.modificationValues.testRate || 0.02;
     }
+
+    // isBoundToTotal(): boolean {
+    //     return this.modificationValues.bindToOverall;
+    // }
 
     isBlendable(): boolean {
         return this.modificationValues.blendable;
     }
 
     getCategoryValue(contactCategoryName: string): number {
-
         if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
             this.modificationValues.multipliers[contactCategoryName] = 0.1;
         }
-
-        // this.modificationValues.multipliers['school'] = 0.70;
-        // this.modificationValues.multipliers['nursing'] = 0.60;
-        // this.modificationValues.multipliers['family'] = 0.15;
-        // this.modificationValues.multipliers['work'] = 0.50;
-        // this.modificationValues.multipliers['other'] = 0.25;
-
-        // const minDecayInstant = TimeUtil.parseCategoryDateFull('15.03.2022'); // 1646438400000; // Date and time (GMT): Saturday, March 5, 2022 0:00:00; // Date and time (GMT): Friday, February 25, 2022 0:00:00
-        // const maxDecayInstant = minDecayInstant + TimeUtil.MILLISECONDS_PER___WEEK * 2;
-        // if (this.modificationValues.instant > minDecayInstant) {
-        //     if (this.modificationValues.instant <= maxDecayInstant) {
-        //         const fraction = (this.modificationValues.instant - minDecayInstant) / (maxDecayInstant - minDecayInstant);
-        //         this.modificationValues.multipliers['school'] = 0.7 - fraction * 0.30;
-        //         // this.modificationValues.multipliers['work'] = mWork - fraction * 0.30;
-        //     } else {
-        //         this.modificationValues.multipliers['school'] = 0.40;
-        //         // this.modificationValues.multipliers['work'] = 0.20;
-        //     }
-        // }
-
         return this.modificationValues.multipliers[contactCategoryName];
-
     }
 
 }

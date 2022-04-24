@@ -121,7 +121,7 @@ export class ChartDiscovery {
         // console.log('contactColumns', contactColumns);
 
         const demographics = Demographics.getInstance();
-        const chartData: IChartDataDiscovery[]  = [];
+        const chartData: IChartDataDiscovery[] = [];
         const ageGroups = demographics.getAgeGroups();
 
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
@@ -134,7 +134,7 @@ export class ChartDiscovery {
             });
         }
 
-        const discoveryRatioTotal = modificationTime.getDiscoveryRatioTotal(); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
+        const discoveryRatioTotal = modificationTime.getDiscoveryRateTotal(); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
         // console.log('discoveryRatioTotal', discoveryRatioTotal);
         // this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
         this.valueTotalLabel.text = this.labellingDefinitionTooltip.format(discoveryRatioTotal); // ControlsConstants.LOCALE_FORMAT_FIXED (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
@@ -142,7 +142,6 @@ export class ChartDiscovery {
         if (this.fullDataUpdate) {
             this.chart.data = chartData;
             this.fullDataUpdate = false;
-            this.chart.invalidateRawData();
         } else {
             for (let i = 0; i < chartData.length; i++) {
                 if (this.chart.data[i].discoveryRatio) {
@@ -151,8 +150,8 @@ export class ChartDiscovery {
                     this.chart.data[i].label = chartData[i].label;
                 }
             }
-            this.chart.invalidateRawData();
         }
+        this.chart.invalidateRawData();
 
         this.fullDataUpdate = false;
 

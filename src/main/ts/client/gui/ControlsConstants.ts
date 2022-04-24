@@ -162,10 +162,10 @@ export class ControlsConstants {
         'VACCINATED': {
             id: ObjectUtil.createId(),
             title: 'Compartments',
-            getHeatValue: (dataItem, ageGroupName) => 1 - dataItem.valueset[ageGroupName].SUSCEPTIBLE,
+            getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL],
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.54, Math.min(0.75, value * 0.25), value * 0.75).getHex(), //  Math.min(1.0, (10 + Math.round(value * 90)) / 100)
-            getHeatMax: () => 1,
+            getHeatColor: (value) => new Color(0.83, Math.min(0.50, value * 0.75), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
                 chart.setSeriesTestingVisible(false);

@@ -57,9 +57,10 @@ export class ModificationContact extends AModification<IModificationValuesContac
             const multipliers: { [K in string]: number } = {};
             const corrections: { [K in string]: number } = {};
 
-            // multipliers['other'] = modificationRegression.getMultiplierRegression(instantA, 'other').loess.y;
             // multipliers['work'] = modificationRegression.getMultiplierRegression(instantA, 'work').loess.y;
+            // multipliers['school'] = modificationRegression.getMultiplierRegression(instantA, 'work').loess.y;
             // multipliers['family'] = modificationRegression.getMultiplierRegression(instantA, 'family').loess.y;
+            // multipliers['other'] = modificationRegression.getMultiplierRegression(instantA, 'other').loess.y;
 
             //     Demographics.getInstance().getCategories().forEach(category => {
             //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).loess.y;
@@ -87,6 +88,7 @@ export class ModificationContact extends AModification<IModificationValuesContac
             // const multiplierWork = baseDataItem.getAverageMobilityWork();
             // if (multiplierWork) {
             //     multipliers['work'] = multiplierWork;
+            //     multipliers['school'] = multiplierWork;
             // }
             // const multiplierHome = baseDataItem.getAverageMobilityHome();
             // if (multiplierHome) {

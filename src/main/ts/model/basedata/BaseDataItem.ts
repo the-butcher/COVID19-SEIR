@@ -1,12 +1,8 @@
-import { StrainUtil } from './../../util/StrainUtil';
-import { Demographics } from './../../common/demographics/Demographics';
-import { TimeUtil } from './../../util/TimeUtil';
 import { ModelConstants } from '../ModelConstants';
+import { Demographics } from './../../common/demographics/Demographics';
+import { StrainUtil } from './../../util/StrainUtil';
+import { TimeUtil } from './../../util/TimeUtil';
 import { BaseData, IBaseDataItemConfig } from './BaseData';
-import regression, { DataPoint } from 'regression';
-import { DataParser } from '@amcharts/amcharts4/core';
-import { ValueRegressionBase } from '../regression/ValueRegressionBase';
-import { Console } from 'console';
 
 export interface IBaseDataItem {
 

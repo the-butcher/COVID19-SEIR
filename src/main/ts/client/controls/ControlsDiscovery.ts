@@ -11,6 +11,9 @@ import { Demographics } from './../../common/demographics/Demographics';
 import { Controls } from './Controls';
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
+import { Slider } from '../gui/Slider';
+import { ModelConstants } from '../../model/ModelConstants';
+import { IconSlider } from '../gui/IconSlider';
 
 /**
  * controller for editing testing modifications
@@ -29,10 +32,11 @@ export class ControlsDiscovery {
     private static instance: ControlsDiscovery;
 
     private readonly chartTesting: ChartDiscovery;
-    private readonly sliderOverall: SliderDiscoveryCategory;
+    private readonly sliderTestRate: Slider;
+    // private readonly sliderOverall: SliderDiscoveryCategory;
     private readonly slidersDiscovery: SliderDiscoveryCategory[];
     private readonly iconBlendable: IconToggle;
-    private readonly iconBoundToTotal: IconToggle;
+    // private readonly iconBoundToTotal: IconToggle;
 
     private modification: ModificationDiscovery;
 
@@ -50,16 +54,55 @@ export class ControlsDiscovery {
             label: 'smooth transition'
         });
 
-        this.sliderOverall = new SliderDiscoveryCategory('total');
+        // this.sliderOverall = new SliderDiscoveryCategory('total');
 
-        this.iconBoundToTotal = new IconToggle({
-            container: 'slidersTestingDiv',
-            state: false,
-            handleToggle: state => {
-                this.handleChange();
+        const container = document.createElement('div');
+        container.classList.add('slider-modification');
+        document.getElementById('slidersTestingDiv').appendChild(container);
+        this.sliderTestRate = new Slider({
+            container,
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE__10),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE__10),
+            step: 0.01,
+            values: [0.0],
+            ticks: [...ModelConstants.RANGE____PERCENTAGE__10],
+            label: 'test rate',
+            thumbCreateFunction: (index: number) => {
+                return new IconSlider();
             },
-            label: 'bind to total'
+            labelFormatFunction: (index, value, type) => {
+                if (type === 'tick') {
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
+                } else {
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                }
+            },
+            handleValueChange: (index, value, type) => {
+                if (type === 'stop' || type === 'input') {
+                    this.handleChange();
+                }
+            },
+            handleThumbPicked: (index) => {
+                // nothing
+            },
+            inputFunctions: {
+                inputFormatFunction: (index, value) => {
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                },
+                inputHandleFunction: (index, value) => {
+                    return parseFloat(value.replace(',', '.')) / 100;
+                }
+            }
         });
+
+        // this.iconBoundToTotal = new IconToggle({
+        //     container: 'slidersTestingDiv',
+        //     state: false,
+        //     handleToggle: state => {
+        //         this.handleChange();
+        //     },
+        //     label: 'bind to total'
+        // });
 
         Demographics.getInstance().getCategories().forEach(contactCategory => {
             this.slidersDiscovery.push(new SliderDiscoveryCategory(contactCategory.getName()));
@@ -70,9 +113,11 @@ export class ControlsDiscovery {
     handleChange(): void {
 
         const blendable = this.iconBlendable.getState();
-        const overall = this.sliderOverall.getValue();
-        const bindToOverall = this.iconBoundToTotal.getState();
-        this.sliderOverall.setDisabled(!bindToOverall);
+        // const overall = this.sliderOverall.getValue();
+        const testRate = this.sliderTestRate.getValue(0);
+        // const bindToOverall = this.iconBoundToTotal.getState();
+
+        // this.sliderOverall.setDisabled(!bindToOverall);
 
         const multipliers: { [K in string]: number } = {};
         let updatedCategories: string[] = [];
@@ -86,8 +131,9 @@ export class ControlsDiscovery {
         this.modification.acceptUpdate({
             multipliers,
             blendable,
-            overall,
-            bindToOverall
+            // overall,
+            testRate,
+            // bindToOverall
         });
 
         this.updateChart();
@@ -104,10 +150,12 @@ export class ControlsDiscovery {
         this.modification = modification;
 
         this.iconBlendable.toggle(modification.isBlendable());
-        this.iconBoundToTotal.toggle(modification.isBoundToTotal());
+        // this.iconBoundToTotal.toggle(modification.isBoundToTotal());
 
-        this.sliderOverall.setDisabled(!modification.isBoundToTotal());
-        this.sliderOverall.setValue(modification.getOverall());
+        // this.sliderOverall.setDisabled(!modification.isBoundToTotal());
+        // this.sliderOverall.setValue(modification.getDiscoveryRate());
+
+        this.sliderTestRate.setValueAndRedraw(0, modification.getTestRate(), true);
 
         // console.log('overall', modification);
 

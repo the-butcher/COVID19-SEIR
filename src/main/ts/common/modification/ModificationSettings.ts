@@ -99,4 +99,13 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
 
     }
 
+    calculatePositivityRate(cases: number, testRate: number): number {
+        const scaledCases = cases * 100 / Demographics.getInstance().getAbsTotal();
+        return (this.modificationValues.reg[0] * scaledCases) / testRate;
+    }
+
+    setEquationParams(reg: number[]) {
+        this.modificationValues.reg = reg;
+    }
+
 }

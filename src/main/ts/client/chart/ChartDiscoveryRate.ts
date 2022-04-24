@@ -11,7 +11,7 @@ import { ModificationTime } from './../../common/modification/ModificationTime';
 import { ChartUtil } from './ChartUtil';
 
 export interface IChartDataDiscoveryRate {
-    positivity: number;
+    positivity: string;
     discoveryAv: number;
     discoveryLo: number;
     discoveryHi: number;
@@ -27,7 +27,7 @@ export interface IChartDataDiscoveryRate {
 export class ChartDiscoveryRate {
 
     private readonly chart: XYChart;
-    private readonly xAxis: ValueAxis;
+    private readonly xAxis: CategoryAxis;
     private readonly yAxis: ValueAxis;
 
     private readonly seriesDiscoveryLo: LineSeries;
@@ -51,7 +51,7 @@ export class ChartDiscoveryRate {
         ChartUtil.getInstance().configureChartPadding(this.chart);
         ChartUtil.getInstance().configureSeparators(this.chart);
 
-        this.xAxis = this.chart.xAxes.push(new ValueAxis());
+        this.xAxis = this.chart.xAxes.push(new CategoryAxis());
         this.yAxis = this.chart.yAxes.push(new ValueAxis());
 
         /**
@@ -61,13 +61,14 @@ export class ChartDiscoveryRate {
         this.xAxis.renderer.labels.template.rotation = -90;
         this.xAxis.renderer.labels.template.horizontalCenter = 'right';
         this.xAxis.renderer.labels.template.verticalCenter = 'middle';
-        this.xAxis.tooltip.disabled = false;
+        this.xAxis.tooltip.disabled = true;
+        this.xAxis.dataFields.category = 'positivity';
 
         /**
          * y-axis
          */
         ChartUtil.getInstance().configureAxis(this.yAxis, 'Discovery');
-        this.yAxis.tooltip.disabled = false;
+        this.yAxis.tooltip.disabled = true;
         this.yAxis.renderer.labels.template.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, labellingDefinitionAxis);
         });
@@ -83,33 +84,33 @@ export class ChartDiscoveryRate {
         this.seriesDiscoveryLo.yAxis = this.yAxis;
         this.seriesDiscoveryLo.fontFamily = ControlsConstants.FONT_FAMILY;
         this.seriesDiscoveryLo.fontSize = ControlsConstants.FONT_SIZE;
-        this.seriesDiscoveryLo.dataFields.valueX = 'positivity';
+        this.seriesDiscoveryLo.dataFields.categoryX = 'positivity';
         this.seriesDiscoveryLo.dataFields.valueY = 'discoveryLo';
         this.seriesDiscoveryLo.fillOpacity = 0.0;
         this.seriesDiscoveryLo.strokeWidth = 1;
         this.seriesDiscoveryLo.strokeLinecap = 'round';
         this.seriesDiscoveryLo.strokeOpacity = 1.0;
-        this.seriesDiscoveryLo.tooltip.disabled = false;
+        this.seriesDiscoveryLo.tooltip.disabled = true;
 
         this.seriesDiscoveryHi = this.chart.series.push(new LineSeries());
         this.seriesDiscoveryHi.xAxis = this.xAxis;
         this.seriesDiscoveryHi.yAxis = this.yAxis;
         this.seriesDiscoveryHi.fontFamily = ControlsConstants.FONT_FAMILY;
         this.seriesDiscoveryHi.fontSize = ControlsConstants.FONT_SIZE;
-        this.seriesDiscoveryHi.dataFields.valueX = 'positivity';
+        this.seriesDiscoveryHi.dataFields.categoryX = 'positivity';
         this.seriesDiscoveryHi.dataFields.valueY = 'discoveryHi';
         this.seriesDiscoveryHi.fillOpacity = 0.0;
         this.seriesDiscoveryHi.strokeWidth = 1;
         this.seriesDiscoveryHi.strokeLinecap = 'round';
         this.seriesDiscoveryHi.strokeOpacity = 1.0;
-        this.seriesDiscoveryHi.tooltip.disabled = false;
+        this.seriesDiscoveryHi.tooltip.disabled = true;
 
         this.seriesDiscoveryAv = this.chart.series.push(new LineSeries());
         this.seriesDiscoveryAv.xAxis = this.xAxis;
         this.seriesDiscoveryAv.yAxis = this.yAxis;
         this.seriesDiscoveryAv.fontFamily = ControlsConstants.FONT_FAMILY;
         this.seriesDiscoveryAv.fontSize = ControlsConstants.FONT_SIZE;
-        this.seriesDiscoveryAv.dataFields.valueX = 'positivity';
+        this.seriesDiscoveryAv.dataFields.categoryX = 'positivity';
         this.seriesDiscoveryAv.dataFields.valueY = 'discoveryAv';
         this.seriesDiscoveryAv.fillOpacity = 0.0;
         this.seriesDiscoveryAv.strokeWidth = 2;
@@ -117,7 +118,7 @@ export class ChartDiscoveryRate {
         this.seriesDiscoveryAv.strokeOpacity = 1.0;
         this.seriesDiscoveryAv.tooltip.disabled = false;
 
-        this.seriesDiscoveryAv.tooltipText = '{name}';
+        this.seriesDiscoveryAv.tooltipText = 'positivity:\u00A0{categoryX}\ndiscovery:\u00A0\u00A0{label}';
         ChartUtil.getInstance().configureSeries(this.seriesDiscoveryAv, ControlsConstants.COLOR____FONT, false);
 
         // this.seriesDiscoveryAv.adapter.add('tooltipText', (value, target) => {
@@ -136,12 +137,12 @@ export class ChartDiscoveryRate {
         // });
 
         this.chart.cursor = new XYCursor();
-        // this.chart.cursor.xAxis = this.xAxis;
+        this.chart.cursor.xAxis = this.xAxis;
         // this.chart.cursor.yAxis = this.yAxis;
         this.chart.cursor.showTooltipOn = 'always';
         this.chart.cursor.exportable = true;
-        this.chart.cursor.lineX.disabled = false;
-        this.chart.cursor.lineY.disabled = false;
+        this.chart.cursor.lineX.disabled = true;
+        this.chart.cursor.lineY.disabled = true;
 
         this.chart.events.on('ready', e => {
             (this.seriesDiscoveryAv.bulletsContainer.element.node.parentNode as SVGGElement).setAttributeNS(null, 'clip-path', '');
@@ -167,7 +168,7 @@ export class ChartDiscoveryRate {
             const discoveryHi = modificationSettings.calculateDiscoveryRate(positivity, 0.05);
 
             chartData.push({
-                positivity,
+                positivity: this.labellingDefinitionTooltip.format(positivity),
                 discoveryAv,
                 discoveryLo,
                 discoveryHi,
@@ -178,16 +179,19 @@ export class ChartDiscoveryRate {
         if (this.fullDataUpdate) {
             this.chart.data = chartData;
             this.fullDataUpdate = false;
-            this.chart.invalidateRawData();
         } else {
             const keys = Object.keys(chartData[0]);
             for (let i = 0; i < chartData.length; i++) {
-                for (const key of keys) { // const key in chartData[i]
-                    this.chart.data[i][key] = chartData[i][key];
+                if (this.chart.data[i].discoveryAv) {
+                    // this.chart.data[i].positivity = chartData[i].positivity;
+                    this.chart.data[i].discoveryAv = chartData[i].discoveryAv;
+                    this.chart.data[i].discoveryLo = chartData[i].discoveryLo;
+                    this.chart.data[i].discoveryHi = chartData[i].discoveryHi;
+                    this.chart.data[i].label = chartData[i].label;
                 }
             }
-            this.chart.invalidateRawData();
         }
+        this.chart.invalidateRawData();
 
         this.fullDataUpdate = false;
 

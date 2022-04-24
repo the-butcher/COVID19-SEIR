@@ -253,7 +253,7 @@ export class ChartContactMatrix {
         const heatRule = this.seriesHeat.heatRules.getIndex(0) as any;
         heatRule.minValue = 0;
         heatRule.maxValue = 1;
-        this.yAxisPlot.max = contactMatrix.getMaxColumnValue();
+        this.yAxisPlot.max = contactMatrix.getMaxColumnValue() / 2;
 
         // let matrixValue = 0;
         for (let indexX = 0; indexX < ageGroups.length; indexX++) {

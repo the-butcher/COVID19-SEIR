@@ -89,6 +89,11 @@ A higher discovery rate means:
 * StrainApproximatorBaseData - manual increase of incidence to correct for awkward data
 * Demographics corrections on the matrices
 
+#### Data update
+* snap other, family, work to google data, no manual adjustment yet, since the next step would break adjustments again
+* snap other, family, work to regression, then adjust to plausible levels (TODO :: automate this) for family, school (=work), other that give good regression curves
+* rebuild
+
 #### Issues
 * possibilities
   * initial levels of vaccination by age group, waning of vaccination

@@ -1,13 +1,12 @@
-import { Modifications } from '../../common/modification/Modifications';
-import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { JsonLoader } from '../../util/JsonLoader';
 import { Demographics } from './../../common/demographics/Demographics';
-import { DouglasPeucker } from './../../util/DouglasPeucker';
-import { ObjectUtil } from './../../util/ObjectUtil';
 import { Statistics } from './../../util/Statistics';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelInstants } from './../ModelInstants';
 import { BaseDataItem, IBaseDataItem } from './BaseDataItem';
+
+import regression, { DataPoint } from 'regression';
+import { ModificationSettings } from '../../common/modification/ModificationSettings';
 
 export interface IBaseDataMarker {
     instant: number,
@@ -162,114 +161,160 @@ export class BaseData {
 
         }
 
-
-        const reproductionMarkers: IBaseDataMarker[] = [];
+        // const regression = new Regress
+        const regressionInput: DataPoint[] = [];
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
             const dataItem = this.findBaseDataItem(instant, false);
             if (dataItem) {
-                const value = dataItem.getReproduction(Demographics.getInstance().getAgeGroups().length);
-                if (value && !Number.isNaN(value)) {
-                    reproductionMarkers.push({
-                        instant,
-                        derived: value,
-                        display: value
-                    });
+
+                const positivityRate = dataItem.getAveragePositivity();
+                const averageTests = dataItem.getAverageTests();
+                if (positivityRate && averageTests) {
+
+                    const testRate = averageTests / Demographics.getInstance().getAbsTotal();
+                    const discoveryRate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRate, testRate);
+                    const normalizedCases = dataItem.getAverageCases(Demographics.getInstance().getAgeGroupTotal().getIndex()) * 100 / Demographics.getInstance().getAbsTotal();
+                    regressionInput.push([normalizedCases, positivityRate * testRate]);
+
+                    // console.log(cases, ';', positivityRate * testRate);
+
                 }
+
             }
         }
-        const reproductionIndices = new DouglasPeucker(reproductionMarkers).findIndices();
-        reproductionIndices.forEach(reproductionIndex => {
 
-            const reproductionMarker = reproductionMarkers[reproductionIndex];
-            const id = ObjectUtil.createId();
-            const contactCategories = Demographics.getInstance().getCategories();
-            const multipliers: { [k: string]: number } = {}
-            contactCategories.forEach(contactCategory => {
-                multipliers[contactCategory.getName()] = 0.1;
-            });
-            multipliers['school'] = 0.4;
-            multipliers['nursing'] = 0.5;
-            multipliers['family'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityHome() * 0.60;
-            multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityWork() * 0.60;
-            multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityOther() * 0.60;
-
-            if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
-
-                // console.log('adding at', TimeUtil.formatCategoryDateFull(reproductionMarker.instant));
-
-                // Modifications.getInstance().addModification(new ModificationContact({
-                //     id,
-                //     key: 'CONTACT',
-                //     name: `adjustments (${id})`,
-                //     instant: reproductionMarker.instant,
-                //     multipliers,
-                //     deletable: true,
-                //     draggable: true,
-                //     blendable: false
-                // }));
-
-            }
-
-
-
-            // console.log('reproductionMarker', TimeUtil.formatCategoryDate(reproductionMarker.instant), reproductionMarker.derived);
+        // console.log('regressionInput', regressionInput);
+        const result = regression.linear(regressionInput, {
+            precision: 4
         });
+        ModificationSettings.getInstance().setEquationParams(result.equation);
+        // const posAt002 = result.predict(7000 * 100 / Demographics.getInstance().getAbsTotal())[1] / 0.02;
+        // const posAt005 = result.predict(7000 * 100 / Demographics.getInstance().getAbsTotal())[1] / 0.05;
+        // const dscAt002 = ModificationSettings.getInstance().calculateDiscoveryRate(posAt002, 0.02);
+        // const dscAt005 = ModificationSettings.getInstance().calculateDiscoveryRate(posAt002, 0.05);
 
-        // testing does not
-        let positivityMarkers: IBaseDataMarker[] = [];
-        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const dataItem = this.findBaseDataItem(instant, false);
-            if (dataItem) {
-                const value = dataItem.getDerivedPositivity();
-                if (value && !Number.isNaN(value)) {
-                    positivityMarkers.push({
-                        instant,
-                        derived: value,
-                        display: dataItem.getAveragePositivity(),
-                        avgTest: dataItem.getAverageTests() / Demographics.getInstance().getAbsTotal()
-                    });
-                }
-            }
-        }
-        const positivityIndices = new DouglasPeucker(positivityMarkers).findIndices();
-        positivityIndices.forEach(positivityIndex => {
+        // const realCases = 30000;
+        // const testRate = 0.02;
+        // // TODO find positivity and discovery
+        // for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 100) {
+        //     const positivityRateCandidate = result.predict(discoveredCases * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
+        //     const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, testRate);
+        //     const realCasesCandidate = discoveredCases / discoveryRateCandidate;
+        //     if (realCasesCandidate > realCases) {
+        //         console.log(discoveredCases, positivityRateCandidate, realCasesCandidate);
+        //         break;
+        //     }
+        // }
 
-            const positivityMarker = positivityMarkers[positivityIndex];
-            const modifications = Modifications.getInstance();
-            const overall = ModificationSettings.getInstance().calculateDiscoveryRate(positivityMarker.display, positivityMarker.avgTest);
-            const contactCategories = Demographics.getInstance().getCategories();
-            const multipliers: { [k: string]: number } = {}
-            contactCategories.forEach(contactCategory => {
-                multipliers[contactCategory.getName()] = overall;
-            });
-            multipliers['school'] = 0.4;
-            multipliers['nursing'] = 0.75;
-            multipliers['family'] = 0.6;
-            multipliers['work'] = 0.2;
-            multipliers['other'] = 0.2;
+        // // console.log('result', result, posAt002, dscAt002, posAt005, dscAt005);
 
-            // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
-            const id = ObjectUtil.createId();
-            if (positivityMarker.instant > new Date('2022-03-28').getTime()) {
+        // const reproductionMarkers: IBaseDataMarker[] = [];
+        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        //     const dataItem = this.findBaseDataItem(instant, false);
+        //     if (dataItem) {
+        //         const value = dataItem.getReproduction(Demographics.getInstance().getAgeGroups().length);
+        //         if (value && !Number.isNaN(value)) {
+        //             reproductionMarkers.push({
+        //                 instant,
+        //                 derived: value,
+        //                 display: value
+        //             });
+        //         }
+        //     }
+        // }
+        // const reproductionIndices = new DouglasPeucker(reproductionMarkers).findIndices();
+        // reproductionIndices.forEach(reproductionIndex => {
 
-                // console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
+        //     const reproductionMarker = reproductionMarkers[reproductionIndex];
+        //     const id = ObjectUtil.createId();
+        //     const contactCategories = Demographics.getInstance().getCategories();
+        //     const multipliers: { [k: string]: number } = {}
+        //     contactCategories.forEach(contactCategory => {
+        //         multipliers[contactCategory.getName()] = 0.1;
+        //     });
+        //     multipliers['school'] = 0.4;
+        //     multipliers['nursing'] = 0.5;
+        //     multipliers['family'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityHome() * 0.60;
+        //     multipliers['work'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityWork() * 0.60;
+        //     multipliers['other'] = BaseData.getInstance().findBaseDataItem(reproductionMarker.instant, false).getAverageMobilityOther() * 0.60;
 
-                // Modifications.getInstance().addModification(new ModificationDiscovery({
-                //     id,
-                //     key: 'TESTING',
-                //     name: `adjustments (${id})`,
-                //     instant: positivityMarker.instant,
-                //     bindToOverall: true,
-                //     overall,
-                //     multipliers,
-                //     deletable: true,
-                //     draggable: true,
-                //     blendable: true
-                // }));
+        //     if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
-            }
+        //         // console.log('adding at', TimeUtil.formatCategoryDateFull(reproductionMarker.instant));
 
-        });
+        //         // Modifications.getInstance().addModification(new ModificationContact({
+        //         //     id,
+        //         //     key: 'CONTACT',
+        //         //     name: `adjustments (${id})`,
+        //         //     instant: reproductionMarker.instant,
+        //         //     multipliers,
+        //         //     deletable: true,
+        //         //     draggable: true,
+        //         //     blendable: false
+        //         // }));
+
+        //     }
+
+
+
+        //     // console.log('reproductionMarker', TimeUtil.formatCategoryDate(reproductionMarker.instant), reproductionMarker.derived);
+        // });
+
+        // // testing does not
+        // let positivityMarkers: IBaseDataMarker[] = [];
+        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        //     const dataItem = this.findBaseDataItem(instant, false);
+        //     if (dataItem) {
+        //         const value = dataItem.getDerivedPositivity();
+        //         if (value && !Number.isNaN(value)) {
+        //             positivityMarkers.push({
+        //                 instant,
+        //                 derived: value,
+        //                 display: dataItem.getAveragePositivity(),
+        //                 avgTest: dataItem.getAverageTests() / Demographics.getInstance().getAbsTotal()
+        //             });
+        //         }
+        //     }
+        // }
+        // const positivityIndices = new DouglasPeucker(positivityMarkers).findIndices();
+        // positivityIndices.forEach(positivityIndex => {
+
+        //     const positivityMarker = positivityMarkers[positivityIndex];
+        //     // const modifications = Modifications.getInstance();
+        //     const overall = ModificationSettings.getInstance().calculateDiscoveryRate(positivityMarker.display, positivityMarker.avgTest);
+        //     const contactCategories = Demographics.getInstance().getCategories();
+        //     const multipliers: { [k: string]: number } = {}
+        //     contactCategories.forEach(contactCategory => {
+        //         multipliers[contactCategory.getName()] = overall;
+        //     });
+        //     multipliers['school'] = 0.4;
+        //     multipliers['nursing'] = 0.75;
+        //     multipliers['family'] = 0.6;
+        //     multipliers['work'] = 0.2;
+        //     multipliers['other'] = 0.2;
+
+        //     // if (positivityMarker.instant > ModelInstants.getInstance().getMinInstant()) {
+        //     const id = ObjectUtil.createId();
+        //     if (positivityMarker.instant > new Date('2022-03-28').getTime()) {
+
+        //         // console.log('adding at', TimeUtil.formatCategoryDateFull(positivityMarker.instant));
+
+        //         // Modifications.getInstance().addModification(new ModificationDiscovery({
+        //         //     id,
+        //         //     key: 'TESTING',
+        //         //     name: `adjustments (${id})`,
+        //         //     instant: positivityMarker.instant,
+        //         //     bindToOverall: true,
+        //         //     overall,
+        //         //     multipliers,
+        //         //     deletable: true,
+        //         //     draggable: true,
+        //         //     blendable: true
+        //         // }));
+
+        //     }
+
+        // });
 
         const deletableInstants: string[] = [];
         for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {

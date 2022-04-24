@@ -67,7 +67,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private columnValues: number[];
     private cellValues: number[][];
     private discoveryRatiosByAgeGroup: IRatios[];
-    private discoveryRatioOverall: number;
+    private discoveryRateOverall: number;
+    private positivityRateInjected: number;
 
     private vaccinationsPerDay: { [K in string]: IVaccinationConfig };
 
@@ -193,13 +194,13 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         });
 
-        let _discoveryRatioOverall = 0;
+        let _discoveryRateOverall = 0;
         this.ageGroups.forEach(ageGroup => {
-            _discoveryRatioOverall += ageGroup.getAbsValue() * this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery;
+            _discoveryRateOverall += ageGroup.getAbsValue() * this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery;
         });
-        this.discoveryRatioOverall = _discoveryRatioOverall / this.absTotal;
+        _discoveryRateOverall = _discoveryRateOverall / this.absTotal;
 
-        const correction = this.modificationDiscovery.getOverall() / this.discoveryRatioOverall;
+        const correction = this.calculateDiscoveryRateOverall() / _discoveryRateOverall;
         this.ageGroups.forEach(ageGroup => {
             let contact = this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].contact * correction;
             let discovery = Math.min(1.0, this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery * correction);
@@ -208,15 +209,39 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 discovery
             };
         });
-        this.discoveryRatioOverall = this.modificationDiscovery.getOverall();
+        this.discoveryRateOverall = this.calculateDiscoveryRateOverall();
 
     }
 
-    getDiscoveryRatioTotal(): number {
+    injectPositivityRate(positivityRate: number): void {
+        this.positivityRateInjected = positivityRate;
+    }
+
+    private calculateDiscoveryRateOverall(): number {
+
+        const testRate = this.getTestRate();
+        const positivityRate = this.getPositivityRate();
+        if (testRate && positivityRate) {
+            return ModificationSettings.getInstance().calculateDiscoveryRate(positivityRate, testRate);
+        }
+    }
+
+    getPositivityRate(): number {
+        if (this.positivityRateInjected) {
+            return this.positivityRateInjected;
+        }
+        return this.modificationDiscovery.getPositivityRate();
+    }
+
+    getTestRate(): number {
+        return this.modificationDiscovery.getTestRate();
+    }
+
+    getDiscoveryRateTotal(): number {
         if (!this.discoveryRatiosByAgeGroup) {
             this.buildRatios();
         }
-        return this.discoveryRatioOverall;
+        return this.discoveryRateOverall;
     }
 
     getQuarantineMultiplier(ageGroupIndex: number): number {

@@ -48,4 +48,9 @@ export interface IModificationValuesSettings extends IModificationValues {
      */
     xmr: number;
 
+    /**
+     * equation params calculated from discovery rates over the part of the model where data is known
+     */
+    reg?: number[];
+
 }
