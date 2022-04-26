@@ -51,60 +51,64 @@ export class ModificationContact extends AModification<IModificationValuesContac
         super.setInstants(instantA, instantB);
         const baseDataItem = BaseData.getInstance().findBaseDataItem(instantA);
 
-        const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
-        if (modificationRegression) {
+        // const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
+        // if (modificationRegression) {
 
-            const multipliers: { [K in string]: number } = {};
-            const corrections: { [K in string]: number } = {};
+        //     // const multipliers: { [K in string]: number } = {};
+        //     const corrections: { [K in string]: number } = {};
 
-            // multipliers['work'] = modificationRegression.getMultiplierRegression(instantA, 'work').loess.y;
-            // multipliers['school'] = modificationRegression.getMultiplierRegression(instantA, 'work').loess.y;
-            // multipliers['family'] = modificationRegression.getMultiplierRegression(instantA, 'family').loess.y;
-            // multipliers['other'] = modificationRegression.getMultiplierRegression(instantA, 'other').loess.y;
+        //     // multipliers['work'] = modificationRegression.getMultiplierRegression(instantA, 'work').loess.y;
+        //     // multipliers['school'] = modificationRegression.getMultiplierRegression(instantA, 'work').loess.y;
+        //     // multipliers['family'] = modificationRegression.getMultiplierRegression(instantA, 'family').loess.y;
+        //     // multipliers['other'] = modificationRegression.getMultiplierRegression(instantA, 'other').loess.y;
+        //     // multipliers['nursing'] = modificationRegression.getMultiplierRegression(instantA, 'family').loess.y * 0.6 + modificationRegression.getMultiplierRegression(instantA, 'other').loess.y * 0.2;
 
-            //     Demographics.getInstance().getCategories().forEach(category => {
-            //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).loess.y;
-            //     });
-            //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-            //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).loess.y;
-            //     });
-            //     console.log(TimeUtil.formatCategoryDateFull(this.modificationValues.instant), modificationRegression, multipliers, corrections);
+        //     //     Demographics.getInstance().getCategories().forEach(category => {
+        //     //         multipliers[category.getName()] = modificationRegression.getMultiplierRegression(instantA, category.getName()).loess.y;
+        //     //     });
+        //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+        //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).loess.y;
+        //     });
+        //     //     console.log(TimeUtil.formatCategoryDateFull(this.modificationValues.instant), modificationRegression, multipliers, corrections);
 
-            this.acceptUpdate({
-                multipliers,
-                corrections
-            });
+        //     // multipliers['nursing'] = 0.7; // modificationRegression.getMultiplierRegression(instantA, 'other').loess.y;
 
-        }
+        //     this.acceptUpdate({
+        //         // multipliers,
+        //         corrections
+        //     });
 
-        if (baseDataItem) {
+        // }
 
-            const multipliers: { [K in string]: number } = {};
+        // if (baseDataItem) {
 
-            /**
-             * 1) snap to google data
-             */
+        //     const multipliers: { [K in string]: number } = {};
 
-            // const multiplierWork = baseDataItem.getAverageMobilityWork();
-            // if (multiplierWork) {
-            //     multipliers['work'] = multiplierWork;
-            //     multipliers['school'] = multiplierWork;
-            // }
-            // const multiplierHome = baseDataItem.getAverageMobilityHome();
-            // if (multiplierHome) {
-            //     multipliers['family'] = multiplierHome;
-            // }
-            // const multiplierOther = baseDataItem.getAverageMobilityOther();
-            // if (multiplierOther) {
-            //     multipliers['other'] = multiplierOther;
-            // }
+        //     /**
+        //      * 1) snap to google data
+        //      */
 
-            // multipliers['school'] = 0.75;
+        //     // const multiplierWork = baseDataItem.getAverageMobilityWork();
+        //     // const multiplierHome = baseDataItem.getAverageMobilityHome();
+        //     // const multiplierOther = baseDataItem.getAverageMobilityOther();
+        //     // if (multiplierWork) {
+        //     //     multipliers['work'] = multiplierWork;
+        //     //     multipliers['school'] = multiplierWork;
+        //     // }
+        //     // if (multiplierHome) {
+        //     //     multipliers['family'] = multiplierHome;
+        //     //     //     multipliers['nursing'] = multiplierHome * 0.5 + multiplierOther * 0.3;
+        //     // }
+        //     // if (multiplierOther) {
+        //     //     multipliers['other'] = multiplierOther;
+        //     // }
 
-            this.acceptUpdate({
-                multipliers
-            });
-        }
+        //     // multipliers['school'] = 0.75;
+
+        //     this.acceptUpdate({
+        //         multipliers
+        //     });
+        // }
 
     }
 

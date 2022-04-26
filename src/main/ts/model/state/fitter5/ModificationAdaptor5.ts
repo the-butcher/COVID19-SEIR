@@ -75,7 +75,7 @@ export class ModificationAdaptor5 {
             modificationSet.modA.acceptUpdate({
                 multipliers: {
                     // 'other': currMultO,
-                    'nursing': currMultN,
+                    // 'nursing': currMultN,
                     // 'school': currMultS
                 }
             });

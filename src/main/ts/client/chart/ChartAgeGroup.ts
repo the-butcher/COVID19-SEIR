@@ -444,7 +444,7 @@ export class ChartAgeGroup {
             dashed: true,
             locationOnPath: 0.41,
             labels: {
-                tooltip: false,
+                tooltip: true,
                 pathtip: false
             },
             stacked: false,
@@ -775,7 +775,7 @@ export class ChartAgeGroup {
             },
             stacked: false,
             legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
 
@@ -795,7 +795,7 @@ export class ChartAgeGroup {
             },
             stacked: false,
             legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
 
@@ -815,7 +815,7 @@ export class ChartAgeGroup {
             },
             stacked: false,
             legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
 
@@ -1088,6 +1088,7 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesMobility.setSeriesNote('');
 
 
         this.chart.cursor = new XYCursor();
@@ -1832,17 +1833,17 @@ export class ChartAgeGroup {
             for (const dataItem of this.modelData) {
 
                 if (dataItem.instant >= minInstant && dataItem.instant <= maxInstant) {
-                    Demographics.getInstance().getAgeGroups().forEach(ageGroupHeat => {
+                    Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
 
-                        maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroupHeat.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+                        maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
 
-                        const casesScaled1 = dataItem.valueset[ageGroupHeat.getName()].CASES * 700000 / ageGroupHeat.getAbsValue();
+                        const casesScaled1 = dataItem.valueset[ageGroup.getName()].CASES * 700000 / ageGroup.getAbsValue();
                         if (this.seriesAgeGroupDiscoveredCases.isVisible()) {
                             maxIncidence = Math.max(maxIncidence, casesScaled1);
                         }
 
                         if (this.seriesAgeGroupCasesN.isVisible()) {
-                            const casesOffset = BaseData.getInstance().getAverageOffset(ageGroupHeat.getIndex(), dataItem.instant);
+                            const casesOffset = BaseData.getInstance().getAverageOffset(ageGroup.getIndex(), dataItem.instant);
                             if (casesOffset) {
                                 maxIncidence = Math.max(maxIncidence, casesScaled1 * casesOffset); // daily prediction
                             }
@@ -1851,7 +1852,7 @@ export class ChartAgeGroup {
                         if (this.seriesAgeGroupCasesR.isVisible()) {
                             const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
                             if (dataItem00) {
-                                const casesScaled2 = dataItem00.getCasesM1(ageGroupHeat.getIndex()) * 700000 / ageGroupHeat.getAbsValue();
+                                const casesScaled2 = dataItem00.getCasesM1(ageGroup.getIndex()) * 700000 / ageGroup.getAbsValue();
                                 maxIncidence = Math.max(maxIncidence, casesScaled2);
                             }
                         }

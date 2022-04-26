@@ -54,9 +54,7 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                 key: 'TESTING',
                 name: 'interpolation',
                 instant,
-                // overall,
                 testRate,
-                // bindToOverall: true,
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),
@@ -67,6 +65,10 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
             return interpolatedModification;
 
         } else {
+            // return new ModificationDiscovery({
+            //     instant,
+            //     ...modificationA.getModificationValues()
+            // });
             return modificationA;
         }
 

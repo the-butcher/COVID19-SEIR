@@ -211,10 +211,13 @@ export class ModelImplInfectious implements IModelSeir {
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
-                        const discoveredNrmCases = continuationValue * modificationTime.getDiscoveryRatios(this.ageGroupIndex).discovery;
+                        const discoveryRatio = modificationTime.getDiscoveryRatios(this.ageGroupIndex).discovery;
+                        const discoveredNrmCases = continuationValue * discoveryRatio;
                         result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
                         this.nrmCasesLast += continuationValue;
-                        // console.log(this.parentModel.getStrainId(), this.nrmCasesLast);
+                        // if (this.ageGroupName === '15-24' && this.parentModel.getStrainId() === '719e6') {
+                        //     console.log(this.parentModel.getStrainId(), this.ageGroupName, discoveryRatio);
+                        // }
                     }
 
                 }

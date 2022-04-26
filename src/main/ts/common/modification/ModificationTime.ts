@@ -67,10 +67,9 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private columnValues: number[];
     private cellValues: number[][];
     private discoveryRatiosByAgeGroup: IRatios[];
+    private quarantineMultipliersByAgeGroup: number[];
     private discoveryRateOverall: number;
     private positivityRateInjected: number;
-
-    private vaccinationsPerDay: { [K in string]: IVaccinationConfig };
 
     private readonly ageGroups: AgeGroup[];
     private readonly contactCategories: ContactCategory[];
@@ -81,7 +80,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.ageGroups = [...Demographics.getInstance().getAgeGroups()];
         this.contactCategories = [...Demographics.getInstance().getCategories()];
         this.absTotal = Demographics.getInstance().getAbsTotal();
-        this.vaccinationsPerDay = {};
         this.resetValues();
     }
 
@@ -142,6 +140,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.valueSum = -1;
         this.columnValues = [];
         this.discoveryRatiosByAgeGroup = undefined;
+        this.quarantineMultipliersByAgeGroup = undefined;
         this.cellValues = [];
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
             this.columnValues[indexContact] = -1;
@@ -163,6 +162,11 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private buildRatios(): void {
 
         this.discoveryRatiosByAgeGroup = [];
+        this.quarantineMultipliersByAgeGroup = [];
+
+        const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
+        const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
+
         this.ageGroups.forEach(ageGroup => {
 
             const ageGroupIndex = ageGroup.getIndex();
@@ -192,6 +196,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 discovery: discoveryRatioAgeGroup / contactTotal
             };
 
+
+
         });
 
         let _discoveryRateOverall = 0;
@@ -202,12 +208,16 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         const correction = this.calculateDiscoveryRateOverall() / _discoveryRateOverall;
         this.ageGroups.forEach(ageGroup => {
-            let contact = this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].contact * correction;
-            let discovery = Math.min(1.0, this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery * correction);
+
+            const ageGroupIndex = ageGroup.getIndex();
+            let contact = this.discoveryRatiosByAgeGroup[ageGroupIndex].contact * correction;
+            let discovery = Math.min(1.0, this.discoveryRatiosByAgeGroup[ageGroupIndex].discovery * correction);
             this.discoveryRatiosByAgeGroup[ageGroup.getIndex()] = {
                 contact,
                 discovery
             };
+            this.quarantineMultipliersByAgeGroup[ageGroupIndex] = shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
+
         });
         this.discoveryRateOverall = this.calculateDiscoveryRateOverall();
 
@@ -233,7 +243,11 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.modificationDiscovery.getPositivityRate();
     }
 
+    static defaultTestRate: number;
     getTestRate(): number {
+        if (ModificationTime.defaultTestRate && this.getInstantA() > TimeUtil.parseCategoryDateFull('19.04.2022')) {
+            return ModificationTime.defaultTestRate;
+        }
         return this.modificationDiscovery.getTestRate();
     }
 
@@ -245,9 +259,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     }
 
     getQuarantineMultiplier(ageGroupIndex: number): number {
-        const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
-        const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
-        return shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - this.getDiscoveryRatios(ageGroupIndex).discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
+        if (!this.quarantineMultipliersByAgeGroup) {
+            this.buildRatios();
+        }
+        return this.quarantineMultipliersByAgeGroup[ageGroupIndex];
     }
 
     getCellValue(indexContact: number, indexParticipant: number): number {

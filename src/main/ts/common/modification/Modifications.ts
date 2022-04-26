@@ -26,6 +26,7 @@ export type IAnyModificationValue = IModificationValuesTime | IModificationValue
 export class Modifications {
 
     static setInstanceFromValues(modificationValues: IModificationValues[]): void {
+
         this.instance = new Modifications();
         modificationValues.forEach(modificationValue => {
             // if (modificationValue.key !== 'TESTING') {
@@ -33,6 +34,7 @@ export class Modifications {
             // }
         });
         this.instance.updateModificationInstants();
+
     }
 
     static getInstance(): Modifications {

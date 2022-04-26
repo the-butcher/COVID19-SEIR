@@ -100,29 +100,24 @@ export class ModelStateIntegrator {
     private integrate(dT: number, tT: number): ModificationTime {
 
         const modificationTime = ModificationTime.createInstance(tT);
-        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > TimeUtil.parseCategoryDateFull('20.04.2022')) {
 
-            const baseData = BaseData.getInstance().findBaseDataItem(tT);
-            if (!baseData) {
+            // const baseData = BaseData.getInstance().findBaseDataItem(tT);
+            // if (!baseData) {
 
-                // console.log(this.nrmCasesLast * this.model.getAbsTotal());
-                const realCases = this.nrmCasesLast * this.model.getAbsTotal();
-                for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 10) {
-                    const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(realCases, modificationTime.getTestRate()); // result.predict(discoveredCases * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
-                    const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, modificationTime.getTestRate());
-                    const realCasesCandidate = discoveredCases / discoveryRateCandidate;
-                    if (realCasesCandidate > realCases) {
-                        modificationTime.injectPositivityRate(positivityRateCandidate * 0.55);
-                        console.log(discoveredCases, ' >> ', realCases, positivityRateCandidate, realCasesCandidate);
-                        break;
-                    }
+            // console.log(this.nrmCasesLast * this.model.getAbsTotal());
+            const realCases = this.nrmCasesLast * this.model.getAbsTotal();
+            for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 10) {
+                const testRate = modificationTime.getTestRate() * 1;
+                const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(discoveredCases, testRate); // result.predict(discoveredCases * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
+                const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, testRate);
+                const realCasesCandidate = discoveredCases / discoveryRateCandidate;
+                if (realCasesCandidate > realCases) {
+                    // once reached, treat as well enough match (TODO :: improve)
+                    modificationTime.injectPositivityRate(positivityRateCandidate);
+                    // console.log(discoveredCases, ' >> ', realCases, '@positivity(2)', positivityRateCandidate, '@discovery(2)', discoveryRateCandidate);
+                    break;
                 }
-
-                // const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0);
-                // const cases = this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * this.model.getAbsTotal();
-                // const discoveryRate = ModificationSettings.getInstance().calculateDiscoveryRateFromCases(cases);
-                // modificationTime.injectDiscoveryRateOverall(discoveryRate * 0.8);
-                // console.log('discoveryRate', discoveryRate);
             }
 
         }

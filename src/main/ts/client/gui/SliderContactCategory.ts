@@ -39,7 +39,7 @@ export class SliderContactCategory extends Slider {
             container,
             min: Math.min(...ModelConstants.RANGE____PERCENTAGE_125),
             max: Math.max(...ModelConstants.RANGE____PERCENTAGE_125),
-            step: 0.01, // 100
+            step: 0.001, // 100
             values: [1.0],
             ticks,
             label: contactCategory.getName(),

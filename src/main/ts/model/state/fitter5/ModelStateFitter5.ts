@@ -215,7 +215,7 @@ export class ModelStateFitter5 {
         modificationSet.modB.acceptUpdate({
             multipliers: {
                 // 'other': currMultO,
-                'nursing': modificationSet.modA.getModificationValues().multipliers['nursing'],
+                // 'nursing': modificationSet.modA.getModificationValues().multipliers['nursing'],
                 // 'school': modificationSet.modA.getModificationValues().multipliers['school'],
             },
             corrections: {

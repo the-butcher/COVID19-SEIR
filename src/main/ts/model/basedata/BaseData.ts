@@ -7,6 +7,7 @@ import { BaseDataItem, IBaseDataItem } from './BaseDataItem';
 
 import regression, { DataPoint } from 'regression';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
+import { ILoessInput, ValueRegressionBase } from '../regression/ValueRegressionBase';
 
 export interface IBaseDataMarker {
     instant: number,
@@ -176,7 +177,7 @@ export class BaseData {
                     const normalizedCases = dataItem.getAverageCases(Demographics.getInstance().getAgeGroupTotal().getIndex()) * 100 / Demographics.getInstance().getAbsTotal();
                     regressionInput.push([normalizedCases, positivityRate * testRate]);
 
-                    // console.log(cases, ';', positivityRate * testRate);
+                    console.log(normalizedCases, ';', positivityRate * testRate);
 
                 }
 
@@ -188,7 +189,48 @@ export class BaseData {
             precision: 4
         });
         ModificationSettings.getInstance().setEquationParams(result.equation);
-        // const posAt002 = result.predict(7000 * 100 / Demographics.getInstance().getAbsTotal())[1] / 0.02;
+
+        // console.log('result', result);
+
+
+        // const xValues: number[] = [];
+        // const yValues: number[] = [];
+        // // const mValues: number[] = [];
+
+        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        //     const dataItem = this.findBaseDataItem(instant, false);
+        //     if (dataItem && dataItem.getAverageMobilityHome()) {
+
+        //         const x = ValueRegressionBase.toRegressionX(dataItem.getInstant());
+        //         const y = dataItem.getAverageMobilityHome();
+
+        //         // iValues.push(dataItem.getInstant());
+        //         xValues.push(x);
+        //         yValues.push(y);
+
+        //     }
+        // }
+        // const loessModelInput: ILoessInput = {
+        //     x: xValues,
+        //     y: yValues
+        //     // i: iValues,
+        //     // m: mValues
+        // };
+
+        // var Loess = require('loess');
+        // const loessModel = new Loess.default(loessModelInput, {
+        //     span: 0.125,
+        //     band: 0.50
+        // });
+
+
+
+
+        // const testRate = 0.02;
+        // const posAt002 = result.predict(6770 * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
+        // const posAt002c = ModificationSettings.getInstance().calculatePositivityRate(6770, testRate);
+        // console.log('result', result, 6770, testRate, posAt002, posAt002c);
+
         // const posAt005 = result.predict(7000 * 100 / Demographics.getInstance().getAbsTotal())[1] / 0.05;
         // const dscAt002 = ModificationSettings.getInstance().calculateDiscoveryRate(posAt002, 0.02);
         // const dscAt005 = ModificationSettings.getInstance().calculateDiscoveryRate(posAt002, 0.05);
@@ -316,19 +358,19 @@ export class BaseData {
 
         // });
 
-        const deletableInstants: string[] = [];
-        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            let dataItem = this.findBaseDataItem(instant, false);
-            if (!dataItem) {
-                dataItem = this.findBaseDataItem(instant, true);
-                if (dataItem) {
-                    deletableInstants.push(instant.toString());
-                }
-            }
-        }
-        deletableInstants.forEach(instant => {
-            delete this.baseDataItems[instant];
-        })
+        // const deletableInstants: string[] = [];
+        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
+        //     let dataItem = this.findBaseDataItem(instant, false);
+        //     if (!dataItem) {
+        //         dataItem = this.findBaseDataItem(instant, true);
+        //         if (dataItem) {
+        //             deletableInstants.push(instant.toString());
+        //         }
+        //     }
+        // }
+        // deletableInstants.forEach(instant => {
+        //     delete this.baseDataItems[instant];
+        // })
 
     }
 

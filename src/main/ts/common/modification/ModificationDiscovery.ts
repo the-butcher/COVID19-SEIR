@@ -1,5 +1,6 @@
 import { BaseData } from '../../model/basedata/BaseData';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { TimeUtil } from '../../util/TimeUtil';
 import { Demographics } from '../demographics/Demographics';
 import { AModification } from './AModification';
 import { IContactColumns } from './IContactColumns';
@@ -45,6 +46,8 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
         const dataItem = BaseData.getInstance().findBaseDataItem(this.getInstantA());
         if (dataItem) {
             return dataItem.getAveragePositivity();
+        } else {
+            Math.random();
         }
     }
 
@@ -56,13 +59,11 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
             if (averagePosititivity && averageTests) {
                 return averageTests / Demographics.getInstance().getAbsTotal();
             }
+        } else {
+            Math.random();
         }
-        return this.modificationValues.testRate || 0.02;
+        return this.modificationValues.testRate || 0.04;
     }
-
-    // isBoundToTotal(): boolean {
-    //     return this.modificationValues.bindToOverall;
-    // }
 
     isBlendable(): boolean {
         return this.modificationValues.blendable;

@@ -124,7 +124,7 @@ export class Demographics implements IContactCategories {
                     1, // 65-74
                     1, // 75-84
                     1  // >= 85
-                ].map(v => v * 0.7)
+                ].map(v => v * 0.36)
             }
 
             if (matrixConfig.name === 'family') {
