@@ -3,8 +3,10 @@ import { ControlsConstants } from './client/gui/ControlsConstants';
 import { ModelActions } from './client/gui/ModelActions';
 import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
+import { IRegressionConfig } from './common/modification/IModificationValuesRegression';
 import { IModificationValuesSettings } from './common/modification/IModificationValuesSettings';
 import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
+import { ModificationResolverRegression } from './common/modification/ModificationResolverRegression';
 import { Modifications } from './common/modification/Modifications';
 import { ModificationSettings } from './common/modification/ModificationSettings';
 import { BaseData } from './model/basedata/BaseData';
@@ -29,6 +31,46 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             // needs model-instants to be ready
             BaseData.getInstance().calculateDailyStats();
 
+            const snapLastCorrectionToLongTermRegression = false;
+            if (snapLastCorrectionToLongTermRegression) {
+
+                const modificationsContact = new ModificationResolverContact().getModifications();
+                const lastModificationContact = modificationsContact[modificationsContact.length - 1];
+
+                const modificationRegression = new ModificationResolverRegression().getModifications()[0];
+                const correction_configs: { [K in string]: IRegressionConfig } = {};
+                const corrections: { [K in string]: number } = {};
+
+                Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+                    correction_configs[ageGroup.getName()] = {
+                        back_days_a: -35,
+                        back_days_b: 0,
+                        poly_shares: [
+                            0.75,
+                            0.95
+                        ]
+                    }
+                    // console.log(ageGroup.getName(), modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()));
+                    corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()).regression;
+                });
+
+                modificationRegression.acceptUpdate({
+                    correction_configs
+                });
+                lastModificationContact.acceptUpdate({
+                    corrections
+                });
+
+            }
+
+
+            // const modificationsContact = new ModificationResolverContact().getModifications();
+            // modificationsContact.shift();
+            // modificationsContact.forEach(modificationContact => {
+            //     modificationContact.acceptUpdate({
+            //         instant: modificationContact.getInstant() - TimeUtil.MILLISECONDS_PER____DAY
+            //     });
+            // });
 
             // const instantMin = ModelInstants.getInstance().getMinInstant();
             // const instantMax = ModelInstants.getInstance().getMaxInstant();
@@ -51,7 +93,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             // }
 
             // const loessDef = {
-            //     span: 0.250,
+            //     span: 0.175,
             //     band: 0.50
             // };
 
@@ -95,7 +137,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             //                 'work': predictionW.fitted[i],
             //                 'school': predictionW.fitted[i],
             //                 'other': predictionO.fitted[i],
-            //                 'nursing': predictionH.fitted[i] * 0.6 + predictionO.fitted[i] * 0.2
+            //                 // 'nursing': predictionH.fitted[i] * 0.6 + predictionO.fitted[i] * 0.2
             //             }
             //         })
 

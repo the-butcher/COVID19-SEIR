@@ -12,8 +12,7 @@ import { ModelConstants } from './../../ModelConstants';
  * @author h.fleischer
  * @since 25.10.2021
  *
- *
- * leads to oscillation (runge phenomenon?) the further away it gets from origin
+ * performs regression originating from the (singleton) regression modification
  *
  */
 export class ModelStateFitter9Reg1 {
@@ -45,7 +44,7 @@ export class ModelStateFitter9Reg1 {
 
 
         // stats by day, then age group
-        const predictionStats: { [K in string]: { [K in string]: Statistics }} = {};
+        const predictionStats: { [K in string]: { [K in string]: Statistics } } = {};
         const incidenceKeys: Set<string> = new Set();
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
             predictionStats[ageGroup.getName()] = {};

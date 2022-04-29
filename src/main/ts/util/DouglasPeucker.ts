@@ -13,7 +13,7 @@ export class DouglasPeucker {
 
         let indices: number[] = [
             0,
-            this.dataMarkers.length-1
+            this.dataMarkers.length - 1
         ];
 
         /**
@@ -21,11 +21,11 @@ export class DouglasPeucker {
          */
         // const tolerance = 2;
         // const yStretch = 50;
-        const tolerance = 2;
-        const yStretch = 50;
+        const tolerance = 1;
+        const yStretch = 100;
 
         // TODO while tolerance not reached (or not reachable)
-        for (let iteration = 0; iteration < 30; iteration++) {
+        for (let iteration = 0; iteration < 100; iteration++) {
 
             let maxIndices: number[] = [];
             for (let indexP = 1; indexP < indices.length; indexP++) {

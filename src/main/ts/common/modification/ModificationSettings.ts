@@ -82,30 +82,20 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
      */
     calculateDiscoveryRate(positivityRate: number, testRate: number): number {
 
-        // \left(x\ \cdot2\ +\ 0.70^{\frac{1}{-4}}\ \ \right)^{-4}
+        // \left(x\ \cdot s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}-x\cdot\left(s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}
 
         const pow = -this.modificationValues.pow;
         const max = this.modificationValues.max;
         const slp = this.modificationValues.xmb - testRate * this.modificationValues.xmr; // higher number means steeper (less tests per person means steeper slope = less cases found for )
 
-        // if (instant % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-        //     console.log(TimeUtil.formatCategoryDateFull(instant), slp);
-        // }
+        const sqm = Math.pow(max, 1 / pow);
 
-        // return Math.pow(positivityRate * 1.1 + 1, -10);
-        // return Math.pow(positivityRate * 2.0 + 1.10, -4);
-
-        return Math.pow(positivityRate * slp + Math.pow(max, 1 / pow), pow);
+        return Math.pow(positivityRate * slp + sqm, pow) - positivityRate * Math.pow(slp + sqm, pow);
 
     }
 
     calculatePositivityRate(cases: number, testRate: number): number {
-        const scaledCases = cases * 100 / Demographics.getInstance().getAbsTotal();
-        return (this.modificationValues.reg[0] * scaledCases) / testRate;
-    }
-
-    setEquationParams(reg: number[]) {
-        this.modificationValues.reg = reg;
+        return cases / Demographics.getInstance().getAbsTotal() / testRate;
     }
 
 }

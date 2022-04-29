@@ -189,6 +189,12 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 contactTotal += contactTotalCategory;
                 discoveryRatioAgeGroup += discoveryRatioCategory * contactTotalCategory;
 
+                if (ageGroup.getIndex() == 0) {
+                    discoveryRatioAgeGroup *= 0.9;
+                } else if (ageGroup.getIndex() == 3 || ageGroup.getIndex() == 4) {
+                    discoveryRatioAgeGroup *= 1.1;
+                }
+
             });
 
             this.discoveryRatiosByAgeGroup[ageGroupIndex] = {

@@ -65,7 +65,7 @@ export class ModelImplVaccination implements IModelSeir {
         }
         this.linkCompartmentsVaccination(this.compartmentsVaccination);
 
-        this.compartmentI = new CompartmentImmunity(ECompartmentType.R___IMMUNIZING, this.absTotal, absValueImmunizing, this.ageGroupIndex, this.ageGroupName, ModelConstants.STRAIN_ID___________ALL, 0, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER___WEEK * 4), '');
+        this.compartmentI = new CompartmentImmunity(ECompartmentType.R___IMMUNIZING, this.absTotal, absValueImmunizing, this.ageGroupIndex, this.ageGroupName, ModelConstants.STRAIN_ID___________ALL, 0, new RationalDurationFixed(TimeUtil.MILLISECONDS_PER___WEEK * 2), '');
 
         this.nrmValue = (absCompartmentRecoverySum + absValueImmunizing) / this.absTotal;
 

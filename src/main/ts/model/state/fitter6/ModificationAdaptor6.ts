@@ -9,12 +9,10 @@ import { IDataItem, IModelProgress, ModelStateIntegrator } from '../ModelStateIn
 /**
  * modification adapter for curve multipliers
  * @author h.fleischer
- * @since 25.10.2021
+ * @since 27.04.2022
  *
- * this type updates curve multipliers, from the errors produced by 1-n value-adaptors
- * multipliers are applied to the first modification in a modification set assumed to exist from a starting modification and an ending modification
  */
-export class ModificationAdaptor5 {
+export class ModificationAdaptor6 {
 
     async adapt(modelStateIntegrator: ModelStateIntegrator, modificationSet: IModificationSet, referenceData: IDataItem, iterationIndex: number, progressCallback: (progress: IModelProgress) => void): Promise<{ [K in string]: number }> {
 
@@ -57,36 +55,47 @@ export class ModificationAdaptor5 {
             corrections[ageGroup.getName()] = currCorrG;
             currCorrT += currCorrG;
         });
-        // const currCorrT1 = 1; // 1 + ((1 - currCorrT / ageGropups.length) * 0.3);
+        const currCorrT1 = 1; // 1 + ((1 - currCorrT / ageGropups.length) * 0.3);
         // console.log(TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant()), currCorrT / ageGropups.length, currCorrT1);
 
         // currMultO *= currCorrT1;
-        // const currMultO = Math.max(0.00, Math.min(1, (prevMultO - errorsG['TOTAL'] * errorRatio * 0.30) / currCorrT1));
-        let currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.28 - errorsG['75-84'] * errorRatio * 0.12));
-        // const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 0.40));
+        const currMultO = Math.max(0.00, Math.min(1, (prevMultO - errorsG['TOTAL'] * errorRatio * 0.30) / currCorrT1));
+        const currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.28 - errorsG['75-84'] * errorRatio * 0.12));
+        const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 0.40));
 
-        const correctionN = corrections['>= 85'] * 0.6 + corrections['75-84'] * 0.4;
-
-        // console.log(TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant()), currMultN, correctionN, currMultN - correctionN, (currMultN - correctionN) * errorRatio)
-        currMultN -= (currMultN - correctionN) * errorRatio;
 
         if (iterationIndex % 10 < 3) {
 
             modificationSet.modA.acceptUpdate({
                 multipliers: {
                     // 'other': currMultO,
-                    'nursing': currMultN,
+                    // 'nursing': currMultN,
                     // 'school': currMultS
                 }
             });
+            // if (modificationSet.ratio === 1) {
+            //     modificationSet.modB.acceptUpdate({
+            //         multipliers: {
+            //             'other': currMultO,
+            //             'nursing': currMultN,
+            //             'school': currMultS
+            //         }
+            //     });
+            // }
 
         } else {
 
             modificationSet.modA.acceptUpdate({
                 corrections: { ...corrections }
             });
+            // if (modificationSet.ratio === 1) {
+            //     modificationSet.modB.acceptUpdate({
+            //         corrections: {...corrections}
+            //     });
+            // }
 
         }
+
 
         modelStateIntegrator.rollback();
 

@@ -127,6 +127,11 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupCasesN: ChartAgeGroupSeries;
 
     /**
+     * offsets between model and real cases
+     */
+    protected readonly seriesAgeGroupCasesD: ChartAgeGroupSeries;
+
+    /**
      * cases as reported age-wise
      */
     protected readonly seriesAgeGroupCasesR: ChartAgeGroupSeries;
@@ -492,11 +497,32 @@ export class ChartAgeGroup {
             seriesConstructor: () => new StepLineSeries()
         });
 
+        this.seriesAgeGroupCasesD = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotAbsolute,
+            title: 'daily cases (diff)',
+            baseLabel: 'daily cases (diff)',
+            valueField: 'ageGroupCasesD',
+            colorKey: 'CONTACT',
+            strokeWidth: 0.5,
+            dashed: false,
+            locationOnPath: 1.10,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
+            seriesConstructor: () => new StepLineSeries()
+        });
+
+
         this.seriesAgeGroupCasesR = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
-            title: 'cases (ages)',
-            baseLabel: 'cases (ages)',
+            title: 'daily cases (ages)',
+            baseLabel: 'daily cases (ages)',
             valueField: 'ageGroupCasesR',
             colorKey: 'CASES',
             strokeWidth: 1,
@@ -1422,6 +1448,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupAssumedAllCases.setSeriesNote(ageGroup.getName());
 
         this.seriesAgeGroupCasesN.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupCasesD.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
         this.seriesPositivityRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesTestRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
@@ -1669,6 +1696,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupDiscoveredCases.setVisible(visible);
         this.seriesAgeGroupAssumedAllCases.setVisible(visible);
         this.seriesAgeGroupCasesN.setVisible(visible); // visible
+        this.seriesAgeGroupCasesD.setVisible(visible);
         this.seriesAgeGroupCasesR.setVisible(visible); // visible
 
         // this.seriesSeasonality.setVisible(visible);
@@ -1997,9 +2025,12 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
 
         // console.log('modelData', this.modelData);
+        // const ageGroupCasesOffsets: number[] = [0, 0, 0, 0, 0, 0, 0];
 
         const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
         for (const dataItem of this.modelData) {
+
+            const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
 
             // data independent from sub-strains
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
@@ -2014,10 +2045,28 @@ export class ChartAgeGroup {
             const ageGroupDiscoveryRate = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
             const ageGroupAssumedAllCases = ageGroupDiscoveredCases / ageGroupDiscoveryRate;
 
+            // start with offset, then multiply if an offset is available
             let ageGroupCasesN = ageGroupDiscoveredCases && BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), dataItem.instant);
+            // let ageGroupCasesD;
             if (ageGroupCasesN) {
                 ageGroupCasesN *= ageGroupDiscoveredCases;
+                if (dataItem00) {
+
+                    const ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
+
+                    // ageGroupCasesOffsets.shift();
+                    // ageGroupCasesOffsets.push(ageGroupCasesN - ageGroupCasesR);
+
+                    // ageGroupCasesD = ageGroupCasesN;
+                    // for (let i = 0; i < ageGroupCasesOffsets.length; i++) {
+                    //     ageGroupCasesD += i * ageGroupCasesOffsets[i] / 3.5;
+                    // }
+
+                    // console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), ageGroupCasesN - ageGroupCasesR, ageGroupCasesD, ageGroupCasesOffsets)
+
+                }
             }
+
 
             let positivityRate = dataItem.positivityRate;
             let testRate = dataItem.testRate;
@@ -2052,20 +2101,13 @@ export class ChartAgeGroup {
                 ageGroupDiscoveredCases,
                 ageGroupAssumedAllCases,
                 ageGroupCasesN,
+                // ageGroupCasesD,
                 seasonality,
                 positivityRate,
                 testRate,
                 reproductionP,
                 ageGroupDiscoveryRate
             };
-
-            // const check = ageGroupRemovedV2 + ageGroupRemovedVI + ageGroupRemovedID + ageGroupSusceptible + ageGroupExposed + ageGroupInfectious;
-            // if (TimeUtil.formatCategoryDateFull(dataItem.instant) === '25.12.2021') {
-            //     console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), check, [
-            //         ageGroupRemovedV2, ageGroupRemovedVI, ageGroupRemovedID, ageGroupSusceptible, ageGroupExposed, ageGroupInfectious
-            //     ]);
-            // }
-
 
             // add one strain value per modification
             modificationValuesStrain.forEach(modificationValueStrain => {
@@ -2076,7 +2118,7 @@ export class ChartAgeGroup {
 
             plotData.push(item);
 
-            const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroupHeat => {
 
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
@@ -2160,6 +2202,7 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupDiscoveredCases, plotData);
         this.applyData(this.seriesAgeGroupAssumedAllCases, plotData);
         this.applyData(this.seriesAgeGroupCasesN, plotData);
+        // this.applyData(this.seriesAgeGroupCasesD, plotData);
         this.applyData(this.seriesSeasonality, plotData);
         this.applyData(this.seriesPositivityRate, plotData);
         this.applyData(this.seriesTestRate, plotData);

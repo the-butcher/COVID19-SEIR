@@ -94,7 +94,6 @@ export class ControlsRegression {
 
         ChartAgeGroup.getInstance().renderRegressionData();
 
-
     }
 
     handleRegressionPointerChange(): void {

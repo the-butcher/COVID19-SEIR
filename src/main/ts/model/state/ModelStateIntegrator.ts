@@ -100,16 +100,16 @@ export class ModelStateIntegrator {
     private integrate(dT: number, tT: number): ModificationTime {
 
         const modificationTime = ModificationTime.createInstance(tT);
-        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > TimeUtil.parseCategoryDateFull('20.04.2022')) {
+        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > TimeUtil.parseCategoryDateFull('23.04.2022')) {
 
             // const baseData = BaseData.getInstance().findBaseDataItem(tT);
             // if (!baseData) {
 
             // console.log(this.nrmCasesLast * this.model.getAbsTotal());
             const realCases = this.nrmCasesLast * this.model.getAbsTotal();
+            const testRate = modificationTime.getTestRate();
             for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 10) {
-                const testRate = modificationTime.getTestRate() * 1;
-                const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(discoveredCases, testRate); // result.predict(discoveredCases * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
+                const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(discoveredCases, testRate);
                 const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, testRate);
                 const realCasesCandidate = discoveredCases / discoveryRateCandidate;
                 if (realCasesCandidate > realCases) {

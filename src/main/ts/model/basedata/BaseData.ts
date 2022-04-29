@@ -5,9 +5,6 @@ import { TimeUtil } from './../../util/TimeUtil';
 import { ModelInstants } from './../ModelInstants';
 import { BaseDataItem, IBaseDataItem } from './BaseDataItem';
 
-import regression, { DataPoint } from 'regression';
-import { ModificationSettings } from '../../common/modification/ModificationSettings';
-import { ILoessInput, ValueRegressionBase } from '../regression/ValueRegressionBase';
 
 export interface IBaseDataMarker {
     instant: number,
@@ -56,6 +53,7 @@ export class BaseData {
     private readonly path: string;
     private readonly baseDataset: { [K: string]: IBaseDataItemConfig };
     private readonly baseDataItems: { [K: string]: IBaseDataItem };
+    private lastValidInstant: number;
     private dailyOffsetInstantMin: number;
     private dailyOffsetInstantMax: number;
 
@@ -89,6 +87,10 @@ export class BaseData {
         return dataItem;
     }
 
+    getLastValidInstant(): number {
+        return this.lastValidInstant;
+    }
+
 
     calculateDailyStats(): void {
 
@@ -110,6 +112,7 @@ export class BaseData {
             const dataItem = this.findBaseDataItem(instant, false);
             if (dataItem) {
                 (dataItem as BaseDataItem).calculatePrimaryValues();
+                this.lastValidInstant = dataItem.getInstant();
             }
         }
 
@@ -162,94 +165,6 @@ export class BaseData {
 
         }
 
-        // const regression = new Regress
-        const regressionInput: DataPoint[] = [];
-        for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-            const dataItem = this.findBaseDataItem(instant, false);
-            if (dataItem) {
-
-                const positivityRate = dataItem.getAveragePositivity();
-                const averageTests = dataItem.getAverageTests();
-                if (positivityRate && averageTests) {
-
-                    const testRate = averageTests / Demographics.getInstance().getAbsTotal();
-                    const discoveryRate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRate, testRate);
-                    const normalizedCases = dataItem.getAverageCases(Demographics.getInstance().getAgeGroupTotal().getIndex()) * 100 / Demographics.getInstance().getAbsTotal();
-                    regressionInput.push([normalizedCases, positivityRate * testRate]);
-
-                    console.log(normalizedCases, ';', positivityRate * testRate);
-
-                }
-
-            }
-        }
-
-        // console.log('regressionInput', regressionInput);
-        const result = regression.linear(regressionInput, {
-            precision: 4
-        });
-        ModificationSettings.getInstance().setEquationParams(result.equation);
-
-        // console.log('result', result);
-
-
-        // const xValues: number[] = [];
-        // const yValues: number[] = [];
-        // // const mValues: number[] = [];
-
-        // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
-        //     const dataItem = this.findBaseDataItem(instant, false);
-        //     if (dataItem && dataItem.getAverageMobilityHome()) {
-
-        //         const x = ValueRegressionBase.toRegressionX(dataItem.getInstant());
-        //         const y = dataItem.getAverageMobilityHome();
-
-        //         // iValues.push(dataItem.getInstant());
-        //         xValues.push(x);
-        //         yValues.push(y);
-
-        //     }
-        // }
-        // const loessModelInput: ILoessInput = {
-        //     x: xValues,
-        //     y: yValues
-        //     // i: iValues,
-        //     // m: mValues
-        // };
-
-        // var Loess = require('loess');
-        // const loessModel = new Loess.default(loessModelInput, {
-        //     span: 0.125,
-        //     band: 0.50
-        // });
-
-
-
-
-        // const testRate = 0.02;
-        // const posAt002 = result.predict(6770 * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
-        // const posAt002c = ModificationSettings.getInstance().calculatePositivityRate(6770, testRate);
-        // console.log('result', result, 6770, testRate, posAt002, posAt002c);
-
-        // const posAt005 = result.predict(7000 * 100 / Demographics.getInstance().getAbsTotal())[1] / 0.05;
-        // const dscAt002 = ModificationSettings.getInstance().calculateDiscoveryRate(posAt002, 0.02);
-        // const dscAt005 = ModificationSettings.getInstance().calculateDiscoveryRate(posAt002, 0.05);
-
-        // const realCases = 30000;
-        // const testRate = 0.02;
-        // // TODO find positivity and discovery
-        // for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 100) {
-        //     const positivityRateCandidate = result.predict(discoveredCases * 100 / Demographics.getInstance().getAbsTotal())[1] / testRate;
-        //     const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, testRate);
-        //     const realCasesCandidate = discoveredCases / discoveryRateCandidate;
-        //     if (realCasesCandidate > realCases) {
-        //         console.log(discoveredCases, positivityRateCandidate, realCasesCandidate);
-        //         break;
-        //     }
-        // }
-
-        // // console.log('result', result, posAt002, dscAt002, posAt005, dscAt005);
-
         // const reproductionMarkers: IBaseDataMarker[] = [];
         // for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
         //     const dataItem = this.findBaseDataItem(instant, false);
@@ -282,7 +197,7 @@ export class BaseData {
 
         //     if (reproductionMarker.instant > ModelInstants.getInstance().getMinInstant()) {
 
-        //         // console.log('adding at', TimeUtil.formatCategoryDateFull(reproductionMarker.instant));
+        //         console.log('adding at', TimeUtil.formatCategoryDateFull(reproductionMarker.instant));
 
         //         // Modifications.getInstance().addModification(new ModificationContact({
         //         //     id,
@@ -296,6 +211,8 @@ export class BaseData {
         //         // }));
 
         //     }
+
+        // });
 
 
 
@@ -371,6 +288,7 @@ export class BaseData {
         // deletableInstants.forEach(instant => {
         //     delete this.baseDataItems[instant];
         // })
+
 
     }
 

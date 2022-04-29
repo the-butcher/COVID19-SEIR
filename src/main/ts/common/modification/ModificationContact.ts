@@ -10,6 +10,7 @@ import { IContactCategories } from './IContactCategories';
 import { IContactMatrix } from './IContactMatrix';
 import { IModificationValuesContact } from './IModificationValuesContact';
 import { ModificationRegression } from './ModificationRegression';
+import { ModificationResolverRegression } from './ModificationResolverRegression';
 import { Modifications } from './Modifications';
 
 /**
@@ -50,6 +51,20 @@ export class ModificationContact extends AModification<IModificationValuesContac
 
         super.setInstants(instantA, instantB);
         const baseDataItem = BaseData.getInstance().findBaseDataItem(instantA);
+
+        // /**
+        //  * snap corrections to their regression curves
+        //  */
+        // const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
+        // if (modificationRegression) {
+        //     const corrections: { [K in string]: number } = {};
+        //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+        //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(instantA, ageGroup.getName()).loess.y;
+        //     });
+        //     this.acceptUpdate({
+        //         corrections
+        //     });
+        // }
 
         // const modificationRegression = Modifications.getInstance().findModificationsByType('REGRESSION').find(m => true) as ModificationRegression;
         // if (modificationRegression) {
@@ -131,10 +146,12 @@ export class ModificationContact extends AModification<IModificationValuesContac
     }
 
     acceptUpdate(update: Partial<IModificationValuesContact>): void {
+
         update.multipliers = { ...this.modificationValues.multipliers, ...update.multipliers };
         update.corrections = { ...this.modificationValues.corrections, ...update.corrections };
         super.acceptUpdate(update);
         this.resetValues();
+
     }
 
     resetValues(): void {

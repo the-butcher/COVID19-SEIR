@@ -1,21 +1,16 @@
-import { Demographics } from '../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
-import { StrainUtil } from '../../../util/StrainUtil';
 import { TimeUtil } from '../../../util/TimeUtil';
-import { BaseData } from '../../basedata/BaseData';
-import { ModelInstants } from '../../ModelInstants';
 import { IModificationSet } from '../fitter/IModificationSet';
 import { IDataItem, IFitterParams, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
-import { ModificationAdaptor5 } from './ModificationAdaptor5';
+import { ModificationAdaptor6 } from './ModificationAdaptor6';
 
 /**
- * model-fitter trying to lay an already pre-fitted curve on the averaged model's base curve
+ * model-fitter trying find a good for the end of the model curve
  * @author h.fleischer
- * @since 25.10.2021
+ * @since 27.04.2022
  *
- * this type iterates forth an back in specific, i.e. 7 day steps, then from the ratio between the average offset of that interval calculates corrections and multipliers
  */
-export class ModelStateFitter5 {
+export class ModelStateFitter6 {
 
     static readonly ERROR_TOLERANCES: number[] = [
         0.4,
@@ -67,9 +62,9 @@ export class ModelStateFitter5 {
         const modificationsContact = modificationResolver.getModifications();
 
         let nxtErrorTolerance: number;
-        for (let i = 0; i < ModelStateFitter5.ERROR_TOLERANCES.length; i++) {
-            if (ModelStateFitter5.ERROR_TOLERANCES[i] <= fitterParams.curErrorCalculate) {
-                nxtErrorTolerance = ModelStateFitter5.ERROR_TOLERANCES[i];
+        for (let i = 0; i < ModelStateFitter6.ERROR_TOLERANCES.length; i++) {
+            if (ModelStateFitter6.ERROR_TOLERANCES[i] <= fitterParams.curErrorCalculate) {
+                nxtErrorTolerance = ModelStateFitter6.ERROR_TOLERANCES[i];
                 break;
             }
         }
@@ -83,7 +78,7 @@ export class ModelStateFitter5 {
             console.log(`error-tolerance max: ${fitterParams.maxErrorTolerance.toFixed(4)}, last: ${fitterParams.curErrorCalculate.toFixed(4)}, reached adjustment limit!`);
         }
 
-        const modificationAdapter = new ModificationAdaptor5();
+        const modificationAdapter = new ModificationAdaptor6();
 
         let modificationIndexStart = 1; // modificationsContact.length - 6; // 2;
 
@@ -100,12 +95,12 @@ export class ModelStateFitter5 {
 
         fitterParams.curErrorCalculate = -1;
         let modificationIndex = modificationIndexStart;
-        for (; modificationIndex < modificationsContact.length - ModelStateFitter5.FIT_INTERVAL; modificationIndex++) {
+        for (; modificationIndex < modificationsContact.length - ModelStateFitter6.FIT_INTERVAL; modificationIndex++) {
 
             const ratio = (modificationIndex + 2) / modificationsContact.length;
             const modificationSet: IModificationSet = {
                 modA: modificationsContact[modificationIndex],
-                modB: modificationsContact[modificationIndex + ModelStateFitter5.FIT_INTERVAL],
+                modB: modificationsContact[modificationIndex + ModelStateFitter6.FIT_INTERVAL],
                 ratio
             }
 
@@ -207,67 +202,21 @@ export class ModelStateFitter5 {
 
         }
 
-        // if (modificationIndex === modificationsContact.length - 1) {
-        //     const lastModification = modificationsContact[modificationsContact.length - 1];
-        //     const lastValidInstant = BaseData.getInstance().getLastValidInstant();
-        //     modelStateIntegrator.checkpoint();
-        //     const stepData = await modelStateIntegrator.buildModelData(lastValidInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-        //         progressCallback({
-        //             ratio: modelProgress.ratio // drop data from callback
-        //         });
-        //     });
-        //     const dataItem = dataset[dataset.length - 1];
-        //     const baseData = BaseData.getInstance().findBaseDataItem(dataItem.instant);
-        //     const errorsO: { [K in string]: number } = {};
-        //     const errorsG: { [K in string]: number } = {};
-        //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-        //         const baseCases = baseData.getCasesM1(ageGroup.getIndex());
-        //         const dataCases = dataItem.valueset[ageGroup.getName()].CASES * BaseData.getInstance().getAverageOffset(ageGroup.getIndex(), dataItem.instant);
-        //         const error = dataCases - baseCases;
-        //         errorsO[ageGroup.getName()] = error * stepData.length; // allow each step to carry on the error on the last modification
-        //         errorsG[ageGroup.getName()] = 0;
-        //     });
-        //     console.log('errorsO', errorsO);
-        //     stepData.forEach(dataItem => {
-        //         const baseData = BaseData.getInstance().findBaseDataItem(dataItem.instant);
-        //         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-        //             const baseCases = baseData.getCasesM1(ageGroup.getIndex());
-        //             const dataCases = dataItem.valueset[ageGroup.getName()].CASES * BaseData.getInstance().getAverageOffset(ageGroup.getIndex(), dataItem.instant);
-        //             const error = dataCases - baseCases;
-        //             errorsG[ageGroup.getName()] = errorsG[ageGroup.getName()] + error;
-        //         });
-        //     });
-        //     const corrections: { [K in string]: number } = {};
-        //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-        //         const ageGroupError = errorsG[ageGroup.getName()] - errorsO[ageGroup.getName()];
-        //         if (ageGroupError > 0) {
-        //             corrections[ageGroup.getName()] = lastModification.getCorrectionValue(ageGroup.getIndex()) - 0.003;
-        //         } else if (ageGroupError < 0) {
-        //             corrections[ageGroup.getName()] = lastModification.getCorrectionValue(ageGroup.getIndex()) + 0.003;
-        //         }
-        //         console.log(ageGroup.getName(), ageGroupError);
-        //     });
-        //     lastModification.acceptUpdate({
-        //         corrections: { ...corrections }
-        //     });
-        //     modelStateIntegrator.rollback();
-        // }
-
-        // const modificationSet: IModificationSet = {
-        //     modA: modificationsContact[modificationsContact.length - 2],
-        //     modB: modificationsContact[modificationsContact.length - 1],
-        //     ratio: 1
-        // }
-        // modificationSet.modB.acceptUpdate({
-        //     multipliers: {
-        //         // 'other': currMultO,
-        //         // 'nursing': modificationSet.modA.getModificationValues().multipliers['nursing'],
-        //         // 'school': modificationSet.modA.getModificationValues().multipliers['school'],
-        //     },
-        //     corrections: {
-        //         ...modificationSet.modA.getModificationValues().corrections
-        //     }
-        // });
+        const modificationSet: IModificationSet = {
+            modA: modificationsContact[modificationsContact.length - 2],
+            modB: modificationsContact[modificationsContact.length - 1],
+            ratio: 1
+        }
+        modificationSet.modB.acceptUpdate({
+            multipliers: {
+                // 'other': currMultO,
+                // 'nursing': modificationSet.modA.getModificationValues().multipliers['nursing'],
+                // 'school': modificationSet.modA.getModificationValues().multipliers['school'],
+            },
+            corrections: {
+                ...modificationSet.modA.getModificationValues().corrections
+            }
+        });
 
 
         console.log('------------------------------------------------------------------------------------------');

@@ -94,6 +94,10 @@ export class ModelTask {
                     StorageUtil.getInstance().setSaveRequired(true);
                 });
 
+                // const modificationRegression = new ModificationResolverRegression().getModifications()[0];
+                // modificationRegression.acceptUpdate({
+                //     ...modificationRegression.getModificationValues()
+                // });
 
                 // if (modelProgress.modificationValuesRegression) {
                 //     const modificationRegression = Modifications.getInstance().findModificationById(modelProgress.modificationValuesRegression.id) as ModificationRegression;

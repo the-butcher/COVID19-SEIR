@@ -234,7 +234,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 instantA,
                 instantB,
                 polyShares: regressionConfig.poly_shares,
-                modifications: new ModificationResolverContact().getModifications() // .filter(m => m.getInstant() <= instantB)
+                modifications: new ModificationResolverContact().getModifications() //.slice(0, -1) // drop last element so it does not contribute to regression and can be adjusted independently
             });
         }
 

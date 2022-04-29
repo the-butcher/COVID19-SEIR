@@ -128,7 +128,7 @@ export class ModelImplRoot implements IModelSeir {
             let absValueV2 = grpValueV2 * ageGroup.getAbsValue();
             absValueSusceptible -= absValueV2;
 
-            const vaccinationModel = new ModelImplVaccination(this, demographics, modificationTime, 0, absValueV2, ageGroup);
+            const vaccinationModel = new ModelImplVaccination(this, demographics, modificationTime, absValueV2 * 0.15, absValueV2 * 0.85, ageGroup);
             this.vaccinationModels.push(vaccinationModel);
 
             const compartmentSusceptible = new CompartmentImmunity(ECompartmentType.S__SUSCEPTIBLE, this.demographics.getAbsTotal(), absValueSusceptible, ageGroup.getIndex(), ageGroup.getName(), ModelConstants.STRAIN_ID___________ALL, 0, CompartmentChainReproduction.NO_CONTINUATION, '');

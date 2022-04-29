@@ -99,7 +99,7 @@ export class Demographics implements IContactCategories {
 
             if (matrixConfig.name === 'school') {
                 corrections = [
-                    0.66, // <= 04
+                    1, // <= 04
                     1, // 05-14
                     1, // 15-24
                     1, // 25-34
@@ -159,8 +159,8 @@ export class Demographics implements IContactCategories {
 
             if (matrixConfig.name === 'other') {
                 corrections = [
-                    0.25, // <= 04
-                    0.33, // 05-14
+                    0.44, // <= 04
+                    0.55, // 05-14
                     1.00, // 15-24
                     1.00, // 25-34
                     1.00, // 35-44
