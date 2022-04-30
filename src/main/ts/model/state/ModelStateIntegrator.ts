@@ -100,7 +100,7 @@ export class ModelStateIntegrator {
     private integrate(dT: number, tT: number): ModificationTime {
 
         const modificationTime = ModificationTime.createInstance(tT);
-        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > TimeUtil.parseCategoryDateFull('23.04.2022')) {
+        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > TimeUtil.parseCategoryDateFull('24.04.2022')) {
 
             // const baseData = BaseData.getInstance().findBaseDataItem(tT);
             // if (!baseData) {
