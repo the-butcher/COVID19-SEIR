@@ -3,6 +3,7 @@ import { color, Container, create, Label, percent, Rectangle, useTheme } from "@
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { ModificationResolverDiscovery } from "../../common/modification/ModificationResolverDiscovery";
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
@@ -160,9 +161,14 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedV2: ChartAgeGroupSeries;
 
     /**
-     * modelled discovery rate
+     * modelled discovery rate (loess smoothed)
      */
-    protected readonly seriesAgeGroupDiscovery: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupDiscoveryL: ChartAgeGroupSeries;
+
+    /**
+     * modelled discovery rate (raw)
+     */
+    protected readonly seriesAgeGroupDiscoveryM: ChartAgeGroupSeries;
 
     /**
      * real data
@@ -825,12 +831,12 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
-        this.seriesAgeGroupDiscovery = new ChartAgeGroupSeries({
+        this.seriesAgeGroupDiscoveryL = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
             title: 'discovery rate',
             baseLabel: 'discovery rate',
-            valueField: 'ageGroupDiscoveryRate',
+            valueField: 'ageGroupDiscoveryRateL',
             colorKey: 'TESTING',
             strokeWidth: 2,
             dashed: false,
@@ -838,6 +844,26 @@ export class ChartAgeGroup {
             labels: {
                 tooltip: true,
                 pathtip: true
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesAgeGroupDiscoveryM = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'discovery rate',
+            baseLabel: 'discovery rate',
+            valueField: 'ageGroupDiscoveryRateM',
+            colorKey: 'TESTING',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.05,
+            labels: {
+                tooltip: true,
+                pathtip: false
             },
             stacked: false,
             legend: true,
@@ -1119,7 +1145,7 @@ export class ChartAgeGroup {
 
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
-        this.chart.cursor.showTooltipOn = 'always';
+        // this.chart.cursor.showTooltipOn = 'always';
         this.chart.cursor.exportable = true;
         this.chart.cursor.maxTooltipDistance = 12;
         this.chart.cursor.events.on('cursorpositionchanged', e => {
@@ -1452,7 +1478,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
         this.seriesPositivityRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesTestRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
-        this.seriesAgeGroupDiscovery.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupDiscoveryL.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupDiscoveryM.setSeriesNote(ageGroup.getName());
 
         this.seriesAgeGroupSusceptible.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupExposed.setSeriesNote(ageGroup.getName());
@@ -1764,8 +1791,10 @@ export class ChartAgeGroup {
     setSeriesTestingVisible(visible: boolean): void {
 
         this.seriesPositivityRate.setVisible(visible);
-        this.seriesAgeGroupDiscovery.setVisible(visible);
+        this.seriesAgeGroupDiscoveryL.setVisible(visible);
         this.seriesTestRate.setVisible(visible);
+
+        this.seriesAgeGroupDiscoveryM.setVisible(visible);
 
         if (visible) {
             this.yAxisPlotPercent.visible = visible;
@@ -1892,7 +1921,7 @@ export class ChartAgeGroup {
 
             this.yAxisPlotIncidence.min = 0;
             this.yAxisPlotIncidence.max = maxIncidence * 1.05;
-            console.log('maxIncidence', maxIncidence);
+            // console.log('maxIncidence', maxIncidence);
 
             // this.yAxisPlotPercent.min = 0;
             // this.yAxisPlotPercent.max = maxInfectious * 1.00;
@@ -2042,8 +2071,11 @@ export class ChartAgeGroup {
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
 
             const ageGroupDiscoveredCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
-            const ageGroupDiscoveryRate = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
-            const ageGroupAssumedAllCases = ageGroupDiscoveredCases / ageGroupDiscoveryRate;
+
+            const ageGroupDiscoveryRateL = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
+            const ageGroupDiscoveryRateM = ModificationResolverDiscovery.getRegression(ageGroupPlot.getIndex()).findLoessValue(dataItem.instant).m;
+
+            const ageGroupAssumedAllCases = ageGroupDiscoveredCases / ageGroupDiscoveryRateL;
 
             // start with offset, then multiply if an offset is available
             let ageGroupCasesN = ageGroupDiscoveredCases && BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), dataItem.instant);
@@ -2106,7 +2138,8 @@ export class ChartAgeGroup {
                 positivityRate,
                 testRate,
                 reproductionP,
-                ageGroupDiscoveryRate
+                ageGroupDiscoveryRateL,
+                ageGroupDiscoveryRateM
             };
 
             // add one strain value per modification
@@ -2207,7 +2240,8 @@ export class ChartAgeGroup {
         this.applyData(this.seriesPositivityRate, plotData);
         this.applyData(this.seriesTestRate, plotData);
         this.applyData(this.seriesReproductionP, plotData);
-        this.applyData(this.seriesAgeGroupDiscovery, plotData);
+        this.applyData(this.seriesAgeGroupDiscoveryL, plotData);
+        this.applyData(this.seriesAgeGroupDiscoveryM, plotData);
 
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
             this.applyData(seriesAgeGroupIncidence, plotData);

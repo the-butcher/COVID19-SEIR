@@ -1,3 +1,4 @@
+import { IModificationValuesDiscovery } from '../../common/modification/IModificationValuesDiscovery';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { TimeUtil } from '../../util/TimeUtil';
@@ -25,6 +26,7 @@ export interface IModelProgress {
     data?: IDataItem[];
     modificationValuesRegression?: IModificationValuesRegression;
     modificationValuesContact?: IModificationValuesContact[];
+    modificationValuesDiscovery?: IModificationValuesDiscovery[];
     fitterParams?: IFitterParams;
 }
 
@@ -100,12 +102,8 @@ export class ModelStateIntegrator {
     private integrate(dT: number, tT: number): ModificationTime {
 
         const modificationTime = ModificationTime.createInstance(tT);
-        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > TimeUtil.parseCategoryDateFull('24.04.2022')) {
+        if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4) {
 
-            // const baseData = BaseData.getInstance().findBaseDataItem(tT);
-            // if (!baseData) {
-
-            // console.log(this.nrmCasesLast * this.model.getAbsTotal());
             const realCases = this.nrmCasesLast * this.model.getAbsTotal();
             const testRate = modificationTime.getTestRate();
             for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 10) {
@@ -121,8 +119,6 @@ export class ModelStateIntegrator {
             }
 
         }
-
-
 
         this.modelState.add(this.model.apply(this.modelState, dT, tT, modificationTime));
         return modificationTime;
@@ -246,7 +242,7 @@ export class ModelStateIntegrator {
 
         const dataSet: IDataItem[] = [];
         const absTotal = this.model.getDemographics().getAbsTotal();
-
+        const ageGroupIndexTotal = this.model.getDemographics().getAgeGroupTotal().getIndex();
 
         const minChartInstant = ModelInstants.getInstance().getMinInstant();
         const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
@@ -289,7 +285,7 @@ export class ModelStateIntegrator {
                 const removedIDTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedIDTotal);
                 const removedVITotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVITotal);
                 const removedV2Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV2Total);
-                const discoveryTotal = modificationTime.getDiscoveryRateTotal();
+                const discoveryTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal);
 
                 // values that come by strain
                 const incidences: { [K: string]: number } = {};
@@ -351,8 +347,7 @@ export class ModelStateIntegrator {
                     const removedID = this.modelState.getNrmValueSum(compartmentFilterRemovedID) * groupNormalizer;
                     const removedVI = this.modelState.getNrmValueSum(compartmentFilterRemovedVI) * groupNormalizer;
                     const removedV2 = this.modelState.getNrmValueSum(compartmentFilterRemovedV2) * groupNormalizer;
-                    const discovery = modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
-                    // const positivity = modificationTime.getPos
+                    const discovery = modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
 
                     const incidencesAgeGroup: { [K: string]: number } = {};
                     const exposedAgeGroup: { [K: string]: number } = {};

@@ -123,21 +123,22 @@ export class ChartDiscovery {
         const demographics = Demographics.getInstance();
         const chartData: IChartDataDiscovery[] = [];
         const ageGroups = demographics.getAgeGroups();
+        const ageGroupIndexTotal = demographics.getAgeGroupTotal().getIndex();
 
         for (let indexContact = 0; indexContact < ageGroups.length; indexContact++) {
-            const ratios = modificationTime.getDiscoveryRatios(indexContact);
+            const rates = modificationTime.getDiscoveryRatesRaw(indexContact);
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
-                contactRatio: ratios.contact,
-                discoveryRatio: ratios.discovery,
-                label: this.labellingDefinitionTooltip.format(ratios.discovery)
+                contactRatio: rates.contact,
+                discoveryRatio: rates.discovery,
+                label: this.labellingDefinitionTooltip.format(rates.discovery)
             });
         }
 
-        const discoveryRatioTotal = modificationTime.getDiscoveryRateTotal(); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
+        const discoveryRateTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
         // console.log('discoveryRatioTotal', discoveryRatioTotal);
         // this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
-        this.valueTotalLabel.text = this.labellingDefinitionTooltip.format(discoveryRatioTotal); // ControlsConstants.LOCALE_FORMAT_FIXED (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
+        this.valueTotalLabel.text = this.labellingDefinitionTooltip.format(discoveryRateTotal); // ControlsConstants.LOCALE_FORMAT_FIXED (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';
 
         if (this.fullDataUpdate) {
             this.chart.data = chartData;

@@ -4,9 +4,7 @@ import { TimeUtil } from '../../util/TimeUtil';
 import { Demographics } from '../demographics/Demographics';
 import { AModification } from './AModification';
 import { IContactColumns } from './IContactColumns';
-import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
-import { Modifications } from './Modifications';
-import { ModificationSettings } from './ModificationSettings';
+import { IModificationValuesDiscovery } from './IModificationValuesDiscovery';
 
 /**
  * implementation of IModification for testing / discovery
@@ -43,12 +41,26 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
     }
 
     getPositivityRate(): number {
-        const dataItem = BaseData.getInstance().findBaseDataItem(this.getInstantA());
-        if (dataItem) {
-            return dataItem.getAveragePositivity();
-        } else {
-            Math.random();
+
+        let positivityRate = BaseData.getInstance().findBaseDataItem(this.getInstantA())?.getAveragePositivity();
+
+        if (positivityRate) {
+            this.acceptUpdate({
+                positivityRate
+            });
+            return positivityRate;
         }
+
+        if (this.modificationValues.positivityRate) {
+            return this.modificationValues.positivityRate;
+        }
+
+        positivityRate = BaseData.getInstance().findBaseDataItem(BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4).getAveragePositivity();
+        this.acceptUpdate({
+            positivityRate
+        });
+        return positivityRate;
+
     }
 
     getTestRate(): number {

@@ -1,7 +1,11 @@
+import { ModelInstants } from '../../model/ModelInstants';
+import { ValueRegressionDiscovery } from '../../model/regression/ValueRegressionDiscovery';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { TimeUtil } from '../../util/TimeUtil';
+import { Demographics } from '../demographics/Demographics';
 import { MODIFICATION__FETCH } from './../../model/ModelConstants';
 import { AModificationResolver } from './AModificationResolver';
-import { IModificationValuesDiscovery } from './IModificationValueDiscovery';
+import { IModificationValuesDiscovery } from './IModificationValuesDiscovery';
 import { ModificationDiscovery } from './ModificationDiscovery';
 import { ModificationTime } from './ModificationTime';
 
@@ -13,6 +17,8 @@ import { ModificationTime } from './ModificationTime';
  */
 export class ModificationResolverDiscovery extends AModificationResolver<IModificationValuesDiscovery, ModificationDiscovery> {
 
+    private static discoveryRegressions: ValueRegressionDiscovery[];
+
     constructor() {
         super('TESTING');
     }
@@ -21,8 +27,11 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
     getModification(instant: number, fetchType: MODIFICATION__FETCH): ModificationDiscovery {
 
         const modificationA = super.getModification(instant, fetchType);
-        const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1)) as ModificationDiscovery;
+        if (modificationA && modificationA.getInstantA() === instant) {
+            return modificationA;
+        }
 
+        const modificationB = this.typedModifications.find(m => m.appliesToInstant(modificationA.getInstantB() + 1)) as ModificationDiscovery;
         if (modificationA && modificationB && modificationA.getInstantA() < modificationB.getInstantA()) {
 
             const modificationValuesA = modificationA.getModificationValues();
@@ -49,12 +58,20 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
             const testRateB = modificationValuesB.testRate;
             const testRate = testRateA + (testRateB - testRateA) * fraction;
 
+            let positivityRate: number;
+            if (modificationValuesA.positivityRate && modificationValuesB.positivityRate) {
+                const positivityRateA = modificationValuesA.positivityRate;
+                const positivityRateB = modificationValuesB.positivityRate;
+                positivityRate = positivityRateA + (positivityRateB - positivityRateA) * fraction;
+            }
+
             const interpolatedModification = new ModificationDiscovery({
                 id: ObjectUtil.createId(),
                 key: 'TESTING',
                 name: 'interpolation',
                 instant,
                 testRate,
+                positivityRate,
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),
@@ -74,9 +91,57 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
 
     }
 
-    getValue(instant: number): number {
-        const modificationTime = ModificationTime.createInstance(instant);
-        return modificationTime.getDiscoveryRateTotal();
+    static resetRegression(): void {
+        this.discoveryRegressions = undefined;
     }
+
+    static getRegression(ageGroupIndex: number): ValueRegressionDiscovery {
+
+        if (!this.discoveryRegressions) {
+
+            console.log('rebuilding pos rate regressions');
+
+            const minInstant = ModelInstants.getInstance().getMinInstant();
+            const maxInstant = ModelInstants.getInstance().getMaxInstant();
+            const modificationsTime: ModificationTime[] = [];
+            for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY * 3) {
+                const modificationTime = ModificationTime.createInstance(instant);
+                modificationsTime.push(modificationTime);
+                // console.log('create disc mod', TimeUtil.formatCategoryDateFull(instant), modificationTime);
+            }
+
+            this.discoveryRegressions = [];
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+
+                this.discoveryRegressions[ageGroup.getIndex()] = new ValueRegressionDiscovery({
+                    discoveryPropertyGetter: (m: ModificationTime) => {
+                        // if (ageGroup.getIndex() === Demographics.getInstance().getAgeGroupTotal().getIndex()) {
+                        //     return m.getDiscoveryRateTotal();
+                        // } else {
+                        return m.getDiscoveryRatesRaw(ageGroup.getIndex()).discovery;
+                        // }
+                    },
+                    instantA: minInstant,
+                    instantB: maxInstant,
+                    polyShares: [0.10, 0.90],
+                    modifications: modificationsTime
+                });
+
+            });
+
+
+        }
+        return this.discoveryRegressions[ageGroupIndex];
+
+    }
+
+    private static rebuildRegression(): void {
+
+    }
+
+    // getValue(instant: number): number {
+    //     const modificationTime = ModificationTime.createInstance(instant);
+    //     return modificationTime.getDiscoveryRateTotal();
+    // }
 
 }

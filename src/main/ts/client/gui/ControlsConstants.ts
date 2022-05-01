@@ -307,7 +307,7 @@ export class ControlsConstants {
             handleModificationDrag: () => { },
             showInEditor: modification => {
                 ControlsDiscovery.getInstance().acceptModification(modification as ModificationDiscovery);
-                ChartAgeGroup.getInstance().setChartMode('TESTING');
+                // ChartAgeGroup.getInstance().setChartMode('TESTING');
             },
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -339,7 +339,7 @@ export class ControlsConstants {
             },
             showInEditor: modification => {
                 ControlsSeasonality.getInstance().acceptModification(modification as ModificationSeasonality);
-                ChartAgeGroup.getInstance().setChartMode('REPRODUCTION');
+                // ChartAgeGroup.getInstance().setChartMode('REPRODUCTION');
             },
             labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2
         },
@@ -354,7 +354,7 @@ export class ControlsConstants {
             },
             handleModificationDrag: () => { },
             showInEditor: modification => {
-                ChartAgeGroup.getInstance().setChartMode('CONTACT');
+                // ChartAgeGroup.getInstance().setChartMode('CONTACT');
                 ControlsRegression.getInstance().acceptModification(modification as ModificationRegression);
             },
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED

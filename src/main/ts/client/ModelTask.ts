@@ -17,6 +17,8 @@ import { StorageUtil } from './storage/StorageUtil';
 import { ModificationResolverRegression } from '../common/modification/ModificationResolverRegression';
 import { ModificationRegression } from '../common/modification/ModificationRegression';
 import { QueryUtil } from '../util/QueryUtil';
+import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
+import { TimeUtil } from '../util/TimeUtil';
 
 export type WORKER_MODE = 'REGRESSION' | 'PROJECTION' | 'REBUILDING';
 
@@ -90,6 +92,16 @@ export class ModelTask {
                         multipliers: modificationValuesContact.multipliers,
                         corrections: modificationValuesContact.corrections,
                         dailyerrors: modificationValuesContact.dailyerrors
+                    });
+                    StorageUtil.getInstance().setSaveRequired(true);
+                });
+
+                // console.log('modelProgress.modificationValuesDiscovery', modelProgress.modificationValuesDiscovery);
+                modelProgress.modificationValuesDiscovery?.forEach(modificationValuesDiscovery => {
+                    const modificationDiscovery = Modifications.getInstance().findModificationById(modificationValuesDiscovery.id) as ModificationDiscovery;
+                    // console.log(modificationDiscovery.getId(), TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), modificationDiscovery.getPositivityRate());
+                    modificationDiscovery.acceptUpdate({
+                        positivityRate: modificationValuesDiscovery.positivityRate
                     });
                     StorageUtil.getInstance().setSaveRequired(true);
                 });

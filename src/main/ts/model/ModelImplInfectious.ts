@@ -98,7 +98,7 @@ export class ModelImplInfectious implements IModelSeir {
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
 
             }
-            const dailyActual = dailyTested / modificationTime.getDiscoveryRatios(ageGroup.getIndex()).discovery;
+            const dailyActual = dailyTested / modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
             this.compartmentsInfectiousPrimary.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic, `_INF_${ObjectUtil.padZero(chainIndex)}`));
 
@@ -211,12 +211,12 @@ export class ModelImplInfectious implements IModelSeir {
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
-                        const discoveryRatio = modificationTime.getDiscoveryRatios(this.ageGroupIndex).discovery;
+                        const discoveryRatio = modificationTime.getDiscoveryRateLoess(this.ageGroupIndex);
                         const discoveredNrmCases = continuationValue * discoveryRatio;
                         result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
                         this.nrmCasesLast += continuationValue;
                         // if (this.ageGroupName === '15-24' && this.parentModel.getStrainId() === '719e6') {
-                        //     console.log(this.parentModel.getStrainId(), this.ageGroupName, discoveryRatio);
+                        //     console.log(this.parentModel.getStrainId(), this.ageGroupName, discoveryRatio, modificationTime.getDiscoveryRateLoess(this.ageGroupIndex));
                         // }
                     }
 

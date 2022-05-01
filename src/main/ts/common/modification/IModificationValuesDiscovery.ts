@@ -7,17 +7,12 @@ import { IModificationValues } from './IModificationValues';
  */
 export interface IModificationValuesDiscovery extends IModificationValues {
 
-    /**
-     * should the category sliders be bound to the overall value
-     */
-    // bindToOverall: boolean;
-
-    /**
-     * expected total discovery
-     */
-    // overall: number;
-
     testRate: number;
+
+    /**
+     * optional, since this value is calculated only, therefore it may not be present on i.e. initial runs
+     */
+    positivityRate?: number;
 
     /**
      * category multipliers, normalized values between 0 and 1

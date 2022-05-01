@@ -66,18 +66,20 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private valueSum: number;
     private columnValues: number[];
     private cellValues: number[][];
-    private discoveryRatiosByAgeGroup: IRatios[];
+    private discoveryRatesByAgeGroup: IRatios[];
     private quarantineMultipliersByAgeGroup: number[];
-    private discoveryRateOverall: number;
-    private positivityRateInjected: number;
+    // private discoveryRateOverall: number;
+    // private positivityRateInjected: number;
 
     private readonly ageGroups: AgeGroup[];
+    private readonly ageGroupIndexTotal: number;
     private readonly contactCategories: ContactCategory[];
     private readonly absTotal: number;
 
     constructor(modificationParams: IModificationValuesTime) {
         super('INSTANT', modificationParams);
         this.ageGroups = [...Demographics.getInstance().getAgeGroups()];
+        this.ageGroupIndexTotal = Demographics.getInstance().getAgeGroupTotal().getIndex();
         this.contactCategories = [...Demographics.getInstance().getCategories()];
         this.absTotal = Demographics.getInstance().getAbsTotal();
         this.resetValues();
@@ -139,7 +141,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.maxColumnValue = -1;
         this.valueSum = -1;
         this.columnValues = [];
-        this.discoveryRatiosByAgeGroup = undefined;
+        this.discoveryRatesByAgeGroup = undefined;
         this.quarantineMultipliersByAgeGroup = undefined;
         this.cellValues = [];
         for (let indexContact = 0; indexContact < this.ageGroups.length; indexContact++) {
@@ -152,16 +154,28 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.modificationSeasonality.getSeasonality();
     }
 
-    getDiscoveryRatios(ageGroupIndex: number): IRatios {
-        if (!this.discoveryRatiosByAgeGroup) {
-            this.buildRatios();
+    getDiscoveryRatesRaw(ageGroupIndex: number): IRatios {
+        if (!this.discoveryRatesByAgeGroup) {
+            this.buildRates();
         }
-        return this.discoveryRatiosByAgeGroup[ageGroupIndex];
+        return this.discoveryRatesByAgeGroup[ageGroupIndex];
     }
 
-    private buildRatios(): void {
+    getDiscoveryRateLoess(ageGroupIndex: number): number {
+        return ModificationResolverDiscovery.getRegression(ageGroupIndex).findLoessValue(this.getInstant()).y;
+    }
 
-        this.discoveryRatiosByAgeGroup = [];
+
+    // getDiscoveryRateTotal(): number {
+    //     if (!this.discoveryRatesByAgeGroup) {
+    //         this.buildRates();
+    //     }
+    //     return this.discoveryRateOverall;
+    // }
+
+    private buildRates(): void {
+
+        this.discoveryRatesByAgeGroup = [];
         this.quarantineMultipliersByAgeGroup = [];
 
         const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
@@ -171,35 +185,35 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
             const ageGroupIndex = ageGroup.getIndex();
             let contactTotal = 0;
-            let discoveryRatioAgeGroup = 0;
+            let discoveryRateAgeGroup = 0;
 
             this.contactCategories.forEach(contactCategory => {
 
-                // current contact ratio for that contact category as set in modification (0 to 1 or 0% to 100%)
+                // current contact ratio for that contact category as set in modification (0% to 100%)
                 const contactRatioCategory = this.modificationContact.getCategoryValue(contactCategory.getName());
                 // total contact in the requested age group in contact category (TODO - question this value)
                 const contactGroupCategory = contactCategory.getColumnValue(ageGroupIndex);
                 // current total contact as of base contact-rate and contact-ratio in contact category
                 const contactTotalCategory = contactRatioCategory * contactGroupCategory;
 
-                // current discovery ratio for category as set in modification
-                const discoveryRatioCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName());
+                // current discovery setting for category as set in modification
+                let discoveryRateCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName());
+
+                if (ageGroup.getIndex() == 0) {
+                    discoveryRateCategory *= 0.6;
+                } else if (ageGroup.getIndex() == 3 || ageGroup.getIndex() == 4) {
+                    discoveryRateCategory *= 1.1;
+                }
 
                 // current share of discovered in currentTotal
                 contactTotal += contactTotalCategory;
-                discoveryRatioAgeGroup += discoveryRatioCategory * contactTotalCategory;
-
-                if (ageGroup.getIndex() == 0) {
-                    discoveryRatioAgeGroup *= 0.9;
-                } else if (ageGroup.getIndex() == 3 || ageGroup.getIndex() == 4) {
-                    discoveryRatioAgeGroup *= 1.1;
-                }
+                discoveryRateAgeGroup += discoveryRateCategory * contactTotalCategory;
 
             });
 
-            this.discoveryRatiosByAgeGroup[ageGroupIndex] = {
+            this.discoveryRatesByAgeGroup[ageGroupIndex] = {
                 contact: contactTotal,
-                discovery: discoveryRatioAgeGroup / contactTotal
+                discovery: discoveryRateAgeGroup / contactTotal
             };
 
 
@@ -208,7 +222,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         let _discoveryRateOverall = 0;
         this.ageGroups.forEach(ageGroup => {
-            _discoveryRateOverall += ageGroup.getAbsValue() * this.discoveryRatiosByAgeGroup[ageGroup.getIndex()].discovery;
+            _discoveryRateOverall += ageGroup.getAbsValue() * this.discoveryRatesByAgeGroup[ageGroup.getIndex()].discovery;
         });
         _discoveryRateOverall = _discoveryRateOverall / this.absTotal;
 
@@ -216,57 +230,52 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.ageGroups.forEach(ageGroup => {
 
             const ageGroupIndex = ageGroup.getIndex();
-            let contact = this.discoveryRatiosByAgeGroup[ageGroupIndex].contact * correction;
-            let discovery = Math.min(1.0, this.discoveryRatiosByAgeGroup[ageGroupIndex].discovery * correction);
-            this.discoveryRatiosByAgeGroup[ageGroup.getIndex()] = {
+            let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact * correction;
+            let discovery = Math.min(1.0, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
+            this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
                 contact,
                 discovery
             };
             this.quarantineMultipliersByAgeGroup[ageGroupIndex] = shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
 
         });
-        this.discoveryRateOverall = this.calculateDiscoveryRateOverall();
+        this.discoveryRatesByAgeGroup[this.ageGroupIndexTotal] = {
+            contact: -1,
+            discovery: this.calculateDiscoveryRateOverall()
+        }
+        // this.discoveryRateOverall = this.calculateDiscoveryRateOverall();
 
     }
 
     injectPositivityRate(positivityRate: number): void {
-        this.positivityRateInjected = positivityRate;
+        // console.log('injecting to', this.modificationDiscovery.getId(), this.modificationDiscovery.getName());
+        this.modificationDiscovery.acceptUpdate({
+            positivityRate
+        });
     }
 
     private calculateDiscoveryRateOverall(): number {
-
         const testRate = this.getTestRate();
         const positivityRate = this.getPositivityRate();
         if (testRate && positivityRate) {
             return ModificationSettings.getInstance().calculateDiscoveryRate(positivityRate, testRate);
+        } else {
+            Math.random();
         }
     }
 
     getPositivityRate(): number {
-        if (this.positivityRateInjected) {
-            return this.positivityRateInjected;
-        }
         return this.modificationDiscovery.getPositivityRate();
     }
 
-    static defaultTestRate: number;
     getTestRate(): number {
-        if (ModificationTime.defaultTestRate && this.getInstantA() > TimeUtil.parseCategoryDateFull('19.04.2022')) {
-            return ModificationTime.defaultTestRate;
-        }
         return this.modificationDiscovery.getTestRate();
     }
 
-    getDiscoveryRateTotal(): number {
-        if (!this.discoveryRatiosByAgeGroup) {
-            this.buildRatios();
-        }
-        return this.discoveryRateOverall;
-    }
 
     getQuarantineMultiplier(ageGroupIndex: number): number {
         if (!this.quarantineMultipliersByAgeGroup) {
-            this.buildRatios();
+            this.buildRates();
         }
         return this.quarantineMultipliersByAgeGroup[ageGroupIndex];
     }

@@ -14,6 +14,7 @@ import { StorageUtil } from '../storage/StorageUtil';
 import { Slider } from '../gui/Slider';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IconSlider } from '../gui/IconSlider';
+import { ModificationResolverDiscovery } from '../../common/modification/ModificationResolverDiscovery';
 
 /**
  * controller for editing testing modifications
@@ -94,16 +95,6 @@ export class ControlsDiscovery {
                 }
             }
         });
-
-        // this.iconBoundToTotal = new IconToggle({
-        //     container: 'slidersTestingDiv',
-        //     state: false,
-        //     handleToggle: state => {
-        //         this.handleChange();
-        //     },
-        //     label: 'bind to total'
-        // });
-
         Demographics.getInstance().getCategories().forEach(contactCategory => {
             this.slidersDiscovery.push(new SliderDiscoveryCategory(contactCategory.getName()));
         });
@@ -113,11 +104,7 @@ export class ControlsDiscovery {
     handleChange(): void {
 
         const blendable = this.iconBlendable.getState();
-        // const overall = this.sliderOverall.getValue();
         const testRate = this.sliderTestRate.getValue(0);
-        // const bindToOverall = this.iconBoundToTotal.getState();
-
-        // this.sliderOverall.setDisabled(!bindToOverall);
 
         const multipliers: { [K in string]: number } = {};
         let updatedCategories: string[] = [];
@@ -131,9 +118,7 @@ export class ControlsDiscovery {
         this.modification.acceptUpdate({
             multipliers,
             blendable,
-            // overall,
             testRate,
-            // bindToOverall
         });
 
         this.updateChart();
@@ -141,6 +126,8 @@ export class ControlsDiscovery {
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
         StorageUtil.getInstance().setSaveRequired(true);
         ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
+
+
 
     }
 
@@ -150,15 +137,8 @@ export class ControlsDiscovery {
         this.modification = modification;
 
         this.iconBlendable.toggle(modification.isBlendable());
-        // this.iconBoundToTotal.toggle(modification.isBoundToTotal());
-
-        // this.sliderOverall.setDisabled(!modification.isBoundToTotal());
-        // this.sliderOverall.setValue(modification.getDiscoveryRate());
 
         this.sliderTestRate.setValueAndRedraw(0, modification.getTestRate(), true);
-
-        // console.log('overall', modification);
-
         this.slidersDiscovery.forEach(sliderTesting => {
             sliderTesting.setValue(modification.getCategoryValue(sliderTesting.getName()));
         });
@@ -180,6 +160,7 @@ export class ControlsDiscovery {
                 sliderTesting.handleResize();
             });
         });
+
     }
 
 }

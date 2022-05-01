@@ -1,8 +1,9 @@
 import { Demographics } from './common/demographics/Demographics';
-import { IModificationValuesDiscovery } from './common/modification/IModificationValueDiscovery';
+import { IModificationValuesDiscovery } from './common/modification/IModificationValuesDiscovery';
 import { IModificationValuesSettings } from './common/modification/IModificationValuesSettings';
 import { IModificationValuesStrain } from './common/modification/IModificationValuesStrain';
 import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
+import { ModificationResolverDiscovery } from './common/modification/ModificationResolverDiscovery';
 import { ModificationResolverRegression } from './common/modification/ModificationResolverRegression';
 import { Modifications } from './common/modification/Modifications';
 import { ModificationSettings } from './common/modification/ModificationSettings';
@@ -12,7 +13,6 @@ import { IWorkerInput } from './model/IWorkerInput';
 import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
 import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
-import { ModelStateFitter8 } from './model/state/fitter8/ModelStateFitter8';
 import { ModelStateFitter9Reg1 } from './model/state/fitter9reg1/ModelStateFitter9Reg1';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
@@ -62,6 +62,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
 
         // recreate singleton, since the calibrator changes things
         Modifications.setInstanceFromValues(modificationValues);
+        ModificationResolverDiscovery.resetRegression();
 
         const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), BaseData.getInstance(), modelProgress => {
             ctx.postMessage(modelProgress);
@@ -81,6 +82,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             }).then(data => {
                 data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
                 data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
+                data.modificationValuesDiscovery = new ModificationResolverDiscovery().getModifications().map(m => m.getModificationValues());
                 ctx.postMessage(data);
             });
         } else if (workerInput.workerMode == 'REGRESSION') {
@@ -89,10 +91,12 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             }).then(data => {
                 data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
                 data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
+                data.modificationValuesDiscovery = new ModificationResolverDiscovery().getModifications().map(m => m.getModificationValues());
                 ctx.postMessage(data);
             });
         } else {
             modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
+                modelProgress.modificationValuesDiscovery = new ModificationResolverDiscovery().getModifications().map(m => m.getModificationValues());
                 ctx.postMessage(modelProgress);
             });
         }
