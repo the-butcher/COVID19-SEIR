@@ -30,9 +30,15 @@ export class ControlsTime {
     private readonly chartContactMatrix: ChartContactMatrix;
     // private readonly chartDiffIncidences: ChartDiscovery;
 
+    private modification: ModificationTime;
+
     constructor() {
         this.chartContactMatrix = new ChartContactMatrix('chartTimeDiv', false);
         // this.chartDiffIncidences = new ChartDiscovery('chartDiffIncidenceDiv', -20, 20, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2, ControlsConstants.LABEL_ABSOLUTE_FLOAT_2);
+    }
+
+    getModification(): ModificationTime {
+        return this.modification;
     }
 
     getChartContactMatrix(): ChartContactMatrix {
@@ -46,6 +52,7 @@ export class ControlsTime {
     acceptModification(modification: ModificationTime): void {
 
         Controls.acceptModification(modification);
+        this.modification = modification;
         const modificationResolver = ModificationResolverTime.getInstance();
         const contactMatrix = modificationResolver.findContactMatrix(modification.getInstantA());
 

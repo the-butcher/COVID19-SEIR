@@ -8,7 +8,9 @@ import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
 import { QueryUtil } from '../../util/QueryUtil';
+import { Controls } from "../controls/Controls";
 import { ControlsRegression } from '../controls/ControlsRegression';
+import { ControlsTime } from "../controls/ControlsTime";
 import { CHART_MODE______KEY, ControlsConstants } from '../gui/ControlsConstants';
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
@@ -249,8 +251,9 @@ export class ChartAgeGroup {
         this.chart.plotContainer.events.on('out', () => {
             clearTimeout(plotContainerOutTimeout);
             plotContainerOutTimeout = window.setTimeout(() => {
-                const timeInstant = Modifications.getInstance().findModificationsByType('TIME')[0].getInstantA();
-                this.setInstant(timeInstant);
+                const activeModification = ControlsTime.getInstance().getModification();
+                // const timeInstant = Modifications.getInstance().findModificationsByType('TIME')[0].getInstantA();
+                this.setInstant(activeModification.getInstant());
             }, 100);
         });
         this.chart.plotContainer.events.on('over', () => {
@@ -1347,6 +1350,7 @@ export class ChartAgeGroup {
 
     setInstant(instant: number): void {
         const point = this.xAxis.anyToPoint(TimeUtil.formatCategoryDateFull(instant));
+        console.log('point@instance', point);
         this.chart.cursor.triggerMove(point, 'soft'); // https://www.amcharts.com/docs/v4/tutorials/sticky-chart-cursor/
     }
 
