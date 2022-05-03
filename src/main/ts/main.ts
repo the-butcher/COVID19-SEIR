@@ -5,7 +5,9 @@ import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
 import { IRegressionConfig } from './common/modification/IModificationValuesRegression';
 import { IModificationValuesSettings } from './common/modification/IModificationValuesSettings';
+import { ModificationDiscovery } from './common/modification/ModificationDiscovery';
 import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
+import { ModificationResolverDiscovery } from './common/modification/ModificationResolverDiscovery';
 import { ModificationResolverRegression } from './common/modification/ModificationResolverRegression';
 import { Modifications } from './common/modification/Modifications';
 import { ModificationSettings } from './common/modification/ModificationSettings';
@@ -13,6 +15,7 @@ import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
 import { ILoessInput, ValueRegressionBase } from './model/regression/ValueRegressionBase';
 import { Logger } from './util/Logger';
+import { ObjectUtil } from './util/ObjectUtil';
 import { TimeUtil } from './util/TimeUtil';
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
@@ -30,6 +33,28 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             // needs model-instants to be ready
             BaseData.getInstance().calculateDailyStats();
+
+            const recreateDiscoveryModificationsAfterLastValidDate = true;
+            if (recreateDiscoveryModificationsAfterLastValidDate) {
+
+                const lastValidDiscoveryInstant = BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4;
+                const modificationResolverDiscovery = new ModificationResolverDiscovery();
+
+                const modificationsDiscoveryDeletable = modificationResolverDiscovery.getModifications().filter(m => m.getInstantA() > lastValidDiscoveryInstant);
+                console.log('last valid discovery', TimeUtil.formatCategoryDateFull(lastValidDiscoveryInstant), modificationsDiscoveryDeletable);
+                modificationsDiscoveryDeletable.forEach(modificationDiscoveryDeletable => {
+                    Modifications.getInstance().deleteModification(modificationDiscoveryDeletable.getId());
+                });
+
+                const instantMin = lastValidDiscoveryInstant + TimeUtil.MILLISECONDS_PER____DAY * 3;
+                const instantMax = ModelInstants.getInstance().getMaxInstant();
+                for (let instant = instantMin; instant < instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY * 3) {
+                    const modificationDiscoveryInsertable = modificationResolverDiscovery.getModification(instant, 'INTERPOLATE');
+                    console.log('insert discovery', TimeUtil.formatCategoryDateFull(instant), modificationDiscoveryInsertable.getId(), modificationDiscoveryInsertable);
+                    Modifications.getInstance().addModification(modificationDiscoveryInsertable);
+                }
+
+            }
 
             const snapLastCorrectionToLongTermRegression = false;
             if (snapLastCorrectionToLongTermRegression) {
@@ -101,7 +126,9 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             }
 
-
+            /**
+             * move all contact modifications by one day
+             */
             // const modificationsContact = new ModificationResolverContact().getModifications();
             // modificationsContact.shift();
             // modificationsContact.forEach(modificationContact => {

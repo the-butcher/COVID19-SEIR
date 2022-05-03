@@ -39,6 +39,7 @@ export interface IBaseDataItem {
     getAverageHelp1(ageGroupIndex: number): number;
     getAverageHelp2(ageGroupIndex: number): number;
     getReproduction(ageGroupIndex: number): number;
+    getIcuM7(): number;
 
     getAverageMobilityOther(): number;
     getAverageMobilityWork(): number;
@@ -374,6 +375,14 @@ export class BaseDataItem implements IBaseDataItem {
 
     getCasesM7(ageGroupIndex: number): number {
         return this.casesM7[ageGroupIndex];
+    }
+
+    getIcuM7(): number {
+        const dataItemP21 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 21);
+        const dataItemM14 = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY * 14);
+        if (dataItemP21 && dataItemM14) {
+            return dataItemP21.getIcu() - dataItemM14.getIcu();
+        }
     }
 
     getAverageCases(ageGroupIndex: number): number {

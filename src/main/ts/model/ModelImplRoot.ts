@@ -9,7 +9,6 @@ import { IBaseDataItem } from './basedata/BaseDataItem';
 import { StrainApproximatorBaseData } from './calibration/StrainApproximatorBaseData';
 import { CompartmentBase } from './compartment/CompartmentBase';
 import { CompartmentChainReproduction } from './compartment/CompartmentChainReproduction';
-import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { CompartmentImmunity } from './compartment/CompartmentImmunity';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { IModelSeir } from './IModelSeir';

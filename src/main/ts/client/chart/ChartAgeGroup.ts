@@ -4,6 +4,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { ModificationResolverDiscovery } from "../../common/modification/ModificationResolverDiscovery";
+import { ModificationResolverTime } from "../../common/modification/ModificationResolverTime";
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
@@ -251,8 +252,10 @@ export class ChartAgeGroup {
         this.chart.plotContainer.events.on('out', () => {
             clearTimeout(plotContainerOutTimeout);
             plotContainerOutTimeout = window.setTimeout(() => {
-                const activeModification = ControlsTime.getInstance().getModification();
-                // const timeInstant = Modifications.getInstance().findModificationsByType('TIME')[0].getInstantA();
+                let activeModification = ControlsTime.getInstance().getModification();
+                if (!activeModification) {
+                    activeModification = ModificationResolverTime.getInstance().getModification(Date.now(), 'INTERPOLATE');
+                }
                 this.setInstant(activeModification.getInstant());
             }, 100);
         });
@@ -896,7 +899,7 @@ export class ChartAgeGroup {
         // });
         // this.seriesIcuR = new ChartAgeGroupSeries({
         //     chart: this.chart,
-        //     yAxis: this.yAxisPlotPercent,
+        //     yAxis: this.yAxisPlotAbsolute,
         //     title: 'icu',
         //     baseLabel: 'icu',
         //     valueField: 'icuR',
@@ -1180,7 +1183,8 @@ export class ChartAgeGroup {
         this.chart.zoomOutButton.scale = 0.77;
 
         this.chart.cursor.behavior = 'zoomX';
-        this.chart.mouseWheelBehavior = 'zoomX';
+        this.chart.mouseWheelBehavior = 'panX'; // zoomX
+
 
         /**
          * heat axis
@@ -1350,7 +1354,7 @@ export class ChartAgeGroup {
 
     setInstant(instant: number): void {
         const point = this.xAxis.anyToPoint(TimeUtil.formatCategoryDateFull(instant));
-        console.log('point@instance', point);
+        // console.log('point@instance', point);
         this.chart.cursor.triggerMove(point, 'soft'); // https://www.amcharts.com/docs/v4/tutorials/sticky-chart-cursor/
     }
 
@@ -1732,6 +1736,7 @@ export class ChartAgeGroup {
 
         // this.seriesSeasonality.setVisible(visible);
         // this.setAxisPercentBounds(0, 2);
+        // this.seriesIcuR.setVisible(visible);
 
         // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -1901,6 +1906,9 @@ export class ChartAgeGroup {
                         const casesScaled1 = dataItem.valueset[ageGroup.getName()].CASES * 700000 / ageGroup.getAbsValue();
                         if (this.seriesAgeGroupDiscoveredCases.isVisible()) {
                             maxIncidence = Math.max(maxIncidence, casesScaled1);
+                        }
+                        if (this.seriesAgeGroupAssumedAllCases.isVisible()) {
+                            maxIncidence = Math.max(maxIncidence, casesScaled1 / dataItem.valueset[ageGroup.getName()].DISCOVERY);
                         }
 
                         if (this.seriesAgeGroupCasesN.isVisible()) {
@@ -2288,7 +2296,7 @@ export class ChartAgeGroup {
             let ageGroupAverageCasesR: number;
             let ageGroupCasesR = null;
             let reproductionR = null;
-            let mobility = null;
+            // let icuR = null;
             const dataItem00 = BaseData.getInstance().findBaseDataItem(instant);
             if (dataItem00) {
 
@@ -2302,7 +2310,8 @@ export class ChartAgeGroup {
 
                 ageGroupAverageCasesR = dataItem00.getAverageCases(ageGroupPlot.getIndex());
                 ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
-                reproductionR = dataItem00.getReproduction(ageGroupPlot.getIndex()); // dataItem00.getAverageMobilityOther();//
+                reproductionR = dataItem00.getReproduction(ageGroupPlot.getIndex()); // dataItem00.getAverageMobilityOther(); //
+                // icuR = dataItem00.getIcuM7() * 300;
 
             } else {
                 // console.log('no data found', categoryX);
@@ -2317,6 +2326,7 @@ export class ChartAgeGroup {
                 ageGroupAverageCasesR,
                 ageGroupCasesR,
                 reproductionR,
+                // icuR
             }
             baseData.push(item);
 
@@ -2348,6 +2358,7 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupAverageCasesR, baseData);
         this.applyData(this.seriesAgeGroupCasesR, baseData);
         this.applyData(this.seriesReproductionR, baseData);
+        // this.applyData(this.seriesIcuR, baseData);
 
     }
 

@@ -1,6 +1,15 @@
 import { IBaseDataItemConfig } from './BaseData';
 import { IBaseDataItem } from './BaseDataItem';
 export class BaseDataItemCalibrate implements IBaseDataItem {
+    getHospitalization(): number {
+        throw new Error('Method not implemented.');
+    }
+    getIcu(): number {
+        throw new Error('Method not implemented.');
+    }
+    getAverageTests(): number {
+        throw new Error('Method not implemented.');
+    }
 
     calculateAverageValues(): void {
         // do nothing

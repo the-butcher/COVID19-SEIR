@@ -1,8 +1,9 @@
 import { Demographics } from '../../common/demographics/Demographics';
-import { IModificationValuesDiscovery } from '../../common/modification/IModificationValueDiscovery';
+import { IModificationValuesDiscovery } from '../../common/modification/IModificationValuesDiscovery';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { IAnyModificationValue, Modifications } from '../../common/modification/Modifications';
 import { ModificationTime } from '../../common/modification/ModificationTime';
+import { TimeUtil } from '../../util/TimeUtil';
 import { BaseData } from '../basedata/BaseData';
 import { CompartmentFilter } from '../compartment/CompartmentFilter';
 import { ECompartmentType } from '../compartment/ECompartmentType';
@@ -26,7 +27,9 @@ export class StrainCalibrator {
         // no public instance
     }
 
-    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesTesting: IModificationValuesDiscovery, baseData: BaseData): void {
+    static calibrate(demographics: Demographics, modificationValuesStrain: IModificationValuesStrain, modificationValuesDiscovery: IModificationValuesDiscovery, baseData: BaseData): void {
+
+        // console.warn('modificationValuesDiscovery', modificationValuesDiscovery, TimeUtil.formatCategoryDateFull(modificationValuesDiscovery.instant));
 
         const ageGroups = demographics.getAgeGroups();
 
@@ -49,10 +52,10 @@ export class StrainCalibrator {
         const vaccinationCurves = {};
         demographics.getAgeGroups().forEach(ageGroup => {
             vaccinationCurves[ageGroup.getName()] = {
-                pA: { x: preInstant, y: 0},
-                cA: { x: preInstant, y: 0},
-                cB: { x: preInstant, y: 0},
-                pB: { x: preInstant, y: 0},
+                pA: { x: preInstant, y: 0 },
+                cA: { x: preInstant, y: 0 },
+                cB: { x: preInstant, y: 0 },
+                pB: { x: preInstant, y: 0 },
                 vv: vv
             };
         })
@@ -82,7 +85,7 @@ export class StrainCalibrator {
                 draggable: false,
                 blendable: false
             },
-            modificationValuesTesting,
+            modificationValuesDiscovery,
             {
                 id: 'calibrate (settings)',
                 key: 'SETTINGS',
@@ -125,7 +128,6 @@ export class StrainCalibrator {
             instant: preInstant,
             deletable: false,
             draggable: false,
-            blendable: false
         }) as ModificationTime;
         modificationTimeCalibrate.setInstants(preInstant, preInstant);
 

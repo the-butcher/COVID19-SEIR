@@ -102,20 +102,29 @@ export class ModelStateIntegrator {
     private integrate(dT: number, tT: number): ModificationTime {
 
         const modificationTime = ModificationTime.createInstance(tT);
+
         if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4) {
 
             const realCases = this.nrmCasesLast * this.model.getAbsTotal();
             const testRate = modificationTime.getTestRate();
             for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 10) {
+
                 const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(discoveredCases, testRate);
                 const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, testRate);
                 const realCasesCandidate = discoveredCases / discoveryRateCandidate;
                 if (realCasesCandidate > realCases) {
+
                     // once reached, treat as well enough match (TODO :: improve)
+                    /**
+                     * this effectively triggers an update of the underlying discovery modification
+                     * in cases when that modification is not interpolated, but refers to an actual configuration, the config gets updated
+                     */
                     modificationTime.injectPositivityRate(positivityRateCandidate);
                     // console.log(discoveredCases, ' >> ', realCases, '@positivity(2)', positivityRateCandidate, '@discovery(2)', discoveryRateCandidate);
                     break;
+
                 }
+
             }
 
         }

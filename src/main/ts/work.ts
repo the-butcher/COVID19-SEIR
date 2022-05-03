@@ -14,6 +14,7 @@ import { ModelImplRoot } from './model/ModelImplRoot';
 import { ModelInstants } from './model/ModelInstants';
 import { ModelStateFitter5 } from './model/state/fitter5/ModelStateFitter5';
 import { ModelStateFitter9Reg1 } from './model/state/fitter9reg1/ModelStateFitter9Reg1';
+import { ModelStateIntegrator } from './model/state/ModelStateIntegrator';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
 
@@ -96,7 +97,10 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
             });
         } else {
             modelStateIntegrator.buildModelData(maxInstant, curInstant => curInstant % TimeUtil.MILLISECONDS_PER____DAY === 0, modelProgress => {
-                modelProgress.modificationValuesDiscovery = new ModificationResolverDiscovery().getModifications().map(m => m.getModificationValues());
+                if (modelProgress.ratio >= 1 && modelProgress.data) {
+                    ModelStateIntegrator.addReproduction(modelProgress.data);
+                    modelProgress.modificationValuesDiscovery = new ModificationResolverDiscovery().getModifications().map(m => m.getModificationValues());
+                }
                 ctx.postMessage(modelProgress);
             });
         }

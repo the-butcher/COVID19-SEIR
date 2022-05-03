@@ -1,9 +1,8 @@
-import { Demographics } from './../common/demographics/Demographics';
 import { IVaccinationConfig } from '../common/demographics/IVaccinationConfig';
 import { IModification } from '../common/modification/IModification';
-import { IModificationValuesDiscovery } from '../common/modification/IModificationValueDiscovery';
 import { IModificationValues } from '../common/modification/IModificationValues';
 import { IModificationValuesContact } from '../common/modification/IModificationValuesContact';
+import { IModificationValuesDiscovery } from '../common/modification/IModificationValuesDiscovery';
 import { IModificationValuesRegression } from '../common/modification/IModificationValuesRegression';
 import { ModificationContact } from '../common/modification/ModificationContact';
 import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
@@ -14,6 +13,7 @@ import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
 import { ModificationVaccination } from '../common/modification/ModificationVaccination';
 import { ObjectUtil } from '../util/ObjectUtil';
+import { Demographics } from './../common/demographics/Demographics';
 import { IModificationValuesSeasonality } from './../common/modification/IModificationValuesSeasonality';
 import { IModificationValuesSettings } from './../common/modification/IModificationValuesSettings';
 import { IModificationValuesStrain } from './../common/modification/IModificationValuesStrain';
@@ -94,8 +94,7 @@ export class ModelConstants {
                 key: 'TESTING',
                 name: 'testing',
                 instant,
-                bindToOverall: false,
-                overall: 0.1,
+                testRate: 0.02,
                 multipliers: {},
                 deletable: true,
                 draggable: true,

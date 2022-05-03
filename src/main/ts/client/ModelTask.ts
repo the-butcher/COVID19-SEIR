@@ -19,6 +19,7 @@ import { ModificationRegression } from '../common/modification/ModificationRegre
 import { QueryUtil } from '../util/QueryUtil';
 import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { TimeUtil } from '../util/TimeUtil';
+import { ModificationResolverDiscovery } from '../common/modification/ModificationResolverDiscovery';
 
 export type WORKER_MODE = 'REGRESSION' | 'PROJECTION' | 'REBUILDING';
 
@@ -62,12 +63,6 @@ export class ModelTask {
             const modelProgress: IModelProgress = e.data;
             if (modelProgress.ratio >= 1 && modelProgress.data) {
 
-                await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
-                await ChartAgeGroup.getInstance().renderModelData();
-
-                await ChartAgeGroupFlow.getInstance().acceptModelData(modelProgress.data);
-                await ChartAgeGroupFlow.getInstance().renderModelData();
-
                 /**
                  * primary strain has a "floating value", update the value on the gui instance of that modification
                  */
@@ -99,12 +94,26 @@ export class ModelTask {
                 // console.log('modelProgress.modificationValuesDiscovery', modelProgress.modificationValuesDiscovery);
                 modelProgress.modificationValuesDiscovery?.forEach(modificationValuesDiscovery => {
                     const modificationDiscovery = Modifications.getInstance().findModificationById(modificationValuesDiscovery.id) as ModificationDiscovery;
-                    // console.log(modificationDiscovery.getId(), TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), modificationDiscovery.getPositivityRate());
-                    modificationDiscovery.acceptUpdate({
-                        positivityRate: modificationValuesDiscovery.positivityRate
-                    });
-                    StorageUtil.getInstance().setSaveRequired(true);
+                    let saveRequired = false;
+                    const positivityRateChange = Math.abs(modificationValuesDiscovery.positivityRate - modificationDiscovery.getPositivityRate());
+                    if (positivityRateChange > 0.002) {
+                        // console.log('positivityRateChange', TimeUtil.formatCategoryDateFull(modificationValuesDiscovery.instant), positivityRateChange, modificationDiscovery.getId());
+                        modificationDiscovery.acceptUpdate({
+                            positivityRate: modificationValuesDiscovery.positivityRate
+                        });
+                        saveRequired = true;
+                    }
+                    if (saveRequired) {
+                        StorageUtil.getInstance().setSaveRequired(true);
+                    }
                 });
+                ModificationResolverDiscovery.resetRegression();
+
+                await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
+                await ChartAgeGroup.getInstance().renderModelData();
+
+                await ChartAgeGroupFlow.getInstance().acceptModelData(modelProgress.data);
+                await ChartAgeGroupFlow.getInstance().renderModelData();
 
                 // const modificationRegression = new ModificationResolverRegression().getModifications()[0];
                 // modificationRegression.acceptUpdate({

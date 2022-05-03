@@ -83,8 +83,6 @@ export class StrainApproximatorBaseData implements IStrainApproximator {
         modificationValueDiscovery.instant = this.instantPre;
         modificationValueVaccination.instant = this.instantPre;
 
-
-
         // fill with zeroes for each age group
         const heatmapPreIncidencesB = ageGroups.map(() => 0);
         const heatmapPreIncidencesC = ageGroups.map(() => 0);

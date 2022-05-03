@@ -82,16 +82,18 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
             return interpolatedModification;
 
         } else {
-            // return new ModificationDiscovery({
-            //     instant,
-            //     ...modificationA.getModificationValues()
-            // });
-            return modificationA;
+            return new ModificationDiscovery({
+                ...modificationA.getModificationValues(),
+                id: ObjectUtil.createId(),
+                instant,
+            });
+            // return modificationA;
         }
 
     }
 
     static resetRegression(): void {
+        // console.warn('resetting pos rate regressions');
         this.discoveryRegressions = undefined;
     }
 
@@ -99,11 +101,13 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
 
         if (!this.discoveryRegressions) {
 
-            console.log('rebuilding pos rate regressions');
+            // console.warn('rebuilding pos rate regressions');
 
             const minInstant = ModelInstants.getInstance().getMinInstant();
             const maxInstant = ModelInstants.getInstance().getMaxInstant();
             const modificationsTime: ModificationTime[] = [];
+
+            // create one every 3 days
             for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY * 3) {
                 const modificationTime = ModificationTime.createInstance(instant);
                 modificationsTime.push(modificationTime);
@@ -115,11 +119,7 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
 
                 this.discoveryRegressions[ageGroup.getIndex()] = new ValueRegressionDiscovery({
                     discoveryPropertyGetter: (m: ModificationTime) => {
-                        // if (ageGroup.getIndex() === Demographics.getInstance().getAgeGroupTotal().getIndex()) {
-                        //     return m.getDiscoveryRateTotal();
-                        // } else {
                         return m.getDiscoveryRatesRaw(ageGroup.getIndex()).discovery;
-                        // }
                     },
                     instantA: minInstant,
                     instantB: maxInstant,

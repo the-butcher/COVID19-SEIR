@@ -29,9 +29,7 @@ export class Modifications {
 
         this.instance = new Modifications();
         modificationValues.forEach(modificationValue => {
-            // if (modificationValue.key !== 'TESTING') {
             this.instance.addModification(ModelConstants.MODIFICATION_PARAMS[modificationValue.key].createValuesModification(modificationValue));
-            // }
         });
         this.instance.updateModificationInstants();
 

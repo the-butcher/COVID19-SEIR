@@ -165,14 +165,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return ModificationResolverDiscovery.getRegression(ageGroupIndex).findLoessValue(this.getInstant()).y;
     }
 
-
-    // getDiscoveryRateTotal(): number {
-    //     if (!this.discoveryRatesByAgeGroup) {
-    //         this.buildRates();
-    //     }
-    //     return this.discoveryRateOverall;
-    // }
-
     private buildRates(): void {
 
         this.discoveryRatesByAgeGroup = [];
@@ -243,7 +235,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
             contact: -1,
             discovery: this.calculateDiscoveryRateOverall()
         }
-        // this.discoveryRateOverall = this.calculateDiscoveryRateOverall();
 
     }
 
