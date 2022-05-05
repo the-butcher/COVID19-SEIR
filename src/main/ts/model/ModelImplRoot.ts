@@ -61,8 +61,12 @@ export class ModelImplRoot implements IModelSeir {
     private readonly demographics: Demographics;
 
     private readonly strainModels: ModelImplStrain[];
+
     private readonly compartmentsSusceptible: CompartmentImmunity[];
-    // private readonly compartmentsRemoved: CompartmentBase[];
+
+    /**
+     * helper collection to avaoid reassembling arrays repeatedly
+     */
     private readonly compartmentsImmunity: CompartmentImmunity[][];
 
     /**
@@ -74,7 +78,6 @@ export class ModelImplRoot implements IModelSeir {
 
         this.strainModels = [];
         this.compartmentsSusceptible = [];
-        // this.compartmentsRemoved = [];
         this.compartmentsImmunity = [];
         this.vaccinationModels = [];
 
@@ -157,8 +160,8 @@ export class ModelImplRoot implements IModelSeir {
             // this.strainModels.forEach(strainModel => {
             //     this.compartmentsImmunity[ageGroupIndex].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
             // });
-            this.compartmentsImmunity[ageGroupIndex].push(...this.vaccinationModels[ageGroupIndex].getCompartments());
-            this.compartmentsImmunity[ageGroupIndex].push(this.vaccinationModels[ageGroupIndex].getCompartmentI());
+            this.compartmentsImmunity[ageGroupIndex].push(...this.vaccinationModels[ageGroupIndex].getCompartments()); // the full compartment chain
+            this.compartmentsImmunity[ageGroupIndex].push(this.vaccinationModels[ageGroupIndex].getCompartmentI()); // the immunizing compartment
         }
         return this.compartmentsImmunity[ageGroupIndex];
     }

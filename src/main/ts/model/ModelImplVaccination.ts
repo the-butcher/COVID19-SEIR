@@ -89,7 +89,6 @@ export class ModelImplVaccination implements IModelSeir {
                 }
 
                 const suscptCompartment = this.getRootModel().getCompartmentSusceptible(this.ageGroupIndex);
-                let sourceIndex: number;
                 let targetIndex: number;
 
                 // console.log(this.ageGroupName + ' s > ' + suscptCompartment.getAgeGroupName());
@@ -97,13 +96,12 @@ export class ModelImplVaccination implements IModelSeir {
                 /**
                  * connect infection compartments among each other
                  */
-                for (let compartmentIndex = 0; compartmentIndex < compartmentsVaccination.length; compartmentIndex++) {
+                for (let sourceIndex = 0; sourceIndex < compartmentsVaccination.length; sourceIndex++) {
 
-                    sourceIndex = compartmentIndex;
-                    targetIndex = compartmentIndex + 1;
+                    targetIndex = sourceIndex + 1;
 
-                    const sourceCompartment = compartmentsVaccination[compartmentIndex];
-                    const targetCompartment = compartmentsVaccination[compartmentIndex + 1]; // may resolve to null, in which case values will simply be non-continued in this model
+                    const sourceCompartment = compartmentsVaccination[sourceIndex];
+                    const targetCompartment = compartmentsVaccination[targetIndex]; // may resolve to null, in which case values will simply be non-continued in this model
 
                     // const continuationRate = sourceCompartment.getContinuationRatio().getRate(dT, tT);
                     const continuationValue = sourceCompartment.getContinuationRatio().getRate(dT, tT) * modelState.getNrmValue(sourceCompartment);
@@ -111,8 +109,7 @@ export class ModelImplVaccination implements IModelSeir {
                     /**
                      * move from recovered compartment to next recovered compartment, if any
                      */
-                    // increments.addNrmValue(-continuationValue, sourceCompartment);
-                    nrmIncrs[compartmentIndex] = nrmIncrs[compartmentIndex] - continuationValue;
+                    nrmIncrs[sourceIndex] = nrmIncrs[sourceIndex] - continuationValue;
 
                     let targetRatio = 0;
                     let suscptRatio = 1;
@@ -121,7 +118,6 @@ export class ModelImplVaccination implements IModelSeir {
                         targetRatio = targetCompartment.getImmunity() / sourceCompartment.getImmunity();
                         suscptRatio = 1 - targetRatio;
 
-                        // increments.addNrmValue(continuationValue * targetRatio, targetCompartment);
                         nrmIncrs[targetIndex] = nrmIncrs[targetIndex] + continuationValue * targetRatio;
 
                     }
@@ -131,10 +127,15 @@ export class ModelImplVaccination implements IModelSeir {
 
                 for (let compartmentIndex = 0; compartmentIndex < compartmentsVaccination.length; compartmentIndex++) {
                     increments.addNrmValue(nrmIncrs[compartmentIndex], compartmentsVaccination[compartmentIndex]);
-
                 }
-                increments.addNrmValue(nrmSuscp, suscptCompartment);
 
+                /**
+                 * TODO :: in order to get unvaccinated vs. vaccinated incindence, there would to be separate susceptible compartments for:
+                 * -- people that always susceptible
+                 * -- people that had immunity from vaccination prior to being susceptible again
+                 * -- people that had immunity from recovery prior to being susceptible again
+                 */
+                increments.addNrmValue(nrmSuscp, suscptCompartment); // add any immunity loss to susceptible
 
                 return increments;
 

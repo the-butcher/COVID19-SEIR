@@ -330,6 +330,17 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.min = 0.00;
         this.yAxisPlotPercent.max = 1.00;
 
+
+        const range = this.yAxisPlotPercent.axisRanges.create();
+        range.value = 1;
+        range.label.visible = false;
+
+        range.axisFill.fillOpacity = 0.00;
+        range.axisFill.strokeOpacity = 1.00;
+        range.axisFill.strokeWidth = 0.50;
+        range.grid.stroke = color(ControlsConstants.COLOR____FONT).brighten(-0.40);
+
+
         this.yAxisPlotPercent.renderer.labels.template.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent.max >= 1 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
@@ -558,7 +569,7 @@ export class ChartAgeGroup {
             title: 'incidence (model)',
             baseLabel: 'incidence (model)',
             valueField: 'ageGroupIncidence',
-            colorKey: 'INCIDENCE',
+            colorKey: 'STRAIN',
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.16,
@@ -579,7 +590,7 @@ export class ChartAgeGroup {
             title: 'incidence (ages)',
             baseLabel: 'incidence (ages)',
             valueField: 'ageGroupIncidenceR',
-            colorKey: 'STRAIN',
+            colorKey: 'REGRESSION',
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.05,
@@ -1133,7 +1144,7 @@ export class ChartAgeGroup {
             title: 'mobility (google)',
             baseLabel: 'mobility (google)',
             valueField: 'mobility',
-            colorKey: 'HOSPITALIZED',
+            colorKey: 'MOBILITY',
             strokeWidth: 1,
             dashed: false,
             locationOnPath: 0.55,
@@ -1183,7 +1194,7 @@ export class ChartAgeGroup {
         this.chart.zoomOutButton.scale = 0.77;
 
         this.chart.cursor.behavior = 'zoomX';
-        this.chart.mouseWheelBehavior = 'panX'; // zoomX
+        this.chart.mouseWheelBehavior = 'zoomX'; // zoomX
 
 
         /**
@@ -1332,6 +1343,28 @@ export class ChartAgeGroup {
         document.addEventListener('keyup', e => {
             if (e.key === 'x') {
                 this.exportToPng();
+            } else if (e.key === 'ArrowRight') {
+
+                let minCategory = this.xAxis.positionToCategory(this.xAxis.start);
+                let maxCategory = this.xAxis.positionToCategory(this.xAxis.end);
+
+                let minInstant = TimeUtil.parseCategoryDateFull(minCategory);
+                let maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
+
+                if (maxInstant < ModelInstants.getInstance().getMaxInstant() - TimeUtil.MILLISECONDS_PER___WEEK) {
+                    minInstant = minInstant + TimeUtil.MILLISECONDS_PER___WEEK;
+                    maxInstant = maxInstant + TimeUtil.MILLISECONDS_PER___WEEK;
+                } else {
+                    minInstant = ModelInstants.getInstance().getMaxInstant() - (maxInstant - minInstant);
+                    maxInstant = ModelInstants.getInstance().getMaxInstant();
+                }
+
+                minCategory = TimeUtil.formatCategoryDateFull(minInstant);
+                maxCategory = TimeUtil.formatCategoryDateFull(maxInstant);
+
+                this.xAxis.start = this.xAxis.categoryToPosition(minCategory);
+                this.xAxis.end = this.xAxis.categoryToPosition(maxCategory);
+
             }
         });
 
@@ -1564,6 +1597,7 @@ export class ChartAgeGroup {
             }
 
         }
+
 
     }
 

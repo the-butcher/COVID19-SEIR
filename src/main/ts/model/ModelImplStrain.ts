@@ -153,10 +153,6 @@ export class ModelImplStrain implements IModelSeir {
         let nrmE: number;
         let compartmentE: ICompartment;
         let nrmESum: number;
-
-        let nrmESumTotal = 0;
-        let nrmESumRecov = 0;
-
         let nrmSESums: number[] = [];
         this.infectiousModels.forEach(() => {
             nrmSESums.push(0.0);
@@ -197,30 +193,23 @@ export class ModelImplStrain implements IModelSeir {
 
                     // remove from susceptible compartment (adding to exposed happens after loop in a single call)
                     result.addNrmValue(-nrmE, compartmentS);
-
                     nrmESum += nrmE;
 
-                    // if (compartmentS.getCompartmentType() === ECompartmentType.S__SUSCEPTIBLE || compartmentS.getCompartmentType() === ECompartmentType.R___VACCINATED) {
-                    nrmESumTotal += nrmE;
-                    // }
-                    if (compartmentS.getCompartmentType() === ECompartmentType.R____RECOVERED) {
-                        nrmESumRecov += nrmE;
-                    }
                     nrmSESums[infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
                     this.nrmExposure[infectiousModelContact.getAgeGroupIndex()][infectiousModelParticipant.getAgeGroupIndex()] += nrmE;
 
                 });
+
+                // batch exposure from various contacts with other age groups
+                /**
+                 * TODO differentiate between vaccinated and non-vaccinated here
+                 */
                 compartmentE = infectiousModelParticipant.getFirstCompartment();
                 result.addNrmValue(nrmESum, compartmentE);
 
             });
 
         });
-
-        // if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-        //     console.log(TimeUtil.formatCategoryDateFull(tT), nrmESumRecov / nrmESumTotal);
-        // }
-
 
         // calculate a ratio between infections and exposure to be used by calibration
         this.infectiousModels.forEach(infectiousModelContact => {

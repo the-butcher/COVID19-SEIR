@@ -65,7 +65,12 @@ export interface ILabellingDefinition {
 }
 
 export type CHART_MODE______KEY = 'INCIDENCE' | 'VACCINATED' | 'TESTING' | 'CONTACT' | 'REPRODUCTION'; // | 'HOSPITAL';
-export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'IMMUNIZING' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'RECOVERED' | 'HOME' | 'HOSPITALIZED' | 'DEAD' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
+export type COMPARTMENT__COLORS = 'SUSCEPTIBLE' | 'IMMUNIZING' | 'EXPOSED' | 'INFECTIOUS' | 'REMOVED' | 'MOBILITY' | 'INCIDENCE' | 'CASES' | MODIFICATION____KEY;
+
+export const HUE_VACCINATION = 0.540;
+export const HUE_____EXPOSED = 0.060;
+export const HUE__INFECTIOUS = HUE_____EXPOSED + 0.07;
+export const HUE___RECOVERED = HUE_____EXPOSED + 0.14;
 
 /**
  * collection of type specific functionality, think methods on enum-constants
@@ -113,23 +118,25 @@ export class ControlsConstants {
         format: value => value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)
     }
 
+
+
     static readonly COLORS: { [K in COMPARTMENT__COLORS]: string } = {
-        'SUSCEPTIBLE': '#515f6c',
-        'IMMUNIZING': '#516c63',
-        'EXPOSED': '#bb890c',
-        'INFECTIOUS': '#da0edf',
-        'REMOVED': '#83ca0d',
-        'RECOVERED': '#0cbba8',
-        'HOME': '#9fbec8',
-        'HOSPITALIZED': '#0c90bb',
-        'DEAD': '#0e1d22',
+
+        'SUSCEPTIBLE': '#1a1a1a',
+        'IMMUNIZING': new Color(HUE_VACCINATION, 1.00, 0.78).getHex(), // '#186987',
+        'EXPOSED': new Color(HUE_____EXPOSED, 1.00, 0.78).getHex(), // '#7c400e',
+        'INFECTIOUS': new Color(HUE__INFECTIOUS, 1.00, 0.83).getHex(), // '#bd6215',
+        'REMOVED': new Color(HUE___RECOVERED, 1.00, 0.93).getHex(), // '#caba0d',
+
+        'MOBILITY': '#0c90bb',
+
         'INCIDENCE': '#bbbbbb', // '#df5f5f',
         'CASES': '#666666', // '#acb00b',
         'TIME': '#aaaaaa', // '#aaaaaa',
-        'STRAIN': '#b012bb',
-        'CONTACT': '#f43f3f',
+        'STRAIN': new Color(HUE__INFECTIOUS, 1.00, 0.83).getHex(), // '#b012bb',
+        'CONTACT': '#b5594b',
         'TESTING': '#29c437',
-        'VACCINATION': '#0c90bb',
+        'VACCINATION': new Color(HUE_VACCINATION, 1.00, 0.93).getHex(), // '#1b94bb',
         'SEASONALITY': '#dbd905',
         'SETTINGS': '#687580',
         'REGRESSION': '#976b00'
@@ -164,7 +171,7 @@ export class ControlsConstants {
             title: 'Compartments',
             getHeatValue: (dataItem, ageGroupName) => dataItem.valueset[ageGroupName].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL],
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.83, Math.min(0.50, value * 0.75), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatColor: (value) => new Color(HUE__INFECTIOUS, Math.max(0, value * 0.85), Math.min(1.0, (10 + Math.round(value * 60)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
@@ -181,7 +188,7 @@ export class ControlsConstants {
             title: 'Testing estimates',
             getHeatValue: (dataItem, ageGroupName) => Math.min(1, dataItem.valueset[ageGroupName].DISCOVERY),
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.35, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatColor: (value) => new Color(0.35, Math.max(0, value * 0.85), Math.min(1.0, (10 + Math.round(value * 60)) / 100)).getHex(),
             getHeatMax: (maxValue) => maxValue,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);
@@ -217,7 +224,7 @@ export class ControlsConstants {
                 return dataItem.valueset[ageGroupName].REPRODUCTION;
             },
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
-            getHeatColor: (value) => new Color(0.82, Math.min(0.75, value), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
+            getHeatColor: (value) => new Color(HUE__INFECTIOUS, Math.max(0, value * 0.85), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),
             getHeatMax: (maxValue) => 2,
             visitChart: (chart) => {
                 chart.setSeriesIncidenceVisible(false);

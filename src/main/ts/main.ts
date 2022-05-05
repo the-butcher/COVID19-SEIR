@@ -34,7 +34,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             // needs model-instants to be ready
             BaseData.getInstance().calculateDailyStats();
 
-            const recreateDiscoveryModificationsAfterLastValidDate = true;
+            const recreateDiscoveryModificationsAfterLastValidDate = false;
             if (recreateDiscoveryModificationsAfterLastValidDate) {
 
                 const lastValidDiscoveryInstant = BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4;
@@ -51,6 +51,9 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 for (let instant = instantMin; instant < instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY * 3) {
                     const modificationDiscoveryInsertable = modificationResolverDiscovery.getModification(instant, 'INTERPOLATE');
                     console.log('insert discovery', TimeUtil.formatCategoryDateFull(instant), modificationDiscoveryInsertable.getId(), modificationDiscoveryInsertable);
+                    // modificationDiscoveryInsertable.acceptUpdate({
+                    //     testRate: 0.03
+                    // })
                     Modifications.getInstance().addModification(modificationDiscoveryInsertable);
                 }
 

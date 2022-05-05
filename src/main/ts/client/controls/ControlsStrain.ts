@@ -8,7 +8,7 @@ import { Color } from '../../util/Color';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { StrainUtil } from '../../util/StrainUtil';
 import { TimeUtil } from '../../util/TimeUtil';
-import { ControlsConstants } from '../gui/ControlsConstants';
+import { ControlsConstants, HUE_____EXPOSED } from '../gui/ControlsConstants';
 import { IconSlider } from '../gui/IconSlider';
 import { SliderModification } from '../gui/SliderModification';
 import { StorageUtil } from '../storage/StorageUtil';
@@ -374,7 +374,8 @@ export class ControlsStrain {
             const yDim = compartmentParam.immunity * 40; // TODO magic number
             const yMax = toCanvasY(yDim);
 
-            weibullContext.fillStyle = 'rgba(131, 202, 13, 0.50)'; // ValueSet.COLORS.REMOVED;
+            // weibullContext.fillStyle = 'rgba(131, 202, 13, 0.50)'; // ValueSet.COLORS.REMOVED;
+            weibullContext.fillStyle = ControlsConstants.COLORS.CASES;
             weibullContext.fillRect(xMin + 0.5, yMin, (xMax - xMin) - 1, Math.min(yMax - yMin, -1));
 
         });
@@ -393,7 +394,7 @@ export class ControlsStrain {
 
         weibullContext.fillStyle = "#cccccc";
         weibullContext.clearRect(0, 0, weibullCanvas.width, weibullCanvas.height);
-        weibullContext.fillStyle = 'rgba(187, 137, 12, 0.75)'; // ValueSet.COLORS.EXPOSED;
+        weibullContext.fillStyle = ControlsConstants.COLORS.EXPOSED; // 'rgba(187, 137, 12, 0.75)'; // ValueSet.COLORS.EXPOSED;
 
         const toCanvasY = (n: number) => weibullCanvas.height - 20 - n;
         const pxPerDay = weibullCanvas.width / (this.sliderSerialInterval.getMaxValue() * TimeUtil.MILLISECONDS_PER____DAY); // one day in pixel
@@ -424,14 +425,14 @@ export class ControlsStrain {
             const yDim = compartmentParam.r0 * 300 / xDim; // TODO magic number
             const yMax = toCanvasY(yDim);
 
-            const hue = compartmentParam.presymptomatic ? 0.94 : 0.83;
-            weibullContext.fillStyle = new Color(hue, 0.9, 0.73).getHex(); // 'rgba(218, 14, 223, 0.95)'; // ValueSet.COLORS.INFECTIOUS;
+            // const hue = compartmentParam.presymptomatic ? 0.94 : 0.83;
+            weibullContext.fillStyle = compartmentParam.presymptomatic ? ControlsConstants.COLORS.EXPOSED : ControlsConstants.COLORS.INFECTIOUS; // new Color(hue, 0.9, 0.73).getHex(); // 'rgba(218, 14, 223, 0.95)'; // ValueSet.COLORS.INFECTIOUS;
             weibullContext.fillRect(xMin + 0.5, yMin, (xMax - xMin) - 1, Math.min(yMax - yMin, -1));
 
         });
         const xMinN = compartmentParams[compartmentParams.length - 1].instantB * pxPerDay;
 
-        weibullContext.fillStyle = 'rgba(131, 202, 13, 0.75)'; // ValueSet.COLORS.REMOVED;
+        weibullContext.fillStyle = ControlsConstants.COLORS.REMOVED;
         weibullContext.fillRect(xMinN + 1, toCanvasY(0), 500, -1);
 
     }

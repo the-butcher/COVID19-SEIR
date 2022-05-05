@@ -173,6 +173,9 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
 
+        /**
+         * just collect from the settings
+         */
         this.ageGroups.forEach(ageGroup => {
 
             const ageGroupIndex = ageGroup.getIndex();
@@ -208,29 +211,61 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 discovery: discoveryRateAgeGroup / contactTotal
             };
 
-
-
         });
 
-        let _discoveryRateOverall = 0;
-        this.ageGroups.forEach(ageGroup => {
-            _discoveryRateOverall += ageGroup.getAbsValue() * this.discoveryRatesByAgeGroup[ageGroup.getIndex()].discovery;
-        });
-        _discoveryRateOverall = _discoveryRateOverall / this.absTotal;
+        const normalize = () => {
 
-        const correction = this.calculateDiscoveryRateOverall() / _discoveryRateOverall;
+            let _discoveryRateOverall = 0;
+            this.ageGroups.forEach(ageGroup => {
+                _discoveryRateOverall += ageGroup.getAbsValue() * this.discoveryRatesByAgeGroup[ageGroup.getIndex()].discovery;
+            });
+            _discoveryRateOverall = _discoveryRateOverall / this.absTotal;
+
+            const correction = this.calculateDiscoveryRateOverall() / _discoveryRateOverall;
+            this.ageGroups.forEach(ageGroup => {
+                const ageGroupIndex = ageGroup.getIndex();
+                let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact * correction;
+                let discovery = Math.min(1.0, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
+                this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
+                    contact,
+                    discovery
+                };
+            });
+
+        }
+
+        normalize();
+
         this.ageGroups.forEach(ageGroup => {
 
             const ageGroupIndex = ageGroup.getIndex();
-            let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact * correction;
-            let discovery = Math.min(1.0, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
+            let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact;
+            let discovery = Math.min(1.0, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery);
+
+            // discoveryRateCategory = discoveryRateCategory + (1 - discoveryRateCategory) * 0.5 * Math.pow(ageGroup.getIndex() / 9, 8);
+            // discoveryRateCategory *= (0.90 + Math.pow(ageGroup.getIndex() / 9, 8));
+
+
+            discovery = discovery + (1 - discovery) * 0.33 * Math.pow(ageGroup.getIndex() / 9, 4);
+
             this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
                 contact,
                 discovery
             };
-            this.quarantineMultipliersByAgeGroup[ageGroupIndex] = shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
 
         });
+
+        normalize();
+
+        /**
+         * calculate quarantine multipliers, depending on contact
+         */
+        this.ageGroups.forEach(ageGroup => {
+            const ageGroupIndex = ageGroup.getIndex();
+            let discovery = this.discoveryRatesByAgeGroup[ageGroupIndex].discovery;
+            this.quarantineMultipliersByAgeGroup[ageGroupIndex] = shareOfInfectionBeforeIncubation + shareOfInfectionAfterIncubation * (1 - discovery * this.modificationSettings.getQuarantine(ageGroupIndex));
+        });
+
         this.discoveryRatesByAgeGroup[this.ageGroupIndexTotal] = {
             contact: -1,
             discovery: this.calculateDiscoveryRateOverall()
