@@ -20,14 +20,14 @@ export class ModificationResolverSettings extends AModificationResolver<IModific
         super('SETTINGS');
     }
 
-    getValue(instant: number): number {
-        const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
-        if (dataItemCur) {
-            const value = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].TOTAL;
-            // console.log('set', new Date(instant), value);
-            return value;
-        }
-        return Number.NaN;
-    }
+    // getValue(instant: number): number {
+    //     const dataItemCur = ChartAgeGroup.getInstance().findDataItemByInstant(instant);
+    //     if (dataItemCur) {
+    //         const value = dataItemCur.valueset[ModelConstants.AGEGROUP_NAME_______ALL].TOTAL;
+    //         // console.log('set', new Date(instant), value);
+    //         return value;
+    //     }
+    //     return Number.NaN;
+    // }
 
 }

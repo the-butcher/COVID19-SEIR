@@ -17,7 +17,6 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
     static setupInstance(modificationValuesSettings: IModificationValuesSettings) {
         this.instance = new ModificationSettings(modificationValuesSettings);
     }
-
     static getInstance(): ModificationSettings {
         return this.instance;
     }

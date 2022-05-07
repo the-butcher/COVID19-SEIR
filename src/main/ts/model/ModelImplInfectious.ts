@@ -44,6 +44,8 @@ export class ModelImplInfectious implements IModelSeir {
 
     private nrmCasesLast: number;
 
+    // private baseDiscovery: number;
+
 
     constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime) {
 
@@ -56,6 +58,9 @@ export class ModelImplInfectious implements IModelSeir {
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupName = ageGroup.getName();
         this.ageGroupTotal = ageGroup.getAbsValue();
+
+        // const ageGroupFraction = this.ageGroupIndex / 9;
+        // this.baseDiscovery = 0.1 + 0.2 * ageGroupFraction + 0.7 * Math.pow(ageGroupFraction, 9);
 
         // make some assumptions about initial cases (duplicated code in ModelImplIncidence)
         let dailyTested = strainValues.preIncidence * ageGroup.getAbsValue() / 700000;
@@ -210,11 +215,14 @@ export class ModelImplInfectious implements IModelSeir {
                      * only consider cases that have been discovered
                      */
                     if (sourceCompartment.isPreSymptomatic() && !targetCompartment.isPreSymptomatic()) {
+
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
+
                         const discoveryRatio = modificationTime.getDiscoveryRateLoess(this.ageGroupIndex);
                         const discoveredNrmCases = continuationValue * discoveryRatio;
                         result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
                         this.nrmCasesLast += continuationValue;
+
                     }
 
                 }

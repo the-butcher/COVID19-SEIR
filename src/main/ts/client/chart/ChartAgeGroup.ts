@@ -4,12 +4,12 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
 import { ModificationResolverDiscovery } from "../../common/modification/ModificationResolverDiscovery";
+import { ModificationResolverRegression } from "../../common/modification/ModificationResolverRegression";
 import { ModificationResolverTime } from "../../common/modification/ModificationResolverTime";
 import { Modifications } from '../../common/modification/Modifications';
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
 import { QueryUtil } from '../../util/QueryUtil';
-import { Controls } from "../controls/Controls";
 import { ControlsRegression } from '../controls/ControlsRegression';
 import { ControlsTime } from "../controls/ControlsTime";
 import { CHART_MODE______KEY, ControlsConstants } from '../gui/ControlsConstants';
@@ -131,11 +131,6 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupCasesN: ChartAgeGroupSeries;
 
     /**
-     * offsets between model and real cases
-     */
-    protected readonly seriesAgeGroupCasesD: ChartAgeGroupSeries;
-
-    /**
      * cases as reported age-wise
      */
     protected readonly seriesAgeGroupCasesR: ChartAgeGroupSeries;
@@ -217,7 +212,7 @@ export class ChartAgeGroup {
 
         this.absValue = 0;
         // this.ageGroupIndex = -1;
-        this.chartMode = 'INCIDENCE';
+        this.chartMode = 'VACCINATED';
 
         this.chart = create('chartDivAgeGroupPlot', XYChart);
 
@@ -519,27 +514,6 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
             seriesConstructor: () => new StepLineSeries()
         });
-
-        this.seriesAgeGroupCasesD = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotAbsolute,
-            title: 'daily cases (diff)',
-            baseLabel: 'daily cases (diff)',
-            valueField: 'ageGroupCasesD',
-            colorKey: 'CONTACT',
-            strokeWidth: 0.5,
-            dashed: false,
-            locationOnPath: 1.10,
-            labels: {
-                tooltip: true,
-                pathtip: false
-            },
-            stacked: false,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
-            seriesConstructor: () => new StepLineSeries()
-        });
-
 
         this.seriesAgeGroupCasesR = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -1351,9 +1325,9 @@ export class ChartAgeGroup {
                 let minInstant = TimeUtil.parseCategoryDateFull(minCategory);
                 let maxInstant = TimeUtil.parseCategoryDateFull(maxCategory);
 
-                if (maxInstant < ModelInstants.getInstance().getMaxInstant() - TimeUtil.MILLISECONDS_PER___WEEK) {
-                    minInstant = minInstant + TimeUtil.MILLISECONDS_PER___WEEK;
-                    maxInstant = maxInstant + TimeUtil.MILLISECONDS_PER___WEEK;
+                if (maxInstant < ModelInstants.getInstance().getMaxInstant() - TimeUtil.MILLISECONDS_PER____DAY) {
+                    minInstant = minInstant + TimeUtil.MILLISECONDS_PER____DAY;
+                    maxInstant = maxInstant + TimeUtil.MILLISECONDS_PER____DAY;
                 } else {
                     minInstant = ModelInstants.getInstance().getMaxInstant() - (maxInstant - minInstant);
                     maxInstant = ModelInstants.getInstance().getMaxInstant();
@@ -1443,7 +1417,7 @@ export class ChartAgeGroup {
 
     async handleAgeGroupChange(): Promise<void> {
 
-        const requiresRegressionDataRender = this.getChartMode() === 'CONTACT';
+        // const requiresRegressionDataRender = this.getChartMode() === 'CONTACT';
 
         const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
         this.updateTitle();
@@ -1454,9 +1428,9 @@ export class ChartAgeGroup {
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
 
-            if (requiresRegressionDataRender) {
-                this.renderRegressionData();
-            }
+            // if (this.getChartMode() === 'CONTACT') {
+            //     this.renderRegressionData();
+            // }
             this.requestRenderModelData();
 
 
@@ -1515,7 +1489,6 @@ export class ChartAgeGroup {
         this.seriesAgeGroupAssumedAllCases.setSeriesNote(ageGroup.getName());
 
         this.seriesAgeGroupCasesN.setSeriesNote(ageGroup.getName());
-        this.seriesAgeGroupCasesD.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
         this.seriesPositivityRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesTestRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
@@ -1551,9 +1524,9 @@ export class ChartAgeGroup {
 
         this.updateSeriesNotes();
 
-        if (this.getChartMode() === 'CONTACT') {
-            this.renderRegressionData();
-        }
+        // if (this.getChartMode() === 'CONTACT') {
+        //     this.renderRegressionData();
+        // }
 
         if (ObjectUtil.isNotEmpty(this.modelData)) {
             this.requestRenderModelData();
@@ -1568,9 +1541,10 @@ export class ChartAgeGroup {
 
         this.updateSeriesNotes();
 
-        if (this.getChartMode() === 'CONTACT') {
-            this.renderRegressionData();
-        }
+        this.requestRenderModelData();
+        // if (this.getChartMode() === 'CONTACT') {
+        //     this.renderRegressionData();
+        // }
 
     }
 
@@ -1753,10 +1727,11 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
         this.seriesAgeGroupIncidence.setVisible(visible); // visible
-        this.seriesAgeGroupIncidence95L.setVisible(visible);
-        this.seriesAgeGroupIncidence95U.setVisible(visible);
-        this.seriesAgeGroupIncidence68L.setVisible(visible);
-        this.seriesAgeGroupIncidence68U.setVisible(visible);
+
+        // this.seriesAgeGroupIncidence95L.setVisible(visible);
+        // this.seriesAgeGroupIncidence95U.setVisible(visible);
+        // this.seriesAgeGroupIncidence68L.setVisible(visible);
+        // this.seriesAgeGroupIncidence68U.setVisible(visible);
 
         this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
 
@@ -1765,7 +1740,6 @@ export class ChartAgeGroup {
         this.seriesAgeGroupDiscoveredCases.setVisible(visible);
         this.seriesAgeGroupAssumedAllCases.setVisible(visible);
         this.seriesAgeGroupCasesN.setVisible(visible); // visible
-        this.seriesAgeGroupCasesD.setVisible(visible);
         this.seriesAgeGroupCasesR.setVisible(visible); // visible
 
         // this.seriesSeasonality.setVisible(visible);
@@ -1800,6 +1774,7 @@ export class ChartAgeGroup {
             this.yAxisPlotPercent.visible = visible;
             this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
             this.yAxisPlotPercent.tooltip.disabled = !visible;
+            this.setAxisPercentBounds(0, 2);
         }
 
         this.seriesEstimationValue.setVisible(visible);
@@ -1843,7 +1818,7 @@ export class ChartAgeGroup {
             this.yAxisPlotPercent.visible = visible;
             this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
             this.yAxisPlotPercent.tooltip.disabled = !visible;
-            this.setAxisPercentBounds(0, 1.0);
+            this.setAxisPercentBounds(0, 1);
         }
 
     }
@@ -1864,13 +1839,17 @@ export class ChartAgeGroup {
 
     setChartMode(chartMode: CHART_MODE______KEY): void {
 
-        this.chartMode = chartMode;
-        ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
-        this.updateTitle();
-        if (chartMode === 'CONTACT') {
-            this.renderRegressionData();
+        if (chartMode !== this.chartMode) {
+
+            console.warn('set chart mode', chartMode, this.chartMode);
+
+            this.chartMode = chartMode;
+            ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].visitChart(this);
+            this.updateTitle();
+            this.requestRenderModelData();
+
         }
-        this.requestRenderModelData();
+
     }
 
     private updateTitle(): void {
@@ -1884,6 +1863,7 @@ export class ChartAgeGroup {
     }
 
     setAxisPercentBounds(min: number, max: number): void {
+        // console.warn('chart bounds', min, max);
         this.yAxisPlotPercent.min = min;
         this.yAxisPlotPercent.max = max;
     }
@@ -1933,34 +1913,38 @@ export class ChartAgeGroup {
             for (const dataItem of this.modelData) {
 
                 if (dataItem.instant >= minInstant && dataItem.instant <= maxInstant) {
-                    Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
 
-                        maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+                    const ageGroup = ModelActions.getInstance().getAgeGroup();
 
-                        const casesScaled1 = dataItem.valueset[ageGroup.getName()].CASES * 700000 / ageGroup.getAbsValue();
-                        if (this.seriesAgeGroupDiscoveredCases.isVisible()) {
-                            maxIncidence = Math.max(maxIncidence, casesScaled1);
+                    // Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+
+                    maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
+
+                    const casesScaled1 = dataItem.valueset[ageGroup.getName()].CASES * 700000 / ageGroup.getAbsValue();
+                    if (this.seriesAgeGroupDiscoveredCases.isVisible()) {
+                        maxIncidence = Math.max(maxIncidence, casesScaled1);
+                    }
+                    if (this.seriesAgeGroupAssumedAllCases.isVisible()) {
+                        maxIncidence = Math.max(maxIncidence, casesScaled1 / dataItem.valueset[ageGroup.getName()].DISCOVERY);
+                    }
+
+                    if (this.seriesAgeGroupCasesN.isVisible()) {
+                        const casesOffset = BaseData.getInstance().getAverageOffset(ageGroup.getIndex(), dataItem.instant);
+                        if (casesOffset) {
+                            maxIncidence = Math.max(maxIncidence, casesScaled1 * casesOffset); // daily prediction
                         }
-                        if (this.seriesAgeGroupAssumedAllCases.isVisible()) {
-                            maxIncidence = Math.max(maxIncidence, casesScaled1 / dataItem.valueset[ageGroup.getName()].DISCOVERY);
-                        }
+                    }
 
-                        if (this.seriesAgeGroupCasesN.isVisible()) {
-                            const casesOffset = BaseData.getInstance().getAverageOffset(ageGroup.getIndex(), dataItem.instant);
-                            if (casesOffset) {
-                                maxIncidence = Math.max(maxIncidence, casesScaled1 * casesOffset); // daily prediction
-                            }
+                    if (this.seriesAgeGroupCasesR.isVisible()) {
+                        const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+                        if (dataItem00) {
+                            const casesScaled2 = dataItem00.getCasesM1(ageGroup.getIndex()) * 700000 / ageGroup.getAbsValue();
+                            maxIncidence = Math.max(maxIncidence, casesScaled2);
                         }
+                    }
 
-                        if (this.seriesAgeGroupCasesR.isVisible()) {
-                            const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
-                            if (dataItem00) {
-                                const casesScaled2 = dataItem00.getCasesM1(ageGroup.getIndex()) * 700000 / ageGroup.getAbsValue();
-                                maxIncidence = Math.max(maxIncidence, casesScaled2);
-                            }
-                        }
+                    // });
 
-                    });
                 }
 
             }
@@ -1990,6 +1974,15 @@ export class ChartAgeGroup {
 
     }
 
+    handleModificationChange(): void {
+
+        if (this.getChartMode() === 'CONTACT') {
+            ControlsRegression.getInstance().updateCurrentRegression();
+            this.requestRenderModelData();
+        }
+
+    }
+
     private renderTimeout = -1;
     requestRenderModelData(): void {
         clearTimeout(this.renderTimeout);
@@ -1997,7 +1990,13 @@ export class ChartAgeGroup {
             this.renderTimeout = window.setTimeout(() => {
                 requestAnimationFrame(() => {
                     this.renderBaseData();
-                    this.renderModelData();
+                    if (this.chartMode === "CONTACT") {
+                        // ControlsRegression.getInstance().handleChange();
+
+                        this.renderRegressionData();
+                    } else {
+                        this.renderModelData();
+                    }
                 });
             }, 250);
         }
@@ -2005,7 +2004,11 @@ export class ChartAgeGroup {
 
     async renderRegressionData(): Promise<void> {
 
-        this.setAxisPercentBounds(0, 2);
+        // console.warn('renderRegressionData');
+
+        clearTimeout(this.renderTimeout);
+
+
 
         // const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
         // const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
@@ -2085,6 +2088,8 @@ export class ChartAgeGroup {
     }
 
     async renderModelData(): Promise<void> {
+
+        // console.warn('renderModelData');
 
         clearTimeout(this.renderTimeout);
 
@@ -2281,7 +2286,6 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupDiscoveredCases, plotData);
         this.applyData(this.seriesAgeGroupAssumedAllCases, plotData);
         this.applyData(this.seriesAgeGroupCasesN, plotData);
-        // this.applyData(this.seriesAgeGroupCasesD, plotData);
         this.applyData(this.seriesSeasonality, plotData);
         this.applyData(this.seriesPositivityRate, plotData);
         this.applyData(this.seriesTestRate, plotData);
@@ -2310,6 +2314,8 @@ export class ChartAgeGroup {
     }
 
     async renderBaseData(): Promise<void> {
+
+        // console.warn('renderBaseData');
 
         const baseData: any[] = [];
         const chartData: any[] = [];

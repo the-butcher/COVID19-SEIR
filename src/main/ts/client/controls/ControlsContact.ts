@@ -1,5 +1,5 @@
-import { ModelActions } from './../gui/ModelActions';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { ChartAgeGroup } from '../chart/ChartAgeGroup';
 import { ChartContactMatrix } from '../chart/ChartContactMatrix';
 import { ControlsConstants } from '../gui/ControlsConstants';
 import { SliderContactCategory } from '../gui/SliderContactCategory';
@@ -8,7 +8,9 @@ import { StorageUtil } from '../storage/StorageUtil';
 import { Demographics } from './../../common/demographics/Demographics';
 import { ModificationContact } from './../../common/modification/ModificationContact';
 import { IconToggle } from './../gui/IconToggle';
+import { ModelActions } from './../gui/ModelActions';
 import { Controls } from './Controls';
+import { ControlsRegression } from './ControlsRegression';
 
 /**
  * controller for editing contact modifications
@@ -82,6 +84,11 @@ export class ControlsContact {
 
         this.applyToChartContact();
 
+        /**
+         * give the chart a chance for pre model chart update, i.e. to show an updated regression curve
+         */
+        ChartAgeGroup.getInstance().handleModificationChange();
+
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
         StorageUtil.getInstance().setSaveRequired(true);
         ControlsConstants.MODIFICATION_PARAMS[this.modification.getKey()].handleModificationUpdate(); // update model after modification update
@@ -105,6 +112,11 @@ export class ControlsContact {
         // console.log('handleChange', corrections, this.modification);
 
         this.applyToChartContact();
+
+        /**
+         * give the chart a chance for pre model chart update, i.e. to show an updated regression curve
+         */
+        ChartAgeGroup.getInstance().handleModificationChange();
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
         StorageUtil.getInstance().setSaveRequired(true);

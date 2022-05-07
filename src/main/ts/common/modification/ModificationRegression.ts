@@ -1,8 +1,7 @@
-import { min } from '@amcharts/amcharts4/.internal/core/utils/Math';
-import { ModelInstants } from '../../model/ModelInstants';
+import { ControlsRegression } from '../../client/controls/ControlsRegression';
+import { ModelActions } from '../../client/gui/ModelActions';
 import { IRegressionResult } from '../../model/regression/IRegressionResult';
 import { ValueRegressionCorrection } from '../../model/regression/ValueRegressionCorrection';
-import { ValueRegressionDiscovery } from '../../model/regression/ValueRegressionDiscovery';
 import { ValueRegressionVaccination } from '../../model/regression/ValueRegressionVaccination';
 import { ValueRegressionMultiplier } from './../../model/regression/ValueRegressionMultiplier';
 import { StrainUtil } from './../../util/StrainUtil';
@@ -11,9 +10,7 @@ import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
 import { IModificationValuesRegression, IRegressionConfig } from './IModificationValuesRegression';
 import { ModificationResolverContact } from './ModificationResolverContact';
-import { ModificationResolverTime } from './ModificationResolverTime';
 import { ModificationResolverVaccination } from './ModificationResolverVaccination';
-import { ModificationTime } from './ModificationTime';
 import { ModificationVaccination } from './ModificationVaccination';
 
 
@@ -32,8 +29,6 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     private multiplierRegressions: { [K in string]: ValueRegressionMultiplier };
     private correctionRegressions: { [K in string]: ValueRegressionCorrection };
     private vaccinationRegressions: { [K in string]: { [K in string]: ValueRegressionVaccination } };
-
-
 
     constructor(modificationParams: IModificationValuesRegression) {
 
@@ -63,6 +58,8 @@ export class ModificationRegression extends AModification<IModificationValuesReg
         this.normalize();
 
         this.updateRegressions(this.modificationValues.multiplier_configs, this.modificationValues.correction_configs, this.modificationValues.vaccination_configs);
+
+        // ControlsRegression.getInstance().acceptModification(this);
 
     }
 

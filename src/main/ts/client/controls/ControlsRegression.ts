@@ -96,6 +96,31 @@ export class ControlsRegression {
 
     }
 
+    updateCurrentRegression(): void {
+
+        const modelActions = ModelActions.getInstance();
+        const lastRegressionType = modelActions.getLastRegressionType();
+
+        const multiplier_configs: { [K in string]: IRegressionConfig } = {};
+        const correction_configs: { [K in string]: IRegressionConfig } = {};
+        const vaccination_configs: { [K in string]: { [K in string]: IRegressionConfig } } = {};
+
+        if (lastRegressionType === 'MULTIPLIER') {
+            multiplier_configs[modelActions.getCategory()] = this.modification.getMultiplierConfig(modelActions.getCategory());
+        } else if (lastRegressionType === 'CORRECTION') {
+            correction_configs[modelActions.getAgeGroup().getName()] = this.modification.getCorrectionConfig(modelActions.getAgeGroup().getName());
+        } else if (lastRegressionType === 'VACCKEY') {
+            vaccination_configs[modelActions.getAgeGroup().getName()][modelActions.getVaccKey()] = this.modification.getVaccinationConfig(modelActions.getAgeGroup().getName(), modelActions.getVaccKey());
+        }
+
+        this.modification.acceptUpdate({
+            multiplier_configs,
+            correction_configs,
+            vaccination_configs
+        });
+
+    }
+
     handleRegressionPointerChange(): void {
         this.updateSliderValues();
     }
@@ -105,8 +130,9 @@ export class ControlsRegression {
         // console.log('this.regressionPointer', this.regressionPointer, this.modification);
         if (this.modification) {
 
-            const lastRegressionType = ModelActions.getInstance().getLastRegressionType();
             const modelActions = ModelActions.getInstance();
+            const lastRegressionType = modelActions.getLastRegressionType();
+
             let regressionConfig: IRegressionConfig;
 
             let label: string;
@@ -130,9 +156,9 @@ export class ControlsRegression {
                 this.sliderPolyShares.setValue(1, regressionConfig.poly_shares[1]);
             }
 
-            if (ChartAgeGroup.getInstance().getChartMode() === 'CONTACT') {
-                ChartAgeGroup.getInstance().setAxisPercentBounds(0, 2);
-            }
+            // if (ChartAgeGroup.getInstance().getChartMode() === 'CONTACT') {
+            //     ChartAgeGroup.getInstance().setAxisPercentBounds(0, 2);
+            // }
 
         }
 

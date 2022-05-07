@@ -135,13 +135,4 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
 
     }
 
-    private static rebuildRegression(): void {
-
-    }
-
-    // getValue(instant: number): number {
-    //     const modificationTime = ModificationTime.createInstance(instant);
-    //     return modificationTime.getDiscoveryRateTotal();
-    // }
-
 }

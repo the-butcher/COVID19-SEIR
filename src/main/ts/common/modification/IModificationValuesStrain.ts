@@ -41,6 +41,8 @@ export interface IModificationValuesStrain extends IModificationValues {
      */
     timeToWane: number;
 
+    // 0.1+0.2\ \frac{x}{9}\ +\ 0.7\left(\frac{x}{9}\right)^{9}
+
     /**
      * the initial incidence of this strain
      */
