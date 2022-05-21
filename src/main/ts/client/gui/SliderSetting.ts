@@ -8,12 +8,12 @@ export class SliderSetting extends Slider {
 
     private readonly compartmentName: string;
 
-    constructor(compartmentName: string, range: number[], steps: number, percent: boolean) {
+    constructor(compartmentName: string, range: number[], steps: number, percent: boolean, parentContainer: string, handleChange: () => void) {
 
         const container = document.createElement('div');
         container.className = 'slider-modification';
 
-        document.getElementById('slidersSettingsDiv').appendChild(container);
+        document.getElementById(parentContainer).appendChild(container);
 
         let tickFormat = ControlsConstants.LOCALE_FORMAT_FIXED;
         let valueFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
@@ -53,7 +53,7 @@ export class SliderSetting extends Slider {
             },
             handleValueChange: (value, index, type) => {
                 if (type === 'stop' || type === 'input') {
-                    ControlsSettings.getInstance().handleChange();
+                    handleChange();
                 }
             },
             handleThumbPicked: (index) => {

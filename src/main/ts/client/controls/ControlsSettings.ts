@@ -50,13 +50,13 @@ export class ControlsSettings {
 
         this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
 
-        this.sliderPow = new SliderSetting("exponent", [2, 4, 6, 8, 10], 1, false);
-        this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false);
-        this.sliderXmb = new SliderSetting("discovery slope base", [1.5, 2.00, 2.5, 3.0], 0.05, false);
-        this.sliderXmr = new SliderSetting("discovery slope rate", [0, 10, 20, 30, 40], 1, false);
+        this.sliderPow = new SliderSetting("exponent", [2, 4, 6, 8, 10], 1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderXmb = new SliderSetting("discovery slope base", [1.0, 1.5, 2.00, 2.5, 3.0], 0.05, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderXmr = new SliderSetting("discovery slope rate", [0, 10, 20, 30, 40], 1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
-        this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false);
-        this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true);
+        this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         // this.sliderReexposure = new SliderSetting("reexposure (months)", ModelConstants.RANGE________REEXPOSURE, 0.1, false);
         // this.sliderDead = new SliderSetting("deceased", ModelConstants.RANGE__PERCENTAGE__10, 0.001);
 
@@ -205,7 +205,7 @@ export class ControlsSettings {
     updateChart(): void {
 
         requestAnimationFrame(() => {
-            this.chartTesting.acceptModificationSettings(this.modification);
+            this.chartTesting.acceptModification(this.modification);
         });
 
     }

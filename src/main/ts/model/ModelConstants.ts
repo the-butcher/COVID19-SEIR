@@ -71,7 +71,11 @@ export class ModelConstants {
                 dstIncidence: 1,
                 deletable: true,
                 draggable: true,
-                primary: false
+                primary: false,
+                pow: 5,
+                max: 0.9,
+                xmb: 2.0,
+                xmr: 0.0
             }),
         },
         'CONTACT': {
@@ -158,8 +162,8 @@ export class ModelConstants {
     static readonly RANGE____PERCENTAGE_125 = [0.00, 0.25, 0.50, 0.75, 1.00, 1.25];
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
-    static readonly RANGE____PERCENTAGE__60 = [0.6, 0.7, 0.8, 0.9, 1.0];
-    static readonly RANGE________REEXPOSURE = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    static readonly RANGE____PERCENTAGE__50 = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+    static readonly RANGE________REEXPOSURE = [0, 3, 6, 9, 12, 15];
     static readonly RANGE________INCUBATION = [1, 7, 14];
     static readonly RANGE____INCIDENCE_1000 = [0, 250, 500, 750, 1000];
     static readonly RANGE_____INCIDENCE__10 = [0, 2, 4, 6, 8, 10];

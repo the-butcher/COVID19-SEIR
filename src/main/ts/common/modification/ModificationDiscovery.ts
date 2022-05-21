@@ -36,17 +36,11 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
     }
 
     setInstants(instantA: number, instantB: number): void {
-        // if (this.getId() === '7e6f0') {
-        //     console.warn('instants of 7e6f0', TimeUtil.formatCategoryDateFull(this.getInstantA()), ' >> ', TimeUtil.formatCategoryDateFull(instantA))
-        // }
         super.setInstants(instantA, instantB);
     }
 
     acceptUpdate(update: Partial<IModificationValuesDiscovery>): void {
         update.multipliers = { ...this.modificationValues.multipliers, ...update.multipliers };
-        // if (this.getId() === '7e6f0') {
-        //     console.warn('update of 7e6f0', update)
-        // }
         super.acceptUpdate(update);
     }
 
@@ -79,7 +73,11 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
             const averagePosititivity = dataItem.getAveragePositivity();
             const averageTests = dataItem.getAverageTests();
             if (averagePosititivity && averageTests) {
-                return averageTests / Demographics.getInstance().getAbsTotal();
+                const testRate = averageTests / Demographics.getInstance().getAbsTotal();
+                this.acceptUpdate({
+                    testRate
+                });
+                return testRate;
             }
         } else {
             Math.random();

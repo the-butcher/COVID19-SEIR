@@ -94,7 +94,7 @@ export class ChartAgeGroupSeries {
         this.series.hiddenInLegend = true; // !params.legend;
         this.series.strokeWidth = params.strokeWidth;
         if (params.dashed) {
-            this.series.strokeDasharray = params.strokeWidth * 2 + ',' + params.strokeWidth * 2;
+            this.series.strokeDasharray = `${params.strokeWidth * 2},${params.strokeWidth * 2}`;
         }
         this.series.fontFamily = ControlsConstants.FONT_FAMILY;
         this.series.fontSize = ControlsConstants.FONT_SIZE;

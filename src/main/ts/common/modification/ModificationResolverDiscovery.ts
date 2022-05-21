@@ -82,12 +82,15 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
             return interpolatedModification;
 
         } else {
-            return new ModificationDiscovery({
+
+            const modificationClone = new ModificationDiscovery({
                 ...modificationA.getModificationValues(),
                 id: ObjectUtil.createId(),
                 instant,
             });
-            // return modificationA;
+            // console.log('modificationClone', TimeUtil.formatCategoryDateFull(modificationA.getInstantA()), modificationClone);
+            return modificationClone;
+
         }
 
     }
@@ -123,7 +126,7 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                     },
                     instantA: minInstant,
                     instantB: maxInstant,
-                    polyShares: [0.10, 0.90],
+                    polyShares: [0.00, 0.50],
                     modifications: modificationsTime
                 });
 

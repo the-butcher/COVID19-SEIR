@@ -8,9 +8,11 @@ import { Color } from '../../util/Color';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { StrainUtil } from '../../util/StrainUtil';
 import { TimeUtil } from '../../util/TimeUtil';
+import { ChartDiscoveryRate } from '../chart/ChartDiscoveryRate';
 import { ControlsConstants, HUE_____EXPOSED } from '../gui/ControlsConstants';
 import { IconSlider } from '../gui/IconSlider';
 import { SliderModification } from '../gui/SliderModification';
+import { SliderSetting } from '../gui/SliderSetting';
 import { StorageUtil } from '../storage/StorageUtil';
 import { Slider } from './../gui/Slider';
 import { SliderSerialInterval } from './../gui/SliderSerialInterval';
@@ -32,6 +34,12 @@ export class ControlsStrain {
     }
     private static instance: ControlsStrain;
 
+    private readonly chartTesting: ChartDiscoveryRate;
+    private sliderPow: SliderSetting;
+    private sliderMax: SliderSetting;
+    private sliderXmb: SliderSetting;
+    private sliderXmr: SliderSetting;
+
     private readonly sliderReproduction: Slider;
     private readonly sliderSerialInterval: Slider;
     private readonly sliderIncidence: Slider;
@@ -52,6 +60,13 @@ export class ControlsStrain {
     private modification: ModificationStrain;
 
     constructor() {
+
+        this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDivStrain', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
+
+        this.sliderPow = new SliderSetting("exponent", [2, 4, 6, 8, 10], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
+        this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
+        this.sliderXmb = new SliderSetting("discovery slope base", [1.0, 1.5, 2.00, 2.5, 3.0], 0.05, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
+        this.sliderXmr = new SliderSetting("discovery slope rate", [0, 10, 20, 30, 40], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
 
         this.sliderReproduction = new Slider({
             container: 'sliderReproductionDiv',
@@ -263,7 +278,13 @@ export class ControlsStrain {
             this.sliderIncidence.setRange(ModelConstants.RANGE_____INCIDENCE__10);
         }
 
+        this.sliderPow.setValue(this.modification.getPow() || 4);
+        this.sliderMax.setValue(this.modification.getMax() || 0.7);
+        this.sliderXmb.setValue(this.modification.getXmb() || 2.2);
+        this.sliderXmr.setValue(this.modification.getXmr() === undefined ? 10 : this.modification.getXmr());
+
         const strain = modification.getModificationValues();
+
 
         this.r0 = strain.r0;
 
@@ -288,8 +309,6 @@ export class ControlsStrain {
         this.sliderIncidence.setStep(minR0);
         this.sliderIncidence.setRange([minR0, maxR0]);
 
-
-
         this.sliderSerialInterval.setValueAndRedraw(0, StrainUtil.calculateLatency(this.serialInterval, this.intervalScale), true); // = [Strain.calculateLatency(this.serialInterval, this.intervalScale), this.serialInterval];
         this.sliderSerialInterval.setValueAndRedraw(1, this.serialInterval, true);
         this.sliderReproduction.setValueAndRedraw(0, this.r0, true);
@@ -302,15 +321,25 @@ export class ControlsStrain {
             this.sliderReproduction.handleResize();
             this.sliderImmuneEscape.handleResize();
             this.sliderTimeToWane.handleResize();
+            this.sliderPow.handleResize();
+            this.sliderMax.handleResize();
+            this.sliderXmb.handleResize();
+            this.sliderXmr.handleResize();
             this.sliderIncidence.setDisabled(modification.isPrimary());
         });
 
         this.redrawCanvasReproduction();
         this.redrawCanvasRecovery();
+        this.updateChart();
 
     }
 
     handleChange(): void {
+
+        const pow = this.sliderPow.getValue();
+        const max = this.sliderMax.getValue();
+        const xmb = this.sliderXmb.getValue();
+        const xmr = this.sliderXmr.getValue();
 
         this.modification.acceptUpdate({
             r0: this.r0,
@@ -318,7 +347,11 @@ export class ControlsStrain {
             intervalScale: this.intervalScale,
             dstIncidence: this.incidence,
             immuneEscape: this.immuneEscape,
-            timeToWane: this.timeToWane
+            timeToWane: this.timeToWane,
+            pow,
+            max,
+            xmb,
+            xmr,
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
@@ -412,7 +445,11 @@ export class ControlsStrain {
             dstIncidence: -1,
             deletable: false,
             draggable: false,
-            primary: false
+            primary: false,
+            pow: 5,
+            max: 0.8,
+            xmb: 2.0,
+            xmr: 0.0
         };
         const compartmentParams = CompartmentChainReproduction.getInstance().getStrainedCompartmentParams(strain);
         compartmentParams.forEach(compartmentParam => {
@@ -434,6 +471,14 @@ export class ControlsStrain {
 
         weibullContext.fillStyle = ControlsConstants.COLORS.REMOVED;
         weibullContext.fillRect(xMinN + 1, toCanvasY(0), 500, -1);
+
+    }
+
+    updateChart(): void {
+
+        requestAnimationFrame(() => {
+            this.chartTesting.acceptModification(this.modification);
+        });
 
     }
 

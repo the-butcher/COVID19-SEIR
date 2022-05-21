@@ -34,18 +34,13 @@ export class ModelImplInfectious implements IModelSeir {
     private readonly ageGroupTotal: number;
 
     /**
-     * 
+     *
      */
     private readonly compartmentsInfectious: CompartmentInfectious[];
 
     private readonly compartmentsIncidence: CompartmentBase[];
 
     private readonly integrationSteps: IModelIntegrationStep[];
-
-    private nrmCasesLast: number;
-
-    // private baseDiscovery: number;
-
 
     constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime) {
 
@@ -107,6 +102,8 @@ export class ModelImplInfectious implements IModelSeir {
                 dailyTested = incidenceC * ageGroup.getAbsValue() / 700000;
 
             }
+
+            // TODO DISCOVERY :: calculate discovery ratio from some (yet to be created) utility created from this instance's strain-values
             const dailyActual = dailyTested / modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
             this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic, `_INF_${ObjectUtil.padZero(chainIndex)}`));
@@ -167,10 +164,6 @@ export class ModelImplInfectious implements IModelSeir {
 
             apply: (modelState: IModelState, dT: number, tT: number, modificationTime: ModificationTime) => {
 
-                if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-                    this.nrmCasesLast = 0;
-                }
-
                 const result = ModelState.empty();
 
                 let nrmRecov = 0;
@@ -218,10 +211,11 @@ export class ModelImplInfectious implements IModelSeir {
 
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
 
+                        // TODO DISCOVERY :: calculate discovery ratio from some (yet to be created) utility created from this instance's strain-values
                         const discoveryRatio = modificationTime.getDiscoveryRateLoess(this.ageGroupIndex);
+
                         const discoveredNrmCases = continuationValue * discoveryRatio;
                         result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
-                        this.nrmCasesLast += continuationValue;
 
                     }
 
@@ -240,10 +234,6 @@ export class ModelImplInfectious implements IModelSeir {
 
         });
 
-    }
-
-    getNrmCasesLast(): number {
-        return this.nrmCasesLast;
     }
 
     getRootModel(): ModelImplRoot {

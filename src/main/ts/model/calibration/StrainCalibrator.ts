@@ -60,16 +60,21 @@ export class StrainCalibrator {
             };
         })
 
+        const seasonalities: { [K in string]: number } = {};
+        demographics.getCategories().forEach(category => {
+            seasonalities[category.getName()] = 1;
+        });
+
         const modificationValuesCalibrate: IAnyModificationValue[] = [
             {
                 id: 'calibrate (seasonality)',
                 key: 'SEASONALITY',
                 name: 'calibrate (seasonality)',
                 instant: new Date('2021-07-10').getTime(),
-                seasonality: 1.00,
                 deletable: false,
                 draggable: false,
-                blendable: false
+                blendable: false,
+                seasonalities
             },
             modificationValuesStrain,
             {
@@ -113,7 +118,6 @@ export class StrainCalibrator {
                 key: "VACCINATION",
                 name: "calibrate (vaccination)",
                 instant: preInstant,
-                vaccinationCurves,
                 deletable: false,
                 draggable: false,
                 blendable: false

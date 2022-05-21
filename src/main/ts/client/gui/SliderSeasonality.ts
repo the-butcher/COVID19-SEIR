@@ -6,21 +6,22 @@ import { ControlsConstants } from './ControlsConstants';
 
 export class SliderSeasonality extends Slider {
 
-    constructor() {
+    private readonly category: string;
+
+    constructor(category: string) {
 
         const container = document.createElement('div');
         container.classList.add('slider-modification');
-
         document.getElementById('slidersSeasonalityDiv').appendChild(container);
 
         super({
             container,
-            min: Math.min(...ModelConstants.RANGE____PERCENTAGE__60),
-            max: Math.max(...ModelConstants.RANGE____PERCENTAGE__60),
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE__50),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE__50),
             step: 0.01,
             values: [0.90],
-            ticks: [...ModelConstants.RANGE____PERCENTAGE__60],
-            label: 'amount',
+            ticks: [...ModelConstants.RANGE____PERCENTAGE__50],
+            label: category,
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
             },
@@ -45,6 +46,13 @@ export class SliderSeasonality extends Slider {
             }
         });
 
+        this.category = category;
+
+
+    }
+
+    getName(): string {
+        return this.category;
     }
 
     getValue(): number {

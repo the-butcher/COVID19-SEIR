@@ -5,6 +5,7 @@ import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationResolverSettings } from '../../common/modification/ModificationResolverSettings';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
+import { ModificationStrain } from '../../common/modification/ModificationStrain';
 import { StrainUtil } from '../../util/StrainUtil';
 import { ControlsConstants, ILabellingDefinition } from '../gui/ControlsConstants';
 import { ModificationTime } from './../../common/modification/ModificationTime';
@@ -153,7 +154,7 @@ export class ChartDiscoveryRate {
 
     }
 
-    async acceptModificationSettings(modificationSettings: ModificationSettings): Promise<void> {
+    async acceptModification(modification: ModificationSettings | ModificationStrain): Promise<void> {
 
         // console.log('contactColumns', contactColumns);
 
@@ -163,9 +164,9 @@ export class ChartDiscoveryRate {
 
         for (let positivity = 0; positivity <= 0.2; positivity += 0.01) {
 
-            const discoveryLo = modificationSettings.calculateDiscoveryRate(positivity, 0.01);
-            const discoveryAv = modificationSettings.calculateDiscoveryRate(positivity, 0.03);
-            const discoveryHi = modificationSettings.calculateDiscoveryRate(positivity, 0.05);
+            const discoveryLo = modification.calculateDiscoveryRate(positivity, 0.01);
+            const discoveryAv = modification.calculateDiscoveryRate(positivity, 0.03);
+            const discoveryHi = modification.calculateDiscoveryRate(positivity, 0.05);
 
             chartData.push({
                 positivity: this.labellingDefinitionTooltip.format(positivity),
@@ -192,6 +193,8 @@ export class ChartDiscoveryRate {
             }
         }
         this.chart.invalidateRawData();
+
+        console.log('this.chart.data', this.chart.data);
 
         this.fullDataUpdate = false;
 

@@ -132,15 +132,6 @@ export class ModelImplStrain implements IModelSeir {
         return this.nrmExposure;
     }
 
-    getNrmCasesLast(): number {
-        let nrmCasesLast = 0;
-        this.infectiousModels.forEach(infectiousModel => {
-            nrmCasesLast += infectiousModel.getNrmCasesLast();
-        });
-        // console.log(this.strainId, nrmCasesLast);
-        return nrmCasesLast;
-    }
-
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();

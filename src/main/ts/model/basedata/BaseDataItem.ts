@@ -41,9 +41,9 @@ export interface IBaseDataItem {
     getReproduction(ageGroupIndex: number): number;
     getIcuM7(): number;
 
-    getAverageMobilityOther(): number;
-    getAverageMobilityWork(): number;
-    getAverageMobilityHome(): number;
+    // getAverageMobilityOther(): number;
+    // getAverageMobilityWork(): number;
+    // getAverageMobilityHome(): number;
 
     extrapolateBaseDataItemConfig(): IBaseDataItemConfig;
 
@@ -69,9 +69,9 @@ export class BaseDataItem implements IBaseDataItem {
     private readonly averageHelp2: number[];
     private readonly reproductions: number[];
 
-    private averageMobilityOther: number;
-    private averageMobilityWork: number;
-    private averageMobilityHome: number;
+    // private averageMobilityOther: number;
+    // private averageMobilityWork: number;
+    // private averageMobilityHome: number;
 
 
     constructor(instant: number, itemConfig: IBaseDataItemConfig) {
@@ -100,15 +100,15 @@ export class BaseDataItem implements IBaseDataItem {
     }
 
     getVacc1(ageGroupName: string): number {
-        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST];
+        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST] > 0 ? this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC1ST] : null;
     }
 
     getVacc2(ageGroupName: string): number {
-        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND];
+        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND] > 0 ? this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC2ND] : null;
     }
 
     getVacc3(ageGroupName: string): number {
-        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC3RD];
+        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC3RD] > 0 ? this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC3RD] : null;
     }
 
     getTests(): number {
@@ -251,9 +251,9 @@ export class BaseDataItem implements IBaseDataItem {
                 }
             }
 
-            this.averageMobilityOther = this.getMobilityOther();
-            this.averageMobilityWork = this.getMobilityWork();
-            this.averageMobilityHome = this.getMobilityHome();
+            // this.averageMobilityOther = this.getMobilityOther();
+            // this.averageMobilityWork = this.getMobilityWork();
+            // this.averageMobilityHome = this.getMobilityHome();
 
             // let mobilityOtherValues: number[] = [];
             // let mobilityWorkValues: number[] = [];
@@ -341,17 +341,17 @@ export class BaseDataItem implements IBaseDataItem {
         return this.testsM7;
     }
 
-    getAverageMobilityOther(): number {
-        return this.averageMobilityOther;
-    }
+    // getAverageMobilityOther(): number {
+    //     return this.averageMobilityOther;
+    // }
 
-    getAverageMobilityWork(): number {
-        return this.averageMobilityWork;
-    }
+    // getAverageMobilityWork(): number {
+    //     return this.averageMobilityWork;
+    // }
 
-    getAverageMobilityHome(): number {
-        return this.averageMobilityHome;
-    }
+    // getAverageMobilityHome(): number {
+    //     return this.averageMobilityHome;
+    // }
 
     getAveragePositivity(): number {
         return this.averagePositivity;

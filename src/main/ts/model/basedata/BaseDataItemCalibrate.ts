@@ -1,6 +1,9 @@
 import { IBaseDataItemConfig } from './BaseData';
 import { IBaseDataItem } from './BaseDataItem';
 export class BaseDataItemCalibrate implements IBaseDataItem {
+    getIcuM7(): number {
+        throw new Error('Method not implemented.');
+    }
     getHospitalization(): number {
         throw new Error('Method not implemented.');
     }

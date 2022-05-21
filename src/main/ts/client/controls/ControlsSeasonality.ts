@@ -1,3 +1,4 @@
+import { Demographics } from '../../common/demographics/Demographics';
 import { ModificationSeasonality } from '../../common/modification/ModificationSeasonality';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { ControlsConstants } from '../gui/ControlsConstants';
@@ -22,17 +23,36 @@ export class ControlsSeasonality {
     }
     private static instance: ControlsSeasonality;
 
-    private sliderAmount: SliderSeasonality;
+    // private sliderAmount: SliderSeasonality;
     private modification: ModificationSeasonality;
 
+    private readonly slidersSeasonality: SliderSeasonality[];
+
     constructor() {
-        this.sliderAmount = new SliderSeasonality();
+
+        // this.sliderAmount = new SliderSeasonality('global');
+
+        this.slidersSeasonality = [];
+        Demographics.getInstance().getCategories().forEach(contactCategory => {
+            this.slidersSeasonality.push(new SliderSeasonality(contactCategory.getName()));
+        });
+
     }
 
     handleChange(): void {
 
+        const seasonalities: { [K in string]: number } = {};
+        let updatedCategories: string[] = [];
+        this.slidersSeasonality.forEach(sliderSeasonality => {
+            if (sliderSeasonality.getValue() !== this.modification.getCategoryValue(sliderSeasonality.getName())) {
+                updatedCategories.push(sliderSeasonality.getName());
+            }
+            seasonalities[sliderSeasonality.getName()] = sliderSeasonality.getValue();
+        });
+
         this.modification.acceptUpdate({
-            seasonality: this.sliderAmount.getValue()
+            // seasonality: this.sliderAmount.getValue(),
+            seasonalities
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
@@ -45,10 +65,17 @@ export class ControlsSeasonality {
 
         Controls.acceptModification(modification);
         this.modification = modification;
-        this.sliderAmount.setValue(this.modification.getSeasonality());
+
+        // this.sliderAmount.setValue(this.modification.getSeasonality());
+        this.slidersSeasonality.forEach(sliderSeasonality => {
+            sliderSeasonality.setValue(modification.getCategoryValue(sliderSeasonality.getName()));
+        });
 
         requestAnimationFrame(() => {
-            this.sliderAmount.handleResize();
+            this.slidersSeasonality.forEach(sliderSeasonality => {
+                sliderSeasonality.handleResize();
+            });
+            // this.sliderAmount.handleResize();
         });
 
     }

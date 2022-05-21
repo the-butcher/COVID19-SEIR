@@ -9,8 +9,8 @@ import { IModificationValues as IModificationValues } from './IModificationValue
 export interface IModificationValuesSeasonality extends IModificationValues {
 
     /**
-     * get the amount of r0 reduction
+     * get the amount of r0 reduction for a specific category
      */
-    seasonality: number;
+    seasonalities: { [K in string]: number };
 
 }

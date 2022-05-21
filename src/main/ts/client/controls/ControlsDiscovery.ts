@@ -34,10 +34,8 @@ export class ControlsDiscovery {
 
     private readonly chartTesting: ChartDiscovery;
     private readonly sliderTestRate: Slider;
-    // private readonly sliderOverall: SliderDiscoveryCategory;
     private readonly slidersDiscovery: SliderDiscoveryCategory[];
     private readonly iconBlendable: IconToggle;
-    // private readonly iconBoundToTotal: IconToggle;
 
     private modification: ModificationDiscovery;
 

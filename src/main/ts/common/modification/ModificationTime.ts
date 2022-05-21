@@ -1,12 +1,9 @@
-import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
-import { TimeUtil } from './../../util/TimeUtil';
-import { ModelImplRoot } from './../../model/ModelImplRoot';
-import { deprecate } from 'util';
 import { CompartmentChainReproduction } from '../../model/compartment/CompartmentChainReproduction';
-import { ModelImplStrain } from '../../model/ModelImplStrain';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
+import { ObjectUtil } from '../../util/ObjectUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
+import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
 import { Demographics } from './../demographics/Demographics';
 import { AModification } from './AModification';
 import { IContactCategories } from './IContactCategories';
@@ -17,13 +14,11 @@ import { ModificationDiscovery } from './ModificationDiscovery';
 import { ModificationResolverContact } from './ModificationResolverContact';
 import { ModificationResolverDiscovery } from './ModificationResolverDiscovery';
 import { ModificationResolverSeasonality } from './ModificationResolverSeasonality';
+import { ModificationResolverVaccination } from './ModificationResolverVaccination';
 import { Modifications } from './Modifications';
 import { ModificationSeasonality } from './ModificationSeasonality';
 import { ModificationSettings } from './ModificationSettings';
 import { ModificationVaccination } from './ModificationVaccination';
-import { Dictionary } from '@amcharts/amcharts4/core';
-import { ObjectUtil } from '../../util/ObjectUtil';
-import { ModificationResolverVaccination } from './ModificationResolverVaccination';
 
 export interface IRatios {
     contact: number;
@@ -68,6 +63,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private cellValues: number[][];
     private discoveryRatesByAgeGroup: IRatios[];
     private quarantineMultipliersByAgeGroup: number[];
+
     // private discoveryRateOverall: number;
     // private positivityRateInjected: number;
 
@@ -150,8 +146,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
     }
 
-    getSeasonality(): number {
-        return this.modificationSeasonality.getSeasonality();
+    getSeasonality(category: string): number {
+        return this.modificationSeasonality.getSeasonality(category);
     }
 
     getDiscoveryRatesRaw(ageGroupIndex: number): IRatios {
@@ -161,6 +157,11 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.discoveryRatesByAgeGroup[ageGroupIndex];
     }
 
+    /**
+     * // TODO DISCOVERY :: deprecate, then remove
+     * @param ageGroupIndex
+     * @returns
+     */
     getDiscoveryRateLoess(ageGroupIndex: number): number {
         return ModificationResolverDiscovery.getRegression(ageGroupIndex).findLoessValue(this.getInstant()).y;
     }
@@ -196,24 +197,25 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
                 if (ageGroup.getIndex() == 0) {// <= 04
                     discoveryRateCategory *= 0.65;
+                } else if (ageGroup.getIndex() == 1) { // 05-14
+                    discoveryRateCategory *= 1.45;
+                } else if (ageGroup.getIndex() == 2) { // 15-24
+                    discoveryRateCategory *= 1.15;
+                } else if (ageGroup.getIndex() == 3) { // 25-34
+                    discoveryRateCategory *= 1.10;
+                } else if (ageGroup.getIndex() == 4) { // 35-44
+                    discoveryRateCategory *= 1.12;
+                } else if (ageGroup.getIndex() == 5) { // 45-54
+                    discoveryRateCategory *= 1.14;
+                } else if (ageGroup.getIndex() == 6) { // 55-64
+                    discoveryRateCategory *= 1.16;
+                } else if (ageGroup.getIndex() == 7) { // 65-74
+                    discoveryRateCategory *= 1.18;
+                } else if (ageGroup.getIndex() == 8) { // 75-84
+                    discoveryRateCategory *= 1.20;
+                } else if (ageGroup.getIndex() == 9) { // >= 85
+                    discoveryRateCategory *= 1.25;
                 }
-                //  else if (ageGroup.getIndex() == 2) { // 15-24
-                //     discoveryRateCategory *= 0.85;
-                // } else if (ageGroup.getIndex() == 3) { // 25-34
-                //     discoveryRateCategory *= 1.05;
-                // } else if (ageGroup.getIndex() == 4) { // 35-44
-                //     discoveryRateCategory *= 1.05;
-                // } else if (ageGroup.getIndex() == 5) { // 45-54
-                //     discoveryRateCategory *= 0.95;
-                // } else if (ageGroup.getIndex() == 7) { // 65-74
-                //     discoveryRateCategory *= 0.80;
-                // } else if (ageGroup.getIndex() == 8) { // 75-84
-                //     discoveryRateCategory *= 1.20;
-                // }
-
-                // else if (ageGroup.getIndex() == 3 || ageGroup.getIndex() == 4) {
-                //     discoveryRateCategory *= 1.1;
-                // }
 
                 // current share of discovered in currentTotal
                 contactTotal += contactTotalCategory;
@@ -227,6 +229,12 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
             };
 
         });
+
+        // if (this.getInstant() % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+        //     this.ageGroups.forEach(ageGroup => {
+        //         console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), ageGroup.getIndex(), ageGroup.getName(), this.discoveryRatesByAgeGroup[ageGroup.getIndex()].discovery, this.discoveryRatesByAgeGroup[ageGroup.getIndex()].contact);
+        //     });
+        // }
 
         const normalize = () => {
 
@@ -313,7 +321,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.modificationDiscovery.getTestRate();
     }
 
-
     getQuarantineMultiplier(ageGroupIndex: number): number {
         if (!this.quarantineMultipliersByAgeGroup) {
             this.buildRates();
@@ -329,22 +336,22 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         if (!this.cellValues[indexContact][indexParticipant]) {
 
-            /**
-             * reduction through seasonality
-             */
-            const multiplierSeasonality = this.modificationSeasonality.getSeasonality();
-
-            /**
-             * reduction through quarantine
-             */
+            // specific quarantine reduction for this combination of age groups (TODO :: precalculate to save some time)
             const multiplierQuarantine = this.getQuarantineMultiplier(indexContact) * this.getQuarantineMultiplier(indexParticipant);
 
-            /**
-             * contact value for this age group (category reductions get considered in ModificationContact)
-             */
-            const contactValue = this.modificationContact.getCellValue(indexContact, indexParticipant);
+            // combined correction multiplier for the combination of these age groups
+            const multiplierCorrection = this.modificationContact.getCorrectionValue(indexContact) * this.modificationContact.getCorrectionValue(indexParticipant);
 
-            this.cellValues[indexContact][indexParticipant] = contactValue * multiplierQuarantine * multiplierSeasonality;
+            let contactValue = 0;
+            this.contactCategories.forEach(contactCategory => {
+
+                // specific seasonal reduction for this category
+                const multiplierSeasonality = this.modificationSeasonality.getSeasonality(contactCategory.getName());
+                contactValue += contactCategory.getCellValue(indexContact, indexParticipant) * this.modificationContact.getCategoryValue(contactCategory.getName()) * multiplierSeasonality;
+
+            });
+
+            this.cellValues[indexContact][indexParticipant] = contactValue * multiplierQuarantine * multiplierCorrection;
 
         }
 
@@ -392,11 +399,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.valueSum;
     }
 
-
     getMaxMatrixSum(): number {
         return this.getMatrixSum();
     }
-
-
 
 }

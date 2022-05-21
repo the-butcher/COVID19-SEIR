@@ -1,5 +1,6 @@
 import { IModificationValuesSeasonality } from './IModificationValuesSeasonality';
 import { AModification } from './AModification';
+import { ObjectUtil } from '../../util/ObjectUtil';
 
 /**
  * implementation of IModification for a specific amount of r0 reduction during warmer periods
@@ -11,10 +12,26 @@ export class ModificationSeasonality extends AModification<IModificationValuesSe
 
     constructor(modificationParams: IModificationValuesSeasonality) {
         super('INSTANT', modificationParams);
+        if (ObjectUtil.isEmpty(this.modificationValues.seasonalities)) {
+            this.modificationValues.seasonalities = {};
+        }
     }
 
-    getSeasonality(): number {
-        return this.modificationValues.seasonality;
+    getSeasonality(category: string): number {
+        return this.modificationValues.seasonalities[category];
     }
+
+    acceptUpdate(update: Partial<IModificationValuesSeasonality>): void {
+        update.seasonalities = { ...this.modificationValues.seasonalities, ...update.seasonalities };
+        super.acceptUpdate(update);
+    }
+
+    getCategoryValue(contactCategoryName: string): number {
+        if (ObjectUtil.isEmpty(this.modificationValues.seasonalities[contactCategoryName])) {
+            this.modificationValues.seasonalities[contactCategoryName] = 0.9;
+        }
+        return this.modificationValues.seasonalities[contactCategoryName];
+    }
+
 
 }

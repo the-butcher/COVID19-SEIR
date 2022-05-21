@@ -154,11 +154,11 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
                 for (let instant = instantMin; instant <= instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY) {
                     const dataItem = BaseData.getInstance().findBaseDataItem(instant, false);
-                    if (dataItem && dataItem.getAverageMobilityHome()) {
+                    if (dataItem && dataItem.getMobilityHome()) {
                         xI.push(ValueRegressionBase.toRegressionX(dataItem.getInstant()));
-                        yH.push(dataItem.getAverageMobilityHome());
-                        yW.push(dataItem.getAverageMobilityWork());
-                        yO.push(dataItem.getAverageMobilityOther());
+                        yH.push(dataItem.getMobilityHome());
+                        yW.push(dataItem.getMobilityWork());
+                        yO.push(dataItem.getMobilityOther());
                         instantMaxData = dataItem.getInstant();
                     }
                 }

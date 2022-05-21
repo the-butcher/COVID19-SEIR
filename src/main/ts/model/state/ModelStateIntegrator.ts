@@ -47,7 +47,6 @@ export interface IDataItem {
     categoryX: string;
     valueset: { [K: string]: IDataValues };
     exposure: number[][];
-    seasonality: number;
     testRate: number;
     positivityRate: number;
     errors?: { [K: string]: number };
@@ -85,7 +84,6 @@ export class ModelStateIntegrator {
 
     private modelState: IModelState;
     private exposure: number[][];
-    private nrmCasesLast: number;
 
     private rollbackInstant: number;
     private rollbackState: IModelState;
@@ -105,27 +103,12 @@ export class ModelStateIntegrator {
 
         if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4) {
 
-            const realCases = this.nrmCasesLast * this.model.getAbsTotal();
+            const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0);
+            const discoveredCases = this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * this.model.getAbsTotal();
+
             const testRate = modificationTime.getTestRate();
-            for (let discoveredCases = 0; discoveredCases < realCases; discoveredCases += 10) {
-
-                const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(discoveredCases, testRate);
-                const discoveryRateCandidate = ModificationSettings.getInstance().calculateDiscoveryRate(positivityRateCandidate, testRate);
-                const realCasesCandidate = discoveredCases / discoveryRateCandidate;
-                if (realCasesCandidate > realCases) {
-
-                    // once reached, treat as well enough match (TODO :: improve)
-                    /**
-                     * this effectively triggers an update of the underlying discovery modification
-                     * in cases when that modification is not interpolated, but refers to an actual configuration, the config gets updated
-                     */
-                    modificationTime.injectPositivityRate(positivityRateCandidate);
-                    // console.log(discoveredCases, ' >> ', realCases, '@positivity(2)', positivityRateCandidate, '@discovery(2)', discoveryRateCandidate);
-                    break;
-
-                }
-
-            }
+            const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(discoveredCases, testRate);
+            modificationTime.injectPositivityRate(positivityRateCandidate);
 
         }
 
@@ -190,7 +173,6 @@ export class ModelStateIntegrator {
                     categoryX: TimeUtil.formatCategoryDateFull(this.curInstant),
                     valueset: {},
                     exposure: this.exposure,
-                    seasonality: modificationTime.getSeasonality(),
                     testRate: modificationTime.getTestRate(),
                     positivityRate: modificationTime.getPositivityRate(),
                 };
@@ -277,7 +259,6 @@ export class ModelStateIntegrator {
             const modificationTime = this.integrate(ModelStateIntegrator.DT, this.curInstant);
 
             // sum up strain exposures to a single exposure matrix
-            this.nrmCasesLast = 0;
             modificationValuesStrain.forEach(modificationValueStrain => {
                 const strainModel = this.model.findStrainModel(modificationValueStrain.id);
                 const strainExposure = strainModel.getNrmExposure();
@@ -286,7 +267,6 @@ export class ModelStateIntegrator {
                         this.exposure[indexContact][indexParticipant] += strainExposure[indexContact][indexParticipant];
                     }
                 }
-                this.nrmCasesLast += strainModel.getNrmCasesLast();
             });
 
             if (dataFilter(this.curInstant)) {
@@ -294,6 +274,8 @@ export class ModelStateIntegrator {
                 const removedIDTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedIDTotal);
                 const removedVITotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVITotal);
                 const removedV2Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV2Total);
+
+                // TODO DISCOVERY :: with discovery moved to strain, find a way to get an overall discovery ratio (try: count discoveredcases in strain iteration)
                 const discoveryTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal);
 
                 // values that come by strain
@@ -305,24 +287,29 @@ export class ModelStateIntegrator {
                 exposed[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterExposedTotal);
                 infectious[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
 
+                let casesTotal = 0;
+                let discoTotal = 0;
                 modificationValuesStrain.forEach(modificationValueStrain => {
 
                     const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 || c.getCompartmentType() === ECompartmentType.X__INCIDENCE_N) && c.getStrainId() === modificationValueStrain.id);
                     const compartmentFilterExposedTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E______EXPOSED) && c.getStrainId() === modificationValueStrain.id);
                     const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I___INFECTIOUS) && c.getStrainId() === modificationValueStrain.id);
+                    const compartmentFilterCasesStrain = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 && c.getStrainId() === modificationValueStrain.id);
 
                     incidences[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * 100000;
                     exposed[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterExposedTotal);
                     infectious[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
 
+                    casesTotal += this.modelState.getNrmValueSum(compartmentFilterCasesStrain);
+
                 });
+                // console.log(TimeUtil.formatCategoryDateFull(this.curInstant), this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal, casesTotal * absTotal);
 
                 const dataItem: IDataItem = {
                     instant: this.curInstant,
                     categoryX: TimeUtil.formatCategoryDateFull(this.curInstant),
                     valueset: {},
                     exposure: this.exposure,
-                    seasonality: modificationTime.getSeasonality(),
                     testRate: modificationTime.getTestRate(),
                     positivityRate: modificationTime.getPositivityRate(),
                 };
@@ -356,6 +343,8 @@ export class ModelStateIntegrator {
                     const removedID = this.modelState.getNrmValueSum(compartmentFilterRemovedID) * groupNormalizer;
                     const removedVI = this.modelState.getNrmValueSum(compartmentFilterRemovedVI) * groupNormalizer;
                     const removedV2 = this.modelState.getNrmValueSum(compartmentFilterRemovedV2) * groupNormalizer;
+
+                    // TODO DISCOVERY :: with discovery moved to strain, find a way to get an overall discovery ratio (try: count discoveredcases in strain iteration)
                     const discovery = modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
 
                     const incidencesAgeGroup: { [K: string]: number } = {};

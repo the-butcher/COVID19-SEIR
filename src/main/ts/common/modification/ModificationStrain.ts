@@ -1,3 +1,4 @@
+import { Demographics } from '../demographics/Demographics';
 import { AModification } from './AModification';
 import { IModificationValuesStrain } from './IModificationValuesStrain';
 
@@ -36,6 +37,40 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
 
     getImmuneEscape(): number {
         return this.modificationValues.immuneEscape;
+    }
+
+    getPow(): number {
+        return this.modificationValues.pow;
+    }
+
+    getMax(): number {
+        return this.modificationValues.max;
+    }
+
+    getXmb(): number {
+        return this.modificationValues.xmb;
+    }
+
+    getXmr(): number {
+        return this.modificationValues.xmr;
+    }
+
+    calculateDiscoveryRate(positivityRate: number, testRate: number): number {
+
+        // \left(x\ \cdot s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}-x\cdot\left(s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}
+
+        const pow = -this.modificationValues.pow;
+        const max = this.modificationValues.max;
+        const slp = this.modificationValues.xmb - testRate * this.modificationValues.xmr; // higher number means steeper (less tests per person means steeper slope = less cases found for )
+
+        const sqm = Math.pow(max, 1 / pow);
+
+        return Math.pow(positivityRate * slp + sqm, pow) - positivityRate * Math.pow(slp + sqm, pow);
+
+    }
+
+    calculatePositivityRate(cases: number, testRate: number): number {
+        return cases / Demographics.getInstance().getAbsTotal() / testRate;
     }
 
 }

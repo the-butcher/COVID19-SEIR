@@ -269,7 +269,7 @@ export class SliderContactCategory extends Slider {
     redrawCanvas(): void {
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
-        const scale = 10.75 * this.getValue();
+        const scale = 3 * this.getValue();
 
         ageGroups.forEach(ageGroup => {
 
