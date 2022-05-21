@@ -85,9 +85,9 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.contactCategories;
     }
 
-    logSummary(): void {
-        // do nothing
-    }
+    // logSummary(): void {
+    //     // do nothing
+    // }
 
     acceptUpdate(update: Partial<IModificationValuesTime>): void {
         super.acceptUpdate(update); // title is updateable
@@ -356,6 +356,45 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         }
 
         return this.cellValues[indexContact][indexParticipant];
+
+    }
+
+    getColumnValueSummary(ageGroupContact: AgeGroup): { [K in string]: number } {
+
+        const indexContact = ageGroupContact.getIndex();
+
+        const summary: { [K: string]: number } = {};
+        let contactTotal = 0;
+        let contactValue: number;
+
+        this.contactCategories.forEach(category => {
+
+            // specific seasonal reduction for this category
+            const multiplierSeasonality = this.modificationSeasonality.getSeasonality(category.getName());
+
+            let contactCategory = 0;
+            this.ageGroups.forEach(ageGroupParticipant => {
+
+                const indexParticipant = ageGroupParticipant.getIndex();
+
+                // specific quarantine reduction for this combination of age groups (TODO :: precalculate to save some time)
+                const multiplierQuarantine = this.getQuarantineMultiplier(indexContact) * this.getQuarantineMultiplier(indexParticipant);
+
+                // combined correction multiplier for the combination of these age groups
+                const multiplierCorrection = this.modificationContact.getCorrectionValue(indexContact) * this.modificationContact.getCorrectionValue(indexParticipant);
+
+                contactValue = category.getCellValue(indexContact, indexParticipant) * this.modificationContact.getCategoryValue(category.getName()) * multiplierQuarantine * multiplierCorrection;
+                contactCategory += contactValue;
+
+            });
+            // console.log(contactCategory.getName(), 'TOTAL', sum);
+            summary[category.getName()] = contactCategory * multiplierSeasonality;
+            contactTotal += contactCategory;
+
+        });
+        summary['total'] = contactTotal;
+        console.log('TOTAL', summary);
+        return summary;
 
     }
 

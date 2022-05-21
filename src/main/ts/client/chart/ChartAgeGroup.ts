@@ -9,6 +9,7 @@ import { ModificationResolverDiscovery } from "../../common/modification/Modific
 import { ModificationResolverRegression } from "../../common/modification/ModificationResolverRegression";
 import { ModificationResolverTime } from "../../common/modification/ModificationResolverTime";
 import { Modifications } from '../../common/modification/Modifications';
+import { ModificationTime } from "../../common/modification/ModificationTime";
 import { BaseData } from '../../model/basedata/BaseData';
 import { Color } from '../../util/Color';
 import { QueryUtil } from '../../util/QueryUtil';
@@ -2091,7 +2092,7 @@ export class ChartAgeGroup {
 
                 const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
                 const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
-                const contactSummary = new ModificationResolverContact().getModification(dataItem.instant, 'INTERPOLATE').getColumnValueSummary(ageGroupPlot);
+                const contactSummary = ModificationTime.createInstance(dataItem.instant).getColumnValueSummary(ageGroupPlot);
 
                 // let totalShare = 0;
                 Demographics.getInstance().getCategories().forEach(category => {

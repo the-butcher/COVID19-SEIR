@@ -99,15 +99,15 @@ export class ContactMatrixExposure implements IContactMatrix {
         return this.getMatrixSum(); // TODO return max value of timeline
     }
 
-    logSummary(ageGroupName: string): void {
-        const ageGroupContact = this.ageGroups.find(g => g.getName() === ageGroupName);
-        console.log('ageGroupContact', ageGroupContact);
-        let nrmSum = 0;
-        this.ageGroups.forEach(ageGroupParticipant => {
-            nrmSum += this.getCellValue(ageGroupContact.getIndex(), ageGroupParticipant.getIndex());
-        });
-        console.log('nrmSum', ageGroupName, nrmSum);
-    }
+    // logSummary(ageGroupName: string): void {
+    //     const ageGroupContact = this.ageGroups.find(g => g.getName() === ageGroupName);
+    //     console.log('ageGroupContact', ageGroupContact);
+    //     let nrmSum = 0;
+    //     this.ageGroups.forEach(ageGroupParticipant => {
+    //         nrmSum += this.getCellValue(ageGroupContact.getIndex(), ageGroupParticipant.getIndex());
+    //     });
+    //     console.log('nrmSum', ageGroupName, nrmSum);
+    // }
 
     getInstant(): number {
         return this.instant;

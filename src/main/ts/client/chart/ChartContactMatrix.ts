@@ -176,9 +176,9 @@ export class ChartContactMatrix {
         columnTemplate.width = percent(98);
         columnTemplate.height = percent(98);
         columnTemplate.tooltipText = '{categoryX}';
-        columnTemplate.events.on('hit', e => {
-            this.contactMatrix.logSummary(e.target.dataItem['categoryX']);
-        });
+        // columnTemplate.events.on('hit', e => {
+        //     this.contactMatrix.logSummary(e.target.dataItem['categoryX']);
+        // });
 
         const ageGroups = Demographics.getInstance().getAgeGroups();
         columnTemplate.adapter.add('tooltipText', (value, target) => {

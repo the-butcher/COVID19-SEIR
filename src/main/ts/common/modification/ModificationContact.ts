@@ -77,10 +77,10 @@ export class ModificationContact extends AModification<IModificationValuesContac
         }
     }
 
-    logSummary(ageGroupName: string): void {
-        const ageGroupContact = this.ageGroups.find(g => g.getName() === ageGroupName);
-        console.log(this.getColumnValueSummary(ageGroupContact));
-    }
+    // logSummary(ageGroupName: string): void {
+    //     const ageGroupContact = this.ageGroups.find(g => g.getName() === ageGroupName);
+    //     console.log(this.getColumnValueSummary(ageGroupContact));
+    // }
 
     getInstant(): number {
         return this.modificationValues.instant;
@@ -109,32 +109,6 @@ export class ModificationContact extends AModification<IModificationValuesContac
             this.columnValues[indexAgeGroup] = ContactCellsUtil.findColumnValue(indexAgeGroup, this);
         }
         return this.columnValues[indexAgeGroup];
-    }
-
-    getColumnValueSummary(ageGroupContact: AgeGroup): { [K in string]: number } {
-
-        const correctionContact = this.getCorrectionValue(ageGroupContact.getIndex());
-        let correctionParticipant: number;
-
-        const summary: { [K: string]: number } = {};
-        let total = 0;
-        let val: number;
-
-        this.contactCategories.forEach(contactCategory => {
-            let sum = 0;
-            this.ageGroups.forEach(ageGroupParticipant => {
-                correctionParticipant = this.getCorrectionValue(ageGroupParticipant.getIndex());
-                val = contactCategory.getCellValue(ageGroupContact.getIndex(), ageGroupParticipant.getIndex()) * this.getCategoryValue(contactCategory.getName()) * correctionContact * correctionParticipant;
-                // console.log(contactCategory.getName(), ageGroupParticipant.getName(), val);
-                sum += val;
-            });
-            // console.log(contactCategory.getName(), 'TOTAL', sum);
-            summary[contactCategory.getName()] = sum;
-            total += sum;
-        });
-        summary['total'] = total;
-        console.log('TOTAL', total);
-        return summary;
     }
 
     getColumnSum(): number {

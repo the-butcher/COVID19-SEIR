@@ -24,6 +24,6 @@ export interface IContactCells {
      */
     getCellSum(): number;
 
-    logSummary(ageGroupName: string): void;
+    // logSummary(ageGroupName: string): void;
 
 }

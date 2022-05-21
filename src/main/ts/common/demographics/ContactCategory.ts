@@ -64,8 +64,8 @@ export class ContactCategory implements IContactCells {
         return this.columnValues[indexAgeGroup];
     }
 
-    logSummary(ageGroupName: string): void {
-        throw new Error('Method not implemented.');
-    }
+    // logSummary(ageGroupName: string): void {
+    //     throw new Error('Method not implemented.');
+    // }
 
 }
