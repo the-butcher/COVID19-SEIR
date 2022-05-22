@@ -3,6 +3,7 @@ import { color, create, Label, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
+import { IDiscoveryValueSet } from '../../common/modification/IDiscoveryValueSet';
 import { ModificationResolverSettings } from '../../common/modification/ModificationResolverSettings';
 import { ModificationSettings } from '../../common/modification/ModificationSettings';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
@@ -154,7 +155,7 @@ export class ChartDiscoveryRate {
 
     }
 
-    async acceptModification(modification: ModificationSettings | ModificationStrain): Promise<void> {
+    async acceptModification(discoveryValueSet: IDiscoveryValueSet): Promise<void> {
 
         // console.log('contactColumns', contactColumns);
 
@@ -164,9 +165,9 @@ export class ChartDiscoveryRate {
 
         for (let positivity = 0; positivity <= 0.2; positivity += 0.01) {
 
-            const discoveryLo = modification.calculateDiscoveryRate(positivity, 0.01);
-            const discoveryAv = modification.calculateDiscoveryRate(positivity, 0.03);
-            const discoveryHi = modification.calculateDiscoveryRate(positivity, 0.05);
+            const discoveryLo = StrainUtil.calculateDiscoveryRate(positivity, 0.01, discoveryValueSet);
+            const discoveryAv = StrainUtil.calculateDiscoveryRate(positivity, 0.03, discoveryValueSet);
+            const discoveryHi = StrainUtil.calculateDiscoveryRate(positivity, 0.05, discoveryValueSet);
 
             chartData.push({
                 positivity: this.labellingDefinitionTooltip.format(positivity),

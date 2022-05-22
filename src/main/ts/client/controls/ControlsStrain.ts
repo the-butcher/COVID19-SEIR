@@ -477,7 +477,7 @@ export class ControlsStrain {
     updateChart(): void {
 
         requestAnimationFrame(() => {
-            this.chartTesting.acceptModification(this.modification);
+            this.chartTesting.acceptModification(this.modification.getModificationValues());
         });
 
     }

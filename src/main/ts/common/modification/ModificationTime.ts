@@ -1,6 +1,7 @@
 import { CompartmentChainReproduction } from '../../model/compartment/CompartmentChainReproduction';
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
+import { StrainUtil } from '../../util/StrainUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
 import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
@@ -303,11 +304,27 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         });
     }
 
+    /**
+     * TODO DISCOVERY :: with varying strains maybe "overall" is a term that can not be calculated any more
+     * but how would a smoothed discovery curve be calculated without first knowing discovery rates throughout time?
+     *
+     * assumme:
+     *
+     * 80% delta   --> high DiscoveryProfile as of DiscoveryValueSet (which describes a discovery distribution through age groups)
+     * 20% omicron --> low  DiscoveryProfile as of DiscoveryValueSet (which describes a discovery distribution through age groups)
+     *
+     *
+     *
+     * when integrating the model, the discovery distributions could be calculated and normalized in a pre-processing step (how, where?),
+     * so total positivity would be correct again
+     *
+     * @returns
+     */
     private calculateDiscoveryRateOverall(): number {
         const testRate = this.getTestRate();
         const positivityRate = this.getPositivityRate();
         if (testRate && positivityRate) {
-            return ModificationSettings.getInstance().calculateDiscoveryRate(positivityRate, testRate);
+            return StrainUtil.calculateDiscoveryRate(positivityRate, testRate, ModificationSettings.getInstance().getModificationValues());
         } else {
             Math.random();
         }
@@ -393,7 +410,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         });
         summary['total'] = contactTotal;
-        console.log('TOTAL', summary);
+        // console.log('TOTAL', summary);
         return summary;
 
     }

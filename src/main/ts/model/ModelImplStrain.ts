@@ -1,10 +1,7 @@
 import { Demographics } from '../common/demographics/Demographics';
 import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
-import { TimeUtil } from '../util/TimeUtil';
-import { BaseData } from './basedata/BaseData';
 import { IBaseDataItem } from './basedata/BaseDataItem';
-import { CompartmentFilter } from './compartment/CompartmentFilter';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
@@ -174,7 +171,7 @@ export class ModelImplStrain implements IModelSeir {
                 const baseContactRate = modificationTime.getCellValue(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
 
                 nrmESum = 0;
-                this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex()).forEach(compartmentS => {
+                this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex(), this.strainId).forEach(compartmentS => {
 
                     // if there is some immunity, can be treated as immune (escape only), if there is no immunity (immunizing, susceptible), treat as fully susceptible
                     susceptibility = compartmentS.getImmunity() > 0 ? this.immuneEscape : 1;

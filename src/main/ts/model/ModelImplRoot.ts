@@ -32,7 +32,7 @@ export class ModelImplRoot implements IModelSeir {
      * this method performs multiple integrations of the model from a date earlier than the actual model date
      * from the model values at specific times in the model integration corrective multipliers are approximated
      * that way the desired starting values can be achieved with satisfactory precision
-     * 
+     *
      * @param demographics
      * @param modifications
      * @param progressCallback
@@ -67,7 +67,7 @@ export class ModelImplRoot implements IModelSeir {
     /**
      * helper collection to avaoid reassembling arrays repeatedly
      */
-    private readonly compartmentsImmunity: CompartmentImmunity[][];
+    private readonly compartmentsImmunity: CompartmentImmunity[][][];
 
     /**
      * submodels with compartments for individuals vaccinated once and individuals vaccinated twice
@@ -113,17 +113,8 @@ export class ModelImplRoot implements IModelSeir {
             });
 
             const vaccinationConfig = modificationTime.getVaccinationConfig2(ageGroup.getName());
-            // const grpRatio = 1 - ageGroup.getIndex() * 0.06; // 0.55 for oldest (longer ago), 1 for youngest (were vaccinated more recently)
 
-            // const grpOffset = 4.5 - ageGroup.getIndex();
             let grpRatio = groupRatios[ageGroup.getIndex()]; // 0.45 + grpOffset * 0.07;
-
-
-
-            // if (ageGroup.getIndex() <= 1) {
-            //     grpRatio = 0.9;
-            // }
-            // console.log(ageGroup.getName(), ageGroup.getIndex(), 'group ratio', grpRatio);
 
             const grpValueV2 = vaccinationConfig.v2 * grpRatio;
 
@@ -153,17 +144,22 @@ export class ModelImplRoot implements IModelSeir {
     }
 
 
-    getCompartmentsSusceptible(ageGroupIndex: number): CompartmentImmunity[] {
+    getCompartmentsSusceptible(ageGroupIndex: number, strainId: string): CompartmentImmunity[] {
         if (!this.compartmentsImmunity[ageGroupIndex]) {
             this.compartmentsImmunity[ageGroupIndex] = [];
-            this.compartmentsImmunity[ageGroupIndex].push(this.compartmentsSusceptible[ageGroupIndex]);
-            // this.strainModels.forEach(strainModel => {
-            //     this.compartmentsImmunity[ageGroupIndex].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
-            // });
-            this.compartmentsImmunity[ageGroupIndex].push(...this.vaccinationModels[ageGroupIndex].getCompartments()); // the full compartment chain
-            this.compartmentsImmunity[ageGroupIndex].push(this.vaccinationModels[ageGroupIndex].getCompartmentI()); // the immunizing compartment
         }
-        return this.compartmentsImmunity[ageGroupIndex];
+        if (!this.compartmentsImmunity[ageGroupIndex][strainId]) {
+            this.compartmentsImmunity[ageGroupIndex][strainId] = [];
+            this.compartmentsImmunity[ageGroupIndex][strainId].push(this.compartmentsSusceptible[ageGroupIndex]);
+            this.strainModels.forEach(strainModel => {
+                if (strainModel.getStrainId() !== strainId) {
+                    this.compartmentsImmunity[ageGroupIndex][strainId].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
+                }
+            });
+            this.compartmentsImmunity[ageGroupIndex][strainId].push(...this.vaccinationModels[ageGroupIndex].getCompartments()); // the full compartment chain
+            this.compartmentsImmunity[ageGroupIndex][strainId].push(this.vaccinationModels[ageGroupIndex].getCompartmentI()); // the immunizing compartment
+        }
+        return this.compartmentsImmunity[ageGroupIndex][strainId];
     }
 
     getNrmValueGroup(ageGroupIndex: number): number {

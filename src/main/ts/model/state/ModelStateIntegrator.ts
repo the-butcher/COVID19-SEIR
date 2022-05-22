@@ -107,7 +107,7 @@ export class ModelStateIntegrator {
             const discoveredCases = this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * this.model.getAbsTotal();
 
             const testRate = modificationTime.getTestRate();
-            const positivityRateCandidate = ModificationSettings.getInstance().calculatePositivityRate(discoveredCases, testRate);
+            const positivityRateCandidate = StrainUtil.calculatePositivityRate(discoveredCases, testRate);
             modificationTime.injectPositivityRate(positivityRateCandidate);
 
         }
@@ -228,9 +228,6 @@ export class ModelStateIntegrator {
 
     async buildModelData(dstInstant: number, dataFilter: (curInstant: number) => boolean, progressCallback: (progress: IModelProgress) => void): Promise<IDataItem[]> {
 
-        // this.rollbackInstant = this.curInstant;
-        // this.rollbackState = ModelState.copy(this.modelState);
-
         const dataSet: IDataItem[] = [];
         const absTotal = this.model.getDemographics().getAbsTotal();
         const ageGroupIndexTotal = this.model.getDemographics().getAgeGroupTotal().getIndex();
@@ -238,21 +235,8 @@ export class ModelStateIntegrator {
         const minChartInstant = ModelInstants.getInstance().getMinInstant();
         const maxChartInstant = ModelInstants.getInstance().getMaxInstant();
 
-        // const compartmentFilterRemovedVInit = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___REMOVED_V));
-        // console.log('v-init', this.modelState.getNrmValueSum(compartmentFilterRemovedVInit));
-
         // one time evaluation of strains contributing
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
-
-        const compartmentFilterSusceptibleTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.S__SUSCEPTIBLE));
-        const compartmentFilterExposedTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E______EXPOSED));
-        const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I___INFECTIOUS));
-        const compartmentFilterRemovedIDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R____RECOVERED));
-        const compartmentFilterRemovedVITotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___IMMUNIZING));
-        const compartmentFilterRemovedV2Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___VACCINATED));
-        const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0);
-        const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 || c.getCompartmentType() === ECompartmentType.X__INCIDENCE_N));
-        const compartmentFilterModelTotal = new CompartmentFilter(c => (c.getCompartmentType() !== ECompartmentType.X__INCIDENCE_0 && c.getCompartmentType() !== ECompartmentType.X__INCIDENCE_N));
 
         for (; this.curInstant <= dstInstant; this.curInstant += ModelStateIntegrator.DT) {
 
@@ -270,6 +254,16 @@ export class ModelStateIntegrator {
             });
 
             if (dataFilter(this.curInstant)) {
+
+                const compartmentFilterSusceptibleTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.S__SUSCEPTIBLE));
+                const compartmentFilterExposedTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E______EXPOSED));
+                const compartmentFilterInfectiousTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I___INFECTIOUS));
+                const compartmentFilterRemovedIDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R____RECOVERED));
+                const compartmentFilterRemovedVITotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___IMMUNIZING));
+                const compartmentFilterRemovedV2Total = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R___VACCINATED));
+                const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0);
+                const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 || c.getCompartmentType() === ECompartmentType.X__INCIDENCE_N));
+                const compartmentFilterModelTotal = new CompartmentFilter(c => (c.getCompartmentType() !== ECompartmentType.X__INCIDENCE_0 && c.getCompartmentType() !== ECompartmentType.X__INCIDENCE_N));
 
                 const removedIDTotal = this.modelState.getNrmValueSum(compartmentFilterRemovedIDTotal);
                 const removedVITotal = this.modelState.getNrmValueSum(compartmentFilterRemovedVITotal);

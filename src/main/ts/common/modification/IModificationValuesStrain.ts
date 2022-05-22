@@ -1,3 +1,4 @@
+import { IDiscoveryValueSet } from './IDiscoveryValueSet';
 import { IModificationValues } from './IModificationValues';
 
 
@@ -7,7 +8,7 @@ import { IModificationValues } from './IModificationValues';
  * @author h.fleischer
  * @since 23.04.2021
  */
-export interface IModificationValuesStrain extends IModificationValues {
+export interface IModificationValuesStrain extends IModificationValues, IDiscoveryValueSet {
 
     /**
      * get the base reproduction number of this strain
@@ -61,25 +62,5 @@ export interface IModificationValuesStrain extends IModificationValues {
     preGrowthRate?: number[];
 
     transmissionRisk?: number;
-
-    /**
-     * the exponent of the discovery function (attention, used as negative number)
-     */
-    pow: number;
-
-    /**
-     * maximum assumed discovery at very low positivity rates
-     */
-    max: number;
-
-    /**
-     * the base slope of discovery (modified by tests/100000 and age-group, TODO: specify a base tests/100.000 reference value)
-     */
-    xmb: number;
-
-    /**
-     * modifier for test-rate
-     */
-    xmr: number;
 
 }

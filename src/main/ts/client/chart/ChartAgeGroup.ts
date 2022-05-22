@@ -2210,8 +2210,6 @@ export class ChartAgeGroup {
             // add one strain value per modification
             modificationValuesStrain.forEach(modificationValueStrain => {
                 item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
-                // item[`ageGroupExposed${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[modificationValueStrain.id];
-                // item[`ageGroupInfectious${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[modificationValueStrain.id];
             });
 
             plotData.push(item);
