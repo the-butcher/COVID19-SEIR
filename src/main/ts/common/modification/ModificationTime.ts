@@ -199,7 +199,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 if (ageGroup.getIndex() == 0) {// <= 04
                     discoveryRateCategory *= 0.65;
                 } else if (ageGroup.getIndex() == 1) { // 05-14
-                    discoveryRateCategory *= 1.45;
+                    discoveryRateCategory *= 1.42;
                 } else if (ageGroup.getIndex() == 2) { // 15-24
                     discoveryRateCategory *= 1.15;
                 } else if (ageGroup.getIndex() == 3) { // 25-34
@@ -213,9 +213,9 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 } else if (ageGroup.getIndex() == 7) { // 65-74
                     discoveryRateCategory *= 1.18;
                 } else if (ageGroup.getIndex() == 8) { // 75-84
-                    discoveryRateCategory *= 1.20;
+                    discoveryRateCategory *= 1.21;
                 } else if (ageGroup.getIndex() == 9) { // >= 85
-                    discoveryRateCategory *= 1.25;
+                    discoveryRateCategory *= 1.27;
                 }
 
                 // current share of discovered in currentTotal

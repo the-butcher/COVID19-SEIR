@@ -100,6 +100,11 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupIncidenceByStrain: Map<string, ChartAgeGroupSeries>;
 
     /**
+     * incidence series by strain
+     */
+    protected readonly seriesAgeGroupRemovedByStrain: Map<string, ChartAgeGroupSeries>;
+
+    /**
      * contact series by category
      */
     protected readonly seriesAgeGroupContactByCategory: Map<string, ChartAgeGroupSeries>;
@@ -156,6 +161,9 @@ export class ChartAgeGroup {
      */
     protected readonly seriesAgeGroupInfectious: ChartAgeGroupSeries;
 
+    /**
+     * primary removed series
+     */
     protected readonly seriesAgeGroupRemovedID: ChartAgeGroupSeries;
 
     /**
@@ -358,6 +366,7 @@ export class ChartAgeGroup {
 
 
         this.seriesAgeGroupIncidenceByStrain = new Map();
+        this.seriesAgeGroupRemovedByStrain = new Map();
         this.seriesAgeGroupContactByCategory = new Map();
 
         // turn all active strain back on
@@ -592,144 +601,6 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
         this.seriesAgeGroupIncidenceR.getSeries().tooltip.exportable = false;
-
-
-
-
-        const vaccSeriesColor = '#000000';
-        this.seriesAgeGroupRemovedV2 = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'vaccinated',
-            baseLabel: 'vaccinated',
-            valueField: 'ageGroupRemovedV2',
-            colorKey: 'VACCINATION',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.05,
-            labels: {
-                tooltip: true,
-                pathtip: false
-            },
-            stacked: true,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesAgeGroupRemovedV2.getSeries().stroke = color(vaccSeriesColor);
-
-
-        this.seriesAgeGroupRemovedVI = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'immunizing',
-            baseLabel: 'immunizing',
-            valueField: 'ageGroupRemovedVI',
-            colorKey: 'IMMUNIZING',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.25,
-            labels: {
-                tooltip: true,
-                pathtip: false
-            },
-            stacked: true,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesAgeGroupRemovedVI.getSeries().stroke = color(vaccSeriesColor);
-
-
-        this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'susceptible',
-            baseLabel: 'susceptible',
-            valueField: 'ageGroupSusceptible',
-            colorKey: 'SUSCEPTIBLE',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.05,
-            labels: {
-                tooltip: true,
-                pathtip: false
-            },
-            stacked: true,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesAgeGroupSusceptible.getSeries().stroke = color(vaccSeriesColor);
-        this.seriesAgeGroupSusceptible.bindToLegend(this.seriesAgeGroupRemovedVI);
-
-        this.seriesAgeGroupExposed = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'exposed',
-            baseLabel: 'exposed',
-            valueField: 'ageGroupExposed',
-            colorKey: 'EXPOSED',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.25,
-            labels: {
-                tooltip: true,
-                pathtip: false
-            },
-            stacked: true,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesAgeGroupExposed.getSeries().stroke = color(vaccSeriesColor);
-
-        this.seriesAgeGroupInfectious = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'infectious',
-            baseLabel: 'infectious',
-            valueField: 'ageGroupInfectious',
-            colorKey: 'INFECTIOUS',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.75,
-            labels: {
-                tooltip: true,
-                pathtip: false
-            },
-            stacked: true,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        this.seriesAgeGroupInfectious.getSeries().stroke = color(vaccSeriesColor);
-
-        /**
-         * recovered after known infection
-         */
-        this.seriesAgeGroupRemovedID = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotPercent,
-            title: 'recovered',
-            baseLabel: 'recovered',
-            valueField: 'ageGroupRemovedID',
-            colorKey: 'REMOVED',
-            strokeWidth: 0,
-            dashed: false,
-            locationOnPath: 0.15,
-            labels: {
-                tooltip: true,
-                pathtip: false
-            },
-            stacked: true,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
-            seriesConstructor: () => new LineSeries()
-        });
-        // no need to switch to black, should not have stroke at all
-
-
 
         /**
          * vaccinated (first)
@@ -1126,6 +997,140 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
         this.seriesMobility.setSeriesNote('');
+
+        const vaccSeriesColor = '#000000';
+        this.seriesAgeGroupRemovedV2 = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'vaccinated',
+            baseLabel: 'vaccinated',
+            valueField: 'ageGroupRemovedV2',
+            colorKey: 'VACCINATION',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.05,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupRemovedV2.getSeries().stroke = color(vaccSeriesColor);
+
+
+        this.seriesAgeGroupRemovedVI = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'immunizing',
+            baseLabel: 'immunizing',
+            valueField: 'ageGroupRemovedVI',
+            colorKey: 'IMMUNIZING',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.25,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupRemovedVI.getSeries().stroke = color(vaccSeriesColor);
+
+
+        this.seriesAgeGroupSusceptible = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'susceptible',
+            baseLabel: 'susceptible',
+            valueField: 'ageGroupSusceptible',
+            colorKey: 'SUSCEPTIBLE',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.05,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupSusceptible.getSeries().stroke = color(vaccSeriesColor);
+        this.seriesAgeGroupSusceptible.bindToLegend(this.seriesAgeGroupRemovedVI);
+
+        this.seriesAgeGroupExposed = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'exposed',
+            baseLabel: 'exposed',
+            valueField: 'ageGroupExposed',
+            colorKey: 'EXPOSED',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.25,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupExposed.getSeries().stroke = color(vaccSeriesColor);
+
+        this.seriesAgeGroupInfectious = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'infectious',
+            baseLabel: 'infectious',
+            valueField: 'ageGroupInfectious',
+            colorKey: 'INFECTIOUS',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.75,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesAgeGroupInfectious.getSeries().stroke = color(vaccSeriesColor);
+
+        /**
+         * recovered after known infection
+         */
+        this.seriesAgeGroupRemovedID = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'recovered',
+            baseLabel: 'recovered',
+            valueField: 'ageGroupRemovedID',
+            colorKey: 'REMOVED',
+            strokeWidth: 0,
+            dashed: false,
+            locationOnPath: 0.15,
+            labels: {
+                tooltip: true,
+                pathtip: false
+            },
+            stacked: true,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        // no need to switch to black, should not have stroke at all
+
 
 
         this.chart.cursor = new XYCursor();
@@ -1657,7 +1662,55 @@ export class ChartAgeGroup {
         const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
         seriesAgeGroup.setVisible(this.chartMode === 'INCIDENCE');
-        // seriesAgeGroup.setVisible(false);
+        return seriesAgeGroup;
+
+    }
+
+    /**
+     * ensures presence of a series for the given strain
+     *
+     * @param strainValues
+     * @returns
+     */
+    getOrCreateSeriesAgeGroupRemovedStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
+
+        if (!this.seriesAgeGroupRemovedByStrain.has(strainValues.id)) {
+
+            const seriesAgeGroupRemovedStrain = new ChartAgeGroupSeries({
+                chart: this.chart,
+                yAxis: this.yAxisPlotPercent,
+                title: 'recovered',
+                baseLabel: 'recovered',
+                valueField: `ageGroupRemovedID${strainValues.id}`,
+                colorKey: 'REMOVED',
+                strokeWidth: 1,
+                dashed: false,
+                locationOnPath: this.seriesAgeGroupLabelLocation,
+                labels: {
+                    tooltip: true,
+                    pathtip: false
+                },
+                stacked: true,
+                legend: false,
+                labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+                seriesConstructor: () => new LineSeries()
+            });
+            seriesAgeGroupRemovedStrain.getSeries().stroke = color('#000000');
+
+            // toggle strain incidence with primary incidence
+            this.seriesAgeGroupRemovedID.bindToLegend(seriesAgeGroupRemovedStrain);
+
+            this.seriesAgeGroupRemovedByStrain.set(strainValues.id, seriesAgeGroupRemovedStrain);
+            this.seriesAgeGroupLabelLocation += 0.1;
+            if (this.seriesAgeGroupLabelLocation > 0.8) {
+                this.seriesAgeGroupLabelLocation = 0.5;
+            }
+
+        }
+
+        const seriesAgeGroup = this.seriesAgeGroupRemovedByStrain.get(strainValues.id);
+        seriesAgeGroup.setBaseLabel(strainValues.name);
+        seriesAgeGroup.setVisible(this.chartMode === 'VACCINATED');
         return seriesAgeGroup;
 
     }
@@ -1753,9 +1806,20 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupExposed.setVisible(visible);
         this.seriesAgeGroupInfectious.setVisible(visible);
-
         this.seriesAgeGroupExposed.setStacked(stacked);
         this.seriesAgeGroupInfectious.setStacked(stacked);
+        this.seriesAgeGroupRemovedByStrain.forEach(seriesAgeGroupRemoved => {
+            seriesAgeGroupRemoved.setVisible(visible);
+        });
+
+        // specific incidence makes sense only if there is more than one strain
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        if (visible && modificationValuesStrain.length > 1) {
+            // turn all active strain back on
+            modificationValuesStrain.forEach(strainValues => {
+                this.getOrCreateSeriesAgeGroupRemovedStrain(strainValues).setVisible(visible);
+            });
+        }
 
     }
 
@@ -1766,36 +1830,24 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
         this.seriesAgeGroupIncidence.setVisible(visible); // visible
-
-        // this.seriesAgeGroupIncidence95L.setVisible(visible);
-        // this.seriesAgeGroupIncidence95U.setVisible(visible);
-        // this.seriesAgeGroupIncidence68L.setVisible(visible);
-        // this.seriesAgeGroupIncidence68U.setVisible(visible);
-
         this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
-
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
-
         this.seriesAgeGroupDiscoveredCases.setVisible(visible);
         this.seriesAgeGroupAssumedAllCases.setVisible(visible);
         this.seriesAgeGroupCasesN.setVisible(visible); // visible
         this.seriesAgeGroupCasesR.setVisible(visible); // visible
-
-        // set everything to invisible
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
             seriesAgeGroupIncidence.setVisible(visible);
         });
-        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
 
         // specific incidence makes sense only if there is more than one strain
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
         if (visible && modificationValuesStrain.length > 1) {
             // turn all active strain back on
             modificationValuesStrain.forEach(strainValues => {
                 this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setVisible(visible);
             });
         }
-
-        // this.applyMaxYAxisValue();
 
     }
 
@@ -1916,6 +1968,7 @@ export class ChartAgeGroup {
         modificationValuesStrain.forEach(strainValues => {
             // be sure there are series for each strain
             this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues);
+            this.getOrCreateSeriesAgeGroupRemovedStrain(strainValues);
         });
 
         // this.setChartMode(this.chartMode);
@@ -2149,7 +2202,7 @@ export class ChartAgeGroup {
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
             const ageGroupExposed = dataItem.valueset[ageGroupPlot.getName()].EXPOSED[ModelConstants.STRAIN_ID___________ALL];;
             const ageGroupInfectious = dataItem.valueset[ageGroupPlot.getName()].INFECTIOUS[ModelConstants.STRAIN_ID___________ALL];
-            const ageGroupRemovedID = dataItem.valueset[ageGroupPlot.getName()].REMOVED_ID;
+            const ageGroupRemovedID = dataItem.valueset[ageGroupPlot.getName()].REMOVED[ModelConstants.STRAIN_ID___________ALL];
             const ageGroupRemovedVI = dataItem.valueset[ageGroupPlot.getName()].REMOVED_VI;
             const ageGroupRemovedV2 = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V2;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
@@ -2210,7 +2263,10 @@ export class ChartAgeGroup {
             // add one strain value per modification
             modificationValuesStrain.forEach(modificationValueStrain => {
                 item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
+                item[`ageGroupRemovedID${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].REMOVED[modificationValueStrain.id];
             });
+
+            // console.log('item', item)
 
             plotData.push(item);
 
@@ -2287,7 +2343,7 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupSusceptible, plotData);
         this.applyData(this.seriesAgeGroupExposed, plotData);
         this.applyData(this.seriesAgeGroupInfectious, plotData);
-        this.applyData(this.seriesAgeGroupRemovedID, plotData);
+        // this.applyData(this.seriesAgeGroupRemovedID, plotData);
         this.applyData(this.seriesAgeGroupRemovedVI, plotData);
         this.applyData(this.seriesAgeGroupRemovedV2, plotData);
         this.applyData(this.seriesAgeGroupIncidence, plotData);
@@ -2306,6 +2362,10 @@ export class ChartAgeGroup {
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
             this.applyData(seriesAgeGroupIncidence, plotData);
             seriesAgeGroupIncidence.setSeriesNote(ageGroupPlot.getName());
+        })
+        this.seriesAgeGroupRemovedByStrain.forEach(seriesAgeGroupRemoved => {
+            this.applyData(seriesAgeGroupRemoved, plotData);
+            seriesAgeGroupRemoved.setSeriesNote(ageGroupPlot.getName());
         });
 
     }

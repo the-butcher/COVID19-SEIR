@@ -16,11 +16,11 @@ export class SliderSeasonality extends Slider {
 
         super({
             container,
-            min: Math.min(...ModelConstants.RANGE____PERCENTAGE__50),
-            max: Math.max(...ModelConstants.RANGE____PERCENTAGE__50),
+            min: Math.min(...ModelConstants.RANGE____PERCENTAGE__25),
+            max: Math.max(...ModelConstants.RANGE____PERCENTAGE__25),
             step: 0.01,
             values: [0.90],
-            ticks: [...ModelConstants.RANGE____PERCENTAGE__50],
+            ticks: [...ModelConstants.RANGE____PERCENTAGE__25],
             label: category,
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
