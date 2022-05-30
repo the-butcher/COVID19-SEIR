@@ -105,12 +105,13 @@ export class StrainUtil {
         // \left(x\ \cdot s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}-x\cdot\left(s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}
 
         const pow = -discoveryValueSet.pow;
+
         const max = discoveryValueSet.max;
-        const slp = discoveryValueSet.xmb - testRate * discoveryValueSet.xmr; // higher number means steeper (less tests per person means steeper slope = less cases found for )
+        const slp = discoveryValueSet.xmb; // - testRate * discoveryValueSet.xmr; // higher number means steeper (less tests per person means steeper slope = less cases found for )
 
         const sqm = Math.pow(max, 1 / pow);
 
-        return Math.pow(positivityRate * slp + sqm, pow) - positivityRate * Math.pow(slp + sqm, pow);
+        return Math.pow(positivityRate * slp + sqm, pow) - positivityRate * Math.pow(slp + sqm, pow) + testRate * discoveryValueSet.xmr;
 
     }
 

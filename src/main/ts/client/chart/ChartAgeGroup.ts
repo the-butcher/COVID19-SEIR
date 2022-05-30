@@ -2074,6 +2074,7 @@ export class ChartAgeGroup {
                 if (this.chartMode === "CONTACT") {
                     this.renderRegressionData();
                 } else {
+                    // this.seriesMobility.setVisible(false);
                     // TODO - extract the heat rendering part, so regression data rendering may be accelerated
                 }
                 // });
@@ -2257,7 +2258,8 @@ export class ChartAgeGroup {
                 testRate,
                 reproductionP,
                 ageGroupDiscoveryRateL,
-                ageGroupDiscoveryRateM
+                ageGroupDiscoveryRateM,
+                mobility: 0
             };
 
             // add one strain value per modification

@@ -34,7 +34,7 @@ dateAxis.renderer.labels.template.adapter.add('text', (value, target) => {
         return value;
     }
 });
-dateAxis.max = new Date('2022-05-01').getTime();
+dateAxis.max = new Date('2022-06-01').getTime();
 dateAxis.strictMinMax = true;
 dateAxis.gridIntervals.setAll([
     { timeUnit: "month", count: 3 }
@@ -200,7 +200,7 @@ const createRange = (date1: Date, date2: Date, text: string, opacity: number) =>
 
 // https://www.kleinezeitung.at/politik/innenpolitik/6056751/Lockdowns-und-Lockerungen_Chronologie-der-Pandemie
 
-let postFix = '-9';
+let postFix = '-9'; // -9
 
 /**
  * 1 - Burgenland - ältestes Bundesland - breites Intervall Q1 - trotzdem bei Wildtyp am Rand CI97 - Übersterblichkeit waährend Lockdown Ost
@@ -211,7 +211,7 @@ let postFix = '-9';
  * 6 - Steiermark - hoher Peak in Winterwelle 2020 - will aus CI95 wandern (TODO :: aktuell am schlechtesten dastehendes Bundesland?)
  * 7 - Tirol - rel hoher Peak 2020 - aktuell über Durchschnitt - Anfang 2021 deutlich unter Schnitt
  * 8 - Vorarlberg - will aus CI95 wandern (TODO :: aktuell am schlechtesten dastehendes Bundesland?)
- * 9 - Wien - jüngestes Bundesland - Übersterblichkeit währen Lockdown Ost (nur wien und burgenland)
+ * 9 - Wien - jüngestes Bundesland - Übersterblichkeit während Lockdown Ost (nur wien und burgenland)
  */
 
 createRange(new Date('2020-03-16'), new Date('2020-05-01'), 'Lockdown I', 0.15);

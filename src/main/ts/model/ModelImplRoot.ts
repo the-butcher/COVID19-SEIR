@@ -151,11 +151,20 @@ export class ModelImplRoot implements IModelSeir {
         if (!this.compartmentsImmunity[ageGroupIndex][strainId]) {
             this.compartmentsImmunity[ageGroupIndex][strainId] = [];
             this.compartmentsImmunity[ageGroupIndex][strainId].push(this.compartmentsSusceptible[ageGroupIndex]);
-            this.strainModels.forEach(strainModel => {
+            for (let strainIndex = 0; strainIndex < this.strainModels.length; strainIndex++) {
+                const strainModel = this.strainModels[strainIndex];
                 if (strainModel.getStrainId() !== strainId) {
                     this.compartmentsImmunity[ageGroupIndex][strainId].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
+                } else {
+                    // only consider strains that appeared earlier (which may not be correct, but for the sake of simplicity and performance should be ok)
+                    break;
                 }
-            });
+            }
+            // this.strainModels.forEach(strainModel => {
+            //     if (strainModel.getStrainId() !== strainId) {
+            //         this.compartmentsImmunity[ageGroupIndex][strainId].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
+            //     }
+            // });
             this.compartmentsImmunity[ageGroupIndex][strainId].push(...this.vaccinationModels[ageGroupIndex].getCompartments()); // the full compartment chain
             this.compartmentsImmunity[ageGroupIndex][strainId].push(this.vaccinationModels[ageGroupIndex].getCompartmentI()); // the immunizing compartment
         }

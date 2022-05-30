@@ -83,6 +83,8 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
 
         } else {
 
+            // console.log('cloning with', TimeUtil.formatCategoryDateFull(instant));
+
             const modificationClone = new ModificationDiscovery({
                 ...modificationA.getModificationValues(),
                 id: ObjectUtil.createId(),

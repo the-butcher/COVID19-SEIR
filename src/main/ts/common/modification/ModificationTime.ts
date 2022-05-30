@@ -2,6 +2,7 @@ import { CompartmentChainReproduction } from '../../model/compartment/Compartmen
 import { ContactCellsUtil } from '../../util/ContactCellsUtil';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { StrainUtil } from '../../util/StrainUtil';
+import { TimeUtil } from '../../util/TimeUtil';
 import { AgeGroup } from '../demographics/AgeGroup';
 import { ContactCategory } from '../demographics/ContactCategory';
 import { IVaccinationConfig } from '../demographics/IVaccinationConfig';
@@ -73,6 +74,8 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     private readonly contactCategories: ContactCategory[];
     private readonly absTotal: number;
 
+    // private readonly ageGroupFactors: number[] = [];
+
     constructor(modificationParams: IModificationValuesTime) {
         super('INSTANT', modificationParams);
         this.ageGroups = [...Demographics.getInstance().getAgeGroups()];
@@ -85,10 +88,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
     getCategories(): ContactCategory[] {
         return this.contactCategories;
     }
-
-    // logSummary(): void {
-    //     // do nothing
-    // }
 
     acceptUpdate(update: Partial<IModificationValuesTime>): void {
         super.acceptUpdate(update); // title is updateable
@@ -175,6 +174,46 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
 
+        let discoveryRatesCategory: number[] = [
+            0.65, // <= 04
+            1.00, // 05-14
+            1.00, // 15-24
+            1.00, // 25-34
+            1.00, // 35-44
+            1.00, // 45-54
+            1.00, // 55-64
+            1.00, // 65-74
+            1.00, // 75-84
+            1.00, // >= 85
+        ].map(v => v * 0.9);
+
+        let ageGroupBias = 0;
+        const ageGroupFactors: number[] = [];
+        // if (this.getInstant() > TimeUtil.parseCategoryDateFull('01.04.2022')) {
+        //     ageGroupBias = -3;
+        // }
+
+        // const ageGroupFactors: number[] = [
+        //     0.012345679012346, // <= 04
+        //     0.049382716049383, // 05-14
+        //     0.111111111111111, // 15-24
+        //     0.197530864197531, // 25-34
+        //     0.308641975308642, // 35-44
+        //     0.444444444444444, // 45-54
+        //     0.604938271604938, // 55-64
+        //     0.790123456790123, // 65-74
+        //     1.000000000000000, // 75-84
+        //     1.000000000000000, // >= 85
+        // ];
+        this.ageGroups.forEach(ageGroup => {
+            // 0 (<= 04) to 1 (>= 85)
+            const ageGroupIndex = ageGroup.getIndex();
+            const ageGroupFraction = (ageGroupIndex + ageGroupBias) / (this.ageGroups.length - 1);
+            const discoveryFactorAge = Math.max(0, Math.min(1, Math.pow(ageGroupFraction, 2)));
+            ageGroupFactors.push(discoveryFactorAge);
+        });
+        // console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), ageGroupFactors);
+
         /**
          * just collect from the settings
          */
@@ -194,29 +233,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 const contactTotalCategory = contactRatioCategory * contactGroupCategory;
 
                 // current discovery setting for category as set in modification
-                let discoveryRateCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName());
-
-                if (ageGroup.getIndex() == 0) {// <= 04
-                    discoveryRateCategory *= 0.65;
-                } else if (ageGroup.getIndex() == 1) { // 05-14
-                    discoveryRateCategory *= 1.42;
-                } else if (ageGroup.getIndex() == 2) { // 15-24
-                    discoveryRateCategory *= 1.15;
-                } else if (ageGroup.getIndex() == 3) { // 25-34
-                    discoveryRateCategory *= 1.10;
-                } else if (ageGroup.getIndex() == 4) { // 35-44
-                    discoveryRateCategory *= 1.12;
-                } else if (ageGroup.getIndex() == 5) { // 45-54
-                    discoveryRateCategory *= 1.14;
-                } else if (ageGroup.getIndex() == 6) { // 55-64
-                    discoveryRateCategory *= 1.16;
-                } else if (ageGroup.getIndex() == 7) { // 65-74
-                    discoveryRateCategory *= 1.18;
-                } else if (ageGroup.getIndex() == 8) { // 75-84
-                    discoveryRateCategory *= 1.21;
-                } else if (ageGroup.getIndex() == 9) { // >= 85
-                    discoveryRateCategory *= 1.27;
-                }
+                let discoveryRateCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName()) * discoveryRatesCategory[ageGroup.getIndex()];
 
                 // current share of discovered in currentTotal
                 contactTotal += contactTotalCategory;
@@ -247,39 +264,40 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
             const correction = this.calculateDiscoveryRateOverall() / _discoveryRateOverall;
             this.ageGroups.forEach(ageGroup => {
+
                 const ageGroupIndex = ageGroup.getIndex();
+
                 let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact * correction;
-                let discovery = Math.min(1.0, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
+                let discovery = Math.min(1, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
                 this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
                     contact,
                     discovery
                 };
+
             });
 
         }
 
         normalize();
 
-        // this.ageGroups.forEach(ageGroup => {
-
-        //     const ageGroupIndex = ageGroup.getIndex();
-        //     let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact;
-        //     let discovery = Math.min(1.0, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery);
-
-        //     // discoveryRateCategory = discoveryRateCategory + (1 - discoveryRateCategory) * 0.5 * Math.pow(ageGroup.getIndex() / 9, 8);
-        //     // discoveryRateCategory *= (0.90 + Math.pow(ageGroup.getIndex() / 9, 8));
 
 
-        //     discovery = discovery + (1 - discovery) * 0.33 * Math.pow(ageGroup.getIndex() / 9, 4);
+        this.ageGroups.forEach(ageGroup => {
 
-        //     this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
-        //         contact,
-        //         discovery
-        //     };
+            const ageGroupIndex = ageGroup.getIndex();
 
-        // });
+            // 0 (<= 04) to 1 (>= 85)
+            let discovery = this.discoveryRatesByAgeGroup[ageGroupIndex].discovery;
+            discovery += (1 - discovery) * ageGroupFactors[ageGroupIndex];
 
-        // normalize();
+            this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
+                ...this.discoveryRatesByAgeGroup[ageGroup.getIndex()],
+                discovery
+            };
+
+        });
+
+        normalize();
 
         /**
          * calculate quarantine multipliers, depending on contact
@@ -308,7 +326,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
      * TODO DISCOVERY :: with varying strains maybe "overall" is a term that can not be calculated any more
      * but how would a smoothed discovery curve be calculated without first knowing discovery rates throughout time?
      *
-     * assumme:
+     * assume:
      *
      * 80% delta   --> high DiscoveryProfile as of DiscoveryValueSet (which describes a discovery distribution through age groups)
      * 20% omicron --> low  DiscoveryProfile as of DiscoveryValueSet (which describes a discovery distribution through age groups)

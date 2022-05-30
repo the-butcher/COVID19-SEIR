@@ -28,7 +28,7 @@ export class ModificationAdaptor5 {
             });
         });
 
-        const errorRatio = 0.020;
+        const errorRatio = 0.05;
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
@@ -40,10 +40,9 @@ export class ModificationAdaptor5 {
             }
         });
 
-        const prevMultO = modificationSet.modA.getCategoryValue('other');
-        const prevMultN = modificationSet.modA.getCategoryValue('nursing');
-        const prevMultS = modificationSet.modA.getCategoryValue('school');
-
+        // const prevMultO = modificationSet.modA.getCategoryValue('other');
+        // const prevMultN = modificationSet.modA.getCategoryValue('nursing');
+        // const prevMultS = modificationSet.modA.getCategoryValue('school');
         // if (!errorsG['TOTAL']) {
         //     Math.random();
         // }
@@ -62,31 +61,35 @@ export class ModificationAdaptor5 {
 
         // currMultO *= currCorrT1;
         // const currMultO = Math.max(0.00, Math.min(1, (prevMultO - errorsG['TOTAL'] * errorRatio * 0.30) / currCorrT1));
-        let currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.28 - errorsG['75-84'] * errorRatio * 0.12));
+        // let currMultN = Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.28 - errorsG['75-84'] * errorRatio * 0.12));
+        // let currMultN = 0.8; // Math.max(0.00, Math.min(1, prevMultN - errorsG['>= 85'] * errorRatio * 0.28 - errorsG['75-84'] * errorRatio * 0.12));
         // const currMultS = Math.max(0.00, Math.min(1, prevMultS - errorsG['05-14'] * errorRatio * 0.40));
 
-        const correctionN = corrections['>= 85'] * 0.6 + corrections['75-84'] * 0.4;
+        // const correctionN = corrections['>= 85'] * 0.6 + corrections['75-84'] * 0.4;
 
         // console.log(TimeUtil.formatCategoryDateFull(modificationSet.modA.getInstant()), currMultN, correctionN, currMultN - correctionN, (currMultN - correctionN) * errorRatio)
-        currMultN -= (currMultN - correctionN) * errorRatio;
+        // currMultN -= (currMultN - correctionN) * errorRatio;
 
-        if (iterationIndex % 10 < 3) {
+        // if (iterationIndex % 10 < 3) {
 
-            modificationSet.modA.acceptUpdate({
-                multipliers: {
-                    // 'other': currMultO,
-                    'nursing': currMultN,
-                    // 'school': currMultS
-                }
-            });
+        //     modificationSet.modA.acceptUpdate({
+        //         multipliers: {
+        //             // 'other': currMultO,
+        //             'nursing': currMultN,
+        //             // 'school': currMultS
+        //         }
+        //     });
 
-        } else {
+        // } else {
 
-            modificationSet.modA.acceptUpdate({
-                corrections: { ...corrections }
-            });
+        modificationSet.modA.acceptUpdate({
+            multipliers: {
+                'nursing': 0.8
+            },
+            corrections: { ...corrections }
+        });
 
-        }
+        // }
 
         modelStateIntegrator.rollback();
 
