@@ -128,7 +128,7 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                     },
                     instantA: minInstant,
                     instantB: maxInstant,
-                    polyShares: [0.00, 0.50],
+                    polyShares: [0.25, 0.75],
                     modifications: modificationsTime
                 });
 

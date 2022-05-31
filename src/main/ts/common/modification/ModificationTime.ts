@@ -175,9 +175,9 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
 
         let discoveryRatesCategory: number[] = [
-            0.65, // <= 04
+            0.45, // <= 04
             1.00, // 05-14
-            1.00, // 15-24
+            0.90, // 15-24
             1.00, // 25-34
             1.00, // 35-44
             1.00, // 45-54
@@ -189,27 +189,15 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
         let ageGroupBias = 0;
         const ageGroupFactors: number[] = [];
-        // if (this.getInstant() > TimeUtil.parseCategoryDateFull('01.04.2022')) {
-        //     ageGroupBias = -3;
-        // }
 
-        // const ageGroupFactors: number[] = [
-        //     0.012345679012346, // <= 04
-        //     0.049382716049383, // 05-14
-        //     0.111111111111111, // 15-24
-        //     0.197530864197531, // 25-34
-        //     0.308641975308642, // 35-44
-        //     0.444444444444444, // 45-54
-        //     0.604938271604938, // 55-64
-        //     0.790123456790123, // 65-74
-        //     1.000000000000000, // 75-84
-        //     1.000000000000000, // >= 85
-        // ];
+        // \cos\left(\frac{\left(x\cdot\pi\right)^{3}}{\pi^{2}}\right)\cdot-0.6+0.4
+
         this.ageGroups.forEach(ageGroup => {
             // 0 (<= 04) to 1 (>= 85)
             const ageGroupIndex = ageGroup.getIndex();
             const ageGroupFraction = (ageGroupIndex + ageGroupBias) / (this.ageGroups.length - 1);
-            const discoveryFactorAge = Math.max(0, Math.min(1, Math.pow(ageGroupFraction, 2)));
+            const xp9sqp = Math.cos(Math.pow(ageGroupFraction * Math.PI, 3) / Math.pow(Math.PI, 2)) * -0.70 + 0.30;
+            const discoveryFactorAge = Math.max(0, Math.min(1, xp9sqp));
             ageGroupFactors.push(discoveryFactorAge);
         });
         // console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), ageGroupFactors);
