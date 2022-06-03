@@ -5,6 +5,7 @@ import { IBaseDataItem } from './basedata/BaseDataItem';
 import { ECompartmentType } from './compartment/ECompartmentType';
 import { ICompartment } from './compartment/ICompartment';
 import { IModelSeir } from './IModelSeir';
+import { ModelConstants } from './ModelConstants';
 import { ModelImplInfectious } from './ModelImplInfectious';
 import { ModelImplRecovery } from './ModelImplRecovery';
 import { ModelImplRoot } from './ModelImplRoot';
@@ -28,11 +29,12 @@ export class ModelImplStrain implements IModelSeir {
     private readonly infectiousModels: ModelImplInfectious[];
     private readonly recoveryModels: ModelImplRecovery[];
 
-    private readonly strainId: string;
+    private readonly strainValues: IModificationValuesStrain;
     private readonly absTotal: number;
     private readonly nrmValue: number;
     private readonly transmissionRisk: number;
     private readonly immuneEscape: number;
+    private readonly strainEscape: { [K in string]: number };
 
     private readonly nrmDeltas: number[];
     private nrmExposure: number[][];
@@ -44,10 +46,11 @@ export class ModelImplStrain implements IModelSeir {
         this.recoveryModels = [];
         this.transmissionRisk = strainValues.transmissionRisk;
         this.immuneEscape = strainValues.immuneEscape;
+        this.strainEscape = { ...strainValues.strainEscape };
 
         this.nrmDeltas = [];
 
-        this.strainId = strainValues.id;
+        this.strainValues = strainValues;
         this.absTotal = demographics.getAbsTotal();
 
         let nrmValue1 = 0;
@@ -85,7 +88,7 @@ export class ModelImplStrain implements IModelSeir {
     }
 
     getStrainId(): string {
-        return this.strainId;
+        return this.strainValues.id;
     }
 
     getInfectiousModel(ageGroupIndex: number): ModelImplInfectious {
@@ -148,6 +151,7 @@ export class ModelImplStrain implements IModelSeir {
         let nrm_ISums: number[] = [];
 
         let susceptibility: number;
+        let immuneEscape: number;
 
         this.nrmExposure = [];
         this.infectiousModels.forEach(infectiousModelContact => {
@@ -171,10 +175,13 @@ export class ModelImplStrain implements IModelSeir {
                 const baseContactRate = modificationTime.getCellValue(infectiousModelContact.getAgeGroupIndex(), infectiousModelParticipant.getAgeGroupIndex());
 
                 nrmESum = 0;
-                this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex(), this.strainId).forEach(compartmentS => {
+                this.getRootModel().getCompartmentsSusceptible(infectiousModelParticipant.getAgeGroupIndex(), this.strainValues).forEach(compartmentS => {
+
+                    immuneEscape = compartmentS.getStrainId() === ModelConstants.STRAIN_ID___________ALL ? this.immuneEscape : this.strainEscape[compartmentS.getStrainId()];
+                    // console.log('immuneEscape', immuneEscape, this.strainEscape, compartmentS.getStrainId());
 
                     // if there is some immunity, can be treated as immune (escape only), if there is no immunity (immunizing, susceptible), treat as fully susceptible
-                    susceptibility = compartmentS.getImmunity() > 0 ? this.immuneEscape : 1;
+                    susceptibility = compartmentS.getImmunity() > 0 ? immuneEscape : 1;
 
                     nrmS = state.getNrmValue(compartmentS) * this.absTotal / infectiousModelParticipant.getAgeGroupTotal();
                     nrmE = baseContactRate * nrmI * nrmS * this.transmissionRisk * susceptibility;

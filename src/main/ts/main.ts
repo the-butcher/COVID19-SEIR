@@ -5,7 +5,6 @@ import { StorageUtil } from './client/storage/StorageUtil';
 import { Demographics } from './common/demographics/Demographics';
 import { IRegressionConfig } from './common/modification/IModificationValuesRegression';
 import { IModificationValuesSettings } from './common/modification/IModificationValuesSettings';
-import { ModificationDiscovery } from './common/modification/ModificationDiscovery';
 import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { ModificationResolverDiscovery } from './common/modification/ModificationResolverDiscovery';
 import { ModificationResolverRegression } from './common/modification/ModificationResolverRegression';
@@ -13,9 +12,8 @@ import { Modifications } from './common/modification/Modifications';
 import { ModificationSettings } from './common/modification/ModificationSettings';
 import { BaseData } from './model/basedata/BaseData';
 import { ModelInstants } from './model/ModelInstants';
-import { ILoessInput, ValueRegressionBase } from './model/regression/ValueRegressionBase';
+import { ValueRegressionBase } from './model/regression/ValueRegressionBase';
 import { Logger } from './util/Logger';
-import { ObjectUtil } from './util/ObjectUtil';
 import { TimeUtil } from './util/TimeUtil';
 
 StorageUtil.getInstance().loadConfig().then(modelConfig => {

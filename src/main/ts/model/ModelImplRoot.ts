@@ -1,4 +1,5 @@
 import { Demographics } from '../common/demographics/Demographics';
+import { IModificationValuesStrain } from '../common/modification/IModificationValuesStrain';
 import { ModificationSettings } from '../common/modification/ModificationSettings';
 import { ModificationStrain } from '../common/modification/ModificationStrain';
 import { ModificationTime } from '../common/modification/ModificationTime';
@@ -144,31 +145,43 @@ export class ModelImplRoot implements IModelSeir {
     }
 
 
-    getCompartmentsSusceptible(ageGroupIndex: number, strainId: string): CompartmentImmunity[] {
+    getCompartmentsSusceptible(ageGroupIndex: number, strainValues: IModificationValuesStrain): CompartmentImmunity[] {
+
+        /**
+         * container for this age groups
+         */
         if (!this.compartmentsImmunity[ageGroupIndex]) {
             this.compartmentsImmunity[ageGroupIndex] = [];
         }
-        if (!this.compartmentsImmunity[ageGroupIndex][strainId]) {
-            this.compartmentsImmunity[ageGroupIndex][strainId] = [];
-            this.compartmentsImmunity[ageGroupIndex][strainId].push(this.compartmentsSusceptible[ageGroupIndex]);
+
+        /**
+         * specific strain and age group
+         */
+        if (!this.compartmentsImmunity[ageGroupIndex][strainValues.id]) {
+
+            this.compartmentsImmunity[ageGroupIndex][strainValues.id] = [];
+            this.compartmentsImmunity[ageGroupIndex][strainValues.id].push(this.compartmentsSusceptible[ageGroupIndex]);
             for (let strainIndex = 0; strainIndex < this.strainModels.length; strainIndex++) {
+
                 const strainModel = this.strainModels[strainIndex];
-                if (strainModel.getStrainId() !== strainId) {
-                    this.compartmentsImmunity[ageGroupIndex][strainId].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
+                const strainEscape = strainValues.strainEscape[strainModel.getStrainId()];
+                if (strainEscape > 0) {
+                    this.compartmentsImmunity[ageGroupIndex][strainValues.id].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
                 } else {
+                    //console.log('skipping', strainValues.name, strainModel.getStrainId());
+                    // break on
                     // only consider strains that appeared earlier (which may not be correct, but for the sake of simplicity and performance should be ok)
-                    break;
+                    // break;
                 }
+
             }
-            // this.strainModels.forEach(strainModel => {
-            //     if (strainModel.getStrainId() !== strainId) {
-            //         this.compartmentsImmunity[ageGroupIndex][strainId].push(...strainModel.getRecoveryModel(ageGroupIndex).getCompartments());
-            //     }
-            // });
-            this.compartmentsImmunity[ageGroupIndex][strainId].push(...this.vaccinationModels[ageGroupIndex].getCompartments()); // the full compartment chain
-            this.compartmentsImmunity[ageGroupIndex][strainId].push(this.vaccinationModels[ageGroupIndex].getCompartmentI()); // the immunizing compartment
+            this.compartmentsImmunity[ageGroupIndex][strainValues.id].push(...this.vaccinationModels[ageGroupIndex].getCompartments()); // the full compartment chain
+            this.compartmentsImmunity[ageGroupIndex][strainValues.id].push(this.vaccinationModels[ageGroupIndex].getCompartmentI()); // the immunizing compartment
+
         }
-        return this.compartmentsImmunity[ageGroupIndex][strainId];
+
+        return this.compartmentsImmunity[ageGroupIndex][strainValues.id];
+
     }
 
     getNrmValueGroup(ageGroupIndex: number): number {

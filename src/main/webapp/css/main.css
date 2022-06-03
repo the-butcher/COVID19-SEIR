@@ -13,6 +13,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: "Courier Prime Sans";
   src: url("Courier Prime Sans Bold.ttf") format("truetype");
@@ -28,12 +29,18 @@ body {
   background: #101010;
   font-family: var(--text-font);
   color: var(--color-text);
+  outline: none;
+}
+
+div, input {
+  outline: none;
 }
 
 .size-full-xy {
   width: 100%;
   height: 100%;
 }
+
 .sliderspace {
   min-height: 10px;
   max-height: 10px;
@@ -47,9 +54,11 @@ body {
 .modifiable-text {
   cursor: pointer;
 }
+
 .modifiable-text:hover {
   text-decoration: underline;
 }
+
 input {
   background-color: rgba(120, 120, 120, 0.6);
   font-family: var(--text-font);
@@ -78,9 +87,11 @@ input {
   cursor: pointer;
   filter: drop-shadow(2px 2px 3px var(--color-dropshadow));
 }
+
 .model-mode:hover {
   filter: drop-shadow(4px 4px 3px var(--color-dropshadow));
 }
+
 .model-mode:active {
   filter: drop-shadow(1px 1px 3px var(--color-dropshadow));
 }
@@ -91,6 +102,7 @@ input {
   cursor: pointer;
   filter: unset;
 }
+
 /* .chart-mode:hover {
   filter: drop-shadow(4px 4px 3px var(--color-dropshadow));
 }
@@ -105,6 +117,7 @@ input {
   cursor: pointer;
   color: #666666;
 }
+
 .content-action-container:hover {
   width: 28px;
   height: 28px;
@@ -112,6 +125,7 @@ input {
   cursor: pointer;
   color: #cccccc;
 }
+
 .content-action-container:active {
   width: 28px;
   height: 28px;
@@ -235,7 +249,7 @@ input {
 }
 
 .thumb-edit-label:hover {
-  cursor:pointer;
+  cursor: pointer;
   text-decoration: underline;
 }
 
@@ -268,4 +282,3 @@ input {
 ::-webkit-scrollbar-thumb:active {
   background: #8a8a8a
 }
-

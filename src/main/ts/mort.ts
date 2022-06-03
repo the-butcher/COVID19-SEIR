@@ -34,7 +34,7 @@ dateAxis.renderer.labels.template.adapter.add('text', (value, target) => {
         return value;
     }
 });
-dateAxis.max = new Date('2022-06-01').getTime();
+dateAxis.max = new Date('2022-10-01').getTime();
 dateAxis.strictMinMax = true;
 dateAxis.gridIntervals.setAll([
     { timeUnit: "month", count: 3 }
@@ -47,12 +47,12 @@ valueAxis.max = 50;
 valueAxis.tooltip.disabled = true;
 valueAxis.title.text = "Sterblichkeit / Woche / 100.000";
 
-let valueAxisIncidence = chart.yAxes.push(new am4charts.ValueAxis());
-valueAxisIncidence.min = 0;
-valueAxisIncidence.max = 9000;
-valueAxisIncidence.tooltip.disabled = true;
-valueAxisIncidence.renderer.grid.template.disabled = true;
-valueAxisIncidence.renderer.labels.template.disabled = true;
+// let valueAxisIncidence = chart.yAxes.push(new am4charts.ValueAxis());
+// valueAxisIncidence.min = 0;
+// valueAxisIncidence.max = 9000;
+// valueAxisIncidence.tooltip.disabled = true;
+// valueAxisIncidence.renderer.grid.template.disabled = true;
+// valueAxisIncidence.renderer.labels.template.disabled = true;
 // valueAxisIncidence.title.text = "Sterblichkeit / Woche / 100.000";
 
 const ciColor = '#aaaaaa';
@@ -89,17 +89,17 @@ seriesCi68Lower.stroke = am4core.color(ciColor);
 seriesCi68Lower.strokeOpacity = 0.0;
 seriesCi68Lower.hiddenInLegend = true;
 
-let seriesIncidence = chart.series.push(new am4charts.LineSeries());
-seriesIncidence.yAxis = valueAxisIncidence;
-seriesIncidence.name = '7-Tages-Inzidenz';
-seriesIncidence.dataFields.dateX = "date";
-seriesIncidence.dataFields.valueY = "incidence";
-seriesIncidence.stroke = am4core.color('#000000');
-seriesIncidence.fill = am4core.color('#000000');
-seriesIncidence.fillOpacity = 0.1;
-seriesIncidence.strokeOpacity = 0.2;
-seriesIncidence.strokeWidth = 0;
-seriesIncidence.strokeLinecap = 'round';
+// let seriesIncidence = chart.series.push(new am4charts.LineSeries());
+// seriesIncidence.yAxis = valueAxisIncidence;
+// seriesIncidence.name = '7-Tages-Inzidenz';
+// seriesIncidence.dataFields.dateX = "date";
+// seriesIncidence.dataFields.valueY = "incidence";
+// seriesIncidence.stroke = am4core.color('#000000');
+// seriesIncidence.fill = am4core.color('#000000');
+// seriesIncidence.fillOpacity = 0.1;
+// seriesIncidence.strokeOpacity = 0.2;
+// seriesIncidence.strokeWidth = 0;
+// seriesIncidence.strokeLinecap = 'round';
 
 let seriesVal = chart.series.push(new am4charts.LineSeries());
 seriesVal.name = 'Sterblichkeit';
@@ -200,7 +200,7 @@ const createRange = (date1: Date, date2: Date, text: string, opacity: number) =>
 
 // https://www.kleinezeitung.at/politik/innenpolitik/6056751/Lockdowns-und-Lockerungen_Chronologie-der-Pandemie
 
-let postFix = '-9'; // -9
+let postFix = ''; // -9
 
 /**
  * 1 - Burgenland - ältestes Bundesland - breites Intervall Q1 - trotzdem bei Wildtyp am Rand CI97 - Übersterblichkeit waährend Lockdown Ost

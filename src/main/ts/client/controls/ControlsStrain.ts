@@ -1,5 +1,6 @@
 import { thisExpression } from '@babel/types';
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
+import { ModificationResolverStrain } from '../../common/modification/ModificationResolverStrain';
 import { ModificationStrain } from '../../common/modification/ModificationStrain';
 import { CompartmentChainRecovery } from '../../model/compartment/CompartmentChainRecovery';
 import { CompartmentChainReproduction } from '../../model/compartment/CompartmentChainReproduction';
@@ -34,17 +35,19 @@ export class ControlsStrain {
     }
     private static instance: ControlsStrain;
 
-    private readonly chartTesting: ChartDiscoveryRate;
-    private sliderPow: SliderSetting;
-    private sliderMax: SliderSetting;
-    private sliderXmb: SliderSetting;
-    private sliderXmr: SliderSetting;
+    // private readonly chartTesting: ChartDiscoveryRate;
+    // private sliderPow: SliderSetting;
+    // private sliderMax: SliderSetting;
+    // private sliderXmb: SliderSetting;
+    // private sliderXmr: SliderSetting;
 
     private readonly sliderReproduction: Slider;
     private readonly sliderSerialInterval: Slider;
     private readonly sliderIncidence: Slider;
     private readonly sliderImmuneEscape: Slider;
     private readonly sliderTimeToWane: Slider;
+
+    private readonly slidersStrainEscape: { [K in string]: Slider };
 
     private readonly weibullCanvasReproductionContainer = 'weibullCanvasReproduction';
     private readonly weibullCanvasRecoveryContainer = 'weibullCanvasRecovery';
@@ -54,6 +57,7 @@ export class ControlsStrain {
     private intervalScale: number;
     private incidence: number;
     private immuneEscape: number;
+    private strainEscape: { [K in string]: number };
 
     private timeToWane: number;
 
@@ -61,12 +65,11 @@ export class ControlsStrain {
 
     constructor() {
 
-        this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDivStrain', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
-
-        this.sliderPow = new SliderSetting("exponent", [2, 4, 6, 8, 10], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
-        this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
-        this.sliderXmb = new SliderSetting("discovery slope base", [1.0, 1.5, 2.00, 2.5, 3.0], 0.05, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
-        this.sliderXmr = new SliderSetting("discovery slope rate", [0, 10, 20, 30, 40], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
+        // this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDivStrain', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
+        // this.sliderPow = new SliderSetting("exponent", [2, 4, 6, 8, 10], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
+        // this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
+        // this.sliderXmb = new SliderSetting("discovery slope base", [1.0, 1.5, 2.00, 2.5, 3.0], 0.05, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
+        // this.sliderXmr = new SliderSetting("discovery slope rate", [0, 10, 20, 30, 40], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
 
         this.sliderReproduction = new Slider({
             container: 'sliderReproductionDiv',
@@ -75,7 +78,7 @@ export class ControlsStrain {
             step: 0.01,
             values: [0.0],
             ticks: [...ModelConstants.RANGE___SERIAL_INTERVAL],
-            label: 'R<sub>B</sub>/R<sub>0</sub>',
+            label: 'R<sub>0</sub>',
             thumbCreateFunction: (index: number) => {
                 return new IconSlider();
             },
@@ -189,8 +192,9 @@ export class ControlsStrain {
             }
         });
 
+        const container = document.createElement('div');
         this.sliderImmuneEscape = new Slider({
-            container: 'sliderImmuneEscapeDiv',
+            container,
             min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
             max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
             step: 0.01,
@@ -220,6 +224,47 @@ export class ControlsStrain {
                     return parseFloat(value.replace(',', '.')) / 100;
                 }
             }
+        });
+        document.getElementById('sliderImmuneEscapeDiv').appendChild(container);
+
+        this.slidersStrainEscape = {};
+        new ModificationResolverStrain().getModifications().forEach(strain => {
+            const container = document.createElement('div');
+            const slider = new Slider({
+                container,
+                min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
+                max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
+                step: 0.01,
+                values: [0.0],
+                ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
+                label: `${strain.getName()} escape`,
+                thumbCreateFunction: (index: number) => {
+                    return new IconSlider();
+                },
+                labelFormatFunction: (index, value, type) => {
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
+                },
+                handleValueChange: (index, value, type) => {
+                    this.strainEscape[strain.getId()] = value;
+                    if (type === 'stop' || type === 'input') {
+                        this.handleChange();
+                    }
+                },
+                handleThumbPicked: (index) => {
+                    // nothing
+                },
+                inputFunctions: {
+                    inputFormatFunction: (index, value) => {
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    },
+                    inputHandleFunction: (index, value) => {
+                        return parseFloat(value.replace(',', '.')) / 100;
+                    }
+                }
+            });
+            document.getElementById('sliderImmuneEscapeDiv').appendChild(container);
+            // slider.getContainer().style.height = '60px';
+            this.slidersStrainEscape[strain.getId()] = slider;
         });
 
         this.sliderTimeToWane = new Slider({
@@ -261,6 +306,11 @@ export class ControlsStrain {
         });
         this.sliderTimeToWane.setLabelPosition(13);
 
+        this.strainEscape = {};
+        new ModificationResolverStrain().getModifications().forEach(strain => {
+            this.strainEscape[strain.getId()] = 0;
+        });
+
         // initial redraw of internal canvas
         this.redrawCanvasReproduction();
         this.redrawCanvasRecovery();
@@ -278,10 +328,10 @@ export class ControlsStrain {
             this.sliderIncidence.setRange(ModelConstants.RANGE_____INCIDENCE__10);
         }
 
-        this.sliderPow.setValue(this.modification.getPow() || 4);
-        this.sliderMax.setValue(this.modification.getMax() || 0.7);
-        this.sliderXmb.setValue(this.modification.getXmb() || 2.2);
-        this.sliderXmr.setValue(this.modification.getXmr() === undefined ? 10 : this.modification.getXmr());
+        // this.sliderPow.setValue(this.modification.getPow() || 4);
+        // this.sliderMax.setValue(this.modification.getMax() || 0.7);
+        // this.sliderXmb.setValue(this.modification.getXmb() || 2.2);
+        // this.sliderXmr.setValue(this.modification.getXmr() === undefined ? 10 : this.modification.getXmr());
 
         const strain = modification.getModificationValues();
 
@@ -293,13 +343,18 @@ export class ControlsStrain {
         this.incidence = strain.dstIncidence;
 
         this.immuneEscape = strain.immuneEscape || 0.0;
+
+        Object.keys(this.slidersStrainEscape).forEach(key => {
+            this.strainEscape[key] = modification.getStrainEscape(key) || 0;
+        });
+
         this.timeToWane = strain.timeToWane || 3; // months
 
         const log = Math.log10(this.incidence);
         const minR0 = Math.pow(10, Math.floor(log - 1));
         const maxR0 = Math.pow(10, Math.floor(log + 1));
-        const stepR0 = minR0; // Math.pow(10, Math.round(log));
-        console.log(this.incidence, Math.round(Math.log10(this.incidence)), minR0, maxR0, stepR0);
+        // const stepR0 = minR0; // Math.pow(10, Math.round(log));
+        // console.log(this.incidence, Math.round(Math.log10(this.incidence)), minR0, maxR0, stepR0);
 
         if (log < 0) {
             this.sliderIncidence.setFractionDigits(2 - log);
@@ -315,31 +370,38 @@ export class ControlsStrain {
         this.sliderIncidence.setValueAndRedraw(0, this.incidence, true);
         this.sliderImmuneEscape.setValueAndRedraw(0, this.immuneEscape, true);
         this.sliderTimeToWane.setValueAndRedraw(0, this.timeToWane, true);
+        Object.keys(this.slidersStrainEscape).forEach(key => {
+            this.slidersStrainEscape[key].setValueAndRedraw(0, this.strainEscape[key], true);
+        });
 
         requestAnimationFrame(() => {
             this.sliderIncidence.handleResize();
             this.sliderReproduction.handleResize();
             this.sliderImmuneEscape.handleResize();
+            Object.keys(this.slidersStrainEscape).forEach(key => {
+                this.slidersStrainEscape[key].handleResize();
+            });
             this.sliderTimeToWane.handleResize();
-            this.sliderPow.handleResize();
-            this.sliderMax.handleResize();
-            this.sliderXmb.handleResize();
-            this.sliderXmr.handleResize();
+            // this.sliderPow.handleResize();
+            // this.sliderMax.handleResize();
+            // this.sliderXmb.handleResize();
+            // this.sliderXmr.handleResize();
             this.sliderIncidence.setDisabled(modification.isPrimary());
         });
 
         this.redrawCanvasReproduction();
         this.redrawCanvasRecovery();
-        this.updateChart();
+        // this.updateChart();
 
     }
 
     handleChange(): void {
 
-        const pow = this.sliderPow.getValue();
-        const max = this.sliderMax.getValue();
-        const xmb = this.sliderXmb.getValue();
-        const xmr = this.sliderXmr.getValue();
+        console.log('this.strainEscape', this.strainEscape);
+        // const pow = this.sliderPow.getValue();
+        // const max = this.sliderMax.getValue();
+        // const xmb = this.sliderXmb.getValue();
+        // const xmr = this.sliderXmr.getValue();
 
         this.modification.acceptUpdate({
             r0: this.r0,
@@ -347,11 +409,12 @@ export class ControlsStrain {
             intervalScale: this.intervalScale,
             dstIncidence: this.incidence,
             immuneEscape: this.immuneEscape,
+            strainEscape: { ...this.strainEscape },
             timeToWane: this.timeToWane,
-            pow,
-            max,
-            xmb,
-            xmr,
+            // pow,
+            // max,
+            // xmb,
+            // xmr,
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());
@@ -441,6 +504,7 @@ export class ControlsStrain {
             serialInterval: this.serialInterval,
             intervalScale: this.intervalScale,
             immuneEscape: this.immuneEscape,
+            strainEscape: {},
             timeToWane: this.timeToWane,
             dstIncidence: -1,
             deletable: false,
@@ -474,12 +538,12 @@ export class ControlsStrain {
 
     }
 
-    updateChart(): void {
+    // updateChart(): void {
 
-        requestAnimationFrame(() => {
-            this.chartTesting.acceptModification(this.modification.getModificationValues());
-        });
+    //     requestAnimationFrame(() => {
+    //         this.chartTesting.acceptModification(this.modification.getModificationValues());
+    //     });
 
-    }
+    // }
 
 }

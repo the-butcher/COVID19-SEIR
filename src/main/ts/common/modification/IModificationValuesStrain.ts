@@ -33,9 +33,14 @@ export interface IModificationValuesStrain extends IModificationValues, IDiscove
     /**
      * get the ratio of immune escape for this strain
      * 0 would mean, no recovered or vaccinated individual would be infected until immunity has vanished
-     * @deprecated
+     * @deprecated - needs to be vaccEscape
      */
     immuneEscape: number;
+
+    /**
+     * more specific immune escapes (by other strain's id)
+     */
+    strainEscape: { [K in string]: number };
 
     /**
      * time in months for total waning of immunity

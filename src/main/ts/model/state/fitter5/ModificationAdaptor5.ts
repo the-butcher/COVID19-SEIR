@@ -28,7 +28,7 @@ export class ModificationAdaptor5 {
             });
         });
 
-        const errorRatio = 0.05;
+        const errorRatio = 0.01;
 
         const errorsG: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {

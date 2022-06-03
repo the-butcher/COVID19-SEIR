@@ -58,7 +58,7 @@ export class ModelImplVaccination implements IModelSeir {
             const duration = compartmentParam.instantB - compartmentParam.instantA;
 
             const absCompartment = absValueVaccinated / compartmentParams.length;
-            this.compartmentsVaccination.push(new CompartmentImmunity(ECompartmentType.R___VACCINATED, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, ObjectUtil.createId(), compartmentParam.immunity, new RationalDurationFixed(duration), `_VAC_${ObjectUtil.padZero(chainIndex)}`));
+            this.compartmentsVaccination.push(new CompartmentImmunity(ECompartmentType.R___VACCINATED, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, ModelConstants.STRAIN_ID___________ALL, compartmentParam.immunity, new RationalDurationFixed(duration), `_VAC_${ObjectUtil.padZero(chainIndex)}`));
 
             absCompartmentRecoverySum += absCompartment;
 
