@@ -37,26 +37,31 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
             const modificationValuesA = modificationA.getModificationValues();
             const modificationValuesB = modificationB.getModificationValues();
 
-            const mergedKeys: Set<string> = new Set();
-            Object.keys(modificationValuesA.multipliers).forEach(key => {
-                mergedKeys.add(key);
-            });
-            Object.keys(modificationValuesB.multipliers).forEach(key => {
-                mergedKeys.add(key);
-            });
+            // const mergedKeys: Set<string> = new Set();
+            // Object.keys(modificationValuesA.corrections).forEach(key => {
+            //     mergedKeys.add(key);
+            // });
+            // Object.keys(modificationValuesB.corrections).forEach(key => {
+            //     mergedKeys.add(key);
+            // });
 
             const fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
-            const multipliers: { [K: string]: number } = {};
-            mergedKeys.forEach(key => {
-                const multiplierA = modificationValuesA.multipliers[key];
-                const multiplierB = modificationValuesB.multipliers[key];
-                const multiplier = multiplierA + (multiplierB - multiplierA) * fraction;
-                multipliers[key] = multiplier;
+
+            const corrections: { [K: string]: number } = {};
+            Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+                const correctionA = modificationA.getCorrectionValue(ageGroup.getIndex());
+                const correctionB = modificationB.getCorrectionValue(ageGroup.getIndex());
+                const correction = correctionA + (correctionB - correctionA) * fraction;
+                corrections[ageGroup.getName()] = correction;
             });
 
             const testRateA = modificationValuesA.testRate;
             const testRateB = modificationValuesB.testRate;
             const testRate = testRateA + (testRateB - testRateA) * fraction;
+
+            const factorWeightA = modificationValuesA.factorWeight;
+            const factorWeightB = modificationValuesB.factorWeight;
+            const factorWeight = factorWeightA + (factorWeightB - factorWeightA) * fraction;
 
             let positivityRate: number;
             if (modificationValuesA.positivityRate && modificationValuesB.positivityRate) {
@@ -75,7 +80,8 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                 deletable: true,
                 draggable: true,
                 blendable: modificationB.isBlendable(),
-                multipliers
+                factorWeight,
+                corrections
             });
             // console.log('interpolatedModification', interpolatedModification);
 

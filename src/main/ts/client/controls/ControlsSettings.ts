@@ -31,9 +31,9 @@ export class ControlsSettings {
     private readonly chartTesting: ChartDiscoveryRate;
 
     private sliderPow: SliderSetting;
-    private sliderMax: SliderSetting;
+    private sliderMax: Slider;
     private sliderXmb: SliderSetting;
-    private sliderXmr: SliderSetting;
+    // private sliderXmr: SliderSetting;
 
     private sliderUndetected: SliderSetting;
     private sliderQuarantine: SliderSetting;
@@ -51,9 +51,52 @@ export class ControlsSettings {
         this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
 
         this.sliderPow = new SliderSetting("exponent", [0, 2, 4, 6, 8, 10], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        this.sliderXmb = new SliderSetting("discovery slope base", [0, 10, 20, 30, 40, 50], 0.05, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        this.sliderXmr = new SliderSetting("discovery slope rate", [0, 2, 4, 6, 8, 10], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+
+        const maxRange: number[] = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+
+        const container = document.createElement('div');
+        container.classList.add('slider-modification');
+        document.getElementById('slidersSettingsDiv').appendChild(container);
+        this.sliderMax = new Slider({
+            container,
+            min: Math.min(...maxRange),
+            max: Math.max(...maxRange),
+            step: 0.01,
+            values: [0.0, 1.0],
+            ticks: [...maxRange],
+            label: 'discovery max',
+            thumbCreateFunction: (index: number) => {
+                return new IconSlider();
+            },
+            labelFormatFunction: (index, value, type) => {
+                if (type === 'tick') {
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                } else {
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
+                }
+            },
+            handleValueChange: (index, value, type) => {
+                if (type === 'stop' || type === 'input') {
+                    this.handleChange();
+                }
+            },
+            handleThumbPicked: (index) => {
+                // nothing
+            },
+            inputFunctions: {
+                inputFormatFunction: (index, value) => {
+                    return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                },
+                inputHandleFunction: (index, value) => {
+                    return parseFloat(value.replace(',', '.'));
+                }
+            }
+        });
+
+
+        // new SliderSetting("discovery max", [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderXmb = new SliderSetting("discovery slope base", [0.0, 0.5, 1.0, 1.5, 2.0], 0.05, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        // this.sliderXmr = new SliderSetting("discovery slope rate", [0, 2, 4, 6, 8, 10], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
@@ -142,9 +185,10 @@ export class ControlsSettings {
     handleChange(): void {
 
         const pow = this.sliderPow.getValue();
-        const max = this.sliderMax.getValue();
+        const maxTr1 = this.sliderMax.getValue(0);
+        const maxTr5 = this.sliderMax.getValue(1);
         const xmb = this.sliderXmb.getValue();
-        const xmr = this.sliderXmr.getValue();
+        // const xmr = this.sliderXmr.getValue();
         const undetected = this.sliderUndetected.getValue();
         const quarantine = this.sliderQuarantine.getValue();
         // const reexposure = this.sliderReexposure.getValue();
@@ -153,9 +197,10 @@ export class ControlsSettings {
         const dead = 0; // const dead = this.sliderDead.getValue();
         this.modification.acceptUpdate({
             pow,
-            max,
+            maxTr1,
+            maxTr5,
             xmb,
-            xmr,
+            // xmr: xmr,
             undetected,
             quarantine,
             reexposure: this.timeToWane,
@@ -174,9 +219,10 @@ export class ControlsSettings {
         this.modification = modification;
 
         this.sliderPow.setValue(this.modification.getPow() || 4);
-        this.sliderMax.setValue(this.modification.getMax() || 0.7);
+        this.sliderMax.setValueAndRedraw(0, this.modification.getMaxTr1() || 0.7, true);
+        this.sliderMax.setValueAndRedraw(1, this.modification.getMaxTr5() || 0.9, true);
         this.sliderXmb.setValue(this.modification.getXmb() || 2.2);
-        this.sliderXmr.setValue(this.modification.getXmr() === undefined ? 10 : this.modification.getXmr());
+        // this.sliderXmr.setValue(this.modification.getXmr() === undefined ? 10 : this.modification.getXmr());
 
         this.sliderUndetected.setValue(this.modification.getInitialUndetected());
         this.sliderQuarantine.setValue(this.modification.getQuarantine(-1)); // TODO - deprecate the slider, then introduce a contact category specific setting and calculate a value from there

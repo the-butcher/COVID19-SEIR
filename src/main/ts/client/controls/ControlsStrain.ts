@@ -509,11 +509,7 @@ export class ControlsStrain {
             dstIncidence: -1,
             deletable: false,
             draggable: false,
-            primary: false,
-            pow: 5,
-            max: 0.8,
-            xmb: 2.0,
-            xmr: 0.0
+            primary: false
         };
         const compartmentParams = CompartmentChainReproduction.getInstance().getStrainedCompartmentParams(strain);
         compartmentParams.forEach(compartmentParam => {

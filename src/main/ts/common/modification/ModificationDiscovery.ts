@@ -1,6 +1,7 @@
 import { BaseData } from '../../model/basedata/BaseData';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { TimeUtil } from '../../util/TimeUtil';
+import { AgeGroup } from '../demographics/AgeGroup';
 import { Demographics } from '../demographics/Demographics';
 import { AModification } from './AModification';
 import { IContactColumns } from './IContactColumns';
@@ -15,8 +16,11 @@ import { IModificationValuesDiscovery } from './IModificationValuesDiscovery';
  */
 export class ModificationDiscovery extends AModification<IModificationValuesDiscovery> implements IContactColumns {
 
+    private readonly ageGroups: AgeGroup[];
+
     constructor(valuesTesting: IModificationValuesDiscovery) {
         super('RANGE', valuesTesting);
+        this.ageGroups = [...Demographics.getInstance().getAgeGroups()];
     }
 
     getColumnValue(ageGroupIndex: number): number {
@@ -40,9 +44,19 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
     }
 
     acceptUpdate(update: Partial<IModificationValuesDiscovery>): void {
-        update.multipliers = { ...this.modificationValues.multipliers, ...update.multipliers };
+        // update.multipliers = { ...this.modificationValues.multipliers, ...update.multipliers };
+        update.corrections = { ...this.modificationValues.corrections, ...update.corrections };
         super.acceptUpdate(update);
     }
+
+    getCorrectionValue(ageGroupIndex: number): number {
+        let correctionValue: number;
+        if (this.modificationValues.corrections) {
+            correctionValue = this.modificationValues.corrections[this.ageGroups[ageGroupIndex].getName()];
+        }
+        return correctionValue ? correctionValue : 1;
+    }
+
 
     getPositivityRate(): number {
 
@@ -85,15 +99,19 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
         return this.modificationValues.testRate || 0.04;
     }
 
+    getFactorWeight(): number {
+        return this.modificationValues.factorWeight || 0.7;
+    }
+
     isBlendable(): boolean {
         return this.modificationValues.blendable;
     }
 
-    getCategoryValue(contactCategoryName: string): number {
-        if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
-            this.modificationValues.multipliers[contactCategoryName] = 0.1;
-        }
-        return this.modificationValues.multipliers[contactCategoryName];
-    }
+    // getCategoryValue(contactCategoryName: string): number {
+    //     if (ObjectUtil.isEmpty(this.modificationValues.multipliers[contactCategoryName])) {
+    //         this.modificationValues.multipliers[contactCategoryName] = 0.1;
+    //     }
+    //     return this.modificationValues.multipliers[contactCategoryName];
+    // }
 
 }

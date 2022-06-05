@@ -162,8 +162,8 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 }
 
                 const loessDef = {
-                    span: 0.175,
-                    band: 0.50
+                    span: 0.125,
+                    band: 0.25
                 };
 
                 var Loess = require('loess');

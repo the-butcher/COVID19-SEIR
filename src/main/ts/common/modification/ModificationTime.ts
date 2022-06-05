@@ -174,10 +174,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
 
-        let discoveryRatesCategory: number[] = [
-            0.45, // <= 04
+        let discoveryRates: number[] = [
+            1.00, // <= 04
             1.00, // 05-14
-            0.90, // 15-24
+            1.00, // 15-24
             1.00, // 25-34
             1.00, // 35-44
             1.00, // 45-54
@@ -185,20 +185,25 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
             1.00, // 65-74
             1.00, // 75-84
             1.00, // >= 85
-        ].map(v => v * 0.9);
+        ].map(v => v);
 
-        let ageGroupBias = 0;
         const ageGroupFactors: number[] = [];
 
-        // \cos\left(\frac{\left(x\cdot\pi\right)^{3}}{\pi^{2}}\right)\cdot-0.6+0.4
-
         this.ageGroups.forEach(ageGroup => {
+
+            discoveryRates[ageGroup.getIndex()] = this.modificationDiscovery.getCorrectionValue(ageGroup.getIndex());
+
             // 0 (<= 04) to 1 (>= 85)
             const ageGroupIndex = ageGroup.getIndex();
-            const ageGroupFraction = (ageGroupIndex + ageGroupBias) / (this.ageGroups.length - 1);
-            const xp9sqp = Math.cos(Math.pow(ageGroupFraction * Math.PI, 3) / Math.pow(Math.PI, 2)) * -0.70 + 0.30;
-            const discoveryFactorAge = Math.max(0, Math.min(1, xp9sqp));
-            ageGroupFactors.push(discoveryFactorAge);
+            const ageGroupFraction = ((ageGroupIndex / (this.ageGroups.length - 1)) - 0.35) * 1.8;
+
+            const xp9sqp = Math.sin(Math.pow(ageGroupFraction, 3)) * this.modificationDiscovery.getFactorWeight();
+            ageGroupFactors.push(xp9sqp);
+
+            // const xp9sqp = Math.cos(Math.pow(ageGroupFraction * Math.PI, 3) / Math.pow(Math.PI, 2)) * -0.50 + 0.50;
+            // const discoveryFactorAge = Math.max(0, Math.min(1, xp9sqp));
+            // ageGroupFactors.push(discoveryFactorAge);
+
         });
         // console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), ageGroupFactors);
 
@@ -221,7 +226,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 const contactTotalCategory = contactRatioCategory * contactGroupCategory;
 
                 // current discovery setting for category as set in modification
-                let discoveryRateCategory = this.modificationDiscovery.getCategoryValue(contactCategory.getName()) * discoveryRatesCategory[ageGroup.getIndex()];
+                let discoveryRateCategory = discoveryRates[ageGroup.getIndex()];
 
                 // current share of discovered in currentTotal
                 contactTotal += contactTotalCategory;
@@ -235,6 +240,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
             };
 
         });
+
 
         // if (this.getInstant() % TimeUtil.MILLISECONDS_PER____DAY === 0) {
         //     this.ageGroups.forEach(ageGroup => {

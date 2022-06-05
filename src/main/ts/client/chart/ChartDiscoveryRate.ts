@@ -1,15 +1,11 @@
 import { CategoryAxis, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
-import { color, create, Label, useTheme } from '@amcharts/amcharts4/core';
+import { create, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IDiscoveryValueSet } from '../../common/modification/IDiscoveryValueSet';
-import { ModificationResolverSettings } from '../../common/modification/ModificationResolverSettings';
-import { ModificationSettings } from '../../common/modification/ModificationSettings';
-import { ModificationStrain } from '../../common/modification/ModificationStrain';
 import { StrainUtil } from '../../util/StrainUtil';
 import { ControlsConstants, ILabellingDefinition } from '../gui/ControlsConstants';
-import { ModificationTime } from './../../common/modification/ModificationTime';
 import { ChartUtil } from './ChartUtil';
 
 export interface IChartDataDiscoveryRate {
@@ -17,7 +13,8 @@ export interface IChartDataDiscoveryRate {
     discoveryAv: number;
     discoveryLo: number;
     discoveryHi: number;
-    label: string;
+    labelLo: string;
+    labelHi: string;
 }
 
 /**
@@ -120,7 +117,7 @@ export class ChartDiscoveryRate {
         this.seriesDiscoveryAv.strokeOpacity = 1.0;
         this.seriesDiscoveryAv.tooltip.disabled = false;
 
-        this.seriesDiscoveryAv.tooltipText = 'positivity:\u00A0{categoryX}\ndiscovery:\u00A0\u00A0{label}';
+        this.seriesDiscoveryAv.tooltipText = 'positivity:\u00A0{categoryX}\ndiscovery:\u00A0\u00A0{labelLo}\ndiscovery:\u00A0\u00A0{labelHi}';
         ChartUtil.getInstance().configureSeries(this.seriesDiscoveryAv, ControlsConstants.COLOR____FONT, false);
 
         // this.seriesDiscoveryAv.adapter.add('tooltipText', (value, target) => {
@@ -174,7 +171,8 @@ export class ChartDiscoveryRate {
                 discoveryAv,
                 discoveryLo,
                 discoveryHi,
-                label: this.labellingDefinitionTooltip.format(discoveryAv)
+                labelLo: this.labellingDefinitionTooltip.format(discoveryLo),
+                labelHi: this.labellingDefinitionTooltip.format(discoveryHi)
             });
         }
 
@@ -189,7 +187,8 @@ export class ChartDiscoveryRate {
                     this.chart.data[i].discoveryAv = chartData[i].discoveryAv;
                     this.chart.data[i].discoveryLo = chartData[i].discoveryLo;
                     this.chart.data[i].discoveryHi = chartData[i].discoveryHi;
-                    this.chart.data[i].label = chartData[i].label;
+                    this.chart.data[i].labelLo = chartData[i].labelLo;
+                    this.chart.data[i].labelHi = chartData[i].labelHi;
                 }
             }
         }

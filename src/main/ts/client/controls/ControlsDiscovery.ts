@@ -34,7 +34,8 @@ export class ControlsDiscovery {
 
     private readonly chartTesting: ChartDiscovery;
     private readonly sliderTestRate: Slider;
-    private readonly slidersDiscovery: SliderDiscoveryCategory[];
+    private readonly sliderFactorWeight: Slider;
+    private readonly slidersCorrections: Slider[];
     private readonly iconBlendable: IconToggle;
 
     private modification: ModificationDiscovery;
@@ -42,7 +43,7 @@ export class ControlsDiscovery {
     constructor() {
 
         this.chartTesting = new ChartDiscovery('chartTestingDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
-        this.slidersDiscovery = [];
+        // this.slidersDiscovery = [];
 
         this.iconBlendable = new IconToggle({
             container: 'slidersTestingDiv',
@@ -93,8 +94,90 @@ export class ControlsDiscovery {
                 }
             }
         });
-        Demographics.getInstance().getCategories().forEach(contactCategory => {
-            this.slidersDiscovery.push(new SliderDiscoveryCategory(contactCategory.getName()));
+
+        const factorWeightRange: number[] = [
+            0.00, 0.25, 0.50, 0.75, 1.00
+        ];
+
+        const container2 = document.createElement('div');
+        container2.classList.add('slider-modification');
+        document.getElementById('slidersTestingDiv').appendChild(container2);
+        this.sliderFactorWeight = new Slider({
+            container: container2,
+            min: Math.min(...factorWeightRange),
+            max: Math.max(...factorWeightRange),
+            step: 0.01,
+            values: [0.0],
+            ticks: [...factorWeightRange],
+            label: 'test rate',
+            thumbCreateFunction: (index: number) => {
+                return new IconSlider();
+            },
+            labelFormatFunction: (index, value, type) => {
+                return `${(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
+
+            },
+            handleValueChange: (index, value, type) => {
+                if (type === 'stop' || type === 'input') {
+                    this.handleChange();
+                }
+            },
+            handleThumbPicked: (index) => {
+                // nothing
+            },
+            inputFunctions: {
+                inputFormatFunction: (index, value) => {
+                    return `${(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
+                },
+                inputHandleFunction: (index, value) => {
+                    return parseFloat(value.replace(',', '.'));
+                }
+            }
+        });
+
+        this.slidersCorrections = [];
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+
+            const container = document.createElement('div');
+            container.classList.add('slider-modification');
+            document.getElementById('slidersTestingDiv').appendChild(container);
+
+            this.slidersCorrections.push(new Slider({
+                container,
+                min: Math.min(...ModelConstants.RANGE____PERCENTAGE_200),
+                max: Math.max(...ModelConstants.RANGE____PERCENTAGE_200),
+                step: 0.01,
+                values: [0.0],
+                ticks: [...ModelConstants.RANGE____PERCENTAGE_200],
+                label: ageGroup.getName(),
+                thumbCreateFunction: (index: number) => {
+                    return new IconSlider();
+                },
+                labelFormatFunction: (index, value, type) => {
+                    if (type === 'tick') {
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
+                    } else {
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                    }
+                },
+                handleValueChange: (index, value, type) => {
+                    if (type === 'stop' || type === 'input') {
+                        this.handleChange();
+                    }
+                },
+                handleThumbPicked: (index) => {
+                    // nothing
+                },
+                inputFunctions: {
+                    inputFormatFunction: (index, value) => {
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    },
+                    inputHandleFunction: (index, value) => {
+                        return parseFloat(value.replace(',', '.')) / 100;
+                    }
+                }
+            }));
+
         });
 
     }
@@ -103,20 +186,18 @@ export class ControlsDiscovery {
 
         const blendable = this.iconBlendable.getState();
         const testRate = this.sliderTestRate.getValue(0);
+        const factorWeight = this.sliderFactorWeight.getValue(0);
 
-        const multipliers: { [K in string]: number } = {};
-        let updatedCategories: string[] = [];
-        this.slidersDiscovery.forEach(sliderDiscovery => {
-            if (sliderDiscovery.getValue() !== this.modification.getCategoryValue(sliderDiscovery.getName())) {
-                updatedCategories.push(sliderDiscovery.getName());
-            }
-            multipliers[sliderDiscovery.getName()] = sliderDiscovery.getValue();
+        const corrections: { [K in string]: number } = {};
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            corrections[ageGroup.getName()] = this.slidersCorrections[ageGroup.getIndex()].getValue(0);
         });
 
         this.modification.acceptUpdate({
-            multipliers,
+            corrections,
             blendable,
             testRate,
+            factorWeight
         });
 
         this.updateChart();
@@ -137,8 +218,9 @@ export class ControlsDiscovery {
         this.iconBlendable.toggle(modification.isBlendable());
 
         this.sliderTestRate.setValueAndRedraw(0, modification.getTestRate(), true);
-        this.slidersDiscovery.forEach(sliderTesting => {
-            sliderTesting.setValue(modification.getCategoryValue(sliderTesting.getName()));
+        this.sliderFactorWeight.setValueAndRedraw(0, modification.getFactorWeight(), true);
+        Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            this.slidersCorrections[ageGroup.getIndex()].setValueAndRedraw(0, modification.getCorrectionValue(ageGroup.getIndex()), true);
         });
         this.iconBlendable.toggle(modification.isBlendable());
 
@@ -154,9 +236,9 @@ export class ControlsDiscovery {
 
         requestAnimationFrame(() => {
             this.chartTesting.acceptModificationTime(modificationTime);
-            this.slidersDiscovery.forEach(sliderTesting => {
-                sliderTesting.handleResize();
-            });
+            // this.slidersDiscovery.forEach(sliderTesting => {
+            //     sliderTesting.handleResize();
+            // });
         });
 
     }

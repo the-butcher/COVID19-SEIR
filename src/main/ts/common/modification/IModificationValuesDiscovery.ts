@@ -7,6 +7,11 @@ import { IModificationValues } from './IModificationValues';
  */
 export interface IModificationValuesDiscovery extends IModificationValues {
 
+    factorWeight: number;
+
+    /**
+     * consumed from data
+     */
     testRate: number;
 
     /**
@@ -14,10 +19,12 @@ export interface IModificationValuesDiscovery extends IModificationValues {
      */
     positivityRate?: number;
 
-    /**
-     * category multipliers, normalized values between 0 and 1
-     */
-    multipliers: { [K in string]: number };
+    // /**
+    //  * category multipliers, normalized values between 0 and 1
+    //  */
+    // multipliers: { [K in string]: number };
+
+    corrections: { [K in string]: number };
 
     /**
      * are this instance's value preceded by a smooth transition

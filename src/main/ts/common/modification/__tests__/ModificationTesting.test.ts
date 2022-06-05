@@ -16,13 +16,15 @@ describe("test value", () => {
             // bindToOverall: false,
             // overall: 0.3,
             testRate: 0.02,
-            multipliers: {
-                'family': 0.30,
-                'school': 0.30,
-                'nursing': 0.30,
-                'work': 0.30,
-                'other': 0.30
-            },
+            // multipliers: {
+            //     'family': 0.30,
+            //     'school': 0.30,
+            //     'nursing': 0.30,
+            //     'work': 0.30,
+            //     'other': 0.30
+            // },
+            factorWeight: 0.7,
+            corrections: {},
             deletable: false,
             draggable: false,
             blendable: false,
@@ -43,13 +45,15 @@ describe("test value", () => {
             // bindToOverall: false,
             // overall: 0.5,
             testRate: 0.02,
-            multipliers: {
-                'family': 0.50,
-                'school': 0.50,
-                'nursing': 0.50,
-                'work': 0.50,
-                'other': 0.50
-            },
+            // multipliers: {
+            //     'family': 0.50,
+            //     'school': 0.50,
+            //     'nursing': 0.50,
+            //     'work': 0.50,
+            //     'other': 0.50
+            // },
+            factorWeight: 0.7,
+            corrections: {},
             deletable: false,
             draggable: false,
             blendable: false
@@ -70,13 +74,15 @@ describe("test value", () => {
             // bindToOverall: false,
             // overall: 0.7,
             testRate: 0.02,
-            multipliers: {
-                'family': 0.70,
-                'school': 0.70,
-                'nursing': 0.70,
-                'work': 0.70,
-                'other': 0.70
-            },
+            // multipliers: {
+            //     'family': 0.70,
+            //     'school': 0.70,
+            //     'nursing': 0.70,
+            //     'work': 0.70,
+            //     'other': 0.70
+            // },
+            factorWeight: 0.7,
+            corrections: {},
             deletable: false,
             draggable: false,
             blendable: false

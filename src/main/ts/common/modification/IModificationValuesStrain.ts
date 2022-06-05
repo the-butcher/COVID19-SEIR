@@ -8,7 +8,7 @@ import { IModificationValues } from './IModificationValues';
  * @author h.fleischer
  * @since 23.04.2021
  */
-export interface IModificationValuesStrain extends IModificationValues, IDiscoveryValueSet {
+export interface IModificationValuesStrain extends IModificationValues {
 
     /**
      * get the base reproduction number of this strain
@@ -46,8 +46,6 @@ export interface IModificationValuesStrain extends IModificationValues, IDiscove
      * time in months for total waning of immunity
      */
     timeToWane: number;
-
-    // 0.1+0.2\ \frac{x}{9}\ +\ 0.7\left(\frac{x}{9}\right)^{9}
 
     /**
      * the initial incidence of this strain

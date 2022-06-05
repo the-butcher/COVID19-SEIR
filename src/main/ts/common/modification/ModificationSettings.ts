@@ -46,8 +46,12 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         return this.modificationValues.pow;
     }
 
-    getMax(): number {
-        return this.modificationValues.max;
+    getMaxTr1(): number {
+        return this.modificationValues.maxTr1;
+    }
+
+    getMaxTr5(): number {
+        return this.modificationValues.maxTr5;
     }
 
     getXmb(): number {
