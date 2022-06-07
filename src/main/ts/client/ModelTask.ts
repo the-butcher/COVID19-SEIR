@@ -107,7 +107,7 @@ export class ModelTask {
                         StorageUtil.getInstance().setSaveRequired(true);
                     }
                 });
-                ModificationResolverDiscovery.resetRegression();
+                // ModificationResolverDiscovery.resetRegression();
 
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
                 await ChartAgeGroup.getInstance().renderModelData();

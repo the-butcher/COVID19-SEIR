@@ -63,7 +63,7 @@ export class ControlsDiscovery {
             container,
             min: Math.min(...ModelConstants.RANGE____PERCENTAGE__10),
             max: Math.max(...ModelConstants.RANGE____PERCENTAGE__10),
-            step: 0.01,
+            step: 0.001,
             values: [0.0],
             ticks: [...ModelConstants.RANGE____PERCENTAGE__10],
             label: 'test rate',

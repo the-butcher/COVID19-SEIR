@@ -2211,7 +2211,7 @@ export class ChartAgeGroup {
             const ageGroupDiscoveredCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
 
             const ageGroupDiscoveryRateL = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
-            const ageGroupDiscoveryRateM = ModificationResolverDiscovery.getRegression(ageGroupPlot.getIndex()).findLoessValue(dataItem.instant).m;
+            // const ageGroupDiscoveryRateM = ModificationResolverDiscovery.getRegression(ageGroupPlot.getIndex()).findLoessValue(dataItem.instant).m;
 
             const ageGroupAssumedAllCases = ageGroupDiscoveredCases / ageGroupDiscoveryRateL;
 
@@ -2258,7 +2258,7 @@ export class ChartAgeGroup {
                 testRate,
                 reproductionP,
                 ageGroupDiscoveryRateL,
-                ageGroupDiscoveryRateM,
+                // ageGroupDiscoveryRateM,
                 mobility: 0
             };
 

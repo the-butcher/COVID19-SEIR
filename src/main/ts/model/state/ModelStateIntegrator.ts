@@ -274,7 +274,8 @@ export class ModelStateIntegrator {
                 const removedV2Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV2Total);
 
                 // TODO DISCOVERY :: with discovery moved to strain, find a way to get an overall discovery ratio (try: count discoveredcases in strain iteration)
-                const discoveryTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal);
+                // const discoveryTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal);
+                const discoveryTotal = modificationTime.getDiscoveryRatesRaw(ageGroupIndexTotal).discovery;
 
                 // values that come by strain
                 const incidences: { [K: string]: number } = {};
@@ -349,7 +350,8 @@ export class ModelStateIntegrator {
                     const removedV2 = this.modelState.getNrmValueSum(compartmentFilterRemovedV2) * groupNormalizer;
 
                     // TODO DISCOVERY :: with discovery moved to strain, find a way to get an overall discovery ratio (try: count discoveredcases in strain iteration)
-                    const discovery = modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
+                    // const discovery = modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
+                    const discovery = modificationTime.getDiscoveryRatesRaw(ageGroup.getIndex()).discovery;
 
                     const incidencesAgeGroup: { [K: string]: number } = {};
                     const exposedAgeGroup: { [K: string]: number } = {};

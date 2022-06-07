@@ -63,7 +63,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
 
         // recreate singleton, since the calibrator changes things
         Modifications.setInstanceFromValues(modificationValues);
-        ModificationResolverDiscovery.resetRegression();
+        // ModificationResolverDiscovery.resetRegression();
 
         const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), BaseData.getInstance(), modelProgress => {
             ctx.postMessage(modelProgress);

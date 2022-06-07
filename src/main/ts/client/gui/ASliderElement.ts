@@ -56,8 +56,9 @@ export abstract class ASliderElement {
 
     setFractionDigits(fractionDigits: number): void {
         const numberFormat = {
-            minimumFractionDigits: fractionDigits,
-            maximumFractionDigits: fractionDigits
+            minimumFractionDigits: Math.min(18, fractionDigits),
+            maximumFractionDigits: Math.min(18, fractionDigits)
+
         };
         this.labelFormatFunction = (index, value, type) => {
             return value.toLocaleString(undefined, numberFormat);

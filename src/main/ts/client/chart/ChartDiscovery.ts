@@ -136,7 +136,8 @@ export class ChartDiscovery {
         }
 
         // TODO DISCOVERY :: find another way to get discovery rate
-        const discoveryRateTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
+        // const discoveryRateTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
+        const discoveryRateTotal = modificationTime.getDiscoveryRatesRaw(ageGroupIndexTotal).discovery;
 
         // console.log('discoveryRatioTotal', discoveryRatioTotal);
         // this.valueTotalLabel.text = (columnValue * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1) + '%';

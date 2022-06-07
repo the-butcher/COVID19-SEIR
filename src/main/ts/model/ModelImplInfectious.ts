@@ -104,7 +104,8 @@ export class ModelImplInfectious implements IModelSeir {
             }
 
             // TODO DISCOVERY :: calculate discovery ratio from some (yet to be created) utility created from this instance's strain-values
-            const dailyActual = dailyTested / modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
+            // const dailyActual = dailyTested / modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
+            const dailyActual = dailyTested / modificationTime.getDiscoveryRatesRaw(ageGroup.getIndex()).discovery;
             const absCompartment = dailyActual * duration / TimeUtil.MILLISECONDS_PER____DAY;
             this.compartmentsInfectious.push(new CompartmentInfectious(compartmentParam.type, this.absTotal, absCompartment, this.ageGroupIndex, this.ageGroupName, strainValues.id, compartmentParam.r0, duration, compartmentParam.presymptomatic, `_INF_${ObjectUtil.padZero(chainIndex)}`));
 
@@ -212,7 +213,8 @@ export class ModelImplInfectious implements IModelSeir {
                         const compartmentDiscoveredCases = this.compartmentsIncidence[0];
 
                         // TODO DISCOVERY :: calculate discovery ratio from some (yet to be created) utility created from this instance's strain-values
-                        const discoveryRatio = modificationTime.getDiscoveryRateLoess(this.ageGroupIndex);
+                        // const discoveryRatio = modificationTime.getDiscoveryRateLoess(this.ageGroupIndex);
+                        const discoveryRatio = modificationTime.getDiscoveryRatesRaw(this.ageGroupIndex).discovery;
 
                         const discoveredNrmCases = continuationValue * discoveryRatio;
                         result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
