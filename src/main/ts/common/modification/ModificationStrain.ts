@@ -43,20 +43,4 @@ export class ModificationStrain extends AModification<IModificationValuesStrain>
         return this.modificationValues.strainEscape?.[strainId];
     }
 
-    getPow(): number {
-        return this.modificationValues.pow;
-    }
-
-    getMax(): number {
-        return this.modificationValues.max;
-    }
-
-    getXmb(): number {
-        return this.modificationValues.xmb;
-    }
-
-    getXmr(): number {
-        return this.modificationValues.xmr;
-    }
-
 }

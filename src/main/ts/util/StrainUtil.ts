@@ -101,29 +101,6 @@ export class StrainUtil {
         return num;
     }
 
-    // static calculateDiscoveryRate(positivityRate: number, testRate: number, discoveryValueSet: IDiscoveryValueSet): number {
-
-    //     // \left(x\ \cdot s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}-x\cdot\left(s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}
-
-    //     const pow = -discoveryValueSet.pow;
-
-    //     const maxKey1 = 0.01;
-    //     const maxKey5 = 0.05;
-
-    //     const maxVal1 = discoveryValueSet.maxTr1;
-    //     const maxVal5 = discoveryValueSet.maxTr5;
-
-    //     const fraction = (maxKey1 - testRate) / (maxKey1 - maxKey5);
-    //     const maxVal = maxVal1 + (maxVal5 - maxVal1) * fraction;
-
-    //     const slp = discoveryValueSet.xmb; // - testRate * discoveryValueSet.xmr; // higher number means steeper (less tests per person means steeper slope = less cases found for )
-
-    //     const sqm = Math.pow(maxVal, 1 / pow);
-
-    //     return Math.pow(positivityRate * slp + sqm, pow) - positivityRate * Math.pow(slp + sqm, pow); // + testRate * discoveryValueSet.xmr;
-
-    // }
-
     /**
      * https://www.desmos.com/calculator/v76oalurp7
      * @param positivityRate

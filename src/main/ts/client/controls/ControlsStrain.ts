@@ -35,12 +35,6 @@ export class ControlsStrain {
     }
     private static instance: ControlsStrain;
 
-    // private readonly chartTesting: ChartDiscoveryRate;
-    // private sliderPow: SliderSetting;
-    // private sliderMax: SliderSetting;
-    // private sliderXmb: SliderSetting;
-    // private sliderXmr: SliderSetting;
-
     private readonly sliderReproduction: Slider;
     private readonly sliderSerialInterval: Slider;
     private readonly sliderIncidence: Slider;
@@ -64,12 +58,6 @@ export class ControlsStrain {
     private modification: ModificationStrain;
 
     constructor() {
-
-        // this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDivStrain', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
-        // this.sliderPow = new SliderSetting("exponent", [2, 4, 6, 8, 10], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
-        // this.sliderMax = new SliderSetting("discovery max", [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
-        // this.sliderXmb = new SliderSetting("discovery slope base", [1.0, 1.5, 2.00, 2.5, 3.0], 0.05, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
-        // this.sliderXmr = new SliderSetting("discovery slope rate", [0, 10, 20, 30, 40], 1, false, 'slidersDiscoveryDivStrain', () => ControlsStrain.getInstance().handleChange());
 
         this.sliderReproduction = new Slider({
             container: 'sliderReproductionDiv',
@@ -328,11 +316,6 @@ export class ControlsStrain {
             this.sliderIncidence.setRange(ModelConstants.RANGE_____INCIDENCE__10);
         }
 
-        // this.sliderPow.setValue(this.modification.getPow() || 4);
-        // this.sliderMax.setValue(this.modification.getMax() || 0.7);
-        // this.sliderXmb.setValue(this.modification.getXmb() || 2.2);
-        // this.sliderXmr.setValue(this.modification.getXmr() === undefined ? 10 : this.modification.getXmr());
-
         const strain = modification.getModificationValues();
 
 
@@ -382,10 +365,6 @@ export class ControlsStrain {
                 this.slidersStrainEscape[key].handleResize();
             });
             this.sliderTimeToWane.handleResize();
-            // this.sliderPow.handleResize();
-            // this.sliderMax.handleResize();
-            // this.sliderXmb.handleResize();
-            // this.sliderXmr.handleResize();
             this.sliderIncidence.setDisabled(modification.isPrimary());
         });
 
@@ -397,11 +376,7 @@ export class ControlsStrain {
 
     handleChange(): void {
 
-        console.log('this.strainEscape', this.strainEscape);
-        // const pow = this.sliderPow.getValue();
-        // const max = this.sliderMax.getValue();
-        // const xmb = this.sliderXmb.getValue();
-        // const xmr = this.sliderXmr.getValue();
+        // console.log('this.strainEscape', this.strainEscape);
 
         this.modification.acceptUpdate({
             r0: this.r0,
@@ -411,10 +386,6 @@ export class ControlsStrain {
             immuneEscape: this.immuneEscape,
             strainEscape: { ...this.strainEscape },
             timeToWane: this.timeToWane,
-            // pow,
-            // max,
-            // xmb,
-            // xmr,
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());

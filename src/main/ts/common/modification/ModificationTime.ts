@@ -217,6 +217,31 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
          * - finally from each group would get it's discovery rate and the overall discovery would just be derived from those values
          */
 
+        const normalize2 = () => {
+
+            let _discoveryRateOverall = 0;
+            this.ageGroups.forEach(ageGroup => {
+                _discoveryRateOverall += ageGroup.getAbsValue() * this.discoveryRatesByAgeGroup[ageGroup.getIndex()].discovery;
+            });
+            _discoveryRateOverall = _discoveryRateOverall / this.absTotal;
+
+            const correction = this.calculateDiscoveryRateOverall() / _discoveryRateOverall;
+            this.ageGroups.forEach(ageGroup => {
+
+                const ageGroupIndex = ageGroup.getIndex();
+
+                let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact * correction;
+                let discovery = Math.min(1, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
+                this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
+                    setting: this.discoveryRatesByAgeGroup[ageGroupIndex].setting,
+                    contact,
+                    discovery
+                };
+
+            });
+
+        }
+
         const normalize = () => {
 
             let _discoveryRateOverall = 0;

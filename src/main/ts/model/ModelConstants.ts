@@ -73,10 +73,6 @@ export class ModelConstants {
                 deletable: true,
                 draggable: true,
                 primary: false,
-                pow: 5,
-                max: 0.9,
-                xmb: 2.0,
-                xmr: 0.0
             }),
         },
         'CONTACT': {
