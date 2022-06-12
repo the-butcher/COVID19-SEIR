@@ -9,6 +9,7 @@ import { ChartUtil } from './ChartUtil';
 
 export interface IChartDataDiscovery {
     contactX: string;
+    setting: number;
     contactRatio: number;
     discoveryRatio: number;
     label: string;
@@ -26,6 +27,7 @@ export class ChartDiscovery {
     private readonly xAxis: CategoryAxis;
     private readonly yAxisDiscovery: ValueAxis;
     private readonly seriesDiscovery: LineSeries;
+    private readonly seriesSetting: LineSeries;
     private readonly valueTotalLabel: Label;
 
     // private readonly labellingDefinitionAxis: ILabellingDefinition;
@@ -90,6 +92,24 @@ export class ChartDiscovery {
 
         ChartUtil.getInstance().configureSeries(this.seriesDiscovery, ControlsConstants.COLOR____FONT, false);
 
+        this.seriesSetting = this.chart.series.push(new LineSeries());
+        this.seriesSetting.xAxis = this.xAxis;
+        this.seriesSetting.yAxis = this.yAxisDiscovery;
+        this.seriesSetting.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.seriesSetting.fontSize = ControlsConstants.FONT_SIZE;
+        this.seriesSetting.dataFields.categoryX = 'contactX';
+        this.seriesSetting.dataFields.valueY = 'setting';
+        this.seriesSetting.fillOpacity = 0.2;
+        this.seriesSetting.strokeWidth = 0.5;
+        this.seriesSetting.strokeLinecap = 'round';
+        this.seriesSetting.strokeOpacity = 1.0;
+        this.seriesSetting.tooltip.disabled = false;
+        // this.seriesSetting.tooltipText = 'setting:\u00A0{categoryX}\npercent:\u00A0{label}';
+
+        ChartUtil.getInstance().configureSeries(this.seriesSetting, ControlsConstants.COLOR____FONT, false);
+
+
+
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
         this.chart.cursor.showTooltipOn = 'always';
@@ -130,12 +150,13 @@ export class ChartDiscovery {
             chartData.push({
                 contactX: ageGroups[indexContact].getName(),
                 contactRatio: rates.contact,
+                setting: rates.setting,
                 discoveryRatio: rates.discovery,
                 label: this.labellingDefinitionTooltip.format(rates.discovery)
             });
         }
 
-        // TODO DISCOVERY :: find another way to get discovery rate
+        // TODO DISCOVERY :: find another way to get discovery rate (like fraction from all cases and cases)
         // const discoveryRateTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal); // contactColumns.getColumnSum() / contactColumns.getMaxColumnSum();
         const discoveryRateTotal = modificationTime.getDiscoveryRatesRaw(ageGroupIndexTotal).discovery;
 
@@ -151,12 +172,15 @@ export class ChartDiscovery {
             for (let i = 0; i < chartData.length; i++) {
                 if (this.chart.data[i].discoveryRatio) {
                     this.chart.data[i].contactRatio = chartData[i].contactRatio;
+                    this.chart.data[i].setting = chartData[i].setting;
                     this.chart.data[i].discoveryRatio = chartData[i].discoveryRatio;
                     this.chart.data[i].label = chartData[i].label;
                 }
             }
         }
         this.chart.invalidateRawData();
+
+        console.log('chartData', chartData)
 
         this.fullDataUpdate = false;
 

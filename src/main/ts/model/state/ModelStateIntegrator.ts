@@ -54,16 +54,15 @@ export interface IDataItem {
 }
 export interface IDataValues {
     SUSCEPTIBLE: number;
-    // REMOVED_ID: number;
     REMOVED_VI: number;
     REMOVED_V2: number;
-    CASES: number;
+    CASES: { [K in string]: number };
     INCIDENCES: { [K in string]: number };
     PREDICTION?: IDataForecast;
     EXPOSED: { [K in string]: number };
     INFECTIOUS: { [K in string]: number };
     REMOVED: { [K in string]: number };
-    REPRODUCTION?: number;
+    REPRODUCTION?: { [K in string]: number };
     DISCOVERY: number;
     TOTAL: number;
 }
@@ -101,6 +100,13 @@ export class ModelStateIntegrator {
     private integrate(dT: number, tT: number): ModificationTime {
 
         const modificationTime = ModificationTime.createInstance(tT);
+
+        /**
+         * based on model state:
+         *
+         * test rate is known
+         *
+         */
 
         if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4) {
 
@@ -160,14 +166,20 @@ export class ModelStateIntegrator {
 
             if (dataFilter(this.curInstant)) {
 
+                const cases: { [K: string]: number } = {};
                 const incidences: { [K: string]: number } = {};
                 const exposed: { [K: string]: number } = {};
                 const infectious: { [K: string]: number } = {};
                 const removed: { [K: string]: number } = {};
+                const reproduction: { [K: string]: number } = {};
+
                 modificationValuesStrain.forEach(modificationValueStrain => {
+                    cases[modificationValueStrain.id] = undefined;
                     incidences[modificationValueStrain.id] = undefined;
                     exposed[modificationValueStrain.id] = undefined;
                     infectious[modificationValueStrain.id] = undefined;
+                    removed[modificationValueStrain.id] = undefined;
+                    reproduction[modificationValueStrain.id] = undefined;
                 });
 
                 const dataItem: IDataItem = {
@@ -179,33 +191,33 @@ export class ModelStateIntegrator {
                     positivityRate: modificationTime.getPositivityRate(),
                 };
                 dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
+                    CASES: cases,
                     SUSCEPTIBLE: undefined,
-                    // REMOVED_ID: undefined,
                     REMOVED_VI: undefined,
                     REMOVED_V2: undefined,
-                    CASES: undefined,
                     INCIDENCES: incidences,
                     EXPOSED: exposed,
                     INFECTIOUS: infectious,
                     REMOVED: removed,
                     TOTAL: undefined,
-                    DISCOVERY: undefined
+                    DISCOVERY: undefined,
+                    REPRODUCTION: reproduction
                 };
 
                 this.model.getDemographics().getAgeGroups().forEach(ageGroup => {
 
                     dataItem.valueset[ageGroup.getName()] = {
+                        CASES: cases,
                         SUSCEPTIBLE: undefined,
-                        // REMOVED_ID: undefined,
                         REMOVED_VI: undefined,
                         REMOVED_V2: undefined,
-                        CASES: undefined,
                         INCIDENCES: incidences,
                         EXPOSED: exposed,
                         INFECTIOUS: infectious,
                         REMOVED: removed,
                         TOTAL: undefined,
-                        DISCOVERY: undefined
+                        DISCOVERY: undefined,
+                        REPRODUCTION: reproduction
                     };
 
                 });
@@ -278,18 +290,21 @@ export class ModelStateIntegrator {
                 const discoveryTotal = modificationTime.getDiscoveryRatesRaw(ageGroupIndexTotal).discovery;
 
                 // values that come by strain
+                const cases: { [K: string]: number } = {};
                 const incidences: { [K: string]: number } = {};
                 const exposed: { [K: string]: number } = {};
                 const infectious: { [K: string]: number } = {};
                 const removed: { [K: string]: number } = {};
+                const reproduction: { [K: string]: number } = {};
 
+                cases[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal;
                 incidences[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * absTotal * 100000 / absTotal;
                 exposed[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterExposedTotal);
                 infectious[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
                 removed[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterRemovedIDTotal);
 
-                let casesTotal = 0;
-                let discoTotal = 0;
+                // let casesTotal = 0;
+                // let discoTotal = 0;
                 modificationValuesStrain.forEach(modificationValueStrain => {
 
                     const compartmentFilterIncidenceTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 || c.getCompartmentType() === ECompartmentType.X__INCIDENCE_N) && c.getStrainId() === modificationValueStrain.id);
@@ -298,13 +313,14 @@ export class ModelStateIntegrator {
                     const compartmentFilterCasesStrain = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 && c.getStrainId() === modificationValueStrain.id);
                     const compartmentFilterRemovedIDTotal = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R____RECOVERED && c.getStrainId() === modificationValueStrain.id));
 
+                    cases[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterCasesStrain) * absTotal;
                     incidences[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterIncidenceTotal) * 100000;
                     exposed[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterExposedTotal);
                     infectious[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
                     infectious[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterInfectiousTotal);
                     removed[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterRemovedIDTotal);
 
-                    casesTotal += this.modelState.getNrmValueSum(compartmentFilterCasesStrain);
+                    // casesTotal += this.modelState.getNrmValueSum(compartmentFilterCasesStrain);
 
                 });
                 // console.log(TimeUtil.formatCategoryDateFull(this.curInstant), this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal, casesTotal * absTotal);
@@ -318,17 +334,18 @@ export class ModelStateIntegrator {
                     positivityRate: modificationTime.getPositivityRate(),
                 };
                 dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
+                    CASES: cases,
                     SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptibleTotal),
                     // REMOVED_ID: removedIDTotal,
                     REMOVED_VI: removedVITotal,
                     REMOVED_V2: removedV2Total,
-                    CASES: this.modelState.getNrmValueSum(compartmentFilterCasesTotal) * absTotal,
                     INCIDENCES: incidences,
                     EXPOSED: exposed,
                     REMOVED: removed,
                     INFECTIOUS: infectious,
                     TOTAL: this.modelState.getNrmValueSum(compartmentFilterModelTotal) * absTotal,
-                    DISCOVERY: discoveryTotal
+                    DISCOVERY: discoveryTotal,
+                    REPRODUCTION: reproduction
                 };
 
                 this.model.getDemographics().getAgeGroups().forEach(ageGroup => {
@@ -353,11 +370,14 @@ export class ModelStateIntegrator {
                     // const discovery = modificationTime.getDiscoveryRateLoess(ageGroup.getIndex());
                     const discovery = modificationTime.getDiscoveryRatesRaw(ageGroup.getIndex()).discovery;
 
+                    const casesAgeGroup: { [K: string]: number } = {};
                     const incidencesAgeGroup: { [K: string]: number } = {};
                     const exposedAgeGroup: { [K: string]: number } = {};
                     const infectiousAgeGroup: { [K: string]: number } = {};
                     const removedAgeGroup: { [K: string]: number } = {};
+                    const reproductionAgeGroup: { [K: string]: number } = {};
 
+                    casesAgeGroup[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterCases) * absTotal;
                     incidencesAgeGroup[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterIncidence) * 100000 * groupNormalizer;
                     exposedAgeGroup[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterExposed) * groupNormalizer;
                     infectiousAgeGroup[ModelConstants.STRAIN_ID___________ALL] = this.modelState.getNrmValueSum(compartmentFilterInfectious) * groupNormalizer;
@@ -365,11 +385,13 @@ export class ModelStateIntegrator {
 
                     modificationValuesStrain.forEach(modificationValueStrain => {
 
+                        const compartmentFilterCases = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
                         const compartmentFilterIncidence = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0 || c.getCompartmentType() === ECompartmentType.X__INCIDENCE_N) && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
                         const compartmentFilterExposed = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.E______EXPOSED) && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
                         const compartmentFilterInfectious = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.I___INFECTIOUS) && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
                         const compartmentFilterRmoved = new CompartmentFilter(c => (c.getCompartmentType() === ECompartmentType.R____RECOVERED) && c.getAgeGroupIndex() === ageGroup.getIndex() && c.getStrainId() === modificationValueStrain.id);
 
+                        casesAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterCases) * absTotal;
                         incidencesAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterIncidence) * 100000 * groupNormalizer;
                         exposedAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterExposed) * groupNormalizer;
                         infectiousAgeGroup[modificationValueStrain.id] = this.modelState.getNrmValueSum(compartmentFilterInfectious) * groupNormalizer;
@@ -377,17 +399,17 @@ export class ModelStateIntegrator {
 
                     });
                     dataItem.valueset[ageGroup.getName()] = {
+                        CASES: casesAgeGroup,
                         SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptible) * groupNormalizer,
-                        // REMOVED_ID: removedID,
                         REMOVED_VI: removedVI,
                         REMOVED_V2: removedV2,
-                        CASES: this.modelState.getNrmValueSum(compartmentFilterCases) * absTotal,
                         INCIDENCES: incidencesAgeGroup,
                         EXPOSED: exposedAgeGroup,
                         INFECTIOUS: infectiousAgeGroup,
                         REMOVED: removedAgeGroup,
                         TOTAL: this.modelState.getNrmValueSum(compartmentFilterAgeGroupTotal) * groupNormalizer,
-                        DISCOVERY: discovery
+                        DISCOVERY: discovery,
+                        REPRODUCTION: reproductionAgeGroup
                     };
 
                     // if (ageGroup.getName() === '>= 85') {
@@ -422,13 +444,19 @@ export class ModelStateIntegrator {
     }
 
     static addReproduction(dataSet: IDataItem[]): void {
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
         for (let i = 2; i < dataSet.length - 2; i++) {
             const dataItemM2 = dataSet[i - 2];
             const dataItemP2 = dataSet[i + 2];
             Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
-                const averageCasesM2 = dataItemM2.valueset[ageGroup.getName()].CASES;
-                const averageCasesP2 = dataItemP2.valueset[ageGroup.getName()].CASES;
-                dataSet[i].valueset[ageGroup.getName()].REPRODUCTION = StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.instant, dataItemP2.instant, 4);
+                const averageCasesM2 = dataItemM2.valueset[ageGroup.getName()].CASES[ModelConstants.STRAIN_ID___________ALL];
+                const averageCasesP2 = dataItemP2.valueset[ageGroup.getName()].CASES[ModelConstants.STRAIN_ID___________ALL];
+                dataSet[i].valueset[ageGroup.getName()].REPRODUCTION[ModelConstants.STRAIN_ID___________ALL] = StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.instant, dataItemP2.instant, 4);
+                modificationValuesStrain.forEach(modificationValueStrain => {
+                    const averageCasesM2 = dataItemM2.valueset[ageGroup.getName()].CASES[modificationValueStrain.id];
+                    const averageCasesP2 = dataItemP2.valueset[ageGroup.getName()].CASES[modificationValueStrain.id];
+                    dataSet[i].valueset[ageGroup.getName()].REPRODUCTION[modificationValueStrain.id] = StrainUtil.calculateR0(averageCasesM2, averageCasesP2, dataItemM2.instant, dataItemP2.instant, 4);
+                });
             });
         }
     }

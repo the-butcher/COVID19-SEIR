@@ -221,7 +221,7 @@ export class ControlsConstants {
             id: ObjectUtil.createId(),
             title: 'Reproduction',
             getHeatValue: (dataItem, ageGroupName) => {
-                return dataItem.valueset[ageGroupName].REPRODUCTION;
+                return dataItem.valueset[ageGroupName].REPRODUCTION[ModelConstants.STRAIN_ID___________ALL];
             },
             getHeatLabel: (value) => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`,
             getHeatColor: (value) => new Color(HUE__INFECTIOUS, Math.max(0, value * 0.85), Math.min(1.0, (10 + Math.round(value * 90)) / 100)).getHex(),

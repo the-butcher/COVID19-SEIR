@@ -15,7 +15,14 @@ export interface IChartDataDiscoveryRate {
     discoveryHi: number;
     labelLo: string;
     labelHi: string;
+    discoveryEx01?: number;
+    discoveryEx02?: number;
+    discoveryEx03?: number;
+    discoveryEx04?: number;
+    discoveryEx05?: number;
 }
+
+
 
 /**
  * chart indicating the testing / discovery rate for different age groups
@@ -33,14 +40,26 @@ export class ChartDiscoveryRate {
     private readonly seriesDiscoveryAv: LineSeries;
     private readonly seriesDiscoveryHi: LineSeries;
 
+    private readonly seriesDiscoveryExs: { [K in string]: LineSeries };
+
     private readonly labellingDefinitionTooltip: ILabellingDefinition;
 
     private fullDataUpdate: boolean;
+
+    private readonly distinctVals = [
+        '01',
+        '02',
+        '03',
+        '04',
+        '05'
+    ]
 
     constructor(container: string, yMin: number, yMax: number, labellingDefinitionAxis: ILabellingDefinition, labellingDefinitionTooltip: ILabellingDefinition) {
 
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
+
+        this.seriesDiscoveryExs = {};
 
         this.fullDataUpdate = true;
         this.labellingDefinitionTooltip = labellingDefinitionTooltip;
@@ -77,6 +96,20 @@ export class ChartDiscoveryRate {
         this.yAxis.strictMinMax = true;
 
 
+        this.distinctVals.forEach(distinctVal => {
+            const seriesDiscoveryEx = this.chart.series.push(new LineSeries());
+            seriesDiscoveryEx.xAxis = this.xAxis;
+            seriesDiscoveryEx.yAxis = this.yAxis;
+            seriesDiscoveryEx.fontFamily = ControlsConstants.FONT_FAMILY;
+            seriesDiscoveryEx.fontSize = ControlsConstants.FONT_SIZE;
+            seriesDiscoveryEx.dataFields.categoryX = 'positivity';
+            seriesDiscoveryEx.dataFields.valueY = `discoveryEx${distinctVal}`;
+            seriesDiscoveryEx.fillOpacity = 0.0;
+            seriesDiscoveryEx.strokeWidth = 1;
+            seriesDiscoveryEx.strokeLinecap = 'round';
+            seriesDiscoveryEx.strokeOpacity = 1.0;
+            seriesDiscoveryEx.tooltip.disabled = true;
+        });
 
         this.seriesDiscoveryLo = this.chart.series.push(new LineSeries());
         this.seriesDiscoveryLo.xAxis = this.xAxis;
@@ -117,7 +150,7 @@ export class ChartDiscoveryRate {
         this.seriesDiscoveryAv.strokeOpacity = 1.0;
         this.seriesDiscoveryAv.tooltip.disabled = false;
 
-        this.seriesDiscoveryAv.tooltipText = 'positivity:\u00A0{categoryX}\ndiscovery:\u00A0\u00A0{labelLo}\ndiscovery:\u00A0\u00A0{labelHi}';
+        this.seriesDiscoveryAv.tooltipText = 'positivity:\u00A0{categoryX}\ndiscovery1:\u00A0\u00A0{labelLo}\ndiscovery3:\u00A0\u00A0{labelHi}';
         ChartUtil.getInstance().configureSeries(this.seriesDiscoveryAv, ControlsConstants.COLOR____FONT, false);
 
         // this.seriesDiscoveryAv.adapter.add('tooltipText', (value, target) => {
@@ -160,20 +193,28 @@ export class ChartDiscoveryRate {
         const chartData: IChartDataDiscoveryRate[] = [];
         const ageGroups = demographics.getAgeGroups();
 
-        for (let positivity = 0; positivity <= 0.2; positivity += 0.01) {
+        for (let positivity = 0; positivity <= 1.0; positivity += 0.01) {
 
             const discoveryLo = StrainUtil.calculateDiscoveryRate(positivity, 0.01, discoveryValueSet);
             const discoveryAv = StrainUtil.calculateDiscoveryRate(positivity, 0.03, discoveryValueSet);
             const discoveryHi = StrainUtil.calculateDiscoveryRate(positivity, 0.05, discoveryValueSet);
 
-            chartData.push({
+
+
+            const chartEntry = {
                 positivity: this.labellingDefinitionTooltip.format(positivity),
                 discoveryAv,
                 discoveryLo,
                 discoveryHi,
                 labelLo: this.labellingDefinitionTooltip.format(discoveryLo),
                 labelHi: this.labellingDefinitionTooltip.format(discoveryHi)
+            };
+            this.distinctVals.forEach(distinctVal => {
+                const attributeName = `discoveryEx${distinctVal}`;
+                chartEntry[attributeName] = StrainUtil.calculateDiscoveryRate(positivity, parseFloat(distinctVal) / 100, discoveryValueSet);
             });
+            chartData.push(chartEntry);
+
         }
 
         if (this.fullDataUpdate) {
@@ -183,18 +224,23 @@ export class ChartDiscoveryRate {
             const keys = Object.keys(chartData[0]);
             for (let i = 0; i < chartData.length; i++) {
                 if (this.chart.data[i].discoveryAv) {
-                    // this.chart.data[i].positivity = chartData[i].positivity;
+                    this.chart.data[i].positivity = chartData[i].positivity;
                     this.chart.data[i].discoveryAv = chartData[i].discoveryAv;
                     this.chart.data[i].discoveryLo = chartData[i].discoveryLo;
                     this.chart.data[i].discoveryHi = chartData[i].discoveryHi;
                     this.chart.data[i].labelLo = chartData[i].labelLo;
                     this.chart.data[i].labelHi = chartData[i].labelHi;
+                    this.chart.data[i].discoveryEx01 = chartData[i].discoveryEx01;
+                    this.chart.data[i].discoveryEx02 = chartData[i].discoveryEx02;
+                    this.chart.data[i].discoveryEx03 = chartData[i].discoveryEx03;
+                    this.chart.data[i].discoveryEx04 = chartData[i].discoveryEx04;
+                    this.chart.data[i].discoveryEx05 = chartData[i].discoveryEx05;
                 }
             }
         }
         this.chart.invalidateRawData();
 
-        console.log('this.chart.data', this.chart.data);
+        console.log('this.chart.data', this.chart.data, chartData);
 
         this.fullDataUpdate = false;
 

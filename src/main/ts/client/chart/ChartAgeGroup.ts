@@ -105,9 +105,16 @@ export class ChartAgeGroup {
     protected readonly seriesAgeGroupRemovedByStrain: Map<string, ChartAgeGroupSeries>;
 
     /**
+     * reproduction series by strain
+     */
+    protected readonly seriesAgeGroupReproductionByStrain: Map<string, ChartAgeGroupSeries>;
+
+    /**
      * contact series by category
      */
     protected readonly seriesAgeGroupContactByCategory: Map<string, ChartAgeGroupSeries>;
+
+
 
     /**
      * visualize multipliers and/or corrections (for readability and plausibility)
@@ -123,7 +130,7 @@ export class ChartAgeGroup {
     /**
      * reproduction as calculated
      */
-    protected readonly seriesReproductionP: ChartAgeGroupSeries;
+    protected readonly seriesAgeGroupReproductionP: ChartAgeGroupSeries;
 
     /**
      * reproduction as reported
@@ -367,6 +374,7 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupIncidenceByStrain = new Map();
         this.seriesAgeGroupRemovedByStrain = new Map();
+        this.seriesAgeGroupReproductionByStrain = new Map();
         this.seriesAgeGroupContactByCategory = new Map();
 
         // turn all active strain back on
@@ -786,19 +794,19 @@ export class ChartAgeGroup {
         //     seriesConstructor: () => new LineSeries()
         // });
 
-        this.seriesReproductionP = new ChartAgeGroupSeries({
+        this.seriesAgeGroupReproductionP = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotPercent,
             title: 'reproduction (model)',
             baseLabel: 'reproduction (model)',
-            valueField: 'reproductionP',
+            valueField: 'ageGroupReproductionP',
             colorKey: 'STRAIN',
             strokeWidth: 2,
             dashed: false,
             locationOnPath: 0.20,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: false,
             legend: true,
@@ -818,7 +826,7 @@ export class ChartAgeGroup {
             locationOnPath: 0.50,
             labels: {
                 tooltip: true,
-                pathtip: true
+                pathtip: false
             },
             stacked: false,
             legend: true,
@@ -1157,7 +1165,7 @@ export class ChartAgeGroup {
 
         });
         this.chart.cursor.lineX.disabled = false;
-        this.chart.cursor.lineY.disabled = true;
+        this.chart.cursor.lineY.disabled = false;
 
         this.chart.zoomOutButton.disabled = false;
         this.chart.zoomOutButton.background.fill = color('#555555');
@@ -1510,7 +1518,7 @@ export class ChartAgeGroup {
         this.seriesEstimationValueLL.setSeriesNote(this.contactNote);
         this.seriesEstimationValueLU.setSeriesNote(this.contactNote);
 
-        this.seriesReproductionP.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupReproductionP.setSeriesNote(ageGroup.getName());
         this.seriesReproductionR.setSeriesNote(ageGroup.getName());
 
     }
@@ -1716,6 +1724,55 @@ export class ChartAgeGroup {
     }
 
     /**
+     * ensures presence of a series for the given strain
+     *
+     * @param strainValues
+     * @returns
+     */
+    getOrCreateSeriesAgeGroupReproductionStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
+
+        if (!this.seriesAgeGroupReproductionByStrain.has(strainValues.id)) {
+
+            const seriesAgeGroupReproductionStrain = new ChartAgeGroupSeries({
+                chart: this.chart,
+                yAxis: this.yAxisPlotPercent,
+                title: 'reproduction (model)',
+                baseLabel: 'reproduction (model)',
+                valueField: `ageGroupReproductionP${strainValues.id}`,
+                colorKey: 'STRAIN',
+                strokeWidth: 1,
+                dashed: true,
+                locationOnPath: 0.31,
+                labels: {
+                    tooltip: true,
+                    pathtip: true
+                },
+                stacked: false,
+                legend: false,
+                labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FLOAT_2,
+                seriesConstructor: () => new LineSeries()
+            });
+            // seriesAgeGroupReproductionStrain.getSeries().stroke = color('#000000');
+
+            // toggle strain reproduction with primary reproduction
+            this.seriesAgeGroupReproductionP.bindToLegend(seriesAgeGroupReproductionStrain);
+
+            this.seriesAgeGroupReproductionByStrain.set(strainValues.id, seriesAgeGroupReproductionStrain);
+            this.seriesAgeGroupLabelLocation += 0.1;
+            if (this.seriesAgeGroupLabelLocation > 0.8) {
+                this.seriesAgeGroupLabelLocation = 0.5;
+            }
+
+        }
+
+        const seriesAgeGroup = this.seriesAgeGroupReproductionByStrain.get(strainValues.id);
+        seriesAgeGroup.setBaseLabel(strainValues.name);
+        seriesAgeGroup.setVisible(this.chartMode === 'REPRODUCTION');
+        return seriesAgeGroup;
+
+    }
+
+    /**
      * ensures presence of a series for the given category
      *
      * @param category
@@ -1755,7 +1812,6 @@ export class ChartAgeGroup {
 
             // toggle strain incidence with primary incidence
             // this.seriesEstimationValueM.bindToLegend(seriesAgeGroupContactCategory);
-
             // seriesAgeGroupContactCategory.setSeriesNote(category);
 
             this.seriesAgeGroupContactByCategory.set(category, seriesAgeGroupContactCategory);
@@ -1890,11 +1946,23 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.renderer.grid.template.disabled = !visible;
         this.yAxisPlotPercent.tooltip.disabled = !visible;
         if (visible) {
-            this.setAxisPercentBounds(0, 2);
+            this.setAxisPercentBounds(0, 2.5);
         }
 
-        this.seriesReproductionP.setVisible(visible);
+        this.seriesAgeGroupReproductionP.setVisible(visible);
         this.seriesReproductionR.setVisible(visible);
+        this.seriesAgeGroupReproductionByStrain.forEach(seriesAgeGroupReproduction => {
+            seriesAgeGroupReproduction.setVisible(visible);
+        });
+
+        // specific incidence makes sense only if there is more than one strain
+        const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
+        if (visible && modificationValuesStrain.length > 1) {
+            // turn all active strain back on
+            modificationValuesStrain.forEach(strainValues => {
+                this.getOrCreateSeriesAgeGroupReproductionStrain(strainValues).setVisible(visible);
+            });
+        }
 
     }
 
@@ -2000,7 +2068,7 @@ export class ChartAgeGroup {
 
                     maxIncidence = Math.max(maxIncidence, dataItem.valueset[ageGroup.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL]);
 
-                    const casesScaled1 = dataItem.valueset[ageGroup.getName()].CASES * 700000 / ageGroup.getAbsValue();
+                    const casesScaled1 = dataItem.valueset[ageGroup.getName()].CASES[ModelConstants.STRAIN_ID___________ALL] * 700000 / ageGroup.getAbsValue();
                     if (this.seriesAgeGroupDiscoveredCases.isVisible()) {
                         maxIncidence = Math.max(maxIncidence, casesScaled1);
                     }
@@ -2197,7 +2265,7 @@ export class ChartAgeGroup {
 
         for (const dataItem of this.modelData) {
 
-            const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+            // const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
 
             // data independent from sub-strains
             const ageGroupSusceptible = dataItem.valueset[ageGroupPlot.getName()].SUSCEPTIBLE;
@@ -2208,7 +2276,7 @@ export class ChartAgeGroup {
             const ageGroupRemovedV2 = dataItem.valueset[ageGroupPlot.getName()].REMOVED_V2;
             const ageGroupIncidence = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[ModelConstants.STRAIN_ID___________ALL];
 
-            const ageGroupDiscoveredCases = dataItem.valueset[ageGroupPlot.getName()].CASES;
+            const ageGroupDiscoveredCases = dataItem.valueset[ageGroupPlot.getName()].CASES[ModelConstants.STRAIN_ID___________ALL];
 
             const ageGroupDiscoveryRateL = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
             // const ageGroupDiscoveryRateM = ModificationResolverDiscovery.getRegression(ageGroupPlot.getIndex()).findLoessValue(dataItem.instant).m;
@@ -2224,7 +2292,7 @@ export class ChartAgeGroup {
             let positivityRate = dataItem.positivityRate;
             let testRate = dataItem.testRate;
 
-            const reproductionP = dataItem.valueset[ageGroupPlot.getName()].REPRODUCTION; // this.calculateRt(dataItem.instant);
+            const ageGroupReproductionP = dataItem.valueset[ageGroupPlot.getName()].REPRODUCTION[ModelConstants.STRAIN_ID___________ALL];
             // console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), reproductionP);
 
             let ageGroupIncidence95L: number;
@@ -2256,7 +2324,7 @@ export class ChartAgeGroup {
                 ageGroupCasesN,
                 positivityRate,
                 testRate,
-                reproductionP,
+                ageGroupReproductionP,
                 ageGroupDiscoveryRateL,
                 // ageGroupDiscoveryRateM,
                 mobility: 0
@@ -2266,6 +2334,10 @@ export class ChartAgeGroup {
             modificationValuesStrain.forEach(modificationValueStrain => {
                 item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
                 item[`ageGroupRemovedID${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].REMOVED[modificationValueStrain.id];
+                if (dataItem.valueset[ageGroupPlot.getName()].CASES[modificationValueStrain.id] > 25) {
+                    item[`ageGroupReproductionP${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].REPRODUCTION[modificationValueStrain.id];
+                }
+
             });
 
             // console.log('item', item)
@@ -2277,36 +2349,6 @@ export class ChartAgeGroup {
                 let value = ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatValue(dataItem, ageGroupHeat.getName());
                 let label = value && ControlsConstants.HEATMAP_DATA_PARAMS[this.chartMode].getHeatLabel(value);
                 let gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
-
-                let color: string;
-                if (QueryUtil.getInstance().isDiffDisplay() && dataItem && dataItem00) { //
-
-                    const caseValue = dataItem.valueset[ageGroupHeat.getName()].CASES / dataItem00.getAverageCases(ageGroupHeat.getIndex()) - 1;
-
-                    // const caseValue = dataItem.derivs ? dataItem.derivs[ageGroupHeat.getName()] : 0;
-
-                    let r = 0;
-                    let g = 0;
-                    let b = 0;
-                    if (caseValue >= 0) {
-                        g = caseValue * 5;
-                    }
-                    else {
-                        r = caseValue * - 5;
-                    }
-
-                    const rgb = [Math.min(1, r), Math.min(1, g), b];
-
-                    const hsv = [0, 0, 0];
-                    ColorUtil.rgbToHsv(rgb, hsv);
-                    color = new Color(hsv[0], hsv[1], hsv[2]).getHex();
-
-                    label = caseValue?.toLocaleString();
-                    // gamma = caseValue;
-                    gamma = Math.pow(caseValue + randomVd, 1 / 0.9); // apply some gamma for better value perception
-                    // gamma = Math.pow(value + randomVd, 1 / 1.15); // apply some gamma for better value perception
-
-                }
 
                 heatData.push({
                     categoryX: dataItem.categoryX,
@@ -2345,7 +2387,6 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupSusceptible, plotData);
         this.applyData(this.seriesAgeGroupExposed, plotData);
         this.applyData(this.seriesAgeGroupInfectious, plotData);
-        // this.applyData(this.seriesAgeGroupRemovedID, plotData);
         this.applyData(this.seriesAgeGroupRemovedVI, plotData);
         this.applyData(this.seriesAgeGroupRemovedV2, plotData);
         this.applyData(this.seriesAgeGroupIncidence, plotData);
@@ -2358,7 +2399,7 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupCasesN, plotData);
         this.applyData(this.seriesPositivityRate, plotData);
         this.applyData(this.seriesTestRate, plotData);
-        this.applyData(this.seriesReproductionP, plotData);
+        this.applyData(this.seriesAgeGroupReproductionP, plotData);
         this.applyData(this.seriesAgeGroupDiscoveryL, plotData);
         this.applyData(this.seriesAgeGroupDiscoveryM, plotData);
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
@@ -2368,6 +2409,11 @@ export class ChartAgeGroup {
         this.seriesAgeGroupRemovedByStrain.forEach(seriesAgeGroupRemoved => {
             this.applyData(seriesAgeGroupRemoved, plotData);
             seriesAgeGroupRemoved.setSeriesNote(ageGroupPlot.getName());
+        });
+        this.seriesAgeGroupReproductionByStrain.forEach(seriesAgeGroupReproduction => {
+            this.applyData(seriesAgeGroupReproduction, plotData);
+            seriesAgeGroupReproduction.setSeriesNote(ageGroupPlot.getName());
+            seriesAgeGroupReproduction.setSeriesNote('');
         });
 
     }

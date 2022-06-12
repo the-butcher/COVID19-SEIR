@@ -34,7 +34,7 @@ export class ControlsDiscovery {
 
     private readonly chartTesting: ChartDiscovery;
     private readonly sliderTestRate: Slider;
-    private readonly sliderFactorWeight: Slider;
+    // private readonly sliderFactorWeight: Slider;
     private readonly slidersCorrections: Slider[];
     private readonly iconBlendable: IconToggle;
 
@@ -74,7 +74,7 @@ export class ControlsDiscovery {
                 if (type === 'tick') {
                     return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
                 } else {
-                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`;
                 }
             },
             handleValueChange: (index, value, type) => {
@@ -87,7 +87,7 @@ export class ControlsDiscovery {
             },
             inputFunctions: {
                 inputFormatFunction: (index, value) => {
-                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                    return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
                 },
                 inputHandleFunction: (index, value) => {
                     return parseFloat(value.replace(',', '.')) / 100;
@@ -96,44 +96,44 @@ export class ControlsDiscovery {
         });
 
         const factorWeightRange: number[] = [
-            0.00, 0.25, 0.50, 0.75, 1.00
+            0.50, 0.75, 1.00, 1.25, 1.5
         ];
 
-        const container2 = document.createElement('div');
-        container2.classList.add('slider-modification');
-        document.getElementById('slidersTestingDiv').appendChild(container2);
-        this.sliderFactorWeight = new Slider({
-            container: container2,
-            min: Math.min(...factorWeightRange),
-            max: Math.max(...factorWeightRange),
-            step: 0.01,
-            values: [0.0],
-            ticks: [...factorWeightRange],
-            label: 'test rate',
-            thumbCreateFunction: (index: number) => {
-                return new IconSlider();
-            },
-            labelFormatFunction: (index, value, type) => {
-                return `${(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
+        // const container2 = document.createElement('div');
+        // container2.classList.add('slider-modification');
+        // document.getElementById('slidersTestingDiv').appendChild(container2);
+        // this.sliderFactorWeight = new Slider({
+        //     container: container2,
+        //     min: Math.min(...factorWeightRange),
+        //     max: Math.max(...factorWeightRange),
+        //     step: 0.01,
+        //     values: [0.0],
+        //     ticks: [...factorWeightRange],
+        //     label: 'test rate',
+        //     thumbCreateFunction: (index: number) => {
+        //         return new IconSlider();
+        //     },
+        //     labelFormatFunction: (index, value, type) => {
+        //         return `${(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
 
-            },
-            handleValueChange: (index, value, type) => {
-                if (type === 'stop' || type === 'input') {
-                    this.handleChange();
-                }
-            },
-            handleThumbPicked: (index) => {
-                // nothing
-            },
-            inputFunctions: {
-                inputFormatFunction: (index, value) => {
-                    return `${(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
-                },
-                inputHandleFunction: (index, value) => {
-                    return parseFloat(value.replace(',', '.'));
-                }
-            }
-        });
+        //     },
+        //     handleValueChange: (index, value, type) => {
+        //         if (type === 'stop' || type === 'input') {
+        //             this.handleChange();
+        //         }
+        //     },
+        //     handleThumbPicked: (index) => {
+        //         // nothing
+        //     },
+        //     inputFunctions: {
+        //         inputFormatFunction: (index, value) => {
+        //             return `${(value).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
+        //         },
+        //         inputHandleFunction: (index, value) => {
+        //             return parseFloat(value.replace(',', '.'));
+        //         }
+        //     }
+        // });
 
         this.slidersCorrections = [];
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
@@ -144,11 +144,11 @@ export class ControlsDiscovery {
 
             this.slidersCorrections.push(new Slider({
                 container,
-                min: Math.min(...ModelConstants.RANGE____PERCENTAGE_200),
-                max: Math.max(...ModelConstants.RANGE____PERCENTAGE_200),
+                min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
+                max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
                 step: 0.01,
                 values: [0.0],
-                ticks: [...ModelConstants.RANGE____PERCENTAGE_200],
+                ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
                 label: ageGroup.getName(),
                 thumbCreateFunction: (index: number) => {
                     return new IconSlider();
@@ -186,7 +186,7 @@ export class ControlsDiscovery {
 
         const blendable = this.iconBlendable.getState();
         const testRate = this.sliderTestRate.getValue(0);
-        const factorWeight = this.sliderFactorWeight.getValue(0);
+        // const factorWeight = this.sliderFactorWeight.getValue(0);
 
         const corrections: { [K in string]: number } = {};
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
@@ -197,7 +197,7 @@ export class ControlsDiscovery {
             corrections,
             blendable,
             testRate,
-            factorWeight
+            // factorWeight
         });
 
         this.updateChart();
@@ -218,7 +218,7 @@ export class ControlsDiscovery {
         this.iconBlendable.toggle(modification.isBlendable());
 
         this.sliderTestRate.setValueAndRedraw(0, modification.getTestRate(), true);
-        this.sliderFactorWeight.setValueAndRedraw(0, modification.getFactorWeight(), true);
+        // this.sliderFactorWeight.setValueAndRedraw(0, modification.getFactorWeight(), true);
         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
             this.slidersCorrections[ageGroup.getIndex()].setValueAndRedraw(0, modification.getCorrectionValue(ageGroup.getIndex()), true);
         });

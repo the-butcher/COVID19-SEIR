@@ -44,7 +44,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                     Modifications.getInstance().deleteModification(modificationDiscoveryDeletable.getId());
                 });
 
-                const instantMin = lastValidDiscoveryInstant + TimeUtil.MILLISECONDS_PER____DAY * 3;
+                const instantMin = lastValidDiscoveryInstant + TimeUtil.MILLISECONDS_PER____DAY * 4;
                 const instantMax = ModelInstants.getInstance().getMaxInstant();
                 for (let instant = instantMin; instant < instantMax; instant += TimeUtil.MILLISECONDS_PER____DAY * 3) {
                     const modificationDiscoveryInsertable = modificationResolverDiscovery.getModification(instant, 'INTERPOLATE');

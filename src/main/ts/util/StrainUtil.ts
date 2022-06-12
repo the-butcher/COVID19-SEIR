@@ -1,5 +1,6 @@
 import { Demographics } from '../common/demographics/Demographics';
 import { IDiscoveryValueSet } from '../common/modification/IDiscoveryValueSet';
+import { ModelConstants } from '../model/ModelConstants';
 import { AgeGroup } from './../common/demographics/AgeGroup';
 import { BaseData } from './../model/basedata/BaseData';
 import { IDataItem } from './../model/state/ModelStateIntegrator';
@@ -62,7 +63,7 @@ export class StrainUtil {
 
         const baseItem = BaseData.getInstance().findBaseDataItem(instant);
         const baseCases = baseItem.getAverageCases(ageGroup.getIndex());
-        const dataCases = dataItem.valueset[ageGroup.getName()].CASES;
+        const dataCases = dataItem.valueset[ageGroup.getName()].CASES[ModelConstants.STRAIN_ID___________ALL];
 
         return {
             base: baseCases,
@@ -100,29 +101,61 @@ export class StrainUtil {
         return num;
     }
 
+    // static calculateDiscoveryRate(positivityRate: number, testRate: number, discoveryValueSet: IDiscoveryValueSet): number {
+
+    //     // \left(x\ \cdot s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}-x\cdot\left(s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}
+
+    //     const pow = -discoveryValueSet.pow;
+
+    //     const maxKey1 = 0.01;
+    //     const maxKey5 = 0.05;
+
+    //     const maxVal1 = discoveryValueSet.maxTr1;
+    //     const maxVal5 = discoveryValueSet.maxTr5;
+
+    //     const fraction = (maxKey1 - testRate) / (maxKey1 - maxKey5);
+    //     const maxVal = maxVal1 + (maxVal5 - maxVal1) * fraction;
+
+    //     const slp = discoveryValueSet.xmb; // - testRate * discoveryValueSet.xmr; // higher number means steeper (less tests per person means steeper slope = less cases found for )
+
+    //     const sqm = Math.pow(maxVal, 1 / pow);
+
+    //     return Math.pow(positivityRate * slp + sqm, pow) - positivityRate * Math.pow(slp + sqm, pow); // + testRate * discoveryValueSet.xmr;
+
+    // }
+
+    /**
+     * https://www.desmos.com/calculator/v76oalurp7
+     * @param positivityRate
+     * @param testRate
+     * @param discoveryValueSet
+     * @returns
+     */
     static calculateDiscoveryRate(positivityRate: number, testRate: number, discoveryValueSet: IDiscoveryValueSet): number {
 
-        // \left(x\ \cdot s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}-x\cdot\left(s\ +\ m^{\frac{1}{p}}\ \ \right)^{p}
+        // p=7
+        const p = discoveryValueSet.pow;
 
-        const pow = -discoveryValueSet.pow;
+        // c=x\cdot t_{1}
+        const c = positivityRate * testRate;
 
-        const maxKey1 = 0.01;
-        const maxKey5 = 0.05;
+        // i=\left(1-x\right)+\frac{x}{t_{1}}
+        const i = (1 - positivityRate) + positivityRate / testRate;
 
-        const maxVal1 = discoveryValueSet.maxTr1;
-        const maxVal5 = discoveryValueSet.maxTr5;
+        // i^{-p}\cdot\left(1-x\right)+c_{1}
+        const discoveryRate = Math.pow(i, -p) * (1 - positivityRate) + c;
 
-        const fraction = (maxKey1 - testRate) / (maxKey1 - maxKey5);
-        const maxVal = maxVal1 + (maxVal5 - maxVal1) * fraction;
-
-        const slp = discoveryValueSet.xmb; // - testRate * discoveryValueSet.xmr; // higher number means steeper (less tests per person means steeper slope = less cases found for )
-
-        const sqm = Math.pow(maxVal, 1 / pow);
-
-        return Math.pow(positivityRate * slp + sqm, pow) - positivityRate * Math.pow(slp + sqm, pow); // + testRate * discoveryValueSet.xmr;
+        return discoveryRate;
 
     }
 
+    /**
+     * testRate * positivityRate = foundCases
+     *
+     * @param cases
+     * @param testRate
+     * @returns
+     */
     static calculatePositivityRate(cases: number, testRate: number): number {
         return cases / Demographics.getInstance().getAbsTotal() / testRate;
     }

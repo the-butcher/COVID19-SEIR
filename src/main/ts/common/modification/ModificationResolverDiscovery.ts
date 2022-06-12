@@ -12,6 +12,9 @@ import { ModificationTime } from './ModificationTime';
 /**
  * modification resolver for testing modifications
  *
+ * if discovery params moved to strain:
+ * -- test rate is known -> absolute cases is known
+ *
  * @author h.fleischer
  * @since 25.05.2021
  */

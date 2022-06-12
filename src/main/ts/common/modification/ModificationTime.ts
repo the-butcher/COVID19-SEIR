@@ -24,6 +24,7 @@ import { ModificationVaccination } from './ModificationVaccination';
 
 export interface IRatios {
     contact: number;
+    setting: number;
     discovery: number;
 }
 
@@ -174,6 +175,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         const shareOfInfectionBeforeIncubation = CompartmentChainReproduction.getInstance().getShareOfPresymptomaticInfection();
         const shareOfInfectionAfterIncubation = 1 - shareOfInfectionBeforeIncubation;
 
+        // have a base set of values
         let discoveryRates: number[] = [
             1.00, // <= 04
             1.00, // 05-14
@@ -187,25 +189,10 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
             1.00, // >= 85
         ].map(v => v);
 
-        const ageGroupFactors: number[] = [];
-
+        // fill with configuration values
         this.ageGroups.forEach(ageGroup => {
-
             discoveryRates[ageGroup.getIndex()] = this.modificationDiscovery.getCorrectionValue(ageGroup.getIndex());
-
-            // 0 (<= 04) to 1 (>= 85)
-            const ageGroupIndex = ageGroup.getIndex();
-            const ageGroupFraction = ((ageGroupIndex / (this.ageGroups.length - 1)) - 0.35) * 1.8;
-
-            const xp9sqp = Math.sin(Math.pow(ageGroupFraction, 3)) * this.modificationDiscovery.getFactorWeight();
-            ageGroupFactors.push(xp9sqp);
-
-            // const xp9sqp = Math.cos(Math.pow(ageGroupFraction * Math.PI, 3) / Math.pow(Math.PI, 2)) * -0.50 + 0.50;
-            // const discoveryFactorAge = Math.max(0, Math.min(1, xp9sqp));
-            // ageGroupFactors.push(discoveryFactorAge);
-
         });
-        // console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), ageGroupFactors);
 
         /**
          * just collect from the settings
@@ -213,40 +200,22 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         this.ageGroups.forEach(ageGroup => {
 
             const ageGroupIndex = ageGroup.getIndex();
-            let contactTotal = 0;
-            let discoveryRateAgeGroup = 0;
-
-            this.contactCategories.forEach(contactCategory => {
-
-                // current contact ratio for that contact category as set in modification (0% to 100%)
-                const contactRatioCategory = this.modificationContact.getCategoryValue(contactCategory.getName());
-                // total contact in the requested age group in contact category (TODO - question this value)
-                const contactGroupCategory = contactCategory.getColumnValue(ageGroupIndex);
-                // current total contact as of base contact-rate and contact-ratio in contact category
-                const contactTotalCategory = contactRatioCategory * contactGroupCategory;
-
-                // current discovery setting for category as set in modification
-                let discoveryRateCategory = discoveryRates[ageGroup.getIndex()];
-
-                // current share of discovered in currentTotal
-                contactTotal += contactTotalCategory;
-                discoveryRateAgeGroup += discoveryRateCategory * contactTotalCategory;
-
-            });
 
             this.discoveryRatesByAgeGroup[ageGroupIndex] = {
-                contact: contactTotal,
-                discovery: discoveryRateAgeGroup / contactTotal
+                setting: discoveryRates[ageGroup.getIndex()],
+                contact: 1, // contactTotal,
+                discovery: discoveryRates[ageGroup.getIndex()], // discoveryRateAgeGroup / contactTotal
             };
 
         });
 
-
-        // if (this.getInstant() % TimeUtil.MILLISECONDS_PER____DAY === 0) {
-        //     this.ageGroups.forEach(ageGroup => {
-        //         console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), ageGroup.getIndex(), ageGroup.getName(), this.discoveryRatesByAgeGroup[ageGroup.getIndex()].discovery, this.discoveryRatesByAgeGroup[ageGroup.getIndex()].contact);
-        //     });
-        // }
+        /**
+         * if configured discovery rates were weights, could the assumption be made that an overall discovery rate could be composed of:
+         * - config value would be the rate of people in an age group actually getting tested (let it be a test rate multiplier)
+         * - effectively this would define a test-rate weight per age-group
+         * - then, depending on actual cases in the respective age group specific age-group positivity-rates could be calculated
+         * - finally from each group would get it's discovery rate and the overall discovery would just be derived from those values
+         */
 
         const normalize = () => {
 
@@ -264,6 +233,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact * correction;
                 let discovery = Math.min(1, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
                 this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
+                    setting: this.discoveryRatesByAgeGroup[ageGroupIndex].setting,
                     contact,
                     discovery
                 };
@@ -271,25 +241,6 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
             });
 
         }
-
-        normalize();
-
-
-
-        this.ageGroups.forEach(ageGroup => {
-
-            const ageGroupIndex = ageGroup.getIndex();
-
-            // 0 (<= 04) to 1 (>= 85)
-            let discovery = this.discoveryRatesByAgeGroup[ageGroupIndex].discovery;
-            discovery += (1 - discovery) * ageGroupFactors[ageGroupIndex];
-
-            this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
-                ...this.discoveryRatesByAgeGroup[ageGroup.getIndex()],
-                discovery
-            };
-
-        });
 
         normalize();
 
@@ -303,6 +254,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         });
 
         this.discoveryRatesByAgeGroup[this.ageGroupIndexTotal] = {
+            setting: -1,
             contact: -1,
             discovery: this.calculateDiscoveryRateOverall()
         }
@@ -338,7 +290,7 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         if (testRate && positivityRate) {
             return StrainUtil.calculateDiscoveryRate(positivityRate, testRate, ModificationSettings.getInstance().getModificationValues());
         } else {
-            Math.random();
+            // Math.random();
         }
     }
 

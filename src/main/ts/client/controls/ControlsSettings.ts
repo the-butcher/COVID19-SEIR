@@ -50,7 +50,7 @@ export class ControlsSettings {
 
         this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
 
-        this.sliderPow = new SliderSetting("exponent", [0, 2, 4, 6, 8, 10], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderPow = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         const maxRange: number[] = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
 
@@ -95,7 +95,7 @@ export class ControlsSettings {
 
 
         // new SliderSetting("discovery max", [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        this.sliderXmb = new SliderSetting("discovery slope base", [0.0, 0.5, 1.0, 1.5, 2.0], 0.05, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderXmb = new SliderSetting("discovery slope base", [0.0, 0.1, 0.2, 0.3, 0.4, 0.5], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         // this.sliderXmr = new SliderSetting("discovery slope rate", [0, 2, 4, 6, 8, 10], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
