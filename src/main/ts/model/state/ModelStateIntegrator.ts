@@ -101,13 +101,6 @@ export class ModelStateIntegrator {
 
         const modificationTime = ModificationTime.createInstance(tT);
 
-        /**
-         * based on model state:
-         *
-         * test rate is known
-         *
-         */
-
         if (tT % TimeUtil.MILLISECONDS_PER____DAY === 0 && tT > BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4) {
 
             const compartmentFilterCasesTotal = new CompartmentFilter(c => c.getCompartmentType() === ECompartmentType.X__INCIDENCE_0);
@@ -120,6 +113,9 @@ export class ModelStateIntegrator {
         }
 
         this.modelState.add(this.model.apply(this.modelState, dT, tT, modificationTime));
+
+
+
         return modificationTime;
 
     }
@@ -256,6 +252,7 @@ export class ModelStateIntegrator {
 
         for (; this.curInstant <= dstInstant; this.curInstant += ModelStateIntegrator.DT) {
 
+            // perform a single model integration step
             const modificationTime = this.integrate(ModelStateIntegrator.DT, this.curInstant);
 
             // sum up strain exposures to a single exposure matrix
@@ -286,7 +283,6 @@ export class ModelStateIntegrator {
                 const removedV2Total = this.modelState.getNrmValueSum(compartmentFilterRemovedV2Total);
 
                 // TODO DISCOVERY :: with discovery moved to strain, find a way to get an overall discovery ratio (try: count discoveredcases in strain iteration)
-                // const discoveryTotal = modificationTime.getDiscoveryRateLoess(ageGroupIndexTotal);
                 const discoveryTotal = modificationTime.getDiscoveryRatesRaw(ageGroupIndexTotal).discovery;
 
                 // values that come by strain
@@ -336,7 +332,6 @@ export class ModelStateIntegrator {
                 dataItem.valueset[ModelConstants.AGEGROUP_NAME_______ALL] = {
                     CASES: cases,
                     SUSCEPTIBLE: this.modelState.getNrmValueSum(compartmentFilterSusceptibleTotal),
-                    // REMOVED_ID: removedIDTotal,
                     REMOVED_VI: removedVITotal,
                     REMOVED_V2: removedV2Total,
                     INCIDENCES: incidences,

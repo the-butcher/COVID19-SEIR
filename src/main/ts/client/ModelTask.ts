@@ -92,6 +92,7 @@ export class ModelTask {
                 });
 
                 // console.log('modelProgress.modificationValuesDiscovery', modelProgress.modificationValuesDiscovery);
+                // COMMENT :: POS
                 modelProgress.modificationValuesDiscovery?.forEach(modificationValuesDiscovery => {
                     const modificationDiscovery = Modifications.getInstance().findModificationById(modificationValuesDiscovery.id) as ModificationDiscovery;
                     let saveRequired = false;

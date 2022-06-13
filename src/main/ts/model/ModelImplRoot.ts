@@ -132,6 +132,14 @@ export class ModelImplRoot implements IModelSeir {
 
     }
 
+    getStepCases(ageGroupIndex: number): number {
+        let stepCases = 0;
+        this.strainModels.forEach(strainModel => {
+            stepCases += strainModel.getStepCases(ageGroupIndex);
+        })
+        return stepCases;
+    }
+
     findStrainModel(strainId: string): ModelImplStrain {
         return this.strainModels.find(m => m.getStrainId() === strainId);
     }

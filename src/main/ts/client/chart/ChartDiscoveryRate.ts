@@ -199,8 +199,6 @@ export class ChartDiscoveryRate {
             const discoveryAv = StrainUtil.calculateDiscoveryRate(positivity, 0.03, discoveryValueSet);
             const discoveryHi = StrainUtil.calculateDiscoveryRate(positivity, 0.05, discoveryValueSet);
 
-
-
             const chartEntry = {
                 positivity: this.labellingDefinitionTooltip.format(positivity),
                 discoveryAv,

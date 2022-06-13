@@ -84,9 +84,9 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
     getTestRate(): number {
         const dataItem = BaseData.getInstance().findBaseDataItem(this.getInstantA());
         if (dataItem) {
-            const averagePosititivity = dataItem.getAveragePositivity();
+            // const averagePosititivity = dataItem.getAveragePositivity();
             const averageTests = dataItem.getAverageTests();
-            if (averagePosititivity && averageTests) {
+            if (/* averagePosititivity && */ averageTests) {
                 const testRate = averageTests / Demographics.getInstance().getAbsTotal();
                 this.acceptUpdate({
                     testRate
@@ -99,9 +99,9 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
         return this.modificationValues.testRate || 0.04;
     }
 
-    getFactorWeight(): number {
-        return this.modificationValues.factorWeight || 0.7;
-    }
+    // getFactorWeight(): number {
+    //     return this.modificationValues.factorWeight || 0.7;
+    // }
 
     isBlendable(): boolean {
         return this.modificationValues.blendable;

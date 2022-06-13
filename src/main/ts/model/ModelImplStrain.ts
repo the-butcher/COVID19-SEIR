@@ -132,6 +132,10 @@ export class ModelImplStrain implements IModelSeir {
         return this.nrmExposure;
     }
 
+    getStepCases(ageGroupIndex: number): number {
+        return this.infectiousModels[ageGroupIndex].getStepCases();
+    }
+
     apply(state: IModelState, dT: number, tT: number, modificationTime: ModificationTime): IModelState {
 
         const result = ModelState.empty();

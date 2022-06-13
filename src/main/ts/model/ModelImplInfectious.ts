@@ -33,14 +33,12 @@ export class ModelImplInfectious implements IModelSeir {
     private readonly ageGroupName: string;
     private readonly ageGroupTotal: number;
 
-    /**
-     *
-     */
     private readonly compartmentsInfectious: CompartmentInfectious[];
-
     private readonly compartmentsIncidence: CompartmentBase[];
 
     private readonly integrationSteps: IModelIntegrationStep[];
+
+    private stepCases: number;
 
     constructor(parentModel: ModelImplStrain, demographics: Demographics, ageGroup: AgeGroup, strainValues: IModificationValuesStrain, modificationTime: ModificationTime) {
 
@@ -53,6 +51,8 @@ export class ModelImplInfectious implements IModelSeir {
         this.ageGroupIndex = ageGroup.getIndex();
         this.ageGroupName = ageGroup.getName();
         this.ageGroupTotal = ageGroup.getAbsValue();
+
+        this.stepCases = 0;
 
         // const ageGroupFraction = this.ageGroupIndex / 9;
         // this.baseDiscovery = 0.1 + 0.2 * ageGroupFraction + 0.7 * Math.pow(ageGroupFraction, 9);
@@ -201,7 +201,7 @@ export class ModelImplInfectious implements IModelSeir {
                     if (targetCompartment) {
                         nrmIncrs[targetIndex] = nrmIncrs[targetIndex] + continuationValue
                     } else {
-                        nrmRecov += continuationValue; // collect be simple addition and push to compartment in a single step
+                        nrmRecov += continuationValue; // collect be simple addition and push to compartment in a single step later
                     }
 
                     /**
@@ -218,6 +218,8 @@ export class ModelImplInfectious implements IModelSeir {
 
                         const discoveredNrmCases = continuationValue * discoveryRatio;
                         result.addNrmValue(discoveredNrmCases, compartmentDiscoveredCases);
+
+                        this.stepCases = continuationValue;
 
                     }
 
@@ -292,6 +294,10 @@ export class ModelImplInfectious implements IModelSeir {
     }
     getAgeGroupTotal(): number {
         return this.ageGroupTotal;
+    }
+
+    getStepCases(): number {
+        return this.stepCases;
     }
 
     getInitialState(): IModelState {
