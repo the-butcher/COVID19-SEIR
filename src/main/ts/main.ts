@@ -70,7 +70,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
                     correction_configs[ageGroup.getName()] = {
                         back_days_a: -35,
-                        back_days_b: 0,
+                        back_days_b: 21,
                         poly_shares: [
                             0.75,
                             0.25
@@ -102,7 +102,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
                     correction_configs[ageGroup.getName()] = {
                         back_days_a: -35,
-                        back_days_b: 0,
+                        back_days_b: 21,
                         poly_shares: [
                             0.25,
                             0.95
@@ -138,7 +138,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             //     });
             // });
 
-            const snapContactMultipliersToGoogleContact = false;
+            const snapContactMultipliersToGoogleContact = true;
             if (snapContactMultipliersToGoogleContact) {
 
                 const instantMin = ModelInstants.getInstance().getMinInstant();

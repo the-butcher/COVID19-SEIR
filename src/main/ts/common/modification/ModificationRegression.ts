@@ -125,7 +125,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     /**
      * get a multiplier randomized in a way that fits the confidence interval associated with this multiplier
-     * 
+     *
      * @param instant
      * @param contactCategory
      * @returns
@@ -150,7 +150,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
 
     /**
      * get a correction randomized in a way that fits the confidence interval associated with this correction
-     * 
+     *
      * @param instant
      * @param ageGroupIndex
      * @returns
@@ -212,11 +212,13 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 regressionConfig.poly_shares = [0.5, 0.75];
             }
             const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
-            const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantB = this.getInstantA(); // + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantC = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
             this.multiplierRegressions[key] = new ValueRegressionMultiplier({
                 contactCategory: key,
                 instantA,
                 instantB,
+                instantC,
                 polyShares: regressionConfig.poly_shares,
                 modifications: new ModificationResolverContact().getModifications() // .filter(m => m.getInstant() <= instantB)
             });
@@ -230,11 +232,13 @@ export class ModificationRegression extends AModification<IModificationValuesReg
             }
             const ageGroupIndex = Demographics.getInstance().findAgeGroupByName(key).getIndex();
             const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
-            const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantB = this.getInstantA(); // + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantC = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
             this.correctionRegressions[key] = new ValueRegressionCorrection({
                 ageGroupIndex,
                 instantA,
                 instantB,
+                instantC,
                 polyShares: regressionConfig.poly_shares,
                 modifications: new ModificationResolverContact().getModifications() //.slice(0, -1) // drop last element so it does not contribute to regression and can be adjusted independently
             });
@@ -250,7 +254,8 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 }
                 // const ageGroupIndex = Demographics.getInstance().findAgeGroupByName(ageKey).getIndex();
                 const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
-                const instantB = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+                const instantB = this.getInstantA(); // + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+                const instantC = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
                 this.vaccinationRegressions[ageKey][vaccKey] = new ValueRegressionVaccination({
                     ageGroupName: ageKey,
                     vaccinationPropertyGetter: (m: ModificationVaccination) => {
@@ -258,6 +263,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                     },
                     instantA,
                     instantB,
+                    instantC,
                     polyShares: regressionConfig.poly_shares,
                     modifications: new ModificationResolverVaccination().getModifications() // .filter(m => m.getInstantA() <= instantB)
                 });

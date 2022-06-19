@@ -474,9 +474,9 @@ export class ChartAgeGroup {
             title: 'discovered cases (model)',
             baseLabel: 'discovered cases (model)',
             valueField: 'ageGroupDiscoveredCases',
-            colorKey: 'CASES',
-            strokeWidth: 2,
-            dashed: false,
+            colorKey: 'SEASONALITY',
+            strokeWidth: 1,
+            dashed: true,
             locationOnPath: 0.41,
             labels: {
                 tooltip: true,

@@ -35,6 +35,7 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
     // private readonly instant: number;
     private readonly instantA: number;
     private readonly instantB: number;
+    private readonly instantC: number;
     private readonly polyShares: number[];
 
 
@@ -52,6 +53,7 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
 
         this.instantA = params.instantA;
         this.instantB = params.instantB;
+        this.instantC = params.instantC;
         this.polyShares = params.polyShares;
         this.loessValues01000 = [];
         this.loessValues00500 = [];
@@ -276,9 +278,22 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         const loessValue00500 = this.findOrInterpolateLoessValue(instant, this.loessValues00500);
         const loessValue00250 = this.findOrInterpolateLoessValue(instant, this.loessValues00250);
 
-        const share01000 = this.polyShares[0];
-        const share00500 = this.polyShares[1] - this.polyShares[0];
-        const share00250 = 1 - this.polyShares[1];
+        // \sin\left(x\cdot\pi-\frac{\pi}{2}\right)\cdot0.5+0.5
+
+        let polyShareShift = Math.max(0, Math.min(1, (instant - this.instantB) / (this.instantC - this.instantB)));
+        polyShareShift = Math.sin(polyShareShift * Math.PI - Math.PI / 2) * 0.5 + 0.5;
+
+        let polyShare0 = this.polyShares[0] + (1 - this.polyShares[0]) * polyShareShift;
+        let polyShare1 = this.polyShares[1] + (1 - this.polyShares[1]) * polyShareShift;
+
+        const share01000 = polyShare0;
+        const share00500 = polyShare1 - polyShare0;
+        const share00250 = 1 - polyShare1;
+
+        // if (instant % TimeUtil.MILLISECONDS_PER___WEEK === 0) {
+        // goes from 0 to n-days
+        // console.log(TimeUtil.formatCategoryDateFull(instant), (instant - this.instantB) / TimeUtil.MILLISECONDS_PER____DAY);
+        // }
 
         let m: number;
         if (loessValue01000.m && loessValue00500.m && loessValue00250.m) {

@@ -86,7 +86,7 @@ export class StrainUtil {
      */
     static randomGaussian(scale: number) {
         let u = 0, v = 0;
-        while (u === 0) u = Math.random() //Converting [0,1) to (0,1)
+        while (u === 0) u = Math.random() //Converting (0 > 1) to (0 < 1)
         while (v === 0) v = Math.random()
         let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
 
@@ -102,8 +102,8 @@ export class StrainUtil {
     }
 
     /**
-     * https://www.desmos.com/calculator/v76oalurp7
-     * https://www.desmos.com/calculator/enhpwod5fq
+     * https://www.desmos.com/calculator/ff3mylqmvc
+     * anim: https://www.desmos.com/calculator/2kfsgonyvv
      * @param positivityRate
      * @param testRate
      * @param discoveryValueSet
@@ -118,7 +118,7 @@ export class StrainUtil {
         const c = positivityRate * testRate;
 
         // i=\left(1-x\right)+\frac{x}{t_{1}}
-        const i = (1 - positivityRate) + positivityRate / testRate;
+        const i = (1 - positivityRate) + Math.pow(positivityRate, discoveryValueSet.pow2) / testRate;
 
         // i^{-p}\cdot\left(1-x\right)+c_{1}
         const discoveryRate = Math.pow(i, -p) * (1 - positivityRate) + c;

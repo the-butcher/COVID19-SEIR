@@ -228,59 +228,46 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
 
             const totalTestsPerDay = this.getTestRate() * Demographics.getInstance().getAbsTotal();
             const totalPositivityRate = this.getPositivityRate();
-            // const totalDiscoveryRate = StrainUtil.calculateDiscoveryRate(totalPositivityRate, totalTestRate, ModificationSettings.getInstance().getModificationValues());
-            // const totalDiscovery = totalDiscoveryRate * absTotal;
+            const totalDiscoveryRate = StrainUtil.calculateDiscoveryRate(totalPositivityRate, this.getTestRate(), ModificationSettings.getInstance().getModificationValues());
+            const totalDiscovery = totalDiscoveryRate * Demographics.getInstance().getAbsTotal();
 
-            const ageGroupTestRates: number[] = [];
-            const ageGroupDiscoveryRates: number[] = [];
+            // const ageGroupTestRates: number[] = [];
+            // const ageGroupDiscoveryRates: number[] = [];
+
+            // let ageGroupTestSum: number = 0;
+            // let ageGroupDiscoverySum: number = 0;
+
             this.ageGroups.forEach(ageGroup => {
 
-                const ageGroupTestRate = ageGroupShares[ageGroup.getIndex()] * totalTestsPerDay / ageGroup.getAbsValue();
 
-                const ageGroupPositivity = totalPositivityRate; // ??? ageGroupShares[ageGroup.getIndex()] = totalPositivityRate / ageGroupShares[ageGroup.getIndex()];
-                const ageGroupDiscovery = StrainUtil.calculateDiscoveryRate(ageGroupPositivity, ageGroupTestRate, ModificationSettings.getInstance().getModificationValues());
+                // calculate a new discovery rate from weights
+                const ageGroupDiscoveryRate = totalDiscovery * ageGroupShares[ageGroup.getIndex()] / ageGroup.getAbsValue();
 
-                ageGroupDiscoveryRates.push(ageGroupDiscovery);
-                ageGroupTestRates.push(ageGroupTestRate);
+                // const ageGroupTestRate = ageGroupShares[ageGroup.getIndex()] * totalTestsPerDay / ageGroup.getAbsValue();
+                // const ageGroupPositivity = totalPositivityRate; // ??? ageGroupShares[ageGroup.getIndex()] = totalPositivityRate / ageGroupShares[ageGroup.getIndex()];
+                // const ageGroupDiscovery = StrainUtil.calculateDiscoveryRate(ageGroupPositivity, ageGroupTestRate, ModificationSettings.getInstance().getModificationValues());
+
+                // ageGroupTestSum += ageGroupShares[ageGroup.getIndex()] * totalTestsPerDay;
+                // ageGroupDiscoverySum += ageGroupDiscoveryRate * ageGroup.getAbsValue();
+
+                // ageGroupDiscoveryRates.push(ageGroupDiscovery);
+                // ageGroupTestRates.push(ageGroupTestRate);
 
                 let contact = this.discoveryRatesByAgeGroup[ageGroup.getIndex()].contact; // * correction;
                 this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
                     setting: this.discoveryRatesByAgeGroup[ageGroup.getIndex()].setting,
                     contact,
-                    discovery: ageGroupDiscovery
+                    discovery: ageGroupDiscoveryRate
                 };
                 // how many tests would it have taken to produce this discovery rate? <-- this in a way that the total number of tests matches
 
             });
 
-        }
+            // console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), totalDiscovery, ageGroupDiscoverySum);
 
-        const normalize = () => {
-
-            let _discoveryRateOverall = 0;
-            this.ageGroups.forEach(ageGroup => {
-                _discoveryRateOverall += ageGroup.getAbsValue() * this.discoveryRatesByAgeGroup[ageGroup.getIndex()].discovery;
-            });
-            _discoveryRateOverall = _discoveryRateOverall / this.absTotal;
-
-            const correction = this.calculateDiscoveryRateOverall() / _discoveryRateOverall;
-
-            // console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), this.calculateDiscoveryRateOverall(), _discoveryRateOverall, correction)
-            this.ageGroups.forEach(ageGroup => {
-
-                const ageGroupIndex = ageGroup.getIndex();
-
-                let contact = this.discoveryRatesByAgeGroup[ageGroupIndex].contact; // * correction;
-                let discovery = Math.min(1, this.discoveryRatesByAgeGroup[ageGroupIndex].discovery * correction);
-                this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
-                    setting: this.discoveryRatesByAgeGroup[ageGroupIndex].setting,
-                    contact,
-                    discovery
-                };
-
-            });
 
         }
+
 
         normalize2();
 

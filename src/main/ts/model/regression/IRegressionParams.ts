@@ -19,6 +19,11 @@ export interface IRegressionParams<M extends IModification<IModificationValues>>
      */
     instantB: number;
 
+    /**
+     * the point in time where it is long term regression only
+     */
+    instantC: number;
+
     polyShares: number[];
 
     modifications: M[];

@@ -42,8 +42,11 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         return this.modificationValues.dead;
     }
 
-    getPow(): number {
+    getPow1(): number {
         return this.modificationValues.pow;
     }
 
+    getPow2(): number {
+        return this.modificationValues.pow2;
+    }
 }
