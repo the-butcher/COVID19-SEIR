@@ -2,16 +2,11 @@ import { Bullet, CategoryAxis, CategoryAxisDataItem, Column, ColumnSeries, LineS
 import { color, Container, create, Label, percent, Rectangle, useTheme } from "@amcharts/amcharts4/core";
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
-import { TIMEOUT } from "dns";
 import { IModificationValuesStrain } from '../../common/modification/IModificationValuesStrain';
-import { ModificationResolverContact } from "../../common/modification/ModificationResolverContact";
-import { ModificationResolverDiscovery } from "../../common/modification/ModificationResolverDiscovery";
-import { ModificationResolverRegression } from "../../common/modification/ModificationResolverRegression";
 import { ModificationResolverTime } from "../../common/modification/ModificationResolverTime";
 import { Modifications } from '../../common/modification/Modifications';
 import { ModificationTime } from "../../common/modification/ModificationTime";
 import { BaseData } from '../../model/basedata/BaseData';
-import { Color } from '../../util/Color';
 import { QueryUtil } from '../../util/QueryUtil';
 import { ControlsRegression } from '../controls/ControlsRegression';
 import { ControlsTime } from "../controls/ControlsTime";
@@ -22,7 +17,6 @@ import { Demographics } from './../../common/demographics/Demographics';
 import { ModelConstants } from './../../model/ModelConstants';
 import { ModelInstants } from './../../model/ModelInstants';
 import { IDataItem } from './../../model/state/ModelStateIntegrator';
-import { ColorUtil } from './../../util/ColorUtil';
 import { ICoordinate } from './../../util/ICoordinate';
 import { ObjectUtil } from './../../util/ObjectUtil';
 import { TimeUtil } from './../../util/TimeUtil';
@@ -152,6 +146,11 @@ export class ChartAgeGroup {
      * cases as reported age-wise
      */
     protected readonly seriesAgeGroupCasesR: ChartAgeGroupSeries;
+
+    /**
+     * cases error
+     */
+    protected readonly seriesAgeGroupCasesE: ChartAgeGroupSeries;
 
     /**
      * SEIR susceptible
@@ -566,7 +565,25 @@ export class ChartAgeGroup {
             seriesConstructor: () => new StepLineSeries()
         });
 
-
+        this.seriesAgeGroupCasesE = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotAbsolute,
+            title: 'cases error',
+            baseLabel: 'cases error',
+            valueField: 'ageGroupCasesE',
+            colorKey: 'CONTACT',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.60,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
+            seriesConstructor: () => new StepLineSeries()
+        });
 
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -1155,10 +1172,8 @@ export class ChartAgeGroup {
             if (chartDataItem) {
                 const baseDataItem = BaseData.getInstance().findBaseDataItem(chartDataItem.instant);
                 if (baseDataItem && baseDataItem.getIncidence(ageGroupIndex)) {
-                    // this.seriesAgeGroupCasesR.getSeries().tooltip.disabled = false;
                     this.seriesAgeGroupIncidenceR.getSeries().tooltip.disabled = false;
                 } else {
-                    // this.seriesAgeGroupCasesR.getSeries().tooltip.disabled = true;
                     this.seriesAgeGroupIncidenceR.getSeries().tooltip.disabled = true;
                 }
             }
@@ -1495,6 +1510,7 @@ export class ChartAgeGroup {
 
         this.seriesAgeGroupCasesN.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
+        this.seriesAgeGroupCasesE.setSeriesNote(ageGroup.getName());
         this.seriesPositivityRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesTestRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesAgeGroupDiscoveryL.setSeriesNote(ageGroup.getName());
@@ -1885,13 +1901,14 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.renderer.grid.template.disabled = !visible;
         this.yAxisPlotIncidence.tooltip.disabled = !visible;
 
-        this.seriesAgeGroupIncidence.setVisible(visible); // visible
-        this.seriesAgeGroupIncidenceR.setVisible(visible); // visible
+        this.seriesAgeGroupIncidence.setVisible(visible);
+        this.seriesAgeGroupIncidenceR.setVisible(visible);
         this.seriesAgeGroupAverageCasesR.setVisible(visible);
         this.seriesAgeGroupDiscoveredCases.setVisible(visible);
         this.seriesAgeGroupAssumedAllCases.setVisible(visible);
-        this.seriesAgeGroupCasesN.setVisible(visible); // visible
-        this.seriesAgeGroupCasesR.setVisible(visible); // visible
+        this.seriesAgeGroupCasesN.setVisible(visible);
+        this.seriesAgeGroupCasesR.setVisible(visible);
+        this.seriesAgeGroupCasesE.setVisible(visible);
         this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
             seriesAgeGroupIncidence.setVisible(visible);
         });
@@ -2263,6 +2280,9 @@ export class ChartAgeGroup {
         let maxGamma = 0;
         const randomVd = Math.random() * 0.00001;
 
+        let ageGroupCasesE: number;
+        const ageGroupCasesErrors = [0, 0, 0, 0, 0, 0, 0];
+
         for (const dataItem of this.modelData) {
 
             // const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
@@ -2285,8 +2305,25 @@ export class ChartAgeGroup {
 
             // start with offset, then multiply if an offset is available
             let ageGroupCasesN = ageGroupDiscoveredCases && BaseData.getInstance().getAverageOffset(ageGroupPlot.getIndex(), dataItem.instant);
+
             if (ageGroupCasesN) {
+
                 ageGroupCasesN *= ageGroupDiscoveredCases;
+
+                const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
+                if (dataItem00) {
+
+                    ageGroupCasesErrors.shift(); // remove first
+                    ageGroupCasesErrors.push(dataItem00.getCasesM1(ageGroupPlot.getIndex()) - ageGroupCasesN);
+                    ageGroupCasesE = ageGroupCasesErrors.reduce((a, b) => a + b, 0);
+                    ageGroupCasesE /= ageGroupCasesErrors.length;
+
+                } else {
+                    ageGroupCasesE = undefined;
+                }
+
+            } else {
+                ageGroupCasesE = undefined;
             }
 
             let positivityRate = dataItem.positivityRate;
@@ -2322,6 +2359,7 @@ export class ChartAgeGroup {
                 ageGroupDiscoveredCases,
                 ageGroupAssumedAllCases,
                 ageGroupCasesN,
+                ageGroupCasesE: ageGroupCasesE + ageGroupCasesN,
                 positivityRate,
                 testRate,
                 ageGroupReproductionP,
@@ -2397,6 +2435,7 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupDiscoveredCases, plotData);
         this.applyData(this.seriesAgeGroupAssumedAllCases, plotData);
         this.applyData(this.seriesAgeGroupCasesN, plotData);
+        this.applyData(this.seriesAgeGroupCasesE, plotData);
         this.applyData(this.seriesPositivityRate, plotData);
         this.applyData(this.seriesTestRate, plotData);
         this.applyData(this.seriesAgeGroupReproductionP, plotData);
@@ -2472,8 +2511,7 @@ export class ChartAgeGroup {
 
                 ageGroupAverageCasesR = dataItem00.getAverageCases(ageGroupPlot.getIndex());
                 ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
-                reproductionR = dataItem00.getReproduction(ageGroupPlot.getIndex()); // dataItem00.getAverageMobilityOther(); //
-                // icuR = dataItem00.getIcuM7() * 300;
+                reproductionR = dataItem00.getReproduction(ageGroupPlot.getIndex());
 
             } else {
                 // console.log('no data found', categoryX);
