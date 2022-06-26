@@ -100,8 +100,8 @@ export class ModelImplRoot implements IModelSeir {
             0.300, // 45-55
             0.250, // 55-65
             0.225, // 65-74
-            0.160, // 75-84
-            0.135  // >= 85
+            0.200, // 75-84
+            0.175  // >= 85
         ];
 
         demographics.getAgeGroups().forEach(ageGroup => {

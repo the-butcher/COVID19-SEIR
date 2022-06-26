@@ -127,7 +127,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             }
 
-            const snapContactMultipliersToGoogleContact = true;
+            const snapContactMultipliersToGoogleContact = false;
             if (snapContactMultipliersToGoogleContact) {
 
                 const instantMin = ModelInstants.getInstance().getMinInstant();

@@ -88,6 +88,7 @@ export class ModificationDiscovery extends AModification<IModificationValuesDisc
             const averageTests = dataItem.getAverageTests();
             if (/* averagePosititivity && */ averageTests) {
                 const testRate = averageTests / Demographics.getInstance().getAbsTotal();
+                // console.log(TimeUtil.formatCategoryDateFull(this.getInstantA()), averageTests.toFixed(2), Demographics.getInstance().getAbsTotal(), testRate.toFixed(4));
                 this.acceptUpdate({
                     testRate
                 });

@@ -175,6 +175,8 @@ export class ChartUtil {
         axis.renderer.labels.template.paddingBottom = 0;
         axis.renderer.labels.template.paddingLeft = 0;
 
+
+
     }
 
 

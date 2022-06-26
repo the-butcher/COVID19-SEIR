@@ -103,7 +103,7 @@ export class StrainUtil {
 
     /**
      * https://www.desmos.com/calculator/ff3mylqmvc
-     * anim: https://www.desmos.com/calculator/2kfsgonyvv
+     * anim: https://www.desmos.com/calculator/tccbzx2xpq
      * @param positivityRate
      * @param testRate
      * @param discoveryValueSet

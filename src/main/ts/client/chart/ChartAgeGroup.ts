@@ -344,7 +344,7 @@ export class ChartAgeGroup {
         this.yAxisPlotPercent.strictMinMax = true;
         this.yAxisPlotPercent.min = 0.00;
         this.yAxisPlotPercent.max = 1.00;
-
+        this.yAxisPlotPercent.extraTooltipPrecision = 2;
 
         const range = this.yAxisPlotPercent.axisRanges.create();
         range.value = 1;
@@ -360,6 +360,7 @@ export class ChartAgeGroup {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent.max > 2 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
         this.yAxisPlotPercent.tooltip.label.adapter.add('text', (value, target) => {
+            // console.log(value);
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, this.yAxisPlotPercent.max > 2 ? ControlsConstants.LABEL_PERCENT___FIXED : ControlsConstants.LABEL_PERCENT__FLOAT_2);
         });
 
@@ -525,6 +526,26 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
+        this.seriesAgeGroupCasesE = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotAbsolute,
+            title: 'cases error',
+            baseLabel: 'cases error',
+            valueField: 'ageGroupCasesE',
+            colorKey: 'VACCINATION',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.60,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
+            seriesConstructor: () => new StepLineSeries()
+        });
+
         this.seriesAgeGroupCasesN = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotAbsolute,
@@ -565,25 +586,7 @@ export class ChartAgeGroup {
             seriesConstructor: () => new StepLineSeries()
         });
 
-        this.seriesAgeGroupCasesE = new ChartAgeGroupSeries({
-            chart: this.chart,
-            yAxis: this.yAxisPlotAbsolute,
-            title: 'cases error',
-            baseLabel: 'cases error',
-            valueField: 'ageGroupCasesE',
-            colorKey: 'CONTACT',
-            strokeWidth: 1,
-            dashed: false,
-            locationOnPath: 0.60,
-            labels: {
-                tooltip: false,
-                pathtip: false
-            },
-            stacked: false,
-            legend: true,
-            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
-            seriesConstructor: () => new StepLineSeries()
-        });
+
 
         this.seriesAgeGroupIncidence = new ChartAgeGroupSeries({
             chart: this.chart,
