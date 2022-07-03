@@ -120,7 +120,7 @@ export class Slider {
     private readonly tickParams: ISliderFunctions;
     private step: number;
 
-    private disabled: boolean;
+    protected disabled: boolean;
 
     constructor(params: ISliderParams) {
 

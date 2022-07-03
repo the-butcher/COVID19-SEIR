@@ -67,6 +67,8 @@ export class ControlsContact {
 
     setSliderState(): void {
 
+        this.sliderCategory.setDisabled(this.modification?.isReadonly());
+
         // if (this.modification?.isReadonly() || this.sliderCategory.getName() === 'work' || this.sliderCategory.getName() === 'family') {
         //     this.sliderCategory.setDisabled(true);
         // } else {

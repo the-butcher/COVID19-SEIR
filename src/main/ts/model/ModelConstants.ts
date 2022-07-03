@@ -149,12 +149,13 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_VACC1ST = 2;
     static readonly BASE_DATA_INDEX_VACC2ND = 3;
     static readonly BASE_DATA_INDEX_VACC3RD = 4;
-    static readonly BASE_DATA_INDEX___TESTS = 5;
-    static readonly BASE_DATA_INDEX____HOSP = 6;
-    static readonly BASE_DATA_INDEX_____ICU = 7;
-    static readonly BASE_DATA_INDEX__MOBI_O = 8;
-    static readonly BASE_DATA_INDEX__MOBI_W = 9;
-    static readonly BASE_DATA_INDEX__MOBI_H = 10;
+    static readonly BASE_DATA_INDEX_VACC4TH = 5;
+    static readonly BASE_DATA_INDEX___TESTS = 6;
+    static readonly BASE_DATA_INDEX____HOSP = 7;
+    static readonly BASE_DATA_INDEX_____ICU = 8;
+    static readonly BASE_DATA_INDEX__MOBI_O = 9;
+    static readonly BASE_DATA_INDEX__MOBI_W = 10;
+    static readonly BASE_DATA_INDEX__MOBI_H = 11;
 
     static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00, 2.50];
     static readonly RANGE____PERCENTAGE_125 = [0.00, 0.25, 0.50, 0.75, 1.00, 1.25];

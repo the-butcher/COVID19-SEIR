@@ -17,6 +17,7 @@ export interface IBaseDataItem {
     getVacc1(ageGroupName: string): number;
     getVacc2(ageGroupName: string): number;
     getVacc3(ageGroupName: string): number;
+    getVacc4(ageGroupName: string): number;
 
     getTests(): number;
     getHospitalization(): number;
@@ -109,6 +110,10 @@ export class BaseDataItem implements IBaseDataItem {
 
     getVacc3(ageGroupName: string): number {
         return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC3RD] > 0 ? this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC3RD] : null;
+    }
+
+    getVacc4(ageGroupName: string): number {
+        return this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC4TH] > 0 ? this.itemConfig[ageGroupName][ModelConstants.BASE_DATA_INDEX_VACC4TH] : null;
     }
 
     getTests(): number {

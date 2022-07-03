@@ -32,7 +32,7 @@ export class ModificationVaccination extends AModification<IModificationValuesVa
                     v1: baseDataItem.getVacc1(ageGroup.getName()) / ageGroup.getAbsValue(),
                     v2: baseDataItem.getVacc2(ageGroup.getName()) / ageGroup.getAbsValue(),
                     v3: baseDataItem.getVacc3(ageGroup.getName()) / ageGroup.getAbsValue(),
-                    v4: 0
+                    v4: baseDataItem.getVacc4(ageGroup.getName()) / ageGroup.getAbsValue(),
                 }
             });
             this.acceptUpdate({

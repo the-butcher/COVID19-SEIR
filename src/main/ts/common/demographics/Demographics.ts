@@ -85,16 +85,16 @@ export class Demographics implements IContactCategories {
              * TODO test scenarios from spring (i.e. after school opening when alpha came)
              */
             let corrections: number[] = [
-                1.00, // <= 04
-                1.00, // 05-14
-                1.00, // 15-24
-                1.00, // 25-34
+                0.75, // <= 04
+                0.77, // 05-14
+                0.87, // 15-24
+                1.15, // 25-34
                 1.00, // 35-44
-                1.00, // 45-54
-                1.00, // 55-64
-                1.00, // 65-74
-                1.00, // 75-84
-                1.00  // >= 85
+                0.80, // 45-54
+                1.15, // 55-64
+                0.85, // 65-74
+                1.10, // 75-84
+                0.85  // >= 85
             ];
 
             if (matrixConfig.name === 'school') {
@@ -120,7 +120,7 @@ export class Demographics implements IContactCategories {
                 //     1.00, // 25-34
                 //     1.00, // 35-44
                 //     1.00, // 45-54
-                //     1.00, // 55-64
+                //     1.25, // 55-64
                 //     1.00, // 65-74
                 //     1.00, // 75-84
                 //     1.00  // >= 85
@@ -165,7 +165,7 @@ export class Demographics implements IContactCategories {
                 //     1.00, // 25-34
                 //     1.00, // 35-44
                 //     1.00, // 45-54
-                //     1.00, // 55-64
+                //     1.25, // 55-64
                 //     1.00, // 65-74
                 //     1.00, // 75-84
                 //     1.00  // >= 85

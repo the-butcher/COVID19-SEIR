@@ -114,6 +114,10 @@ export class BaseDataItemCalibrate implements IBaseDataItem {
         return 0;
     }
 
+    getVacc4(ageGroupName: string): number {
+        return 0;
+    }
+
     getTests(): number {
         return 0;
     }

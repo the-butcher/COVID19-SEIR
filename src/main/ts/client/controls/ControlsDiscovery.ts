@@ -63,7 +63,7 @@ export class ControlsDiscovery {
             container,
             min: Math.min(...ModelConstants.RANGE____PERCENTAGE__10),
             max: Math.max(...ModelConstants.RANGE____PERCENTAGE__10),
-            step: 0.001,
+            step: 0.0001,
             values: [0.0],
             ticks: [...ModelConstants.RANGE____PERCENTAGE__10],
             label: 'test rate',
@@ -95,9 +95,6 @@ export class ControlsDiscovery {
             }
         });
 
-        const factorWeightRange: number[] = [
-            0.50, 0.75, 1.00, 1.25, 1.5
-        ];
 
         // const container2 = document.createElement('div');
         // container2.classList.add('slider-modification');
@@ -157,7 +154,7 @@ export class ControlsDiscovery {
                     if (type === 'tick') {
                         return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FIXED)}%`;
                     } else {
-                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}%`;
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`;
                     }
                 },
                 handleValueChange: (index, value, type) => {
@@ -170,7 +167,7 @@ export class ControlsDiscovery {
                 },
                 inputFunctions: {
                     inputFormatFunction: (index, value) => {
-                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_1)}`;
+                        return `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
                     },
                     inputHandleFunction: (index, value) => {
                         return parseFloat(value.replace(',', '.')) / 100;

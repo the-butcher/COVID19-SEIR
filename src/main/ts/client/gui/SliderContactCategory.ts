@@ -117,13 +117,17 @@ export class SliderContactCategory extends Slider {
             svgElementMore.style.width = '12px';
             svgElementMore.style.height = '12px';
             svgElementMore.addEventListener('pointerover', e => {
-                svgElementLess.setAttributeNS(null, 'fill', '#666666');
+                if (!this.disabled) {
+                    svgElementLess.setAttributeNS(null, 'fill', '#666666');
+                }
             });
             svgElementMore.addEventListener('pointerout', e => {
                 svgElementLess.setAttributeNS(null, 'fill', '#444444');
             });
             svgElementMore.addEventListener('pointerup', e => {
-                this.moreCorrection(ageGroup.getName());
+                if (!this.disabled) {
+                    this.moreCorrection(ageGroup.getName());
+                }
             });
 
             const pathMore = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -141,13 +145,17 @@ export class SliderContactCategory extends Slider {
             svgElementLess.style.height = '12px';
             svgElementLess.style.cursor = 'pointer';
             svgElementLess.addEventListener('pointerover', e => {
-                svgElementLess.setAttributeNS(null, 'fill', '#666666');
+                if (!this.disabled) {
+                    svgElementLess.setAttributeNS(null, 'fill', '#666666');
+                }
             });
             svgElementLess.addEventListener('pointerout', e => {
                 svgElementLess.setAttributeNS(null, 'fill', '#444444');
             });
             svgElementLess.addEventListener('pointerup', e => {
-                this.lessCorrection(ageGroup.getName());
+                if (!this.disabled) {
+                    this.lessCorrection(ageGroup.getName());
+                }
             });
 
             const pathLess = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -240,6 +248,10 @@ export class SliderContactCategory extends Slider {
     setValueAndRedraw(index: number, value: number, animated: boolean): void {
         super.setValueAndRedraw(index, value, animated);
         this.redrawCanvas();
+    }
+
+    setDisabled(disabled: boolean): void {
+        super.setDisabled(disabled);
     }
 
     acceptModification(modification: ModificationContact): void {
