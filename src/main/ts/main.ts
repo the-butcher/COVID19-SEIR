@@ -127,6 +127,14 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             }
 
+            // const modificationsContact = new ModificationResolverContact().getModifications();
+            // modificationsContact.shift();
+            // modificationsContact.forEach(modificationContact => {
+            //     modificationContact.acceptUpdate({
+            //         instant: modificationContact.getInstant() + TimeUtil.MILLISECONDS_PER____DAY
+            //     });
+            // });
+
             const snapContactMultipliersToGoogleContact = false;
             if (snapContactMultipliersToGoogleContact) {
 

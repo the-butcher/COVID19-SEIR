@@ -58,7 +58,7 @@ export class SliderRegression extends Slider {
                     return `${value.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}`;
                 },
                 inputHandleFunction: (index, value) => {
-                    return parseFloat(value) / 100;
+                    return parseFloat(value);
                 }
             }
         });
