@@ -93,8 +93,8 @@ export class ModelImplRoot implements IModelSeir {
 
         let groupRatios: number[] = [
             1.000,
-            0.695, // 05-14
-            0.625, // 15-24
+            0.595, // 05-14
+            0.425, // 15-24
             0.325, // 25-34
             0.300, // 35-44
             0.300, // 45-55

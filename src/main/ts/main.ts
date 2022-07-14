@@ -201,7 +201,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                             multipliers: {
                                 'family': predictionH.fitted[i],
                                 'work': predictionW.fitted[i],
-                                'school': predictionW.fitted[i],
+                                // 'school': predictionW.fitted[i],
                                 'other': predictionO.fitted[i],
                                 // 'nursing': predictionH.fitted[i] * 0.6 + predictionO.fitted[i] * 0.2
                             }
