@@ -159,6 +159,14 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
         return this.discoveryRatesByAgeGroup[ageGroupIndex];
     }
 
+    /**
+     * @param ageGroupIndex
+     * @returns
+     */
+    getDiscoveryRateLoess(ageGroupIndex: number): number {
+        return ModificationResolverDiscovery.getRegression(ageGroupIndex).findLoessValue(this.getInstant()).y;
+    }
+
     getCorrectionValue(ageGroupIndex: number): number {
         return this.modificationDiscovery.getCorrectionValue(ageGroupIndex);
     }

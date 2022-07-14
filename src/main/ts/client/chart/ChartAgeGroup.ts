@@ -2310,7 +2310,7 @@ export class ChartAgeGroup {
         const randomVd = Math.random() * 0.00001;
 
         let ageGroupCasesE: number;
-        const ageGroupCasesErrors = [0, 0, 0, 0, 0, 0, 0];
+        const ageGroupCasesErrors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 4 possible groups of 7 days
 
         for (const dataItem of this.modelData) {
 
@@ -2328,6 +2328,7 @@ export class ChartAgeGroup {
             const ageGroupDiscoveredCases = dataItem.valueset[ageGroupPlot.getName()].CASES[ModelConstants.STRAIN_ID___________ALL];
 
             const ageGroupDiscoveryRateL = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
+            const ageGroupDiscoveryRateM = ModificationTime.createInstance(dataItem.instant).getDiscoveryRatesRaw(ageGroupPlot.getIndex()).discovery;
             // const ageGroupDiscoveryRateM = ModificationResolverDiscovery.getRegression(ageGroupPlot.getIndex()).findLoessValue(dataItem.instant).m;
 
             const ageGroupAssumedAllCases = ageGroupDiscoveredCases / ageGroupDiscoveryRateL;
@@ -2343,9 +2344,18 @@ export class ChartAgeGroup {
                 if (dataItem00) {
 
                     ageGroupCasesErrors.shift(); // remove first
-                    ageGroupCasesErrors.push(dataItem00.getCasesM1(ageGroupPlot.getIndex()) - ageGroupCasesN);
-                    ageGroupCasesE = ageGroupCasesErrors.reduce((a, b) => a + b, 0);
-                    ageGroupCasesE /= ageGroupCasesErrors.length;
+                    ageGroupCasesErrors.push(dataItem00.getCasesM1(ageGroupPlot.getIndex()) - ageGroupCasesN); // add last
+                    let sqSum = 0;
+                    for (let d = 0; d < 4; d++) {
+                        let wSum = 0;
+                        for (let v = 0; v < 7; v++) {
+                            wSum += ageGroupCasesErrors[d + v];
+                        }
+                        sqSum += Math.pow(wSum / 7, 2) * Math.sign(wSum);
+                    }
+                    // ageGroupCasesE = ageGroupCasesErrors.reduce((a, b) => a + b, 0); // array sum
+                    // ageGroupCasesE /= ageGroupCasesErrors.length;
+                    ageGroupCasesE = Math.sqrt(Math.abs(sqSum) / 4) * Math.sign(sqSum);
 
                 } else {
                     ageGroupCasesE = undefined;
@@ -2393,7 +2403,7 @@ export class ChartAgeGroup {
                 testRate,
                 ageGroupReproductionP,
                 ageGroupDiscoveryRateL,
-                // ageGroupDiscoveryRateM,
+                ageGroupDiscoveryRateM,
                 mobility: 0
             };
 

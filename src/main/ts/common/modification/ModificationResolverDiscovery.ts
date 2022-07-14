@@ -106,4 +106,49 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
 
     }
 
+
+    static resetRegression(): void {
+        // console.warn('resetting pos rate regressions');
+        this.discoveryRegressions = undefined;
+    }
+
+    static getRegression(ageGroupIndex: number): ValueRegressionDiscovery {
+
+        if (!this.discoveryRegressions) {
+
+            // console.warn('rebuilding pos rate regressions');
+
+            const minInstant = ModelInstants.getInstance().getMinInstant();
+            const maxInstant = ModelInstants.getInstance().getMaxInstant();
+            const modificationsTime: ModificationTime[] = [];
+
+            // create one every 3 days
+            for (let instant = minInstant; instant <= maxInstant; instant += TimeUtil.MILLISECONDS_PER____DAY * 3) {
+                const modificationTime = ModificationTime.createInstance(instant);
+                modificationsTime.push(modificationTime);
+                // console.log('create disc mod', TimeUtil.formatCategoryDateFull(instant), modificationTime);
+            }
+
+            this.discoveryRegressions = [];
+            Demographics.getInstance().getAgeGroupsWithTotal().forEach(ageGroup => {
+
+                this.discoveryRegressions[ageGroup.getIndex()] = new ValueRegressionDiscovery({
+                    discoveryPropertyGetter: (m: ModificationTime) => {
+                        return m.getDiscoveryRatesRaw(ageGroup.getIndex()).discovery;
+                    },
+                    instantA: minInstant,
+                    instantB: maxInstant,
+                    instantC: maxInstant + TimeUtil.MILLISECONDS_PER___WEEK * 3,
+                    polyShares: [0.00, 0.50],
+                    modifications: modificationsTime
+                });
+
+            });
+
+
+        }
+        return this.discoveryRegressions[ageGroupIndex];
+
+    }
+
 }
