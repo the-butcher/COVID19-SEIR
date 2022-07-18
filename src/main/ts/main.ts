@@ -102,10 +102,10 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
                     correction_configs[ageGroup.getName()] = {
                         back_days_a: -35,
-                        back_days_b: 21,
+                        back_days_b: 70,
                         poly_shares: [
                             0.25,
-                            0.95
+                            0.75
                         ]
                     }
                     // console.log(ageGroup.getName(), modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()));
