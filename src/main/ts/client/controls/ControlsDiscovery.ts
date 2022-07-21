@@ -141,11 +141,11 @@ export class ControlsDiscovery {
 
             this.slidersCorrections.push(new Slider({
                 container,
-                min: Math.min(...ModelConstants.RANGE____PERCENTAGE_100),
-                max: Math.max(...ModelConstants.RANGE____PERCENTAGE_100),
+                min: Math.min(...ModelConstants.RANGE____PERCENTAGE_125),
+                max: Math.max(...ModelConstants.RANGE____PERCENTAGE_125),
                 step: 0.01,
                 values: [0.0],
-                ticks: [...ModelConstants.RANGE____PERCENTAGE_100],
+                ticks: [...ModelConstants.RANGE____PERCENTAGE_125],
                 label: ageGroup.getName(),
                 thumbCreateFunction: (index: number) => {
                     return new IconSlider();
