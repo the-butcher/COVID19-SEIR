@@ -200,7 +200,7 @@ const createRange = (date1: Date, date2: Date, text: string, opacity: number) =>
 
 // https://www.kleinezeitung.at/politik/innenpolitik/6056751/Lockdowns-und-Lockerungen_Chronologie-der-Pandemie
 
-let postFix = '-2'; // -9
+let postFix = '-9'; // -9
 
 /**
  * 1 - Burgenland - ältestes Bundesland - breites Intervall Q1 - trotzdem bei Wildtyp am Rand CI97 - Übersterblichkeit waährend Lockdown Ost

@@ -33,7 +33,7 @@ export class ControlsSettings {
     private sliderPow1: SliderSetting;
     private sliderPow2: SliderSetting;
 
-    private sliderUndetected: SliderSetting;
+    // private sliderUndetected: SliderSetting;
     private sliderQuarantine: SliderSetting;
     private sliderReexposure: Slider;
 
@@ -50,7 +50,7 @@ export class ControlsSettings {
         this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         this.sliderPow2 = new SliderSetting("exponent", [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
-        this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        // this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         this.sliderReexposure = new Slider({
@@ -136,7 +136,7 @@ export class ControlsSettings {
 
         const pow1 = this.sliderPow1.getValue();
         const pow2 = this.sliderPow2.getValue();
-        const undetected = this.sliderUndetected.getValue();
+        // const undetected = this.sliderUndetected.getValue();
         const quarantine = this.sliderQuarantine.getValue();
         // const reexposure = this.sliderReexposure.getValue();
         console.log('changing reexposure to', this.timeToWane);
@@ -145,7 +145,7 @@ export class ControlsSettings {
         this.modification.acceptUpdate({
             pow: pow1,
             pow2,
-            undetected,
+            // undetected,
             quarantine,
             reexposure: this.timeToWane,
             dead
@@ -164,7 +164,7 @@ export class ControlsSettings {
 
         this.sliderPow1.setValue(this.modification.getPow1() || 0.5);
         this.sliderPow2.setValue(this.modification.getPow2() || 0.75);
-        this.sliderUndetected.setValue(this.modification.getInitialUndetected());
+        // this.sliderUndetected.setValue(this.modification.getInitialUndetected());
         this.sliderQuarantine.setValue(this.modification.getQuarantine(-1)); // TODO - deprecate the slider, then introduce a contact category specific setting and calculate a value from there
 
         this.timeToWane = this.modification.getReexposure();
@@ -176,7 +176,7 @@ export class ControlsSettings {
         console.log('accepting reexposure', this.timeToWane);
 
         requestAnimationFrame(() => {
-            this.sliderUndetected.handleResize();
+            // this.sliderUndetected.handleResize();
             this.sliderQuarantine.handleResize();
             this.sliderReexposure.handleResize();
         });

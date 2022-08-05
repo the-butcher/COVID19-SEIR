@@ -39,7 +39,7 @@ export class ModelImplStrain implements IModelSeir {
     private readonly nrmDeltas: number[];
     private nrmExposure: number[][];
 
-    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, referenceDataRemoved: IBaseDataItem, initialUndetected: number) {
+    constructor(parentModel: ModelImplRoot, demographics: Demographics, strainValues: IModificationValuesStrain, modificationTime: ModificationTime, referenceDataRemoved: IBaseDataItem) {
 
         this.parentModel = parentModel;
         this.infectiousModels = [];
@@ -53,11 +53,24 @@ export class ModelImplStrain implements IModelSeir {
         this.strainValues = strainValues;
         this.absTotal = demographics.getAbsTotal();
 
+        let initialUndetected: number[] = [
+            3.00, // <= 04
+            0.90, // 05-14
+            1.20, // 15-24
+            1.30, // 25-34
+            1.30, // 35-44
+            1.30, // 45-54
+            1.30, // 55-64
+            1.20, // 65-74
+            1.10, // 75-84
+            1.00  // >= 85
+        ];
+
         let nrmValue1 = 0;
         demographics.getAgeGroups().forEach(ageGroup => {
 
             const grpRatio = 1 - ageGroup.getIndex() * 0.075; // 0.55 for oldest (longer ago), 1 for youngest (were vaccinated more recently)
-            let absValueRecoveredD = strainValues.primary ? referenceDataRemoved.getRemoved(ageGroup.getName()) * (1 + initialUndetected) : 0;
+            let absValueRecoveredD = strainValues.primary ? referenceDataRemoved.getRemoved(ageGroup.getName()) * (1 + initialUndetected[ageGroup.getIndex()]) : 0;
             absValueRecoveredD = absValueRecoveredD * grpRatio;
 
             const infectiousModel = new ModelImplInfectious(this, demographics, ageGroup, strainValues, modificationTime);

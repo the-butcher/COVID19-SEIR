@@ -26,9 +26,9 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
         super('RANGE', modificationParams);
     }
 
-    getInitialUndetected(): number {
-        return this.modificationValues.undetected;
-    }
+    // getInitialUndetected(): number {
+    //     return this.modificationValues.undetected;
+    // }
 
     getQuarantine(ageGroupIndex: number): number {
         return this.modificationValues.quarantine;

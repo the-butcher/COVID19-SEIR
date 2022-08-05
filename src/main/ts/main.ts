@@ -102,7 +102,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
                     correction_configs[ageGroup.getName()] = {
                         back_days_a: -35,
-                        back_days_b: 70,
+                        back_days_b: 100,
                         poly_shares: [
                             0.25,
                             0.75

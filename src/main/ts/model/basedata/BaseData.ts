@@ -289,6 +289,67 @@ export class BaseData {
         //     delete this.baseDataItems[instant];
         // })
 
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("05.01.2022")).setVariantShareBA1(316.71);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("12.01.2022")).setVariantShareBA1(766.83);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("19.01.2022")).setVariantShareBA1(1400.44);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("26.01.2022")).setVariantShareBA1(1947.85);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("02.02.2022")).setVariantShareBA1(2150.56);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("09.02.2022")).setVariantShareBA1(1803.69);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("16.02.2022")).setVariantShareBA1(1597.96);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("23.02.2022")).setVariantShareBA1(1291.81);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("02.03.2022")).setVariantShareBA1(940.09);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("09.03.2022")).setVariantShareBA1(911.04);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("16.03.2022")).setVariantShareBA1(661.01);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("23.03.2022")).setVariantShareBA1(538.33);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("30.03.2022")).setVariantShareBA1(218.48);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("06.04.2022")).setVariantShareBA1(86.52);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("13.04.2022")).setVariantShareBA1(145.13);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("20.04.2022")).setVariantShareBA1(12.93);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("27.04.2022")).setVariantShareBA1(7.73);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("04.05.2022")).setVariantShareBA1(3.09);
+
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("05.01.2022")).setVariantShareBA2(6.19);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("12.01.2022")).setVariantShareBA2(41.60);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("19.01.2022")).setVariantShareBA2(118.79);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("26.01.2022")).setVariantShareBA2(286.72);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("02.02.2022")).setVariantShareBA2(438.94);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("09.02.2022")).setVariantShareBA2(754.31);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("16.02.2022")).setVariantShareBA2(734.64);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("23.02.2022")).setVariantShareBA2(833.49);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("02.03.2022")).setVariantShareBA2(1291.51);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("09.03.2022")).setVariantShareBA2(1972.46);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("16.03.2022")).setVariantShareBA2(2863.19);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("23.03.2022")).setVariantShareBA2(2714.47);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("30.03.2022")).setVariantShareBA2(2074.42);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("06.04.2022")).setVariantShareBA2(1304.78);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("13.04.2022")).setVariantShareBA2(748.07);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("20.04.2022")).setVariantShareBA2(629.53);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("27.04.2022")).setVariantShareBA2(504.72);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("04.05.2022")).setVariantShareBA2(429.80);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("11.05.2022")).setVariantShareBA2(367.53);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("18.05.2022")).setVariantShareBA2(268.59);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("25.05.2022")).setVariantShareBA2(161.35);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("01.06.2022")).setVariantShareBA2(112.26);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("08.06.2022")).setVariantShareBA2(106.08);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("15.06.2022")).setVariantShareBA2(92.69);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("22.06.2022")).setVariantShareBA2(85.81);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("29.06.2022")).setVariantShareBA2(58.97);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("06.07.2022")).setVariantShareBA2(37.01);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("13.07.2022")).setVariantShareBA2(24.73);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("20.07.2022")).setVariantShareBA2(10.36);
+
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("04.05.2022")).setVariantShareBA5(6.61);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("11.05.2022")).setVariantShareBA5(12.61);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("18.05.2022")).setVariantShareBA5(17.24);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("25.05.2022")).setVariantShareBA5(36.85);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("01.06.2022")).setVariantShareBA5(80.65);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("08.06.2022")).setVariantShareBA5(140.53);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("15.06.2022")).setVariantShareBA5(268.98);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("22.06.2022")).setVariantShareBA5(487.23);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("29.06.2022")).setVariantShareBA5(674.46);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("06.07.2022")).setVariantShareBA5(781.25);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("13.07.2022")).setVariantShareBA5(854.20);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("20.07.2022")).setVariantShareBA5(927.70);
 
     }
 

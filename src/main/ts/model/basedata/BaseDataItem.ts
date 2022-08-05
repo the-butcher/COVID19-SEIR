@@ -1,3 +1,4 @@
+import { AgeGroup } from '../../common/demographics/AgeGroup';
 import { ModelConstants } from '../ModelConstants';
 import { Demographics } from './../../common/demographics/Demographics';
 import { StrainUtil } from './../../util/StrainUtil';
@@ -42,6 +43,15 @@ export interface IBaseDataItem {
     getReproduction(ageGroupIndex: number): number;
     getIcuM7(): number;
 
+    setVariantShareBA1(variantShareBA1: number): void;
+    getVariantShareBA1(ageGroupIndex: number): number;
+
+    setVariantShareBA2(variantShareBA2: number): void;
+    getVariantShareBA2(ageGroupIndex: number): number;
+
+    setVariantShareBA5(variantShareBA5: number): void;
+    getVariantShareBA5(ageGroupIndex: number): number;
+
     // getAverageMobilityOther(): number;
     // getAverageMobilityWork(): number;
     // getAverageMobilityHome(): number;
@@ -69,6 +79,10 @@ export class BaseDataItem implements IBaseDataItem {
     private readonly averageHelp1: number[];
     private readonly averageHelp2: number[];
     private readonly reproductions: number[];
+
+    private variantShareBA1: number;
+    private variantShareBA2: number;
+    private variantShareBA5: number;
 
     // private averageMobilityOther: number;
     // private averageMobilityWork: number;
@@ -405,5 +419,36 @@ export class BaseDataItem implements IBaseDataItem {
     getReproduction(ageGroupIndex: number) {
         return this.reproductions[ageGroupIndex];
     }
+
+    setVariantShareBA1(variantShareBA1: number): void {
+        this.variantShareBA1 = variantShareBA1;
+    }
+
+    getVariantShareBA1(ageGroupIndex: number): number {
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex()) {
+            return this.variantShareBA1;
+        }
+    }
+
+    setVariantShareBA2(variantShareBA2: number): void {
+        this.variantShareBA2 = variantShareBA2;
+    }
+
+    getVariantShareBA2(ageGroupIndex: number): number {
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex()) {
+            return this.variantShareBA2;
+        }
+    }
+
+    setVariantShareBA5(variantShareBA5: number): void {
+        this.variantShareBA5 = variantShareBA5;
+    }
+
+    getVariantShareBA5(ageGroupIndex: number): number {
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex()) {
+            return this.variantShareBA5;
+        }
+    }
+
 
 }

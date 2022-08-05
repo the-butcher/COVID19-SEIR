@@ -88,20 +88,30 @@ export class ModelImplRoot implements IModelSeir {
 
         this.demographics = demographics;
         modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {
-            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTime, referenceDataRemoved, modificationSettings.getInitialUndetected()));
+            this.strainModels.push(new ModelImplStrain(this, demographics, modificationStrain.getModificationValues(), modificationTime, referenceDataRemoved));
         });
 
         let groupRatios: number[] = [
+            // 1.000,
+            // 0.500, // 05-14
+            // 0.475, // 15-24
+            // 0.450, // 25-34
+            // 0.425, // 35-44
+            // 0.400, // 45-55
+            // 0.350, // 55-65
+            // 0.350, // 65-74
+            // 0.325, // 75-84
+            // 0.300  // >= 85
             1.000,
-            0.595, // 05-14
-            0.425, // 15-24
-            0.325, // 25-34
-            0.300, // 35-44
-            0.300, // 45-55
-            0.250, // 55-65
-            0.225, // 65-74
-            0.200, // 75-84
-            0.175  // >= 85
+            0.600, // 05-14
+            0.550, // 15-24
+            0.550, // 25-34
+            0.525, // 35-44
+            0.500, // 45-55
+            0.400, // 55-65
+            0.400, // 65-74
+            0.400, // 75-84
+            0.400  // >= 85
         ];
 
         demographics.getAgeGroups().forEach(ageGroup => {

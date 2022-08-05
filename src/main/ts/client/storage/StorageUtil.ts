@@ -34,6 +34,7 @@ export class StorageUtil {
     private saveRequired: boolean;
 
     constructor() {
+
         this.storageEnabled = this.evalStorageEnabled();
         this.setSaveRequired(false);
         window.onbeforeunload = (e: BeforeUnloadEvent) => {
@@ -41,6 +42,19 @@ export class StorageUtil {
                 (e || window.event).returnValue = 'leave without saving?';
             }
         };
+
+        document.addEventListener('keydown', e => {
+
+            if (e.ctrlKey && e.key === 's') {
+                // Prevent the Save dialog to open
+                e.preventDefault();
+                // Place your code here
+                console.log('CTRL + S');
+            }
+
+
+        });
+
     }
 
     setSaveRequired(saveRequired: boolean): void {
@@ -164,7 +178,7 @@ export class StorageUtil {
             storage.setItem(testItem, testItem);
             storage.removeItem(testItem);
             return true;
-        } catch(e) {
+        } catch (e) {
             return e instanceof DOMException && (
                 // everything except Firefox
                 e.code === 22 ||

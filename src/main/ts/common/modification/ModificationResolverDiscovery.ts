@@ -139,7 +139,7 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
                     instantA: minInstant,
                     instantB: maxInstant,
                     instantC: maxInstant + TimeUtil.MILLISECONDS_PER___WEEK * 3,
-                    polyShares: [0.00, 0.50],
+                    polyShares: [0.10, 0.25],
                     modifications: modificationsTime
                 });
 

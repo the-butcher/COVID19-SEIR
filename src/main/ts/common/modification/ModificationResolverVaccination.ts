@@ -55,7 +55,7 @@ export class ModificationResolverVaccination extends AModificationResolver<IModi
         const id = ObjectUtil.createId();
         const modificationValues: IModificationValuesVaccination = {
             id,
-            key: 'REGRESSION',
+            key: 'VACCINATION',
             name: `regression (${id})`,
             instant: instantA,
             deletable: true,
