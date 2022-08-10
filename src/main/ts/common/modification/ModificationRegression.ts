@@ -1,7 +1,9 @@
 import { ControlsRegression } from '../../client/controls/ControlsRegression';
 import { ModelActions } from '../../client/gui/ModelActions';
+import { ModelConstants } from '../../model/ModelConstants';
 import { IRegressionResult } from '../../model/regression/IRegressionResult';
 import { ValueRegressionCorrection } from '../../model/regression/ValueRegressionCorrection';
+import { ValueRegressionCorrectionTotal } from '../../model/regression/ValueRegressionCorrectionTotal';
 import { ValueRegressionVaccination } from '../../model/regression/ValueRegressionVaccination';
 import { ValueRegressionMultiplier } from './../../model/regression/ValueRegressionMultiplier';
 import { StrainUtil } from './../../util/StrainUtil';
@@ -30,6 +32,8 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     private correctionRegressions: { [K in string]: ValueRegressionCorrection };
     private vaccinationRegressions: { [K in string]: { [K in string]: ValueRegressionVaccination } };
 
+    private correctionRegressionsTotal: ValueRegressionCorrectionTotal;
+
     constructor(modificationParams: IModificationValuesRegression) {
 
         super('INSTANT', modificationParams);
@@ -55,11 +59,19 @@ export class ModificationRegression extends AModification<IModificationValuesReg
             });
         });
 
+        this.correctionRegressionsTotal = new ValueRegressionCorrectionTotal({
+            ageGroupIndex: Demographics.getInstance().getAgeGroupTotal().getIndex(),
+            instantA: this.getInstantA() - 35 * TimeUtil.MILLISECONDS_PER____DAY,
+            instantB: this.getInstantA(),
+            instantC: this.getInstantA() + 35 * TimeUtil.MILLISECONDS_PER____DAY,
+            polyShares: [0.25, 0.75],
+            modifications: new ModificationResolverContact().getModifications()
+        });
+
         this.normalize();
 
+        // initial regression build
         this.updateRegressions(this.modificationValues.multiplier_configs, this.modificationValues.correction_configs, this.modificationValues.vaccination_configs);
-
-        // ControlsRegression.getInstance().acceptModification(this);
 
     }
 
@@ -158,6 +170,16 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     getCorrectionRegression(instant: number, ageGroupName: string): IRegressionResult {
 
         const result = this.correctionRegressions[ageGroupName]?.getRegressionResult(instant);
+        if (!result && ageGroupName === ModelConstants.AGEGROUP_NAME_______ALL) {
+
+            const resultTotal = this.correctionRegressionsTotal.getRegressionResult(instant);
+            let regressionTotal = resultTotal.regression;
+            return {
+                ...resultTotal,
+                regression: regressionTotal
+            }
+        }
+
         if (result && result.regression && result.ci95Dim) {
             let regression = result.regression + result.ci95Dim * this.modificationValues.correction_randoms[ageGroupName];
             if (regression < 0) {
@@ -183,6 +205,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
     setInstants(instantA: number, instantB: number): void {
         super.setInstants(instantA, instantB);
         if (instantA !== this.getInstantA() || instantB !== this.getInstantB()) {
+            // all regression need to rebuild when the instant changes (? verify)
             this.updateRegressions(this.modificationValues.multiplier_configs, this.modificationValues.correction_configs, this.modificationValues.vaccination_configs);
         }
     }
@@ -232,7 +255,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
             }
             const ageGroupIndex = Demographics.getInstance().findAgeGroupByName(key).getIndex();
             const instantA = this.getInstantA() + regressionConfig.back_days_a * TimeUtil.MILLISECONDS_PER____DAY;
-            const instantB = this.getInstantA(); // + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
+            const instantB = this.getInstantA();
             const instantC = this.getInstantA() + regressionConfig.back_days_b * TimeUtil.MILLISECONDS_PER____DAY;
             this.correctionRegressions[key] = new ValueRegressionCorrection({
                 ageGroupIndex,
@@ -240,7 +263,7 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 instantB,
                 instantC,
                 polyShares: regressionConfig.poly_shares,
-                modifications: new ModificationResolverContact().getModifications() //.slice(0, -1) // drop last element so it does not contribute to regression and can be adjusted independently
+                modifications: new ModificationResolverContact().getModifications()
             });
         }
 

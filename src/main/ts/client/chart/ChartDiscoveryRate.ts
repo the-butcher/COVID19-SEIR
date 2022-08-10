@@ -1,20 +1,23 @@
-import { CategoryAxis, LineSeries, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
-import { create, useTheme } from '@amcharts/amcharts4/core';
+import { LineSeries, LineSeriesDataItem, ValueAxis, XYChart, XYCursor } from '@amcharts/amcharts4/charts';
+import { Circle, color, create, useTheme } from '@amcharts/amcharts4/core';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4themes_dark from '@amcharts/amcharts4/themes/dark';
 import { Demographics } from '../../common/demographics/Demographics';
 import { IDiscoveryValueSet } from '../../common/modification/IDiscoveryValueSet';
+import { BaseData } from '../../model/basedata/BaseData';
+import { ModelInstants } from '../../model/ModelInstants';
 import { StrainUtil } from '../../util/StrainUtil';
+import { TimeUtil } from '../../util/TimeUtil';
 import { ControlsConstants, ILabellingDefinition } from '../gui/ControlsConstants';
 import { ChartUtil } from './ChartUtil';
 
 export interface IChartDataDiscoveryRate {
-    positivity: string;
-    discoveryAv: number;
-    discoveryLo: number;
-    discoveryHi: number;
-    labelLo: string;
-    labelHi: string;
+    positivity: number;
+    // discoveryAv: number;
+    // discoveryLo: number;
+    // discoveryHi: number;
+    // labelLo: string;
+    // labelHi: string;
     discoveryEx01?: number;
     discoveryEx02?: number;
     discoveryEx03?: number;
@@ -33,14 +36,21 @@ export interface IChartDataDiscoveryRate {
 export class ChartDiscoveryRate {
 
     private readonly chart: XYChart;
-    private readonly xAxis: CategoryAxis;
+    private readonly xAxis: ValueAxis;
     private readonly yAxis: ValueAxis;
 
-    private readonly seriesDiscoveryLo: LineSeries;
-    private readonly seriesDiscoveryAv: LineSeries;
-    private readonly seriesDiscoveryHi: LineSeries;
+    // private readonly seriesDiscoveryLo: LineSeries;
+    // private readonly seriesDiscoveryAv: LineSeries;
+    // private readonly seriesDiscoveryHi: LineSeries;
 
-    private readonly seriesDiscoveryExs: { [K in string]: LineSeries };
+    static getInstance(): ChartDiscoveryRate {
+        return this.instance;
+    }
+    private static instance: ChartDiscoveryRate;
+
+    private readonly bulletSeries: LineSeries;
+
+    private readonly seriesDiscoveryExs: LineSeries[];
 
     private readonly labellingDefinitionTooltip: ILabellingDefinition;
 
@@ -59,41 +69,51 @@ export class ChartDiscoveryRate {
         useTheme(am4themes_dark);
         useTheme(am4themes_animated);
 
-        this.seriesDiscoveryExs = {};
+        ChartDiscoveryRate.instance = this;
+
+        this.seriesDiscoveryExs = [];
 
         this.fullDataUpdate = true;
         this.labellingDefinitionTooltip = labellingDefinitionTooltip;
 
         this.chart = create(container, XYChart);
         this.chart.zoomOutButton.disabled = true;
+        this.chart.interpolationDuration = 0;
+        this.chart.sequencedInterpolation = false;
         ChartUtil.getInstance().configureChartPadding(this.chart);
         ChartUtil.getInstance().configureSeparators(this.chart);
 
-        this.xAxis = this.chart.xAxes.push(new CategoryAxis());
+        this.xAxis = this.chart.xAxes.push(new ValueAxis());
         this.yAxis = this.chart.yAxes.push(new ValueAxis());
 
         /**
          * x-axis
          */
-        ChartUtil.getInstance().configureAxis(this.xAxis, 'Positivity');
+        ChartUtil.getInstance().configureAxis(this.xAxis, 'Test positivity (%)');
         this.xAxis.renderer.labels.template.rotation = -90;
         this.xAxis.renderer.labels.template.horizontalCenter = 'right';
         this.xAxis.renderer.labels.template.verticalCenter = 'middle';
         this.xAxis.tooltip.disabled = true;
-        this.xAxis.dataFields.category = 'positivity';
+        this.xAxis.rangeChangeDuration = 0;
+        this.xAxis.renderer.labels.template.adapter.add('text', (value, target) => {
+            return ChartUtil.getInstance().formatLabelOrTooltipValue(value, labellingDefinitionAxis);
+        });
+        this.xAxis.max = 0.18;
+        // this.xAxis.dataFields.category = 'positivity';
 
         /**
          * y-axis
          */
-        ChartUtil.getInstance().configureAxis(this.yAxis, 'Discovery');
+        ChartUtil.getInstance().configureAxis(this.yAxis, 'Population tested (%)');
         this.yAxis.tooltip.disabled = true;
         this.yAxis.renderer.labels.template.adapter.add('text', (value, target) => {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, labellingDefinitionAxis);
         });
 
-        this.yAxis.min = yMin;
-        this.yAxis.max = yMax;
-        this.yAxis.strictMinMax = true;
+        // this.yAxis.min = yMin;
+        // this.yAxis.max = yMax;
+        // this.yAxis.strictMinMax = true;
+        this.yAxis.rangeChangeDuration = 0;
 
 
         this.distinctVals.forEach(distinctVal => {
@@ -102,71 +122,55 @@ export class ChartDiscoveryRate {
             seriesDiscoveryEx.yAxis = this.yAxis;
             seriesDiscoveryEx.fontFamily = ControlsConstants.FONT_FAMILY;
             seriesDiscoveryEx.fontSize = ControlsConstants.FONT_SIZE;
-            seriesDiscoveryEx.dataFields.categoryX = 'positivity';
+            seriesDiscoveryEx.dataFields.valueX = 'positivity';
             seriesDiscoveryEx.dataFields.valueY = `discoveryEx${distinctVal}`;
             seriesDiscoveryEx.fillOpacity = 0.0;
             seriesDiscoveryEx.strokeWidth = 1;
             seriesDiscoveryEx.strokeLinecap = 'round';
             seriesDiscoveryEx.strokeOpacity = 1.0;
             seriesDiscoveryEx.tooltip.disabled = true;
+            seriesDiscoveryEx.interpolationDuration = 0;
+            seriesDiscoveryEx.sequencedInterpolation = false;
+            this.seriesDiscoveryExs.push(seriesDiscoveryEx);
         });
 
-        this.seriesDiscoveryLo = this.chart.series.push(new LineSeries());
-        this.seriesDiscoveryLo.xAxis = this.xAxis;
-        this.seriesDiscoveryLo.yAxis = this.yAxis;
-        this.seriesDiscoveryLo.fontFamily = ControlsConstants.FONT_FAMILY;
-        this.seriesDiscoveryLo.fontSize = ControlsConstants.FONT_SIZE;
-        this.seriesDiscoveryLo.dataFields.categoryX = 'positivity';
-        this.seriesDiscoveryLo.dataFields.valueY = 'discoveryLo';
-        this.seriesDiscoveryLo.fillOpacity = 0.0;
-        this.seriesDiscoveryLo.strokeWidth = 1;
-        this.seriesDiscoveryLo.strokeLinecap = 'round';
-        this.seriesDiscoveryLo.strokeOpacity = 1.0;
-        this.seriesDiscoveryLo.tooltip.disabled = true;
+        this.bulletSeries = this.chart.series.push(new LineSeries());
+        this.bulletSeries.dataFields.valueX = "positivity";
+        this.bulletSeries.dataFields.valueY = "y";
+        this.bulletSeries.dataFields.value = "radius";
+        this.bulletSeries.strokeOpacity = 0.5;
+        this.bulletSeries.sequencedInterpolation = false;
+        this.bulletSeries.interpolationDuration = 0;
 
-        this.seriesDiscoveryHi = this.chart.series.push(new LineSeries());
-        this.seriesDiscoveryHi.xAxis = this.xAxis;
-        this.seriesDiscoveryHi.yAxis = this.yAxis;
-        this.seriesDiscoveryHi.fontFamily = ControlsConstants.FONT_FAMILY;
-        this.seriesDiscoveryHi.fontSize = ControlsConstants.FONT_SIZE;
-        this.seriesDiscoveryHi.dataFields.categoryX = 'positivity';
-        this.seriesDiscoveryHi.dataFields.valueY = 'discoveryHi';
-        this.seriesDiscoveryHi.fillOpacity = 0.0;
-        this.seriesDiscoveryHi.strokeWidth = 1;
-        this.seriesDiscoveryHi.strokeLinecap = 'round';
-        this.seriesDiscoveryHi.strokeOpacity = 1.0;
-        this.seriesDiscoveryHi.tooltip.disabled = true;
+        var bullet = this.bulletSeries.bullets.push(new Circle());
+        bullet.fill = color("#ffffff");
+        bullet.strokeOpacity = 0;
+        bullet.strokeWidth = 2;
+        bullet.fillOpacity = 0.4;
+        bullet.strokeOpacity = 0;
+        bullet.radius = 6;
+        bullet.hiddenState.properties.opacity = 0;
+        bullet.tooltipText = "{date}, {discovery}";
 
-        this.seriesDiscoveryAv = this.chart.series.push(new LineSeries());
-        this.seriesDiscoveryAv.xAxis = this.xAxis;
-        this.seriesDiscoveryAv.yAxis = this.yAxis;
-        this.seriesDiscoveryAv.fontFamily = ControlsConstants.FONT_FAMILY;
-        this.seriesDiscoveryAv.fontSize = ControlsConstants.FONT_SIZE;
-        this.seriesDiscoveryAv.dataFields.categoryX = 'positivity';
-        this.seriesDiscoveryAv.dataFields.valueY = 'discoveryAv';
-        this.seriesDiscoveryAv.fillOpacity = 0.0;
-        this.seriesDiscoveryAv.strokeWidth = 2;
-        this.seriesDiscoveryAv.strokeLinecap = 'round';
-        this.seriesDiscoveryAv.strokeOpacity = 1.0;
-        this.seriesDiscoveryAv.tooltip.disabled = false;
+        this.bulletSeries.tooltip.getStrokeFromObject = false;
+        this.bulletSeries.tooltip.getFillFromObject = false;
+        this.bulletSeries.tooltip.background.stroke = color(ControlsConstants.COLOR____FONT);
+        this.bulletSeries.tooltip.background.fill = color(ControlsConstants.COLOR______BG);
 
-        this.seriesDiscoveryAv.tooltipText = 'positivity:\u00A0{categoryX}\ndiscovery1:\u00A0\u00A0{labelLo}\ndiscovery3:\u00A0\u00A0{labelHi}';
-        ChartUtil.getInstance().configureSeries(this.seriesDiscoveryAv, ControlsConstants.COLOR____FONT, false);
+        this.bulletSeries.tooltip.background.strokeWidth = 0.25;
+        this.bulletSeries.tooltip.background.cornerRadius = 0;
+        this.bulletSeries.tooltip.background.filters.clear();
 
-        // this.seriesDiscoveryAv.adapter.add('tooltipText', (value, target) => {
-        //     console.log(value, target);
-        //     return '123';
-        //     const indexCurr = target.tooltipDataItem.index;
-        //     if (indexCurr >= 0 && target.dataItems.values.length > indexCurr) {
-        //         const chartData = target.dataItems.values[indexCurr]?.dataContext as IChartDataDiscoveryRate;
-        //         const rate = chartData.positivity.toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2);
-        //         // if (this.axisDirection === 'CONTACT_PARTICIPANT') {
-        //         return `${ChartUtil.getInstance().formatContactLine('contact', rate)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
-        //         // } else {
-        //         //     return `${ChartUtil.getInstance().formatContactLine('participant', chartData.plotX)}\n${ChartUtil.getInstance().formatContactLine('rate', rate)}`;
-        //         // }
-        //     }
-        // });
+        this.bulletSeries.tooltip.label.fontFamily = ControlsConstants.FONT_FAMILY;
+        this.bulletSeries.tooltip.label.fontSize = ControlsConstants.FONT_SIZE - 2;
+        this.bulletSeries.tooltip.label.fill = color(ControlsConstants.COLOR____FONT);
+        this.bulletSeries.tooltip.label.paddingLeft = 3;
+        this.bulletSeries.tooltip.label.paddingTop = 0;
+        this.bulletSeries.tooltip.label.paddingBottom = 0;
+        this.bulletSeries.tooltip.label.paddingRight = 1;
+
+        // this.bulletSeries.heatRules.push({ target: bullet, min: 2, max: 30, property: "radius" });
+
 
         this.chart.cursor = new XYCursor();
         this.chart.cursor.xAxis = this.xAxis;
@@ -176,13 +180,31 @@ export class ChartDiscoveryRate {
         this.chart.cursor.lineX.disabled = true;
         this.chart.cursor.lineY.disabled = true;
 
-        this.chart.events.on('ready', e => {
-            (this.seriesDiscoveryAv.bulletsContainer.element.node.parentNode as SVGGElement).setAttributeNS(null, 'clip-path', '');
-            setTimeout(() => {
-
-            }, 100);
+        // let instant = ModelInstants.getInstance().getMinInstant();
+        document.addEventListener('keyup', e => {
+            // instant += TimeUtil.MILLISECONDS_PER____DAY * 3;
+            // this.setInstant(instant);
+            if (e.key === 'r') {
+                this.exportToPng();
+            }
         });
 
+    }
+
+    async exportToPng(): Promise<void> {
+        this.chart.exporting.export("png");
+    }
+
+    setInstant(instant: number): void {
+        const date = TimeUtil.formatCategoryDateFull(instant);
+        let datedItem: LineSeriesDataItem;
+        this.bulletSeries.dataItems.each((item, index) => {
+            if (item.dataContext['date'] === date) {
+                datedItem = item;
+            }
+        });
+        const point = this.bulletSeries.showTooltipAtDataItem(datedItem);
+        // this.chart.cursor.triggerMove(point, 'soft');
     }
 
     async acceptModification(discoveryValueSet: IDiscoveryValueSet): Promise<void> {
@@ -191,21 +213,12 @@ export class ChartDiscoveryRate {
 
         const demographics = Demographics.getInstance();
         const chartData: IChartDataDiscoveryRate[] = [];
-        const ageGroups = demographics.getAgeGroups();
+        // const ageGroups = demographics.getAgeGroups();
 
         for (let positivity = 0; positivity <= 1.0; positivity += 0.01) {
 
-            const discoveryLo = StrainUtil.calculateDiscoveryRate(positivity, 0.01, discoveryValueSet);
-            const discoveryAv = StrainUtil.calculateDiscoveryRate(positivity, 0.03, discoveryValueSet);
-            const discoveryHi = StrainUtil.calculateDiscoveryRate(positivity, 0.05, discoveryValueSet);
-
             const chartEntry = {
-                positivity: this.labellingDefinitionTooltip.format(positivity),
-                discoveryAv,
-                discoveryLo,
-                discoveryHi,
-                labelLo: this.labellingDefinitionTooltip.format(discoveryLo),
-                labelHi: this.labellingDefinitionTooltip.format(discoveryHi)
+                positivity: positivity,
             };
             this.distinctVals.forEach(distinctVal => {
                 const attributeName = `discoveryEx${distinctVal}`;
@@ -215,32 +228,39 @@ export class ChartDiscoveryRate {
 
         }
 
-        if (this.fullDataUpdate) {
-            this.chart.data = chartData;
-            this.fullDataUpdate = false;
-        } else {
-            const keys = Object.keys(chartData[0]);
-            for (let i = 0; i < chartData.length; i++) {
-                if (this.chart.data[i].discoveryAv) {
-                    this.chart.data[i].positivity = chartData[i].positivity;
-                    this.chart.data[i].discoveryAv = chartData[i].discoveryAv;
-                    this.chart.data[i].discoveryLo = chartData[i].discoveryLo;
-                    this.chart.data[i].discoveryHi = chartData[i].discoveryHi;
-                    this.chart.data[i].labelLo = chartData[i].labelLo;
-                    this.chart.data[i].labelHi = chartData[i].labelHi;
-                    this.chart.data[i].discoveryEx01 = chartData[i].discoveryEx01;
-                    this.chart.data[i].discoveryEx02 = chartData[i].discoveryEx02;
-                    this.chart.data[i].discoveryEx03 = chartData[i].discoveryEx03;
-                    this.chart.data[i].discoveryEx04 = chartData[i].discoveryEx04;
-                    this.chart.data[i].discoveryEx05 = chartData[i].discoveryEx05;
-                }
+        const bulletData: any[] = [];
+        const minInstant = ModelInstants.getInstance().getMinInstant();
+        const maxInstant = ModelInstants.getInstance().getMaxInstant();
+        for (let bulletInstant = minInstant; bulletInstant <= maxInstant; bulletInstant += TimeUtil.MILLISECONDS_PER____DAY) {
+
+            const dataItem = BaseData.getInstance().findBaseDataItem(bulletInstant);
+            if (dataItem) {
+
+                const positivity = dataItem.getAveragePositivity();
+                const discovery = StrainUtil.calculateDiscoveryRate(dataItem.getAveragePositivity(), dataItem.getAverageTests() / Demographics.getInstance().getAbsTotal(), discoveryValueSet);
+                // console.log(TimeUtil.formatCategoryDateFull(dataItem.getInstant()), positivity);
+
+                bulletData.push({
+                    positivity,
+                    y: discovery, // discovery, dataItem.getAverageTests() / Demographics.getInstance().getAbsTotal()
+                    date: TimeUtil.formatCategoryDateFull(bulletInstant),
+                    discovery: this.labellingDefinitionTooltip.format(discovery)
+                })
+
             }
+
         }
-        this.chart.invalidateRawData();
 
-        console.log('this.chart.data', this.chart.data, chartData);
+        // console.log('bulletData', bulletData);
+        // https://www.amcharts.com/demos-v4/animated-xy-bubble-timeline-chart-v4/
+        this.bulletSeries.data = bulletData;
+        this.seriesDiscoveryExs.forEach(seriesDiscoveryEx => {
+            seriesDiscoveryEx.data = chartData;
+        });
 
-        this.fullDataUpdate = false;
+        // console.log('this.chart.data', this.chart.data, chartData);
+
+        // this.fullDataUpdate = false;
 
     }
 

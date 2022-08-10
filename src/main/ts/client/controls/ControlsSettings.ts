@@ -45,10 +45,13 @@ export class ControlsSettings {
 
     constructor() {
 
-        this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT___FIXED, ControlsConstants.LABEL_PERCENT__FLOAT_2);
+        this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT__FLOAT_2, ControlsConstants.LABEL_PERCENT__FLOAT_2);
 
-        this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        this.sliderPow2 = new SliderSetting("exponent", [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        // this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        // this.sliderPow2 = new SliderSetting("exponent", [0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+
+        this.sliderPow1 = new SliderSetting("exponent", [0.0, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderPow2 = new SliderSetting("exponent", [0.0, 10], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         // this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());

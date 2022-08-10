@@ -89,10 +89,18 @@ export class ControlsConstants {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     };
+    static readonly LOCALE_FORMAT_FLOAT_3 = {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+    };
     static readonly LOCALE_FORMAT_FIXED = {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
     };
+
+    static readonly LABEL_PERCENT__FLOAT_3: ILabellingDefinition = {
+        format: value => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_3)}%`
+    }
 
     static readonly LABEL_PERCENT__FLOAT_2: ILabellingDefinition = {
         format: value => `${(value * 100).toLocaleString(undefined, ControlsConstants.LOCALE_FORMAT_FLOAT_2)}%`
@@ -123,7 +131,7 @@ export class ControlsConstants {
     static readonly COLORS: { [K in COMPARTMENT__COLORS]: string } = {
 
         'SUSCEPTIBLE': '#1a1a1a',
-        'IMMUNIZING': new Color(HUE_VACCINATION, 1.00, 0.78).getHex(), // '#186987',
+        'IMMUNIZING': new Color(HUE_VACCINATION, 1.00, 0.45).getHex(), // '#186987',
         'EXPOSED': new Color(HUE_____EXPOSED, 1.00, 0.78).getHex(), // '#7c400e',
         'INFECTIOUS': new Color(HUE__INFECTIOUS, 1.00, 0.83).getHex(), // '#bd6215',
         'REMOVED': new Color(HUE___RECOVERED, 1.00, 0.93).getHex(), // '#caba0d',

@@ -104,6 +104,7 @@ export class StrainUtil {
     /**
      * https://www.desmos.com/calculator/ff3mylqmvc
      * anim: https://www.desmos.com/calculator/tccbzx2xpq
+     * https://www.desmos.com/calculator/jeqlhoq5el
      * @param positivityRate
      * @param testRate
      * @param discoveryValueSet
@@ -111,19 +112,23 @@ export class StrainUtil {
      */
     static calculateDiscoveryRate(positivityRate: number, testRate: number, discoveryValueSet: IDiscoveryValueSet): number {
 
-        // p=7
-        const p = discoveryValueSet.pow;
+        const b = testRate * discoveryValueSet.pow2 + discoveryValueSet.pow;
+        const d = b - positivityRate * (b - testRate);
+        return d;
 
-        // c=x\cdot t_{1}
-        const c = positivityRate * testRate;
+        // // p=7
+        // const p = discoveryValueSet.pow;
 
-        // i=\left(1-x\right)+\frac{x}{t_{1}}
-        const i = (1 - positivityRate) + Math.pow(positivityRate, discoveryValueSet.pow2) / testRate;
+        // // c=x\cdot t_{1}
+        // const c = positivityRate * testRate;
 
-        // i^{-p}\cdot\left(1-x\right)+c_{1}
-        const discoveryRate = Math.pow(i, -p) * (1 - positivityRate) + c;
+        // // i=\left(1-x\right)+\frac{x}{t_{1}}
+        // const i = (1 - positivityRate) + Math.pow(positivityRate, discoveryValueSet.pow2) / testRate;
 
-        return discoveryRate;
+        // // i^{-p}\cdot\left(1-x\right)+c_{1}
+        // const discoveryRate = Math.pow(i, -p) * (1 - positivityRate) + c;
+
+        // return discoveryRate;
 
     }
 

@@ -22,6 +22,7 @@ import { ObjectUtil } from './../../util/ObjectUtil';
 import { TimeUtil } from './../../util/TimeUtil';
 import { ModelActions } from './../gui/ModelActions';
 import { ChartAgeGroupSeries } from './ChartAgeGroupSeries';
+import { ChartDiscoveryRate } from "./ChartDiscoveryRate";
 import { ChartUtil } from './ChartUtil';
 
 export interface IModificationData {
@@ -152,6 +153,7 @@ export class ChartAgeGroup {
      */
     protected readonly seriesAgeGroupCasesE: ChartAgeGroupSeries;
 
+    protected readonly seriesVariantShareDelta: ChartAgeGroupSeries;
     protected readonly seriesVariantShareBA1: ChartAgeGroupSeries;
     protected readonly seriesVariantShareBA2: ChartAgeGroupSeries;
     protected readonly seriesVariantShareBA5: ChartAgeGroupSeries;
@@ -551,13 +553,14 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
             seriesConstructor: () => new StepLineSeries()
         });
+        (this.seriesAgeGroupCasesE.getSeries() as StepLineSeries).noRisers = true;
 
-        this.seriesVariantShareBA1 = new ChartAgeGroupSeries({
+        this.seriesVariantShareDelta = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
-            title: 'share BA.1',
-            baseLabel: 'share BA.1',
-            valueField: 'variantShareBA1',
+            title: 'share',
+            baseLabel: 'share',
+            valueField: 'variantShareDelta',
             colorKey: 'VACCINATION',
             strokeWidth: 1,
             dashed: false,
@@ -571,6 +574,26 @@ export class ChartAgeGroup {
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesVariantShareBA1 = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotIncidence,
+            title: 'share',
+            baseLabel: 'share',
+            valueField: 'variantShareBA1',
+            colorKey: 'VACCINATION',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.60,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesVariantShareDelta.bindToLegend(this.seriesVariantShareBA1);
         this.seriesVariantShareBA2 = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
@@ -586,10 +609,11 @@ export class ChartAgeGroup {
                 pathtip: false
             },
             stacked: false,
-            legend: true,
+            legend: false,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesVariantShareDelta.bindToLegend(this.seriesVariantShareBA2);
         this.seriesVariantShareBA5 = new ChartAgeGroupSeries({
             chart: this.chart,
             yAxis: this.yAxisPlotIncidence,
@@ -605,10 +629,11 @@ export class ChartAgeGroup {
                 pathtip: false
             },
             stacked: false,
-            legend: true,
+            legend: false,
             labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
             seriesConstructor: () => new LineSeries()
         });
+        this.seriesVariantShareDelta.bindToLegend(this.seriesVariantShareBA5);
 
         this.seriesAgeGroupCasesN = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -1265,6 +1290,8 @@ export class ChartAgeGroup {
                 }
             }
 
+            ChartDiscoveryRate.getInstance()?.setInstant(chartDataItem.instant);
+
         });
         this.chart.cursor.lineX.disabled = false;
         this.chart.cursor.lineY.disabled = false;
@@ -1599,6 +1626,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesR.setSeriesNote(ageGroup.getName());
         this.seriesAgeGroupCasesE.setSeriesNote(ageGroup.getName());
 
+        this.seriesVariantShareDelta.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesVariantShareBA1.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesVariantShareBA2.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesVariantShareBA5.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
@@ -2005,6 +2033,7 @@ export class ChartAgeGroup {
         this.seriesAgeGroupCasesR.setVisible(visible);
         this.seriesAgeGroupCasesE.setVisible(visible);
 
+        this.seriesVariantShareDelta.setVisible(visible);
         this.seriesVariantShareBA1.setVisible(visible);
         this.seriesVariantShareBA2.setVisible(visible);
         this.seriesVariantShareBA5.setVisible(visible);
@@ -2326,9 +2355,11 @@ export class ChartAgeGroup {
             }
 
             const lastRegressionType = ModelActions.getInstance().getLastRegressionType();
-            if (lastRegressionType === 'CORRECTION' && estimationValueM) {
 
-                const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
+            const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
+            if (lastRegressionType === 'CORRECTION' && estimationValueM && ageGroupIndex !== Demographics.getInstance().getAgeGroupTotal().getIndex()) {
+
+
                 const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
                 const contactSummary = ModificationTime.createInstance(dataItem.instant).getColumnValueSummary(ageGroupPlot);
 
@@ -2480,6 +2511,8 @@ export class ChartAgeGroup {
                 mobility: 0
             };
 
+            // console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), ageGroupDiscoveryRateL);
+
             // add one strain value per modification
             modificationValuesStrain.forEach(modificationValueStrain => {
                 item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
@@ -2613,6 +2646,7 @@ export class ChartAgeGroup {
             let ageGroupCasesR = null;
             let reproductionR = null;
 
+            let variantShareDelta = null;
             let variantShareBA1 = null;
             let variantShareBA2 = null;
             let variantShareBA5 = null;
@@ -2638,6 +2672,7 @@ export class ChartAgeGroup {
                 ageGroupCasesR = dataItem00.getCasesM1(ageGroupPlot.getIndex());
                 reproductionR = dataItem00.getReproduction(ageGroupPlot.getIndex());
 
+                variantShareDelta = dataItem00.getVariantShareDelta(ageGroupPlot.getIndex());
                 variantShareBA1 = dataItem00.getVariantShareBA1(ageGroupPlot.getIndex());
                 variantShareBA2 = dataItem00.getVariantShareBA2(ageGroupPlot.getIndex());
                 variantShareBA5 = dataItem00.getVariantShareBA5(ageGroupPlot.getIndex());
@@ -2656,6 +2691,7 @@ export class ChartAgeGroup {
                 ageGroupAverageCasesR,
                 ageGroupCasesR,
                 reproductionR,
+                variantShareDelta,
                 variantShareBA1,
                 variantShareBA2,
                 variantShareBA5
@@ -2693,6 +2729,7 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupCasesR, baseData);
         this.applyData(this.seriesReproductionR, baseData);
 
+        this.applyData(this.seriesVariantShareDelta, baseData);
         this.applyData(this.seriesVariantShareBA1, baseData);
         this.applyData(this.seriesVariantShareBA2, baseData);
         this.applyData(this.seriesVariantShareBA5, baseData);

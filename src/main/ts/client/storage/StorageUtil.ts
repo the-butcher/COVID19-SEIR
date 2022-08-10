@@ -50,6 +50,7 @@ export class StorageUtil {
                 e.preventDefault();
                 // Place your code here
                 console.log('CTRL + S');
+                this.storeModifications();
             }
 
 

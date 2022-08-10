@@ -43,6 +43,9 @@ export interface IBaseDataItem {
     getReproduction(ageGroupIndex: number): number;
     getIcuM7(): number;
 
+    setVariantShareDelta(variantShareDelta: number): void;
+    getVariantShareDelta(ageGroupIndex: number): number;
+
     setVariantShareBA1(variantShareBA1: number): void;
     getVariantShareBA1(ageGroupIndex: number): number;
 
@@ -80,6 +83,7 @@ export class BaseDataItem implements IBaseDataItem {
     private readonly averageHelp2: number[];
     private readonly reproductions: number[];
 
+    private variantShareDelta: number;
     private variantShareBA1: number;
     private variantShareBA2: number;
     private variantShareBA5: number;
@@ -420,13 +424,24 @@ export class BaseDataItem implements IBaseDataItem {
         return this.reproductions[ageGroupIndex];
     }
 
+    setVariantShareDelta(variantShareDelta: number): void {
+        this.variantShareDelta = variantShareDelta;
+    }
+
+    getVariantShareDelta(ageGroupIndex: number): number {
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex() && this.variantShareDelta) {
+            return this.variantShareDelta * this.getIncidence(ageGroupIndex);
+        }
+    }
+
+
     setVariantShareBA1(variantShareBA1: number): void {
         this.variantShareBA1 = variantShareBA1;
     }
 
     getVariantShareBA1(ageGroupIndex: number): number {
-        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex()) {
-            return this.variantShareBA1;
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex() && this.variantShareBA1) {
+            return this.variantShareBA1 * this.getIncidence(ageGroupIndex);
         }
     }
 
@@ -435,8 +450,8 @@ export class BaseDataItem implements IBaseDataItem {
     }
 
     getVariantShareBA2(ageGroupIndex: number): number {
-        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex()) {
-            return this.variantShareBA2;
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex() && this.variantShareBA2) {
+            return this.variantShareBA2 * this.getIncidence(ageGroupIndex);
         }
     }
 
@@ -445,8 +460,8 @@ export class BaseDataItem implements IBaseDataItem {
     }
 
     getVariantShareBA5(ageGroupIndex: number): number {
-        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex()) {
-            return this.variantShareBA5;
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex() && this.variantShareBA5) {
+            return this.variantShareBA5 * this.getIncidence(ageGroupIndex);
         }
     }
 

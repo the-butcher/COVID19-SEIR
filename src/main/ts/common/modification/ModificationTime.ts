@@ -234,16 +234,12 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 ageGroupShares.push(ageGroupDiscoveryWeights[ageGroup.getIndex()] / totalDiscoveryWeight);
             });
 
-            const totalTestsPerDay = this.getTestRate() * Demographics.getInstance().getAbsTotal();
-            const totalPositivityRate = this.getPositivityRate();
-            const totalDiscoveryRate = StrainUtil.calculateDiscoveryRate(totalPositivityRate, this.getTestRate(), ModificationSettings.getInstance().getModificationValues());
+            // const totalTestsPerDay = this.getTestRate() * Demographics.getInstance().getAbsTotal();
+            // const totalPositivityRate = this.getPositivityRate();
+            const totalDiscoveryRate = StrainUtil.calculateDiscoveryRate(this.getPositivityRate(), this.getTestRate(), ModificationSettings.getInstance().getModificationValues());
             const totalDiscovery = totalDiscoveryRate * Demographics.getInstance().getAbsTotal();
 
-            // const ageGroupTestRates: number[] = [];
-            // const ageGroupDiscoveryRates: number[] = [];
-
-            // let ageGroupTestSum: number = 0;
-            // let ageGroupDiscoverySum: number = 0;
+            let ageGroupDiscoverySum: number = 0;
 
             this.ageGroups.forEach(ageGroup => {
 
@@ -251,27 +247,21 @@ export class ModificationTime extends AModification<IModificationValuesTime> imp
                 // calculate a new discovery rate from weights
                 const ageGroupDiscoveryRate = totalDiscovery * ageGroupShares[ageGroup.getIndex()] / ageGroup.getAbsValue();
 
-                // const ageGroupTestRate = ageGroupShares[ageGroup.getIndex()] * totalTestsPerDay / ageGroup.getAbsValue();
-                // const ageGroupPositivity = totalPositivityRate; // ??? ageGroupShares[ageGroup.getIndex()] = totalPositivityRate / ageGroupShares[ageGroup.getIndex()];
-                // const ageGroupDiscovery = StrainUtil.calculateDiscoveryRate(ageGroupPositivity, ageGroupTestRate, ModificationSettings.getInstance().getModificationValues());
+                ageGroupDiscoverySum += ageGroupDiscoveryRate * ageGroup.getAbsValue();
 
-                // ageGroupTestSum += ageGroupShares[ageGroup.getIndex()] * totalTestsPerDay;
-                // ageGroupDiscoverySum += ageGroupDiscoveryRate * ageGroup.getAbsValue();
-
-                // ageGroupDiscoveryRates.push(ageGroupDiscovery);
-                // ageGroupTestRates.push(ageGroupTestRate);
-
-                let contact = this.discoveryRatesByAgeGroup[ageGroup.getIndex()].contact; // * correction;
+                let contact = this.discoveryRatesByAgeGroup[ageGroup.getIndex()].contact;;
                 this.discoveryRatesByAgeGroup[ageGroup.getIndex()] = {
                     setting: this.discoveryRatesByAgeGroup[ageGroup.getIndex()].setting,
                     contact,
                     discovery: ageGroupDiscoveryRate
                 };
-                // how many tests would it have taken to produce this discovery rate? <-- this in a way that the total number of tests matches
 
             });
 
-            // console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), totalDiscovery, ageGroupDiscoverySum);
+            // if (this.getInstant() % TimeUtil.MILLISECONDS_PER____DAY === 0) {
+            //     console.log(TimeUtil.formatCategoryDateFull(this.getInstant()), totalDiscovery, ageGroupDiscoverySum);
+            // }
+
 
 
         }
