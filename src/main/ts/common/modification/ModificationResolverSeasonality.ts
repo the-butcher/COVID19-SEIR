@@ -42,9 +42,19 @@ export class ModificationResolverSeasonality extends AModificationResolver<IModi
         const seasonalityInstant = modificationSeasonality.getInstantA(); // the instant where amount of seasonality is at it's max
         const values: { [K in string]: number } = {};
         Demographics.getInstance().getCategories().forEach(contactCategory => {
+
             const cosine = Math.cos((instant - seasonalityInstant) % TimeUtil.MILLISECONDS_PER___YEAR / TimeUtil.MILLISECONDS_PER___YEAR * Math.PI * 2); // 1 at maxSeasonality, -1 at min
             let value = 1 - (cosine + 1) * 0.5 * (1 - modificationSeasonality.getSeasonality(contactCategory.getName())); // 1 at max seasonality, 0 at min
             values[contactCategory.getName()] = value;
+
+            // https://www.desmos.com/calculator/pqd07owdeo
+            // const v1 = (instant - seasonalityInstant) % TimeUtil.MILLISECONDS_PER___YEAR / TimeUtil.MILLISECONDS_PER___YEAR * Math.PI * 2;
+            // const cosine1 = Math.cos(v1); // 1 at maxSeasonality, -1 at min
+            // const cosine3 = Math.cos(v1 * 3) / 10; // 1 at maxSeasonality, -1 at min
+            // const cosineSum = cosine1 * 1.1 - cosine3;
+            // let value = 1 - (cosineSum + 1) * 0.5 * (1 - modificationSeasonality.getSeasonality(contactCategory.getName())); // 1 at max seasonality, 0 at min
+            // values[contactCategory.getName()] = value;
+
         });
         return values;
     }

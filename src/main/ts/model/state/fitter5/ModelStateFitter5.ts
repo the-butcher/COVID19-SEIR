@@ -1,8 +1,11 @@
+import { DateAxisDataItem } from '@amcharts/amcharts4/charts';
 import { Demographics } from '../../../common/demographics/Demographics';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
+import { ModificationResolverStrain } from '../../../common/modification/ModificationResolverStrain';
 import { StrainUtil } from '../../../util/StrainUtil';
 import { TimeUtil } from '../../../util/TimeUtil';
 import { BaseData } from '../../basedata/BaseData';
+import { ModelConstants } from '../../ModelConstants';
 import { ModelInstants } from '../../ModelInstants';
 import { IModificationSet } from '../fitter/IModificationSet';
 import { IDataItem, IFitterParams, IModelProgress, ModelStateIntegrator } from '../ModelStateIntegrator';
@@ -206,6 +209,14 @@ export class ModelStateFitter5 {
             }
 
         }
+
+        const modificationsStrain = new ModificationResolverStrain().getModifications();
+        const instantD1 = TimeUtil.parseCategoryDateFull("31.12.2021");
+        const dataItemD1 = dataset.find(d => d.instant === instantD1);
+
+        const casesDelta31122021 = dataItemD1.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[0].getId()];
+        console.log('delta cases at 31.12.2021', casesDelta31122021);
+
 
         // if (modificationIndex === modificationsContact.length - 1) {
         //     const lastModification = modificationsContact[modificationsContact.length - 1];

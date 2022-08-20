@@ -131,7 +131,7 @@ export class ControlsConstants {
     static readonly COLORS: { [K in COMPARTMENT__COLORS]: string } = {
 
         'SUSCEPTIBLE': '#1a1a1a',
-        'IMMUNIZING': new Color(HUE_VACCINATION, 1.00, 0.45).getHex(), // '#186987',
+        'IMMUNIZING': new Color(HUE_VACCINATION, 1.00, 0.35).getHex(), // '#186987',
         'EXPOSED': new Color(HUE_____EXPOSED, 1.00, 0.78).getHex(), // '#7c400e',
         'INFECTIOUS': new Color(HUE__INFECTIOUS, 1.00, 0.83).getHex(), // '#bd6215',
         'REMOVED': new Color(HUE___RECOVERED, 1.00, 0.93).getHex(), // '#caba0d',
@@ -314,7 +314,10 @@ export class ControlsConstants {
             icon: 'M 7.98 -2.66 L 2.65 -7.98 C 2.55 -8.08 2.39 -8.08 2.29 -7.98 L 1.22 -6.91 C 1.12 -6.81 1.12 -6.65 1.22 -6.55 L 1.57 -6.2 L -6.11 1.47 C -7.34 2.69 -7.54 4.7 -6.41 6.01 C -5.75 6.77 -4.84 7.15 -3.92 7.15 C -3.09 7.15 -2.25 6.83 -1.61 6.2 L 6.19 -1.59 L 6.55 -1.24 C 6.64 -1.14 6.8 -1.14 6.9 -1.24 L 7.98 -2.31 C 8.08 -2.4 8.08 -2.57 7.98 -2.66 Z M 2.92 -0.45 H -2.05 L 2.64 -5.13 L 5.12 -2.65 L 2.92 -0.45 Z',
             container: 'modificationTestingDiv',
             handleModificationUpdate: () => {
-                return ModelTask.commit('TESTING', ControlsConstants.createWorkerInput());
+                // skip update after settings change --> let the current task complete, it will pick up the changes on the next cycle
+                if (QueryUtil.getInstance().getWorkerMode() !== 'REBUILDING') {
+                    return ModelTask.commit('TESTING', ControlsConstants.createWorkerInput());
+                }
             },
             getModificationResolver: () => {
                 return new ModificationResolverDiscovery();

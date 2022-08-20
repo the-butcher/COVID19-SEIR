@@ -4,6 +4,7 @@ import { AModification } from './AModification';
 import { getMaxListeners } from 'process';
 import { ObjectUtil } from '../../util/ObjectUtil';
 import { Modifications } from './Modifications';
+import { TimeUtil } from '../../util/TimeUtil';
 
 /**
  * implementation of IModification for a specific instant

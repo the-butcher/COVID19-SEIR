@@ -133,6 +133,11 @@ export class ChartAgeGroup {
     protected readonly seriesReproductionR: ChartAgeGroupSeries;
 
     /**
+     * seasonality
+     */
+    protected readonly seriesSeasonality: ChartAgeGroupSeries;
+
+    /**
      * cases as of model
      */
     protected readonly seriesAgeGroupDiscoveredCases: ChartAgeGroupSeries;
@@ -963,6 +968,27 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
 
+        this.seriesSeasonality = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'seasonality (model)',
+            baseLabel: 'seasonality (model)',
+            valueField: 'seasonality',
+            colorKey: 'SEASONALITY',
+            strokeWidth: 10,
+            dashed: false,
+            locationOnPath: 0.50,
+            labels: {
+                tooltip: true,
+                pathtip: true
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesSeasonality.getSeries().strokeOpacity = 0.5;
+
         Demographics.getInstance().getCategories().forEach(category => {
             this.getOrCreateSeriesContactByCategory(category.getName());
         });
@@ -1658,6 +1684,8 @@ export class ChartAgeGroup {
         this.seriesAgeGroupReproductionP.setSeriesNote(ageGroup.getName());
         this.seriesReproductionR.setSeriesNote(ageGroup.getName());
 
+        this.seriesSeasonality.setSeriesNote(ModelActions.getInstance().getCategory());
+
     }
 
     async handleCategoryChange(): Promise<void> {
@@ -2101,6 +2129,8 @@ export class ChartAgeGroup {
             seriesAgeGroupReproduction.setVisible(visible);
         });
 
+        this.seriesSeasonality.setVisible(visible);
+
         // specific incidence makes sense only if there is more than one strain
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
         if (visible && modificationValuesStrain.length > 1) {
@@ -2418,6 +2448,8 @@ export class ChartAgeGroup {
 
         for (const dataItem of this.modelData) {
 
+            const modificationTime = ModificationTime.createInstance(dataItem.instant);
+
             // const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
 
             // data independent from sub-strains
@@ -2432,7 +2464,7 @@ export class ChartAgeGroup {
             const ageGroupDiscoveredCases = dataItem.valueset[ageGroupPlot.getName()].CASES[ModelConstants.STRAIN_ID___________ALL];
 
             const ageGroupDiscoveryRateL = dataItem.valueset[ageGroupPlot.getName()].DISCOVERY;
-            const ageGroupDiscoveryRateM = ModificationTime.createInstance(dataItem.instant).getDiscoveryRatesRaw(ageGroupPlot.getIndex()).discovery;
+            const ageGroupDiscoveryRateM = modificationTime.getDiscoveryRatesRaw(ageGroupPlot.getIndex()).discovery;
             // const ageGroupDiscoveryRateM = ModificationResolverDiscovery.getRegression(ageGroupPlot.getIndex()).findLoessValue(dataItem.instant).m;
 
             const ageGroupAssumedAllCases = ageGroupDiscoveredCases / ageGroupDiscoveryRateL;
@@ -2486,6 +2518,10 @@ export class ChartAgeGroup {
                 ageGroupIncidence68U = dataItem.valueset[ageGroupPlot.getName()].PREDICTION.avg + dataItem.valueset[ageGroupPlot.getName()].PREDICTION.std * 1 - ageGroupIncidence68L; // magic number -- formalize
             }
 
+            let seasonality: number;
+
+            seasonality = modificationTime.getSeasonality(ModelActions.getInstance().getCategory());
+
             const item = {
                 categoryX: dataItem.categoryX,
                 ageGroupSusceptible,
@@ -2508,7 +2544,8 @@ export class ChartAgeGroup {
                 ageGroupReproductionP,
                 ageGroupDiscoveryRateL,
                 ageGroupDiscoveryRateM,
-                mobility: 0
+                mobility: 0,
+                seasonality
             };
 
             // console.log(TimeUtil.formatCategoryDateFull(dataItem.instant), ageGroupDiscoveryRateL);
@@ -2605,6 +2642,8 @@ export class ChartAgeGroup {
         // this.seriesAgeGroupContactByCategory.forEach(seriesAgeGroupContact => {
         //     this.applyData(seriesAgeGroupContact, plotData);
         // });
+
+        this.applyData(this.seriesSeasonality, plotData);
 
     }
 

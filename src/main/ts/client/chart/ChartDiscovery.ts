@@ -180,7 +180,7 @@ export class ChartDiscovery {
         }
         this.chart.invalidateRawData();
 
-        console.log('chartData', chartData)
+        // console.log('chartData', chartData)
 
         this.fullDataUpdate = false;
 

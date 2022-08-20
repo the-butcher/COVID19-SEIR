@@ -110,9 +110,9 @@ export class ChartDiscoveryRate {
             return ChartUtil.getInstance().formatLabelOrTooltipValue(value, labellingDefinitionAxis);
         });
 
-        // this.yAxis.min = yMin;
-        // this.yAxis.max = yMax;
-        // this.yAxis.strictMinMax = true;
+        this.yAxis.min = yMin;
+        this.yAxis.max = yMax;
+        this.yAxis.strictMinMax = true;
         this.yAxis.rangeChangeDuration = 0;
 
 

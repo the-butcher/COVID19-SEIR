@@ -107,19 +107,19 @@ export class StrainUtil {
      * linear: https://www.desmos.com/calculator/jeqlhoq5el
      * falling: https://www.desmos.com/calculator/n4ehbrot1c
      * @param positivityRate
-     * @param testRate
+     * @param t1
      * @param discoveryValueSet
      * @returns
      */
-    static calculateDiscoveryRate(positivityRate: number, testRate: number, discoveryValueSet: IDiscoveryValueSet): number {
+    static calculateDiscoveryRate(positivityRate: number, t1: number, discoveryValueSet: IDiscoveryValueSet): number {
 
         // const c1 = positivityRate * testRate;
         // const t0 = testRate * discoveryValueSet.pow2 + discoveryValueSet.pow;
         // const c2 = t0 * (1 - Math.pow(positivityRate, 1.5));
         // return c1 + c2;
 
-        const b = testRate * discoveryValueSet.pow2 + discoveryValueSet.pow;
-        const d = b - positivityRate * (b - testRate);
+        const t0 = t1 * discoveryValueSet.pow2 + discoveryValueSet.pow;
+        const d = t0 - positivityRate * (t0 - t1);
         return d;
 
         // // p=7

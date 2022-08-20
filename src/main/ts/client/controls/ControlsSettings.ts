@@ -51,7 +51,7 @@ export class ControlsSettings {
         // this.sliderPow2 = new SliderSetting("exponent", [0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         this.sliderPow1 = new SliderSetting("exponent", [0.0, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        this.sliderPow2 = new SliderSetting("exponent", [0.0, 10], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderPow2 = new SliderSetting("exponent", [0.0, 15], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         // this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());

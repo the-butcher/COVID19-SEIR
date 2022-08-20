@@ -212,7 +212,7 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             }
 
-            const normalizeDiscoveryMultipliers = false;
+            const normalizeDiscoveryMultipliers = true;
             if (normalizeDiscoveryMultipliers) {
 
                 const ageGroups = Demographics.getInstance().getAgeGroups();
@@ -229,10 +229,10 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                     ageGroups.forEach(ageGroup => {
                         correctionUdate[ageGroup.getName()] = modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection;
                     });
-                    modificationDiscovery.acceptUpdate({
-                        corrections: correctionUdate
-                    });
-                    // console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionTotal, correctionCorrection, correctionUdate);
+                    // modificationDiscovery.acceptUpdate({
+                    //     corrections: correctionUdate
+                    // });
+                    console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionTotal, correctionCorrection, correctionUdate);
 
                 });
 
