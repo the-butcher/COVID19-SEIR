@@ -20,6 +20,9 @@ import { QueryUtil } from '../util/QueryUtil';
 import { ModificationDiscovery } from '../common/modification/ModificationDiscovery';
 import { TimeUtil } from '../util/TimeUtil';
 import { ModificationResolverDiscovery } from '../common/modification/ModificationResolverDiscovery';
+import { ModificationStrain } from '../common/modification/ModificationStrain';
+import { AgeGroup } from '../common/demographics/AgeGroup';
+import { Demographics } from '../common/demographics/Demographics';
 
 export type WORKER_MODE = 'REGRESSION' | 'PROJECTION' | 'REBUILDING';
 
@@ -88,27 +91,49 @@ export class ModelTask {
                         corrections: modificationValuesContact.corrections,
                         dailyerrors: modificationValuesContact.dailyerrors
                     });
-                    StorageUtil.getInstance().setSaveRequired(true);
+                    // StorageUtil.getInstance().setSaveRequired(true);
                 });
 
                 // console.log('modelProgress.modificationValuesDiscovery', modelProgress.modificationValuesDiscovery);
                 // COMMENT :: POS
+                const ageGroups = Demographics.getInstance().getAgeGroups();
                 modelProgress.modificationValuesDiscovery?.forEach(modificationValuesDiscovery => {
+
                     const modificationDiscovery = Modifications.getInstance().findModificationById(modificationValuesDiscovery.id) as ModificationDiscovery;
-                    let saveRequired = false;
-                    const positivityRateChange = Math.abs(modificationValuesDiscovery.positivityRate - modificationDiscovery.getPositivityRate());
-                    if (positivityRateChange > 0.002) {
-                        // console.log('positivityRateChange', TimeUtil.formatCategoryDateFull(modificationValuesDiscovery.instant), positivityRateChange, modificationDiscovery.getId());
-                        modificationDiscovery.acceptUpdate({
-                            positivityRate: modificationValuesDiscovery.positivityRate
-                        });
-                        saveRequired = true;
-                    }
-                    if (saveRequired) {
-                        StorageUtil.getInstance().setSaveRequired(true);
-                    }
+                    // let saveRequired = false;
+                    // const positivityRateChange = Math.abs(modificationValuesDiscovery.positivityRate - modificationDiscovery.getPositivityRate());
+                    // if (positivityRateChange > 0.002) {
+                    // console.log('positivityRateChange', TimeUtil.formatCategoryDateFull(modificationValuesDiscovery.instant), positivityRateChange, modificationDiscovery.getId());
+                    const correctionUdates: { [x: string]: number } = {};
+                    ageGroups.forEach(ageGroup => {
+                        let correctionUdate = modificationValuesDiscovery.corrections?.[ageGroup.getName()];
+                        if (correctionUdate) {
+                            correctionUdate = (modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) + correctionUdate) / 2;
+                            correctionUdates[ageGroup.getName()] = correctionUdate;
+                        }
+                    });
+                    modificationDiscovery.acceptUpdate({
+                        positivityRate: modificationValuesDiscovery.positivityRate,
+                        corrections: correctionUdates
+                    });
+                    // saveRequired = true;
+                    // }
+                    // if (saveRequired) {
+                    // StorageUtil.getInstance().setSaveRequired(true);
+                    // }
                 });
                 ModificationResolverDiscovery.resetRegression();
+
+                modelProgress.modificationValuesStrain?.forEach(modificationValuesStrain => {
+                    const modificationStrain = Modifications.getInstance().findModificationById(modificationValuesStrain.id) as ModificationStrain;
+                    // console.log(modificationContact.getId(), TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationValuesContact.multipliers);
+                    modificationStrain.acceptUpdate({
+                        dstIncidence: modificationValuesStrain.dstIncidence
+                    });
+                    // StorageUtil.getInstance().setSaveRequired(true);
+                });
+
+                StorageUtil.getInstance().setSaveRequired(true);
 
                 await ChartAgeGroup.getInstance().acceptModelData(modelProgress.data);
                 await ChartAgeGroup.getInstance().renderModelData();
@@ -116,11 +141,13 @@ export class ModelTask {
                 await ChartAgeGroupFlow.getInstance().acceptModelData(modelProgress.data);
                 await ChartAgeGroupFlow.getInstance().renderModelData();
 
+                const modificationRegression = new ModificationResolverRegression().getModifications()[0];
+                modificationRegression.updateCorrectionRegressionsTotal();
+
                 // const modificationRegression = new ModificationResolverRegression().getModifications()[0];
                 // modificationRegression.acceptUpdate({
                 //     ...modificationRegression.getModificationValues()
                 // });
-
                 // if (modelProgress.modificationValuesRegression) {
                 //     const modificationRegression = Modifications.getInstance().findModificationById(modelProgress.modificationValuesRegression.id) as ModificationRegression;
                 //     modificationRegression.acceptUpdate({

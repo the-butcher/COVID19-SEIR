@@ -27,6 +27,7 @@ export interface IModelProgress {
     modificationValuesRegression?: IModificationValuesRegression;
     modificationValuesContact?: IModificationValuesContact[];
     modificationValuesDiscovery?: IModificationValuesDiscovery[];
+    modificationValuesStrain?: IModificationValuesStrain[];
     fitterParams?: IFitterParams;
 }
 

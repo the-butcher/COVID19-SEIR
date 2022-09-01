@@ -1,7 +1,11 @@
 import { DateAxisDataItem } from '@amcharts/amcharts4/charts';
 import { Demographics } from '../../../common/demographics/Demographics';
+import { ModificationDiscovery } from '../../../common/modification/ModificationDiscovery';
 import { ModificationResolverContact } from '../../../common/modification/ModificationResolverContact';
+import { ModificationResolverDiscovery } from '../../../common/modification/ModificationResolverDiscovery';
+import { ModificationResolverRegression } from '../../../common/modification/ModificationResolverRegression';
 import { ModificationResolverStrain } from '../../../common/modification/ModificationResolverStrain';
+import { ModificationSettings } from '../../../common/modification/ModificationSettings';
 import { StrainUtil } from '../../../util/StrainUtil';
 import { TimeUtil } from '../../../util/TimeUtil';
 import { BaseData } from '../../basedata/BaseData';
@@ -66,8 +70,45 @@ export class ModelStateFitter5 {
     async adapt(fitterParams: IFitterParams, modelStateIntegrator: ModelStateIntegrator, maxInstant: number, progressCallback: (progress: IModelProgress) => void): Promise<IModelProgress> {
 
         const dataset: IDataItem[] = [];
-        const modificationResolver = new ModificationResolverContact();
-        const modificationsContact = modificationResolver.getModifications();
+        const modificationResolverContact = new ModificationResolverContact();
+        const modificationsContact = modificationResolverContact.getModifications();
+
+        const modificationRegression = new ModificationResolverRegression().getModifications()[0];
+        const modificationResolverDiscovery = new ModificationResolverDiscovery
+        const modificationsDiscovery = modificationResolverDiscovery.getModifications();
+
+        const ageGroups = Demographics.getInstance().getAgeGroups();
+        const correctionUdate: { [x: string]: number } = {};
+        modificationsDiscovery.slice(2).forEach(modificationDiscovery => {
+
+            // do not update descovery beyond regression
+            if (modificationDiscovery.getInstantA() <= BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4) {
+
+                ageGroups.forEach(ageGroup => {
+
+                    const linearA = modificationRegression.getCorrectionRegression(modificationDiscovery.getInstantA(), ageGroup.getName()).loess.y; // .valueA
+                    const linearB = modificationRegression.getCorrectionRegression(modificationDiscovery.getInstantA(), ModelConstants.AGEGROUP_NAME_______ALL).loess.y; // .valueA;
+                    if (linearA && linearB) {
+                        const linearR = Math.pow((linearA / linearB - 1) * 0.1 + 1, 2);
+                        // const linearR = linearB / linearA;
+                        correctionUdate[ageGroup.getName()] = modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * linearR;
+                    } else {
+                        correctionUdate[ageGroup.getName()] = undefined;
+                    }
+
+                });
+
+            } else {
+                console.log('skipping', TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()));
+            }
+
+            // this will either apply freshly calculated updates, or in case of skipped mods athe end of the timeline the last valid calulated updates
+            modificationDiscovery.acceptUpdate({
+                corrections: { ...correctionUdate }
+            });
+
+
+        });
 
         let nxtErrorTolerance: number;
         for (let i = 0; i < ModelStateFitter5.ERROR_TOLERANCES.length; i++) {
@@ -127,7 +168,9 @@ export class ModelStateFitter5 {
 
             while (!modificationSet.modA.isReadonly()) { //
 
-                const valueErrors = await modificationAdapter.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], iterationIndex++, progressCallback);
+                iterationIndex++;
+
+                const valueErrors = await modificationAdapter.adapt(modelStateIntegrator, modificationSet, dataset[dataset.length - 1], modificationIndex, progressCallback);
                 let maxAbsErrorCurr = 0;
                 Object.keys(valueErrors).forEach(key => {
                     // dont consider ignore groups for max error
@@ -210,13 +253,85 @@ export class ModelStateFitter5 {
 
         }
 
+        /**
+         * adjust initial variant incidences to reach certain dates where the respective variantes become dominant
+         */
+
+        const dateD1 = "30.12.2021";
+        const date12 = "26.02.2022";
+        const date25 = "05.06.2022";
+
         const modificationsStrain = new ModificationResolverStrain().getModifications();
-        const instantD1 = TimeUtil.parseCategoryDateFull("31.12.2021");
+
+        const instantD1 = TimeUtil.parseCategoryDateFull(dateD1);
+        const instant12 = TimeUtil.parseCategoryDateFull(date12);
+        const instant25 = TimeUtil.parseCategoryDateFull(date25);
+
+        const subratio = 0.20;
+
         const dataItemD1 = dataset.find(d => d.instant === instantD1);
+        if (dataItemD1) {
+            const casesDltD1 = dataItemD1.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[0].getId()];
+            const casesBa1D1 = dataItemD1.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[1].getId()];
+            const ratioD1 = (casesBa1D1 / casesDltD1 - 1) * subratio + 1;
+            modificationsStrain[1].acceptUpdate({
+                dstIncidence: modificationsStrain[1].getIncidence() / ratioD1
+            });
+        }
 
-        const casesDelta31122021 = dataItemD1.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[0].getId()];
-        console.log('delta cases at 31.12.2021', casesDelta31122021);
+        const dataItem12 = dataset.find(d => d.instant === instant12);
+        if (dataItem12) {
+            const casesBa112 = dataItem12.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[1].getId()];
+            const casesBa212 = dataItem12.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[2].getId()];
+            const ratio12 = (casesBa212 / casesBa112 - 1) * subratio + 1;
+            modificationsStrain[2].acceptUpdate({
+                dstIncidence: modificationsStrain[2].getIncidence() / ratio12
+            });
+        }
 
+        const dataItem25 = dataset.find(d => d.instant === instant25);
+        if (dataItem25) {
+            const casesBa225 = dataItem25.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[2].getId()];
+            const casesBa525 = dataItem25.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[3].getId()];
+            const ratio25 = (casesBa525 / casesBa225 - 1) * subratio + 1;
+            modificationsStrain[3].acceptUpdate({
+                dstIncidence: modificationsStrain[3].getIncidence() / ratio25
+            });
+        }
+
+        const normalize = (modificationDiscovery: ModificationDiscovery) => {
+
+            // const totalDiscoveryRate = StrainUtil.calculateDiscoveryRate(modificationDiscovery.getPositivityRate(), modificationDiscovery.getTestRate(), ModificationSettings.getInstance().getModificationValues());
+
+            let correctionTotal = 0;
+            ageGroups.forEach(ageGroup => {
+                correctionTotal += modificationDiscovery.getCorrectionValue(ageGroup.getIndex());
+            });
+            const correctionCorrection = ageGroups.length * 0.5 / correctionTotal;
+            const correctionUdate: { [x: string]: number } = {};
+
+            // this will normalize values around an average value of 0.5, values truncated at 1 (in which case normalization may not be centered at 0.5, until re-normalized in subsequent runs)
+            ageGroups.forEach(ageGroup => {
+                correctionUdate[ageGroup.getName()] = Math.min(0.9, modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection);
+            });
+            modificationDiscovery.acceptUpdate({
+                corrections: correctionUdate
+            });
+            // console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionUdate);
+
+        };
+
+
+
+        modificationsDiscovery.forEach(modificationDiscovery => {
+
+            normalize(modificationDiscovery);
+
+        });
+
+        //
+
+        // console.log('cases d1', dateD1, casesDltD1, casesBa1D1, ratioD1);
 
         // if (modificationIndex === modificationsContact.length - 1) {
         //     const lastModification = modificationsContact[modificationsContact.length - 1];

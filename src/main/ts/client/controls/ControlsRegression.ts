@@ -1,4 +1,5 @@
 import { last } from '@amcharts/amcharts4/.internal/core/utils/Array';
+import { AgeGroup } from '../../common/demographics/AgeGroup';
 import { Modifications } from '../../common/modification/Modifications';
 import { ModelConstants } from '../../model/ModelConstants';
 import { IRegressionResult } from '../../model/regression/IRegressionResult';
@@ -45,15 +46,16 @@ export class ControlsRegression {
      * @param instant
      * @returns
      */
-    getRenderableRegressionResult(instant: number): IRegressionResult {
+    getRenderableRegressionResult(instant: number, ageGroupNameOverride?: string): IRegressionResult {
         const modelActions = ModelActions.getInstance();
         const lastRegressionType = modelActions.getLastRegressionType();
+        const ageGroupName = ageGroupNameOverride ?? modelActions.getAgeGroup().getName();
         if (lastRegressionType === 'MULTIPLIER') {
             return this.modification.getMultiplierRegression(instant, modelActions.getCategory());
         } else if (lastRegressionType === 'CORRECTION') {
-            return this.modification.getCorrectionRegression(instant, modelActions.getAgeGroup().getName());
+            return this.modification.getCorrectionRegression(instant, ageGroupName);
         } else if (lastRegressionType === 'VACCKEY') {
-            return this.modification.getVaccinationRegression(instant, modelActions.getAgeGroup().getName(), modelActions.getVaccKey());
+            return this.modification.getVaccinationRegression(instant, ageGroupName, modelActions.getVaccKey());
         } else {
             throw new Error('unrecognized regression type: ' + lastRegressionType);
         }

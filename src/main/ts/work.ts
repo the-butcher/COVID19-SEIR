@@ -5,6 +5,7 @@ import { IModificationValuesStrain } from './common/modification/IModificationVa
 import { ModificationResolverContact } from './common/modification/ModificationResolverContact';
 import { ModificationResolverDiscovery } from './common/modification/ModificationResolverDiscovery';
 import { ModificationResolverRegression } from './common/modification/ModificationResolverRegression';
+import { ModificationResolverStrain } from './common/modification/ModificationResolverStrain';
 import { Modifications } from './common/modification/Modifications';
 import { ModificationSettings } from './common/modification/ModificationSettings';
 import { BaseData } from './model/basedata/BaseData';
@@ -84,6 +85,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
                 data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
                 data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
                 data.modificationValuesDiscovery = new ModificationResolverDiscovery().getModifications().map(m => m.getModificationValues());
+                data.modificationValuesStrain = new ModificationResolverStrain().getModifications().map(m => m.getModificationValues());
                 ctx.postMessage(data);
             });
         } else if (workerInput.workerMode == 'REGRESSION') {
@@ -93,6 +95,7 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
                 data.modificationValuesContact = new ModificationResolverContact().getModifications().map(m => m.getModificationValues());
                 data.modificationValuesRegression = new ModificationResolverRegression().getModifications().map(m => m.getModificationValues()).find(m => true);
                 data.modificationValuesDiscovery = new ModificationResolverDiscovery().getModifications().map(m => m.getModificationValues());
+                data.modificationValuesStrain = new ModificationResolverStrain().getModifications().map(m => m.getModificationValues());
                 ctx.postMessage(data);
             });
         } else {

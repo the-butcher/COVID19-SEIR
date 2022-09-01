@@ -212,31 +212,31 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             }
 
-            const normalizeDiscoveryMultipliers = true;
-            if (normalizeDiscoveryMultipliers) {
+            // const normalizeDiscoveryMultipliers = false;
+            // if (normalizeDiscoveryMultipliers) {
 
-                const ageGroups = Demographics.getInstance().getAgeGroups();
+            //     const ageGroups = Demographics.getInstance().getAgeGroups();
 
-                const modificationsDiscovery = new ModificationResolverDiscovery().getModifications();
-                modificationsDiscovery.forEach(modificationDiscovery => {
+            //     const modificationsDiscovery = new ModificationResolverDiscovery().getModifications();
+            //     modificationsDiscovery.forEach(modificationDiscovery => {
 
-                    let correctionTotal = 0;
-                    ageGroups.forEach(ageGroup => {
-                        correctionTotal += modificationDiscovery.getCorrectionValue(ageGroup.getIndex());
-                    });
-                    const correctionCorrection = ageGroups.length * 0.5 / correctionTotal;
-                    const correctionUdate: { [x: string]: number } = {};
-                    ageGroups.forEach(ageGroup => {
-                        correctionUdate[ageGroup.getName()] = modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection;
-                    });
-                    // modificationDiscovery.acceptUpdate({
-                    //     corrections: correctionUdate
-                    // });
-                    console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionTotal, correctionCorrection, correctionUdate);
+            //         let correctionTotal = 0;
+            //         ageGroups.forEach(ageGroup => {
+            //             correctionTotal += modificationDiscovery.getCorrectionValue(ageGroup.getIndex());
+            //         });
+            //         const correctionCorrection = ageGroups.length * 0.5 / correctionTotal;
+            //         const correctionUdate: { [x: string]: number } = {};
+            //         ageGroups.forEach(ageGroup => {
+            //             correctionUdate[ageGroup.getName()] = modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection;
+            //         });
+            //         modificationDiscovery.acceptUpdate({
+            //             corrections: correctionUdate
+            //         });
+            //         // console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionTotal, correctionCorrection, correctionUdate);
 
-                });
+            //     });
 
-            }
+            // }
 
 
             // initialize model mode

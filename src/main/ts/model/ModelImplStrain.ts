@@ -54,7 +54,7 @@ export class ModelImplStrain implements IModelSeir {
         this.absTotal = demographics.getAbsTotal();
 
         let initialUndetected: number[] = [
-            2.00, // <= 04
+            3.00, // <= 04
             1.00, // 05-14
             1.00, // 15-24
             1.00, // 25-34

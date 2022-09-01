@@ -32,6 +32,9 @@ export interface ILoessInput {
 }
 export abstract class ValueRegressionBase<M extends IModification<IModificationValues>> {
 
+    private readonly orderA = 8;
+    private readonly orderB = 8;
+
     // private readonly instant: number;
     private readonly instantA: number;
     private readonly instantB: number;
@@ -48,6 +51,8 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
     private readonly loessValues01000: ILoessResult[];
     private readonly loessValues00500: ILoessResult[];
     private readonly loessValues00250: ILoessResult[];
+    private equationA: number[];
+    private equationB: number[];
 
     constructor(params: IRegressionParams<M>) {
 
@@ -58,6 +63,7 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         this.loessValues01000 = [];
         this.loessValues00500 = [];
         this.loessValues00250 = [];
+        this.equationA = [];
         this.modifications = params.modifications.filter(m => m.getInstantA() <= this.instantB);
 
     }
@@ -77,6 +83,12 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         }
 
     }
+
+    // collectBasicRegressionInput(): DataPoint[] {
+
+    //     const result:DataPoint[] = [];
+
+    // }
 
     collectLoessPredictionInput(): ILoessInput {
 
@@ -138,16 +150,23 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         const loessPrediction01000 = this.loessModel01000.predict(loessPredictionInput);
         const loessPrediction00500 = this.loessModel00500.predict(loessPredictionInput);
         const loessPrediction00250 = this.loessModel00250.predict(loessPredictionInput);
-        const regressionInput: DataPoint[] = [];
+
+        const basicRegressionInput: DataPoint[] = [];
+        const errorRegressionInput: DataPoint[] = [];
 
         for (let i = 0; i < loessPredictionInput.i.length; i++) {
 
             const instant = loessPredictionInput.i[i];
-            if (instant >= this.instantA && instant <= this.instantB && loessPredictionInput.m[i]) {
-                regressionInput.push([
-                    loessPredictionInput.x[i],
-                    loessPredictionInput.m[i]
-                ]);
+            const dataPoint: DataPoint = [
+                loessPredictionInput.x[i],
+                loessPredictionInput.m[i]
+            ];
+
+            if (loessPredictionInput.m[i]) {
+                basicRegressionInput.push(dataPoint);
+                if (instant >= this.instantA && instant <= this.instantB) {
+                    errorRegressionInput.push(dataPoint);
+                }
             }
 
             this.loessValues01000.push({
@@ -176,6 +195,17 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
 
         }
 
+        // const linearRergression = regression.linear(basicRegressionInput);
+        // const equation = linearRergression.equation[0]
+
+        // https://tom-alexander.github.io/regression-js/
+
+        this.equationA = [...regression.polynomial(basicRegressionInput, { order: this.orderA }).equation];
+        this.equationB = [...regression.polynomial(basicRegressionInput, { order: this.orderB }).equation];
+        // console.log(this.getName(), this.linearRegression);
+
+
+
         // const sse = sumYY - sumXY * sumXY / sumXX;
         // console.log('sse', sse);
         // const meanSquareError = sumSquaredError / (regressionData.length - 2)
@@ -193,10 +223,10 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         let sumYY: number = 0;
         let sumXY: number = 0;
 
-        for (let n = 0; n < regressionInput.length; n++) {
+        for (let n = 0; n < errorRegressionInput.length; n++) {
 
-            const x = regressionInput[n][0];
-            const y = regressionInput[n][1];
+            const x = errorRegressionInput[n][0];
+            const y = errorRegressionInput[n][1];
 
             if (n == 0) {
                 xBar = x;
@@ -217,11 +247,11 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
 
         // preliminary wh-params
         this.whParams = {
-            num: regressionInput.length,
-            avg: sumX / regressionInput.length,
+            num: errorRegressionInput.length,
+            avg: sumX / errorRegressionInput.length,
             tss: sumYY,
             sse: sumYY - sumXY * sumXY / sumXX,
-            wh2: new FDistribution().inverseCumulativeProbability95(regressionInput.length - 2) * 2,
+            wh2: new FDistribution().inverseCumulativeProbability95(errorRegressionInput.length - 2) * 2,
             off: 0,
             nro: 0
         }
@@ -278,6 +308,8 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         const loessValue00500 = this.findOrInterpolateLoessValue(instant, this.loessValues00500);
         const loessValue00250 = this.findOrInterpolateLoessValue(instant, this.loessValues00250);
 
+
+
         // \sin\left(x\cdot\pi-\frac{\pi}{2}\right)\cdot0.5+0.5
 
         let polyShareShift = Math.max(0, Math.min(1, (instant - this.instantB) / (this.instantC - this.instantB)));
@@ -314,6 +346,35 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
 
     }
 
+    findRegressionSlope(instant: number): number {
+
+        return this.equationA[this.equationA.length - 2];
+
+    }
+
+    findRegressionValueA(instant: number): number {
+        return this.findRegressionValueSum(instant, this.equationA);
+    }
+
+    findRegressionValueB(instant: number): number {
+        return this.findRegressionValueSum(instant, this.equationB);
+    }
+
+    findRegressionValueSum(instant: number, equation: number[]): number {
+
+        // console.log(this.equation);
+
+        const x = ValueRegressionBase.toRegressionX(instant);
+        let regressionValueSum = 0;
+        for (let eqautionIndex = 0; eqautionIndex < equation.length; eqautionIndex++) {
+            regressionValueSum += equation[eqautionIndex] * Math.pow(x, equation.length - eqautionIndex - 1);
+        }
+        // return this.equation[0] * Math.pow(x, 3) + this.equation[1] * Math.pow(x, 2) + this.equation[2] * Math.pow(x, 1) + this.equation[3] * Math.pow(x, 0);
+        return regressionValueSum; // this.equation[0] * Math.pow(x, 5) + this.equation[1] * Math.pow(x, 4) + this.equation[2] * Math.pow(x, 3) + this.equation[3] * Math.pow(x, 2) + this.equation[4] * x + this.equation[5];
+
+    }
+
+
     findOrInterpolateLoessValue(instant: number, loessValues: ILoessResult[]): ILoessResult {
 
         for (let i = 1; i < loessValues.length; i++) {
@@ -349,6 +410,9 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         // put instant into regressions space
         const x = ValueRegressionBase.toRegressionX(instant);
         const loessValue = this.findLoessValue(instant);
+        const regressionValueA = this.findRegressionValueA(instant);
+        const regressionValueB = this.findRegressionValueB(instant);
+        const slope = this.findRegressionSlope(instant);
 
         if (instant >= this.whParams.nro) {
 
@@ -372,7 +436,10 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
                 regression: regression,
                 ci95Min,
                 ci95Max,
-                ci95Dim: ci95
+                ci95Dim: ci95,
+                valueA: regressionValueA,
+                valueB: regressionValueB,
+                slope
             };
 
         } else {
@@ -382,7 +449,10 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
                 loess: loessValue,
                 ci95Min: undefined,
                 ci95Max: undefined,
-                ci95Dim: undefined
+                ci95Dim: undefined,
+                valueA: regressionValueA,
+                valueB: regressionValueB,
+                slope
             };
 
         }

@@ -92,7 +92,7 @@ export class ChartAgeGroup {
     /**
      * incidence series by strain
      */
-    protected readonly seriesAgeGroupIncidenceByStrain: Map<string, ChartAgeGroupSeries>;
+    protected readonly seriesAgeGroupCasesByStrain: Map<string, ChartAgeGroupSeries>;
 
     /**
      * incidence series by strain
@@ -118,9 +118,17 @@ export class ChartAgeGroup {
     protected readonly seriesEstimationValue95U: ChartAgeGroupSeries;
     protected readonly seriesEstimationValue95L: ChartAgeGroupSeries;
     protected readonly seriesEstimationValueM: ChartAgeGroupSeries;
+    protected readonly seriesEstimationValueRA: ChartAgeGroupSeries; // linear A
+    protected readonly seriesEstimationValueRB: ChartAgeGroupSeries; // linear B
+
+    /**
+     * loess estimation (center + CI)
+     */
     protected readonly seriesEstimationValueL: ChartAgeGroupSeries;
     protected readonly seriesEstimationValueLL: ChartAgeGroupSeries;
     protected readonly seriesEstimationValueLU: ChartAgeGroupSeries;
+
+
 
     /**
      * reproduction as calculated
@@ -385,7 +393,7 @@ export class ChartAgeGroup {
         this.yAxisPlotIncidence.tooltip.exportable = false;
 
 
-        this.seriesAgeGroupIncidenceByStrain = new Map();
+        this.seriesAgeGroupCasesByStrain = new Map();
         this.seriesAgeGroupRemovedByStrain = new Map();
         this.seriesAgeGroupReproductionByStrain = new Map();
         this.seriesAgeGroupContactByCategory = new Map();
@@ -562,7 +570,7 @@ export class ChartAgeGroup {
 
         this.seriesVariantShareDelta = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotIncidence,
+            yAxis: this.yAxisPlotAbsolute,
             title: 'share',
             baseLabel: 'share',
             valueField: 'variantShareDelta',
@@ -581,7 +589,7 @@ export class ChartAgeGroup {
         });
         this.seriesVariantShareBA1 = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotIncidence,
+            yAxis: this.yAxisPlotAbsolute,
             title: 'share',
             baseLabel: 'share',
             valueField: 'variantShareBA1',
@@ -601,7 +609,7 @@ export class ChartAgeGroup {
         this.seriesVariantShareDelta.bindToLegend(this.seriesVariantShareBA1);
         this.seriesVariantShareBA2 = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotIncidence,
+            yAxis: this.yAxisPlotAbsolute,
             title: 'share BA.2',
             baseLabel: 'share BA.2',
             valueField: 'variantShareBA2',
@@ -621,7 +629,7 @@ export class ChartAgeGroup {
         this.seriesVariantShareDelta.bindToLegend(this.seriesVariantShareBA2);
         this.seriesVariantShareBA5 = new ChartAgeGroupSeries({
             chart: this.chart,
-            yAxis: this.yAxisPlotIncidence,
+            yAxis: this.yAxisPlotAbsolute,
             title: 'share BA.5',
             baseLabel: 'share BA.5',
             valueField: 'variantShareBA5',
@@ -991,6 +999,46 @@ export class ChartAgeGroup {
 
         Demographics.getInstance().getCategories().forEach(category => {
             this.getOrCreateSeriesContactByCategory(category.getName());
+        });
+
+        this.seriesEstimationValueRA = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'regression A',
+            baseLabel: 'regression A',
+            valueField: 'estimationValueRA',
+            colorKey: 'VACCINATION',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.05,
+            labels: {
+                tooltip: false,
+                pathtip: true
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
+        });
+
+        this.seriesEstimationValueRB = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotPercent,
+            title: 'regression B',
+            baseLabel: 'regression B',
+            valueField: 'estimationValueRB',
+            colorKey: 'INFECTIOUS',
+            strokeWidth: 1,
+            dashed: true,
+            locationOnPath: 0.05,
+            labels: {
+                tooltip: false,
+                pathtip: true
+            },
+            stacked: false,
+            legend: true,
+            labellingDefinition: ControlsConstants.LABEL_PERCENT__FLOAT_2,
+            seriesConstructor: () => new LineSeries()
         });
 
         this.seriesEstimationValueL = new ChartAgeGroupSeries({
@@ -1681,8 +1729,11 @@ export class ChartAgeGroup {
         this.seriesEstimationValueLL.setSeriesNote(this.contactNote);
         this.seriesEstimationValueLU.setSeriesNote(this.contactNote);
 
+        this.seriesEstimationValueRA.setSeriesNote(this.contactNote);
+        this.seriesEstimationValueRB.setSeriesNote(this.contactNote);
+
         this.seriesAgeGroupReproductionP.setSeriesNote(ageGroup.getName());
-        this.seriesReproductionR.setSeriesNote(ageGroup.getName());
+        this.seriesReproductionR.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
 
         this.seriesSeasonality.setSeriesNote(ModelActions.getInstance().getCategory());
 
@@ -1797,17 +1848,17 @@ export class ChartAgeGroup {
      * @param strainValues
      * @returns
      */
-    getOrCreateSeriesAgeGroupIncidenceStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
+    getOrCreateSeriesAgeGroupCasesStrain(strainValues: IModificationValuesStrain): ChartAgeGroupSeries {
 
-        if (!this.seriesAgeGroupIncidenceByStrain.has(strainValues.id)) {
+        if (!this.seriesAgeGroupCasesByStrain.has(strainValues.id)) {
 
-            const seriesAgeGroupIncidenceStrain = new ChartAgeGroupSeries({
+            const seriesAgeGroupCasesStrain = new ChartAgeGroupSeries({
                 chart: this.chart,
-                yAxis: this.yAxisPlotIncidence,
-                title: `incidence (${strainValues.name})`,
-                baseLabel: `incidence (${strainValues.name})`,
-                valueField: `ageGroupIncidence${strainValues.id}`,
-                colorKey: 'INCIDENCE',
+                yAxis: this.yAxisPlotAbsolute,
+                title: `cases (${strainValues.name})`,
+                baseLabel: `cases (${strainValues.name})`,
+                valueField: `ageGroupCases${strainValues.id}`,
+                colorKey: 'CASES',
                 strokeWidth: 1,
                 dashed: true,
                 locationOnPath: this.seriesAgeGroupLabelLocation,
@@ -1822,9 +1873,9 @@ export class ChartAgeGroup {
             });
 
             // toggle strain incidence with primary incidence
-            this.seriesAgeGroupIncidence.bindToLegend(seriesAgeGroupIncidenceStrain);
+            this.seriesAgeGroupDiscoveredCases.bindToLegend(seriesAgeGroupCasesStrain);
 
-            this.seriesAgeGroupIncidenceByStrain.set(strainValues.id, seriesAgeGroupIncidenceStrain);
+            this.seriesAgeGroupCasesByStrain.set(strainValues.id, seriesAgeGroupCasesStrain);
             this.seriesAgeGroupLabelLocation += 0.1;
             if (this.seriesAgeGroupLabelLocation > 0.8) {
                 this.seriesAgeGroupLabelLocation = 0.5;
@@ -1832,7 +1883,7 @@ export class ChartAgeGroup {
 
         }
 
-        const seriesAgeGroup = this.seriesAgeGroupIncidenceByStrain.get(strainValues.id);
+        const seriesAgeGroup = this.seriesAgeGroupCasesByStrain.get(strainValues.id);
         seriesAgeGroup.setBaseLabel(strainValues.name);
         seriesAgeGroup.setVisible(this.chartMode === 'INCIDENCE');
         return seriesAgeGroup;
@@ -2066,8 +2117,8 @@ export class ChartAgeGroup {
         this.seriesVariantShareBA2.setVisible(visible);
         this.seriesVariantShareBA5.setVisible(visible);
 
-        this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
-            seriesAgeGroupIncidence.setVisible(visible);
+        this.seriesAgeGroupCasesByStrain.forEach(seriesAgeGroupCases => {
+            seriesAgeGroupCases.setVisible(visible);
         });
 
         // specific incidence makes sense only if there is more than one strain
@@ -2075,7 +2126,7 @@ export class ChartAgeGroup {
         if (visible && modificationValuesStrain.length > 1) {
             // turn all active strain back on
             modificationValuesStrain.forEach(strainValues => {
-                this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues).setVisible(visible);
+                this.getOrCreateSeriesAgeGroupCasesStrain(strainValues).setVisible(visible);
             });
         }
 
@@ -2104,6 +2155,9 @@ export class ChartAgeGroup {
         this.seriesEstimationValueL.setVisible(visible);
         this.seriesEstimationValueLL.setVisible(visible);
         this.seriesEstimationValueLU.setVisible(visible);
+
+        this.seriesEstimationValueRA.setVisible(visible);
+        this.seriesEstimationValueRB.setVisible(visible);
 
         this.seriesMobility.setVisible(false); // will be turned on separately
 
@@ -2185,7 +2239,7 @@ export class ChartAgeGroup {
     }
 
     setAxisPercentBounds(min: number, max: number): void {
-        console.warn('chart bounds', min, max);
+        // console.warn('chart bounds', min, max);
         this.yAxisPlotPercent.min = min;
         this.yAxisPlotPercent.max = max;
     }
@@ -2211,7 +2265,7 @@ export class ChartAgeGroup {
         const modificationValuesStrain = Modifications.getInstance().findModificationsByType('STRAIN').map(m => m.getModificationValues() as IModificationValuesStrain);
         modificationValuesStrain.forEach(strainValues => {
             // be sure there are series for each strain
-            this.getOrCreateSeriesAgeGroupIncidenceStrain(strainValues);
+            this.getOrCreateSeriesAgeGroupCasesStrain(strainValues);
             this.getOrCreateSeriesAgeGroupRemovedStrain(strainValues);
         });
 
@@ -2333,6 +2387,8 @@ export class ChartAgeGroup {
         const ageGroupIndex = ModelActions.getInstance().getAgeGroup().getIndex();
         const ageGroupPlot = Demographics.getInstance().getAgeGroupsWithTotal()[ageGroupIndex];
 
+        // let seriesNoteSet = 0;
+
         const validMobilityCategories = ['other', 'work', 'family', 'school'];
 
         const modelActions = ModelActions.getInstance();
@@ -2345,6 +2401,11 @@ export class ChartAgeGroup {
         for (const dataItem of this.modelData) {
 
             const renderableRegressionResult = ControlsRegression.getInstance().getRenderableRegressionResult(dataItem.instant);
+            const renderableRegressionResultTotal = ControlsRegression.getInstance().getRenderableRegressionResult(dataItem.instant, ModelConstants.AGEGROUP_NAME_______ALL);
+            // if (seriesNoteSet++ < 1) {
+            //     this.seriesEstimationValueRA.setSeriesNote(`slope: ${renderableRegressionResult.slope}`);
+            //     seriesNoteSet = true;
+            // }
 
             const estimationValue = renderableRegressionResult.regression;
             const estimationValue95L = renderableRegressionResult.ci95Min && Math.max(0, renderableRegressionResult.ci95Min);
@@ -2355,10 +2416,14 @@ export class ChartAgeGroup {
             let estimationValueL: number;
             let estimationValueLL: number;
             let estimationValueLU: number;
+            let estimationValueRA: number;
+            let estimationValueRB: number;
             if (renderableRegressionResult.loess && renderableRegressionResult.loess.o && renderableRegressionResult.loess.y) {
                 estimationValueL = renderableRegressionResult.loess.y;
                 estimationValueLL = renderableRegressionResult.loess.y - renderableRegressionResult.loess.o;
                 estimationValueLU = renderableRegressionResult.loess.y + renderableRegressionResult.loess.o - estimationValueLL;
+                estimationValueRA = renderableRegressionResult.loess.y;
+                estimationValueRB = renderableRegressionResultTotal.loess.y; // valueA
             }
 
             const dataItem00 = BaseData.getInstance().findBaseDataItem(dataItem.instant);
@@ -2381,6 +2446,8 @@ export class ChartAgeGroup {
                 estimationValueL,
                 estimationValueLL,
                 estimationValueLU,
+                estimationValueRA,
+                estimationValueRB,
                 mobility
             }
 
@@ -2418,6 +2485,8 @@ export class ChartAgeGroup {
         this.applyData(this.seriesEstimationValueL, chartData);
         this.applyData(this.seriesEstimationValueLL, chartData);
         this.applyData(this.seriesEstimationValueLU, chartData);
+        this.applyData(this.seriesEstimationValueRA, chartData);
+        this.applyData(this.seriesEstimationValueRB, chartData);
         this.applyData(this.seriesMobility, chartData);
         this.seriesAgeGroupContactByCategory.forEach(seriesAgeGroupContact => {
             this.applyData(seriesAgeGroupContact, chartData);
@@ -2552,7 +2621,7 @@ export class ChartAgeGroup {
 
             // add one strain value per modification
             modificationValuesStrain.forEach(modificationValueStrain => {
-                item[`ageGroupIncidence${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].INCIDENCES[modificationValueStrain.id];
+                item[`ageGroupCases${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].CASES[modificationValueStrain.id];
                 item[`ageGroupRemovedID${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].REMOVED[modificationValueStrain.id];
                 if (dataItem.valueset[ageGroupPlot.getName()].CASES[modificationValueStrain.id] > 25) {
                     item[`ageGroupReproductionP${modificationValueStrain.id}`] = dataItem.valueset[ageGroupPlot.getName()].REPRODUCTION[modificationValueStrain.id];
@@ -2623,9 +2692,9 @@ export class ChartAgeGroup {
         this.applyData(this.seriesAgeGroupReproductionP, plotData);
         this.applyData(this.seriesAgeGroupDiscoveryL, plotData);
         this.applyData(this.seriesAgeGroupDiscoveryM, plotData);
-        this.seriesAgeGroupIncidenceByStrain.forEach(seriesAgeGroupIncidence => {
-            this.applyData(seriesAgeGroupIncidence, plotData);
-            seriesAgeGroupIncidence.setSeriesNote(ageGroupPlot.getName());
+        this.seriesAgeGroupCasesByStrain.forEach(seriesAgeGroupCases => {
+            this.applyData(seriesAgeGroupCases, plotData);
+            seriesAgeGroupCases.setSeriesNote(ageGroupPlot.getName());
         })
         this.seriesAgeGroupRemovedByStrain.forEach(seriesAgeGroupRemoved => {
             this.applyData(seriesAgeGroupRemoved, plotData);

@@ -17,7 +17,10 @@ export class SliderSetting extends Slider {
 
         let tickFormat = ControlsConstants.LOCALE_FORMAT_FIXED;
         let valueFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_1;
-        if (steps < 0.1) {
+        if (steps < 0.01) {
+            tickFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_3;
+            valueFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_3;
+        } else if (steps < 0.1) {
             tickFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
             valueFormat = ControlsConstants.LOCALE_FORMAT_FLOAT_2;
         } else if (steps < 1) {

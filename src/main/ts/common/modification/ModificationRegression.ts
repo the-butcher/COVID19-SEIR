@@ -59,14 +59,6 @@ export class ModificationRegression extends AModification<IModificationValuesReg
             });
         });
 
-        this.correctionRegressionsTotal = new ValueRegressionCorrectionTotal({
-            ageGroupIndex: Demographics.getInstance().getAgeGroupTotal().getIndex(),
-            instantA: this.getInstantA() - 35 * TimeUtil.MILLISECONDS_PER____DAY,
-            instantB: this.getInstantA(),
-            instantC: this.getInstantA() + 35 * TimeUtil.MILLISECONDS_PER____DAY,
-            polyShares: [0.25, 0.75],
-            modifications: new ModificationResolverContact().getModifications()
-        });
 
         this.normalize();
 
@@ -226,6 +218,19 @@ export class ModificationRegression extends AModification<IModificationValuesReg
         super.acceptUpdate(update);
     }
 
+    updateCorrectionRegressionsTotal() {
+
+        this.correctionRegressionsTotal = new ValueRegressionCorrectionTotal({
+            ageGroupIndex: Demographics.getInstance().getAgeGroupTotal().getIndex(),
+            instantA: this.getInstantA() - 35 * TimeUtil.MILLISECONDS_PER____DAY,
+            instantB: this.getInstantA(),
+            instantC: this.getInstantA() + 35 * TimeUtil.MILLISECONDS_PER____DAY,
+            polyShares: [0.75, 1.00],
+            modifications: new ModificationResolverContact().getModifications()
+        });
+
+    }
+
     private updateRegressions(multiplierConfigs: { [K in string]: IRegressionConfig }, correctionConfigs: { [K in string]: IRegressionConfig }, vaccinationConfigs: { [K in string]: { [K in string]: IRegressionConfig } }): void {
 
         for (const key of Object.keys(multiplierConfigs)) {
@@ -292,6 +297,8 @@ export class ModificationRegression extends AModification<IModificationValuesReg
                 });
             };
         }
+
+        this.updateCorrectionRegressionsTotal();
 
     }
 
