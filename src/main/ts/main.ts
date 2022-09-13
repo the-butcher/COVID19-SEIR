@@ -57,75 +57,75 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
             }
 
-            const snapLastCorrectionToLongTermRegression = false;
-            if (snapLastCorrectionToLongTermRegression) {
+            // const snapLastCorrectionToLongTermRegression = false;
+            // if (snapLastCorrectionToLongTermRegression) {
 
-                const modificationsContact = new ModificationResolverContact().getModifications();
-                const lastModificationContact = modificationsContact[modificationsContact.length - 1];
+            //     const modificationsContact = new ModificationResolverContact().getModifications();
+            //     const lastModificationContact = modificationsContact[modificationsContact.length - 1];
 
-                const modificationRegression = new ModificationResolverRegression().getModifications()[0];
-                const correction_configs: { [K in string]: IRegressionConfig } = {};
-                const corrections: { [K in string]: number } = {};
+            //     const modificationRegression = new ModificationResolverRegression().getModifications()[0];
+            //     const correction_configs: { [K in string]: IRegressionConfig } = {};
+            //     const corrections: { [K in string]: number } = {};
 
-                Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-                    correction_configs[ageGroup.getName()] = {
-                        back_days_a: -35,
-                        back_days_b: 21,
-                        poly_shares: [
-                            0.75,
-                            0.25
-                        ]
-                    }
-                    // console.log(ageGroup.getName(), modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()));
-                    corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()).regression;
-                });
+            //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            //         correction_configs[ageGroup.getName()] = {
+            //             back_days_a: -35,
+            //             back_days_b: 21,
+            //             poly_shares: [
+            //                 0.75,
+            //                 0.25
+            //             ]
+            //         }
+            //         // console.log(ageGroup.getName(), modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()));
+            //         corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()).regression;
+            //     });
 
-                modificationRegression.acceptUpdate({
-                    correction_configs
-                });
-                lastModificationContact.acceptUpdate({
-                    corrections
-                });
+            //     modificationRegression.acceptUpdate({
+            //         correction_configs
+            //     });
+            //     lastModificationContact.acceptUpdate({
+            //         corrections
+            //     });
 
-            }
+            // }
 
-            const snapAllCorrectionsToMidTermRegression = false;
-            if (snapAllCorrectionsToMidTermRegression) {
+            // const snapAllCorrectionsToMidTermRegression = false;
+            // if (snapAllCorrectionsToMidTermRegression) {
 
-                const modificationsContact = new ModificationResolverContact().getModifications();
-                // const lastModificationContact = modificationsContact[modificationsContact.length - 1];
+            //     const modificationsContact = new ModificationResolverContact().getModifications();
+            //     // const lastModificationContact = modificationsContact[modificationsContact.length - 1];
 
-                const modificationRegression = new ModificationResolverRegression().getModifications()[0];
-                const correction_configs: { [K in string]: IRegressionConfig } = {};
+            //     const modificationRegression = new ModificationResolverRegression().getModifications()[0];
+            //     const correction_configs: { [K in string]: IRegressionConfig } = {};
 
 
-                Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-                    correction_configs[ageGroup.getName()] = {
-                        back_days_a: -35,
-                        back_days_b: 100,
-                        poly_shares: [
-                            0.25,
-                            0.75
-                        ]
-                    }
-                    // console.log(ageGroup.getName(), modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()));
+            //     Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            //         correction_configs[ageGroup.getName()] = {
+            //             back_days_a: -35,
+            //             back_days_b: 100,
+            //             poly_shares: [
+            //                 0.25,
+            //                 0.75
+            //             ]
+            //         }
+            //         // console.log(ageGroup.getName(), modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()));
 
-                });
+            //     });
 
-                modificationRegression.acceptUpdate({
-                    correction_configs
-                });
-                modificationsContact.forEach(modificationContact => {
-                    const corrections: { [K in string]: number } = {};
-                    Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
-                        corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(modificationContact.getInstant(), ageGroup.getName()).loess.y;
-                    });
-                    modificationContact.acceptUpdate({
-                        corrections
-                    });
-                });
+            //     modificationRegression.acceptUpdate({
+            //         correction_configs
+            //     });
+            //     modificationsContact.forEach(modificationContact => {
+            //         const corrections: { [K in string]: number } = {};
+            //         Demographics.getInstance().getAgeGroups().forEach(ageGroup => {
+            //             corrections[ageGroup.getName()] = modificationRegression.getCorrectionRegression(modificationContact.getInstant(), ageGroup.getName()).loess.y;
+            //         });
+            //         modificationContact.acceptUpdate({
+            //             corrections
+            //         });
+            //     });
 
-            }
+            // }
 
             // const modificationsContact = new ModificationResolverContact().getModifications();
             // modificationsContact.shift();
@@ -211,33 +211,6 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
                 }
 
             }
-
-            // const normalizeDiscoveryMultipliers = false;
-            // if (normalizeDiscoveryMultipliers) {
-
-            //     const ageGroups = Demographics.getInstance().getAgeGroups();
-
-            //     const modificationsDiscovery = new ModificationResolverDiscovery().getModifications();
-            //     modificationsDiscovery.forEach(modificationDiscovery => {
-
-            //         let correctionTotal = 0;
-            //         ageGroups.forEach(ageGroup => {
-            //             correctionTotal += modificationDiscovery.getCorrectionValue(ageGroup.getIndex());
-            //         });
-            //         const correctionCorrection = ageGroups.length * 0.5 / correctionTotal;
-            //         const correctionUdate: { [x: string]: number } = {};
-            //         ageGroups.forEach(ageGroup => {
-            //             correctionUdate[ageGroup.getName()] = modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection;
-            //         });
-            //         modificationDiscovery.acceptUpdate({
-            //             corrections: correctionUdate
-            //         });
-            //         // console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionTotal, correctionCorrection, correctionUdate);
-
-            //     });
-
-            // }
-
 
             // initialize model mode
             ModelActions.getInstance().toggleAgeGroup(Demographics.getInstance().getAgeGroups().length, false);
