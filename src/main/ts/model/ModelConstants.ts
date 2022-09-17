@@ -137,8 +137,6 @@ export class ModelConstants {
     static readonly PRELOAD_________________DAYS = 7;
     static readonly APPROXIMATION_________CYCLES = 3;
 
-    // static readonly V1_TO_V2_______DEFAULT_WEEKS = 8;
-
     static readonly AGE_GROUP_ALL = -1;
 
     static readonly AGEGROUP_NAME_______ALL = 'TOTAL';
@@ -151,11 +149,9 @@ export class ModelConstants {
     static readonly BASE_DATA_INDEX_VACC3RD = 4;
     static readonly BASE_DATA_INDEX_VACC4TH = 5;
     static readonly BASE_DATA_INDEX___TESTS = 6;
-    static readonly BASE_DATA_INDEX____HOSP = 7;
-    static readonly BASE_DATA_INDEX_____ICU = 8;
-    static readonly BASE_DATA_INDEX__MOBI_O = 9;
-    static readonly BASE_DATA_INDEX__MOBI_W = 10;
-    static readonly BASE_DATA_INDEX__MOBI_H = 11;
+    static readonly BASE_DATA_INDEX__MOBI_O = 7;
+    static readonly BASE_DATA_INDEX__MOBI_W = 8;
+    static readonly BASE_DATA_INDEX__MOBI_H = 9;
 
     static readonly RANGE____PERCENTAGE_250 = [0.00, 0.50, 1.00, 1.50, 2.00, 2.50];
     static readonly RANGE____PERCENTAGE_125 = [0.00, 0.25, 0.50, 0.75, 1.00, 1.25];

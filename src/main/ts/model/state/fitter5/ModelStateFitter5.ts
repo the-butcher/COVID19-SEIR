@@ -82,7 +82,7 @@ export class ModelStateFitter5 {
         modificationsDiscovery.slice(2).forEach(modificationDiscovery => {
 
             // do not update descovery beyond regression
-            if (modificationDiscovery.getInstantA() <= BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 4) {
+            if (modificationDiscovery.getInstantA() <= BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 0) {
 
                 ageGroups.forEach(ageGroup => {
 
@@ -90,7 +90,6 @@ export class ModelStateFitter5 {
                     const linearB = modificationRegression.getCorrectionRegression(modificationDiscovery.getInstantA(), ModelConstants.AGEGROUP_NAME_______ALL).loess.y; // .valueA;
                     if (linearA && linearB) {
                         const linearR = Math.pow((linearA / linearB - 1) * 0.1 + 1, 2);
-                        // const linearR = linearB / linearA;
                         correctionUdate[ageGroup.getName()] = modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * linearR;
                     } else {
                         correctionUdate[ageGroup.getName()] = undefined;
@@ -99,10 +98,11 @@ export class ModelStateFitter5 {
                 });
 
             } else {
-                console.log('skipping', TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()));
+                // 0001 | 08.10.2021 >> 11.10.2021  0.0160 05-14 success ...
+                // console.log('skipping', TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()));
             }
 
-            // this will either apply freshly calculated updates, or in case of skipped mods athe end of the timeline the last valid calulated updates
+            // this will either apply freshly calculated updates, or in case of skipped mods at he end of the timeline the last valid calulated updates
             modificationDiscovery.acceptUpdate({
                 corrections: { ...correctionUdate }
             });
@@ -257,15 +257,15 @@ export class ModelStateFitter5 {
          * adjust initial variant incidences to reach certain dates where the respective variantes become dominant
          */
 
-        const dateD1 = "30.12.2021";
-        const date12 = "26.02.2022";
-        const date25 = "05.06.2022";
+        const dateD1 = "29.12.2021";
+        const date12 = "25.02.2022";
+        const date25 = "04.06.2022";
 
         const modificationsStrain = new ModificationResolverStrain().getModifications();
 
         const instantD1 = TimeUtil.parseCategoryDateFull(dateD1);
         const instant12 = TimeUtil.parseCategoryDateFull(date12);
-        const instant25 = TimeUtil.parseCategoryDateFull(date25);
+        const instant25 = TimeUtil.parseCategoryDateFull(date25) + TimeUtil.MILLISECONDS_PER____DAY / 2;
 
         const subratio = 0.20;
 
@@ -310,9 +310,9 @@ export class ModelStateFitter5 {
             const correctionCorrection = ageGroups.length * 0.5 / correctionTotal;
             const correctionUdate: { [x: string]: number } = {};
 
-            // this will normalize values around an average value of 0.5, values truncated at 1 (in which case normalization may not be centered at 0.5, until re-normalized in subsequent runs)
+            // this will normalize values around an average value of 0.5, values truncated at 0.85 (in which case normalization may not be centered at 0.5, until re-normalized in subsequent runs)
             ageGroups.forEach(ageGroup => {
-                correctionUdate[ageGroup.getName()] = Math.min(0.9, modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection);
+                correctionUdate[ageGroup.getName()] = Math.min(0.85, modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection);
             });
             modificationDiscovery.acceptUpdate({
                 corrections: correctionUdate

@@ -55,10 +55,6 @@ export interface IBaseDataItem {
     setVariantShareBA5(variantShareBA5: number): void;
     getVariantShareBA5(ageGroupIndex: number): number;
 
-    // getAverageMobilityOther(): number;
-    // getAverageMobilityWork(): number;
-    // getAverageMobilityHome(): number;
-
     extrapolateBaseDataItemConfig(): IBaseDataItemConfig;
 
 }
@@ -87,11 +83,6 @@ export class BaseDataItem implements IBaseDataItem {
     private variantShareBA1: number;
     private variantShareBA2: number;
     private variantShareBA5: number;
-
-    // private averageMobilityOther: number;
-    // private averageMobilityWork: number;
-    // private averageMobilityHome: number;
-
 
     constructor(instant: number, itemConfig: IBaseDataItemConfig) {
         this.instant = instant;
@@ -221,9 +212,6 @@ export class BaseDataItem implements IBaseDataItem {
 
                 const ratioHelp00 = ratioHelpM7 / ratioHelpM81;
 
-                // this.averageHelp2[ageGroup.getIndex()] = this.averageHelp1[ageGroup.getIndex()] / ratioHelp00;
-                // this.averageCases[ageGroup.getIndex()] = (this.averageHelp1[ageGroup.getIndex()] + this.averageHelp2[ageGroup.getIndex()]) / 7;
-
                 baseDateItemConfig[ageGroup.getName()] = [dataItemP3.getExposed(ageGroup.getName()) + this.averageHelp1[ageGroup.getIndex()] * 4 / ratioHelp00];
 
             });
@@ -274,56 +262,6 @@ export class BaseDataItem implements IBaseDataItem {
                 }
             }
 
-            // this.averageMobilityOther = this.getMobilityOther();
-            // this.averageMobilityWork = this.getMobilityWork();
-            // this.averageMobilityHome = this.getMobilityHome();
-
-            // let mobilityOtherValues: number[] = [];
-            // let mobilityWorkValues: number[] = [];
-            // let mobilityHomeValues: number[] = [];
-
-            // if (this.getMobilityOther()) {
-            //     mobilityOtherValues.push(this.getMobilityOther());
-            // }
-            // if (this.getMobilityWork()) {
-            //     mobilityWorkValues.push(this.getMobilityWork());
-            // }
-            // if (this.getMobilityHome()) {
-            //     mobilityHomeValues.push(this.getMobilityHome());
-            // }
-
-            // const dataItemMI = BaseData.getInstance().findBaseDataItem(this.instant - TimeUtil.MILLISECONDS_PER____DAY);
-            // const dataItemPI = BaseData.getInstance().findBaseDataItem(this.instant + TimeUtil.MILLISECONDS_PER____DAY);
-            // if (dataItemMI.getMobilityOther() && dataItemPI.getMobilityOther()) {
-            //     mobilityOtherValues.push(dataItemMI.getMobilityOther());
-            //     mobilityOtherValues.push(dataItemPI.getMobilityOther());
-            // }
-            // if (dataItemMI.getMobilityWork() && dataItemPI.getMobilityWork()) {
-            //     mobilityWorkValues.push(dataItemMI.getMobilityWork());
-            //     mobilityWorkValues.push(dataItemPI.getMobilityWork());
-            // }
-            // if (dataItemMI.getMobilityHome() && dataItemPI.getMobilityHome()) {
-            //     mobilityHomeValues.push(dataItemMI.getMobilityHome());
-            //     mobilityHomeValues.push(dataItemPI.getMobilityHome());
-            // }
-
-            // mobilityOtherValues.sort((a, b) => a - b);
-            // mobilityWorkValues.sort((a, b) => a - b);
-            // mobilityHomeValues.sort((a, b) => a - b);
-
-            // if (mobilityOtherValues.length > 2) {
-            //     this.averageMobilityOther = mobilityOtherValues.reduce((a, b) => a + b, 0) / mobilityOtherValues.length;
-            // }
-            // if (mobilityWorkValues.length > 2) {
-            //     this.averageMobilityWork = mobilityWorkValues.reduce((a, b) => a + b, 0) / mobilityWorkValues.length;
-            // }
-            // if (mobilityHomeValues.length > 2) {
-            //     this.averageMobilityHome = mobilityHomeValues.reduce((a, b) => a + b, 0) / mobilityHomeValues.length;
-            // }
-
-
-            // console.log(TimeUtil.formatCategoryDateFull(this.instant), this.averageMobilityOther, mobilityOtherValues);
-
         }
 
     }
@@ -363,18 +301,6 @@ export class BaseDataItem implements IBaseDataItem {
     getTestsM7(): number {
         return this.testsM7;
     }
-
-    // getAverageMobilityOther(): number {
-    //     return this.averageMobilityOther;
-    // }
-
-    // getAverageMobilityWork(): number {
-    //     return this.averageMobilityWork;
-    // }
-
-    // getAverageMobilityHome(): number {
-    //     return this.averageMobilityHome;
-    // }
 
     getAveragePositivity(): number {
         return this.averagePositivity;

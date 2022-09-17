@@ -84,12 +84,6 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
 
     }
 
-    // collectBasicRegressionInput(): DataPoint[] {
-
-    //     const result:DataPoint[] = [];
-
-    // }
-
     collectLoessPredictionInput(): ILoessInput {
 
         const xValues: number[] = [];
@@ -402,8 +396,6 @@ export abstract class ValueRegressionBase<M extends IModification<IModificationV
         }
 
     }
-
-
 
     getRegressionResult(instant: number): IRegressionResult {
 

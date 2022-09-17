@@ -40,14 +40,6 @@ export class ModificationResolverDiscovery extends AModificationResolver<IModifi
             const modificationValuesA = modificationA.getModificationValues();
             const modificationValuesB = modificationB.getModificationValues();
 
-            // const mergedKeys: Set<string> = new Set();
-            // Object.keys(modificationValuesA.corrections).forEach(key => {
-            //     mergedKeys.add(key);
-            // });
-            // Object.keys(modificationValuesB.corrections).forEach(key => {
-            //     mergedKeys.add(key);
-            // });
-
             const fraction = (instant - modificationValuesA.instant) / (modificationValuesB.instant - modificationValuesA.instant);
 
             const corrections: { [K: string]: number } = {};

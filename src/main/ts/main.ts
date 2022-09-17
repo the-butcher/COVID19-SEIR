@@ -16,6 +16,16 @@ import { ValueRegressionBase } from './model/regression/ValueRegressionBase';
 import { Logger } from './util/Logger';
 import { TimeUtil } from './util/TimeUtil';
 
+/**
+ * parameters that are kept in the code (and may be incorporated into the configuration at a later time)
+ *
+ * - variant takeover dates in ModelStateFitter~260
+ * - variant shares measured from ellings graphics BaseData~290
+ * - global contact matrix correction Demographics~85
+ * - global undedected ModelImplStrain~55
+ * - global vacc ratios ModelImplRoot~95
+ */
+
 StorageUtil.getInstance().loadConfig().then(modelConfig => {
 
     const modificationValuesSettings = modelConfig.model_modifications.find(m => m.key === 'SETTINGS') as IModificationValuesSettings;
