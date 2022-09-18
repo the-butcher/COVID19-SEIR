@@ -215,7 +215,7 @@ export class ChartDiscoveryRate {
         const chartData: IChartDataDiscoveryRate[] = [];
         // const ageGroups = demographics.getAgeGroups();
 
-        for (let positivity = 0; positivity <= 1.0; positivity += 0.01) {
+        for (let positivity = 0; positivity <= 1.0; positivity += 0.001) {
 
             const chartEntry = {
                 positivity: positivity,

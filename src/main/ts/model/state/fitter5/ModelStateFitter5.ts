@@ -81,7 +81,7 @@ export class ModelStateFitter5 {
         const correctionUdate: { [x: string]: number } = {};
         modificationsDiscovery.slice(2).forEach(modificationDiscovery => {
 
-            // do not update descovery beyond regression
+            // do not update discovery beyond regression
             if (modificationDiscovery.getInstantA() <= BaseData.getInstance().getLastValidInstant() - TimeUtil.MILLISECONDS_PER____DAY * 0) {
 
                 ageGroups.forEach(ageGroup => {
@@ -301,6 +301,8 @@ export class ModelStateFitter5 {
 
         const normalize = (modificationDiscovery: ModificationDiscovery) => {
 
+            const maxCorrectionValue = 0.8; // Math.min(1, 0.03 / modificationDiscovery.getTestRate());
+
             // const totalDiscoveryRate = StrainUtil.calculateDiscoveryRate(modificationDiscovery.getPositivityRate(), modificationDiscovery.getTestRate(), ModificationSettings.getInstance().getModificationValues());
 
             let correctionTotal = 0;
@@ -310,14 +312,14 @@ export class ModelStateFitter5 {
             const correctionCorrection = ageGroups.length * 0.5 / correctionTotal;
             const correctionUdate: { [x: string]: number } = {};
 
-            // this will normalize values around an average value of 0.5, values truncated at 0.85 (in which case normalization may not be centered at 0.5, until re-normalized in subsequent runs)
+            // this will normalize values around an average value of 0.5, values truncated (in which case normalization may not be centered at 0.5, until re-normalized in subsequent runs)
             ageGroups.forEach(ageGroup => {
-                correctionUdate[ageGroup.getName()] = Math.min(0.85, modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection);
+                correctionUdate[ageGroup.getName()] = Math.min(0.8, modificationDiscovery.getCorrectionValue(ageGroup.getIndex()) * correctionCorrection);
             });
             modificationDiscovery.acceptUpdate({
                 corrections: correctionUdate
             });
-            // console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionUdate);
+            console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionUdate, maxCorrectionValue);
 
         };
 

@@ -48,7 +48,7 @@ export class ControlsSettings {
         this.chartTesting = new ChartDiscoveryRate('chartDiscoveryRateDiv', 0.00, 1.01, ControlsConstants.LABEL_PERCENT__FLOAT_2, ControlsConstants.LABEL_PERCENT__FLOAT_2);
 
         // this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        // this.sliderPow2 = new SliderSetting("exponent", [0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        // this.sliderPow2 = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.25], 0.001, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         this.sliderPow2 = new SliderSetting("exponent", [5.0, 15.0], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
