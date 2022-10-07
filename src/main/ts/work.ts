@@ -59,12 +59,19 @@ ctx.addEventListener("message", async (event: MessageEvent) => {
          */
         const modificationValuesDiscovery = modificationValues.find(m => m.key === 'TESTING') as IModificationValuesDiscovery;
         modificationValues.filter(m => m.key === 'STRAIN').forEach((modificationValuesStrain: IModificationValuesStrain) => {
+            // console.log('modificationValuesStrain 1', modificationValuesStrain);
+            // if (modificationValuesStrain.transmissionRisk < 0) {
             StrainCalibrator.calibrate(Demographics.getInstance(), modificationValuesStrain, modificationValuesDiscovery, BaseData.getInstance());
+            // }
+            // console.log('modificationValuesStrain 2', modificationValuesStrain);
         });
 
         // recreate singleton, since the calibrator changes things
         Modifications.setInstanceFromValues(modificationValues);
+
+        console.log('reset discovery regression (1)');
         ModificationResolverDiscovery.resetRegression();
+        console.log('reset discovery regression (2)');
 
         const modelStateIntegrator = await ModelImplRoot.setupInstance(Demographics.getInstance(), Modifications.getInstance(), BaseData.getInstance(), modelProgress => {
             ctx.postMessage(modelProgress);

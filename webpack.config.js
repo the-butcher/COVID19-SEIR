@@ -21,6 +21,7 @@ module.exports = {
     work__ts: "./src/main/ts/work.ts",
     main_css: "./src/main/webapp/css/main.css",
     mort__ts: "./src/main/ts/mort.ts",
+    co2___ts: "./src/main/ts/co2.ts",
   },
   output: {
     path: $path.join(__dirname, "dist"),
@@ -127,6 +128,18 @@ module.exports = {
   },
   plugins: [
 
+    new HtmlWebPackPlugin({
+      title: "CO2",
+      template: "./src/main/webapp/co2.html",
+      filename: "./co2.html",
+      chunksSortMode: "none",
+      //hash: true,
+      chunks: [
+        "co2___ts",
+        "main_css"
+      ],
+      inlineSource: ".(css)$"
+    }),
     new HtmlWebPackPlugin({
       title: "COVID19-SEIR",
       template: "./src/main/webapp/mortality.html",

@@ -32,6 +32,7 @@ export class ControlsSettings {
 
     private sliderPow1: SliderSetting;
     private sliderPow2: SliderSetting;
+    private sliderPow3: SliderSetting;
 
     // private sliderUndetected: SliderSetting;
     private sliderQuarantine: SliderSetting;
@@ -50,8 +51,12 @@ export class ControlsSettings {
         // this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         // this.sliderPow2 = new SliderSetting("exponent", [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
-        this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.25], 0.001, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
-        this.sliderPow2 = new SliderSetting("exponent", [5.0, 15.0], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        // this.sliderPow1 = new SliderSetting("exponent", [0.0, 0.25], 0.001, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        // this.sliderPow2 = new SliderSetting("exponent", [5.0, 15.0], 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+
+        this.sliderPow1 = new SliderSetting("exponent", [0.0, 1.0], 0.001, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderPow2 = new SliderSetting("slope (base)", [0.0, 1.0], 0.001, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
+        this.sliderPow3 = new SliderSetting("slope (scale)", [0.0, 10.0], 0.01, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
 
         // this.sliderUndetected = new SliderSetting("undetected (multiplier)", ModelConstants.RANGE________UNDETECTED, 0.1, false, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
         this.sliderQuarantine = new SliderSetting("quarantine (reduction)", ModelConstants.RANGE____PERCENTAGE_100, 0.01, true, 'slidersSettingsDiv', () => ControlsSettings.getInstance().handleChange());
@@ -139,6 +144,7 @@ export class ControlsSettings {
 
         const pow1 = this.sliderPow1.getValue();
         const pow2 = this.sliderPow2.getValue();
+        const pow3 = this.sliderPow3.getValue();
         // const undetected = this.sliderUndetected.getValue();
         const quarantine = this.sliderQuarantine.getValue();
         // const reexposure = this.sliderReexposure.getValue();
@@ -148,6 +154,7 @@ export class ControlsSettings {
         this.modification.acceptUpdate({
             pow: pow1,
             pow2,
+            pow3,
             // undetected,
             quarantine,
             reexposure: this.timeToWane,
@@ -167,6 +174,7 @@ export class ControlsSettings {
 
         this.sliderPow1.setValue(this.modification.getPow1() || 0.5);
         this.sliderPow2.setValue(this.modification.getPow2() || 0.75);
+        this.sliderPow3.setValue(this.modification.getPow3() || 1);
         // this.sliderUndetected.setValue(this.modification.getInitialUndetected());
         this.sliderQuarantine.setValue(this.modification.getQuarantine(-1)); // TODO - deprecate the slider, then introduce a contact category specific setting and calculate a value from there
 

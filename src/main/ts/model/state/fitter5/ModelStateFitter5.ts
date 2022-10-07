@@ -257,15 +257,15 @@ export class ModelStateFitter5 {
          * adjust initial variant incidences to reach certain dates where the respective variantes become dominant
          */
 
-        const dateD1 = "29.12.2021";
-        const date12 = "25.02.2022";
-        const date25 = "04.06.2022";
+        // const dateD1 = "29.12.2021";
+        // const date12 = "25.02.2022";
+        // const date25 = "04.06.2022";
 
         const modificationsStrain = new ModificationResolverStrain().getModifications();
 
-        const instantD1 = TimeUtil.parseCategoryDateFull(dateD1);
-        const instant12 = TimeUtil.parseCategoryDateFull(date12);
-        const instant25 = TimeUtil.parseCategoryDateFull(date25) + TimeUtil.MILLISECONDS_PER____DAY / 2;
+        const instantD1 = TimeUtil.parseCategoryDateFull("29.12.2021");
+        const instant12 = TimeUtil.parseCategoryDateFull("25.02.2022");
+        const instant25 = TimeUtil.parseCategoryDateFull("04.06.2022");
 
         const subratio = 0.20;
 
@@ -294,6 +294,7 @@ export class ModelStateFitter5 {
             const casesBa225 = dataItem25.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[2].getId()];
             const casesBa525 = dataItem25.valueset[ModelConstants.AGEGROUP_NAME_______ALL].CASES[modificationsStrain[3].getId()];
             const ratio25 = (casesBa525 / casesBa225 - 1) * subratio + 1;
+            console.log('ratio25', ratio25);
             modificationsStrain[3].acceptUpdate({
                 dstIncidence: modificationsStrain[3].getIncidence() / ratio25
             });
@@ -319,7 +320,7 @@ export class ModelStateFitter5 {
             modificationDiscovery.acceptUpdate({
                 corrections: correctionUdate
             });
-            console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionUdate, maxCorrectionValue);
+            // console.log(TimeUtil.formatCategoryDateFull(modificationDiscovery.getInstantA()), correctionUdate, maxCorrectionValue);
 
         };
 

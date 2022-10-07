@@ -170,6 +170,7 @@ export class ChartAgeGroup {
     protected readonly seriesVariantShareBA1: ChartAgeGroupSeries;
     protected readonly seriesVariantShareBA2: ChartAgeGroupSeries;
     protected readonly seriesVariantShareBA5: ChartAgeGroupSeries;
+    protected readonly seriesVariantShareB__: ChartAgeGroupSeries;
 
 
     /**
@@ -647,6 +648,26 @@ export class ChartAgeGroup {
             seriesConstructor: () => new LineSeries()
         });
         this.seriesVariantShareDelta.bindToLegend(this.seriesVariantShareBA5);
+        this.seriesVariantShareB__ = new ChartAgeGroupSeries({
+            chart: this.chart,
+            yAxis: this.yAxisPlotAbsolute,
+            title: 'share B_._',
+            baseLabel: 'share B_._',
+            valueField: 'variantShareB__',
+            colorKey: 'VACCINATION',
+            strokeWidth: 1,
+            dashed: false,
+            locationOnPath: 0.60,
+            labels: {
+                tooltip: false,
+                pathtip: false
+            },
+            stacked: false,
+            legend: false,
+            labellingDefinition: ControlsConstants.LABEL_ABSOLUTE_FIXED,
+            seriesConstructor: () => new LineSeries()
+        });
+        this.seriesVariantShareDelta.bindToLegend(this.seriesVariantShareB__);
 
         this.seriesAgeGroupCasesN = new ChartAgeGroupSeries({
             chart: this.chart,
@@ -1704,6 +1725,7 @@ export class ChartAgeGroup {
         this.seriesVariantShareBA1.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesVariantShareBA2.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesVariantShareBA5.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
+        this.seriesVariantShareB__.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
 
         this.seriesPositivityRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
         this.seriesTestRate.setSeriesNote(ModelConstants.AGEGROUP_NAME_______ALL);
@@ -2116,6 +2138,7 @@ export class ChartAgeGroup {
         this.seriesVariantShareBA1.setVisible(visible);
         this.seriesVariantShareBA2.setVisible(visible);
         this.seriesVariantShareBA5.setVisible(visible);
+        this.seriesVariantShareB__.setVisible(visible);
 
         this.seriesAgeGroupCasesByStrain.forEach(seriesAgeGroupCases => {
             seriesAgeGroupCases.setVisible(visible);
@@ -2329,6 +2352,7 @@ export class ChartAgeGroup {
 
             requestAnimationFrame(() => {
                 this.yAxisPlotIncidence.min = 0;
+                // this.yAxisPlotIncidence.max = 7000;
                 this.yAxisPlotIncidence.max = maxIncidence * 1.05;
                 // this.applyMaxHeat(maxIncidence);
                 // console.log('maxIncidence', maxIncidence);
@@ -2758,6 +2782,7 @@ export class ChartAgeGroup {
             let variantShareBA1 = null;
             let variantShareBA2 = null;
             let variantShareBA5 = null;
+            let variantShareB__ = null;
 
             const dataItem00 = BaseData.getInstance().findBaseDataItem(instant);
             if (dataItem00) {
@@ -2784,6 +2809,7 @@ export class ChartAgeGroup {
                 variantShareBA1 = dataItem00.getVariantShareBA1(ageGroupPlot.getIndex());
                 variantShareBA2 = dataItem00.getVariantShareBA2(ageGroupPlot.getIndex());
                 variantShareBA5 = dataItem00.getVariantShareBA5(ageGroupPlot.getIndex());
+                variantShareB__ = dataItem00.getVariantShareB__(ageGroupPlot.getIndex());
 
             } else {
                 // console.log('no data found', categoryX);
@@ -2802,7 +2828,8 @@ export class ChartAgeGroup {
                 variantShareDelta,
                 variantShareBA1,
                 variantShareBA2,
-                variantShareBA5
+                variantShareBA5,
+                variantShareB__
             }
 
             baseData.push(item);
@@ -2841,6 +2868,7 @@ export class ChartAgeGroup {
         this.applyData(this.seriesVariantShareBA1, baseData);
         this.applyData(this.seriesVariantShareBA2, baseData);
         this.applyData(this.seriesVariantShareBA5, baseData);
+        this.applyData(this.seriesVariantShareB__, baseData);
 
         // this.applyData(this.seriesIcuR, baseData);
 

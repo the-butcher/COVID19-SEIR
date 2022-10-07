@@ -386,6 +386,7 @@ export class ControlsStrain {
             immuneEscape: this.immuneEscape,
             strainEscape: { ...this.strainEscape },
             timeToWane: this.timeToWane,
+            transmissionRisk: -1
         });
 
         SliderModification.getInstance().indicateUpdate(this.modification.getId());

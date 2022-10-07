@@ -50,4 +50,9 @@ export class ModificationSettings extends AModification<IModificationValuesSetti
     getPow2(): number {
         return this.modificationValues.pow2;
     }
+
+    getPow3(): number {
+        return this.modificationValues.pow3;
+    }
+
 }

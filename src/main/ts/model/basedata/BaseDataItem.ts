@@ -55,6 +55,9 @@ export interface IBaseDataItem {
     setVariantShareBA5(variantShareBA5: number): void;
     getVariantShareBA5(ageGroupIndex: number): number;
 
+    setVariantShareB__(variantShareB__: number): void;
+    getVariantShareB__(ageGroupIndex: number): number;
+
     extrapolateBaseDataItemConfig(): IBaseDataItemConfig;
 
 }
@@ -83,6 +86,7 @@ export class BaseDataItem implements IBaseDataItem {
     private variantShareBA1: number;
     private variantShareBA2: number;
     private variantShareBA5: number;
+    private variantShareB__: number;
 
     constructor(instant: number, itemConfig: IBaseDataItemConfig) {
         this.instant = instant;
@@ -388,6 +392,16 @@ export class BaseDataItem implements IBaseDataItem {
     getVariantShareBA5(ageGroupIndex: number): number {
         if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex() && this.variantShareBA5) {
             return this.variantShareBA5 * this.getAverageCases(ageGroupIndex);
+        }
+    }
+
+    setVariantShareB__(variantShareB__: number): void {
+        this.variantShareB__ = variantShareB__;
+    }
+
+    getVariantShareB__(ageGroupIndex: number): number {
+        if (ageGroupIndex == Demographics.getInstance().getAgeGroupTotal().getIndex() && this.variantShareB__) {
+            return this.variantShareB__ * this.getAverageCases(ageGroupIndex);
         }
     }
 

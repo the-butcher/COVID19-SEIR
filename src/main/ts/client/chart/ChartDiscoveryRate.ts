@@ -13,11 +13,6 @@ import { ChartUtil } from './ChartUtil';
 
 export interface IChartDataDiscoveryRate {
     positivity: number;
-    // discoveryAv: number;
-    // discoveryLo: number;
-    // discoveryHi: number;
-    // labelLo: string;
-    // labelHi: string;
     discoveryEx01?: number;
     discoveryEx02?: number;
     discoveryEx03?: number;

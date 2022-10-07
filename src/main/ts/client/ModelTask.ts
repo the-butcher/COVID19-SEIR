@@ -128,6 +128,9 @@ export class ModelTask {
                     const modificationStrain = Modifications.getInstance().findModificationById(modificationValuesStrain.id) as ModificationStrain;
                     // console.log(modificationContact.getId(), TimeUtil.formatCategoryDate(modificationContact.getInstant()), modificationValuesContact.multipliers);
                     modificationStrain.acceptUpdate({
+                        r0: modificationValuesStrain.r0,
+                        preIncidences: modificationValuesStrain.preIncidences,
+                        transmissionRisk: modificationValuesStrain.transmissionRisk,
                         dstIncidence: modificationValuesStrain.dstIncidence
                     });
                     // StorageUtil.getInstance().setSaveRequired(true);

@@ -10,4 +10,9 @@ export interface IDiscoveryValueSet {
      */
     pow2: number;
 
+    /**
+     * the exponent (3) of the discovery function
+     */
+    pow3: number;
+
 }

@@ -84,7 +84,7 @@ export class ModelImplRoot implements IModelSeir {
 
         const modificationTime = modifications.findModificationsByType('TIME')[0] as ModificationTime;
         modificationTime.setInstants(ModelInstants.getInstance().getPreInstant(), ModelInstants.getInstance().getPreInstant());
-        const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
+        // const modificationSettings = modifications.findModificationsByType('SETTINGS')[0] as ModificationSettings;
 
         this.demographics = demographics;
         modifications.findModificationsByType('STRAIN').forEach((modificationStrain: ModificationStrain) => {

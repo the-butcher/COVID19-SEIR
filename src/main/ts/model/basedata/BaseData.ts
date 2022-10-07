@@ -356,6 +356,13 @@ export class BaseData {
         this.findBaseDataItem(TimeUtil.parseCategoryDateFull("13.07.2022")).setVariantShareBA5(0.969910);
         this.findBaseDataItem(TimeUtil.parseCategoryDateFull("20.07.2022")).setVariantShareBA5(0.987964);
 
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("15.06.2022")).setVariantShareB__(0.000001);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("31.08.2022")).setVariantShareB__(0.12);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("21.09.2022")).setVariantShareB__(0.19);
+        this.findBaseDataItem(TimeUtil.parseCategoryDateFull("28.09.2022")).setVariantShareB__(0.26);
+        // this.findBaseDataItem(TimeUtil.parseCategoryDateFull("05.10.2022")).setVariantShareB__(0.33);
+
+
     }
 
     getAverageOffset(ageGroupIndex: number, instant: number): number | undefined {

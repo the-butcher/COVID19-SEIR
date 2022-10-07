@@ -249,8 +249,6 @@ export class ModelImplStrain implements IModelSeir {
             result.add(recoveryModel.apply(state, dT, tT, modificationTime));
         });
 
-
-
         return result;
 
     }

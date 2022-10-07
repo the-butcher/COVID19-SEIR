@@ -22,9 +22,6 @@ export class ModelState implements IModelState {
 
     private constructor(valuesByCompartments: Map<ICompartment, number>) {
         this.valuesByCompartments = new Map(valuesByCompartments);
-        // valuesByCompartments.forEach((value, key) => {
-        //     this.valuesByCompartments.set(key, value);
-        // })
     }
 
     toJSON(): { [K: string]: number } {

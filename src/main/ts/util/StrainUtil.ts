@@ -103,6 +103,8 @@ export class StrainUtil {
 
     /**
      * https://www.desmos.com/calculator/rbpwsqinxl
+     * https://www.desmos.com/calculator/kz4ty70brt
+     * https://www.desmos.com/calculator/lfqtfte34f + pow3
      * @param positivityRate
      * @param t1
      * @param discoveryValueSet
@@ -110,28 +112,36 @@ export class StrainUtil {
      */
     static calculateDiscoveryRate(positivityRate: number, t1: number, discoveryValueSet: IDiscoveryValueSet): number {
 
+        const p1 = discoveryValueSet.pow;
+        const p2 = discoveryValueSet.pow2;
+        const p3 = discoveryValueSet.pow3;
+        const p23 = p2 + t1 * p3;
+
+        const t0 = 1 - p23;
+
+        const i1 = Math.pow(positivityRate, p1) * t0 / t1;
+        const r1 = t0 / (1 - positivityRate + i1);
+        const r2 = p23 * (1 - positivityRate);
+
+        return r1 + r2;
+
         // const t0 = 1;
 
         // // // p=7
         // const p1 = discoveryValueSet.pow;
         // const p2 = discoveryValueSet.pow2;
-
         // // // c=x\cdot t_{1}
         // const c1 = positivityRate * t1;
-
         // // // i=\left(1-x\right)+\frac{x}{t_{1}}
         // const i = (1 - positivityRate) + Math.pow(positivityRate, p2) / t1;
-
         // // // i^{-p}\cdot\left(1-x\right)+c_{1}
         // const c2 = Math.pow(i, -p1) * (1 - positivityRate) * (t0 - t1);
-
         // // const discoveryRate = Math.pow(i, -p1) * (1 - positivityRate) + c1;
-
         // return c1 + c2;
 
-        const t0 = t1 * discoveryValueSet.pow2 + discoveryValueSet.pow;
-        const d = t0 - positivityRate * (t0 - t1);
-        return d;
+        // const t0 = Math.pow(t1 * discoveryValueSet.pow2 + discoveryValueSet.pow, 2.00);
+        // const d = t0 - positivityRate * (t0 - t1); // t1
+        // return d;
 
     }
 

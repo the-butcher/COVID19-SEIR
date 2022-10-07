@@ -158,7 +158,7 @@ export class ModelConstants {
     static readonly RANGE____PERCENTAGE_100 = [0.00, 0.25, 0.50, 0.75, 1.00];
     static readonly RANGE____PERCENTAGE__10 = [0.0, 0.1];
     static readonly RANGE____PERCENTAGE__25 = [0.00, 0.25, 0.5, 0.75, 1.0];
-    static readonly RANGE________REEXPOSURE = [0, 3, 6, 9, 12, 15];
+    static readonly RANGE________REEXPOSURE = [0, 3, 6, 9, 12, 15, 18];
     static readonly RANGE________INCUBATION = [1, 7, 14];
     static readonly RANGE____INCIDENCE_1000 = [0, 250, 500, 750, 1000];
     static readonly RANGE_____INCIDENCE__10 = [0, 2, 4, 6, 8, 10];
