@@ -121,7 +121,6 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             //             ]
             //         }
             //         // console.log(ageGroup.getName(), modificationRegression.getCorrectionRegression(lastModificationContact.getInstant(), ageGroup.getName()));
-
             //     });
 
             //     modificationRegression.acceptUpdate({
@@ -136,7 +135,6 @@ StorageUtil.getInstance().loadConfig().then(modelConfig => {
             //             corrections
             //         });
             //     });
-
             // }
 
             // const modificationsContact = new ModificationResolverContact().getModifications();
